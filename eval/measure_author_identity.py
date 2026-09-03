@@ -1,9 +1,9 @@
 """
-PER-170 근거 측정 — 작성자 식별자 방침 (중복 게이트 vs PII 드롭).
+PER-170 근거 측정 — 작성자 식별자 방침 (게이트2 중복 판정 키).
 
-세 옵션의 비용을 같은 스냅샷에서 실측한다.
-  1) 입수 시점 솔트 해시 (authorHash)
-  2) userName + profileImageUrl 조합
+식별자 후보의 비용을 같은 스냅샷에서 실측한다.
+  1) userName 원문을 키로 (채택)
+  2) userName + profileImageUrl 조합키
   3) 작성자 1표 포기 (본문 해시 중복만 처리)
 
 측정 항목은 결정 문서 docs/DECISION_PER170_AUTHOR_IDENTIFIER.md 의 표와 1:1 대응한다.
@@ -12,13 +12,12 @@ PER-170 근거 측정 — 작성자 식별자 방침 (중복 게이트 vs PII �
   .venv/bin/python eval/measure_author_identity.py
   → eval/reports/author_identity_per170.json
 
-주의: 입력 스냅샷에는 userName·profileImageUrl(PII)이 남아 있다.
-이 스크립트는 집계 수치만 출력하고 원문 값은 리포트에 쓰지 않는다.
+리포트에는 집계 수치만 담는다 — 닉네임·URL 원문 값은 쓰지 않는다(리포트를 짧게 유지하기 위한 것이고,
+분리 후보 플래그처럼 사람이 확인해야 하는 목록은 개수만 싣고 상세는 재실행으로 뽑는다).
 """
 import argparse
 import collections
 import hashlib
-import hmac
 import json
 import statistics as st
 import unicodedata
@@ -28,16 +27,10 @@ ROOT = Path(__file__).parents[1]
 DEFAULT_INPUT = ROOT / "data/input/reviews_50products.json"
 DEFAULT_OUTPUT = ROOT / "eval/reports/author_identity_per170.json"
 
-# 결정된 해시 규격의 참조 구현 (입수 코드는 PER-173에서 이 규격을 그대로 쓴다).
-# 솔트는 저장소에 넣지 않는다 — 측정에서는 충돌 여부만 보므로 고정 더미로 충분하다.
-MEASURE_SALT = b"PER170-MEASUREMENT-ONLY"
-HASH_HEX_LEN = 16
 
-
-def author_hash(user_name: str, salt: bytes = MEASURE_SALT, hex_len: int = HASH_HEX_LEN) -> str:
-    """HMAC-SHA256(salt, NFC(userName)) 앞 16 hex. 원문은 저장하지 않는다."""
-    msg = unicodedata.normalize("NFC", user_name).encode("utf-8")
-    return hmac.new(salt, msg, hashlib.sha256).hexdigest()[:hex_len]
+def author_key(user_name: str) -> str:
+    """결정된 작성자 키 (PER-170): 원문을 쓰고 유니코드 표현만 NFC로 고정한다."""
+    return unicodedata.normalize("NFC", user_name)
 
 
 def content_hash(content: str) -> str:
@@ -188,20 +181,19 @@ def measure(reviews: list[dict]) -> dict:
         "skinTypeConflictSpanMonthsMax": max(spans) if spans else None,
         "sameMonthSkinTypeConflictAuthors": same_month_conflict,
         "sameMonthSkinTypeConflictPctOfMultiAuthors": pct(same_month_conflict, len(multi)),
+        # 감사 규칙 (결정 문서 §5): 한 이름에 서로 다른 URL이 2개 이상이면 분리 후보로 플래그한다.
+        # 0이 아니게 되는 순간 게이트2의 병합 규칙을 재검토한다.
+        "authorSplitCandidates": len(multi_two_imgs),
     }
 
-    # --- 5. 해시 규격 검증 ---
-    nfc_mismatch = [k for k in by_name if unicodedata.normalize("NFC", k) != k]
-    collisions = {}
-    for hex_len in (8, 12, 16, 32):
-        hashes = {author_hash(k, hex_len=hex_len) for k in by_name}
-        collisions[f"{hex_len}hex"] = len(by_name) - len(hashes)
-    hash_spec = {
-        "algorithm": "HMAC-SHA256(salt, NFC(userName))[:16]",
+    # --- 5. 키 규격 검증 ---
+    nfc_mismatch = [k for k in by_name if author_key(k) != k]
+    key_spec = {
+        "authorKey": "NFC(userName)",
         "emptyUserNames": sum(1 for r in reviews if not (r["userName"] or "").strip()),
         "namesNotNfc": len(nfc_mismatch),
+        "namesMergedByNfc": len(by_name) - len({author_key(k) for k in by_name}),
         "namesMergedByStripLower": len(by_name) - len({k.strip().lower() for k in by_name}),
-        "collisionsByHexLength": collisions,
         "nameLength": {
             "min": min(len(k) for k in by_name),
             "median": st.median([len(k) for k in by_name]),
@@ -234,7 +226,7 @@ def measure(reviews: list[dict]) -> dict:
         "option3_dropAuthorVote": option3,
         "option2_profileImageUrl": option2,
         "homonymRisk": homonym,
-        "option1_hashSpec": hash_spec,
+        "option1_authorKeySpec": key_spec,
         "downstreamSufficiencyGate": downstream,
     }
 

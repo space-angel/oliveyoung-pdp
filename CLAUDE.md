@@ -11,8 +11,8 @@
 - `data/intermediate/`, `data/cache/` 는 gitignore. 재실행하면 다시 생긴다.
 - `data/output/` 과 `eval/reports/` 는 **커밋한다.** 평가 수치의 1차 근거다.
 - 집계 단위는 `productKey`(50개)다. `goodsNo`(153개)는 변형 SKU가 섞인 단위이므로 그룹핑 키로 쓰지 않는다.
-- **작성자 식별자는 `authorHash`뿐이다** (PER-170 확정). 입수 파서가 `HMAC-SHA256(AUTHOR_HASH_SALT, NFC(userName))[:16]`로 바꿔 넣고 `userName` 원문은 저장하지 않는다. `profileImageUrl`·`reviewImages`는 드롭. 중복 판정 단위는 `(authorHash, productKey)`이고 근거 카운트는 고유 `authorHash` 수를 센다. 근거·한계는 `docs/DECISION_PER170_AUTHOR_IDENTIFIER.md`.
-- v5 파이프라인은 `data/input/reviews_50products.json`(PII 포함 원본)을 직접 읽지 않는다. 비식별 파생본만 입력으로 받고, PII 필드가 남아 있으면 **에러를 낸다** — 조용히 드롭하지 않는다.
+- **작성자 키는 `NFC(userName)` 원문이다** (PER-170 확정). 중복 판정 단위는 `(작성자 키, productKey)`이고 근거 카운트는 리뷰 수가 아니라 **고유 작성자 수**를 센다. 게이트를 안 걸면 카운트가 코퍼스의 19.7% 부풀고, 본문 해시는 그 중 12.1%만 잡는다. 근거·한계는 `docs/DECISION_PER170_AUTHOR_IDENTIFIER.md`.
+- `profileImageUrl`은 키에 넣지 않고 **감사 필드로 유지한다.** 한 이름에 서로 다른 URL이 2개 이상 나타나면 분리 후보로 플래그하되 자동 분리는 하지 않는다 (현 스냅샷 0건).
 
 ## 서술 규칙 — 이게 포트폴리오 방어선이다
 
@@ -24,5 +24,4 @@
 
 - v5 변경은 v4 베이스라인 위에 쌓는다. `git log -p`가 개선 근거이므로, 무관한 정리와 로직 변경을 한 커밋에 섞지 않는다.
 - `.env` 는 절대 커밋하지 않는다. 키가 필요하면 `.env.example` 을 갱신한다.
-- 커밋된 원본 스냅샷 3개(`reviews_50products.json`, `reviews_200_normalized.json`, `v4_reviews_500.json`)에는 `userName`·`profileImageUrl`·`reviewImages`가 남아 있다. read-only 규칙에 따라 그대로 두되, **이 저장소는 비공개 유지가 전제다.** 원격 공개 전환은 파일 삭제로 부족하고 `9ea3ade`를 포함한 히스토리 재작성이 필요하다.
-- `AUTHOR_HASH_SALT`는 `.env`에만 둔다. 솔트가 바뀌면 스냅샷 간 `authorHash`가 달라져 중복 판정이 깨지므로, 교체 시 `AUTHOR_HASH_VERSION`을 올리고 전체 재해시한다.
+- 리뷰 데이터의 `userName`·`profileImageUrl`은 프로덕션 PDP에 그대로 노출되는 값이고 개인정보법상 제약이 없음을 확인했다 (2026-09-03). 중복 판정에 필요하므로 드롭하지 않는다.

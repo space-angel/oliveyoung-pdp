@@ -77,19 +77,15 @@
     "skinTypeConflictSpanMonthsMedian": 18,
     "skinTypeConflictSpanMonthsMax": 73,
     "sameMonthSkinTypeConflictAuthors": 14,
-    "sameMonthSkinTypeConflictPctOfMultiAuthors": 0.31
+    "sameMonthSkinTypeConflictPctOfMultiAuthors": 0.31,
+    "authorSplitCandidates": 0
   },
-  "option1_hashSpec": {
-    "algorithm": "HMAC-SHA256(salt, NFC(userName))[:16]",
+  "option1_authorKeySpec": {
+    "authorKey": "NFC(userName)",
     "emptyUserNames": 0,
     "namesNotNfc": 0,
+    "namesMergedByNfc": 0,
     "namesMergedByStripLower": 0,
-    "collisionsByHexLength": {
-      "8hex": 0,
-      "12hex": 0,
-      "16hex": 0,
-      "32hex": 0
-    },
     "nameLength": {
       "min": 1,
       "median": 5.0,
