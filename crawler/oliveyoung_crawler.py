@@ -63,10 +63,23 @@ IMAGE_BASE = "https://image.oliveyoung.co.kr/uploads/images/gdasEditor/"
 PROFILE_IMAGE_BASE = "https://image.oliveyoung.co.kr/uploads/images/mbrProfile/"
 
 # 피부정보는 코드값으로 온다 (profileDto.skinType/skinTone/skinTrouble).
-# 라벨 매핑이 확인되면 여기에 채우면 parse_review가 자동으로 라벨을 덧붙인다.
-SKIN_TYPE_LABELS: dict[str, str] = {}
-SKIN_TONE_LABELS: dict[str, str] = {}
-SKIN_TROUBLE_LABELS: dict[str, str] = {}
+# 라벨 사전은 코드에 박지 않고 data/input/skin_codebook.json 에서 읽는다.
+# (출처: PDP 리뷰 위젯 DOM 실측 2026-09-03. 근거는 코드북의 _meta.evidence)
+# 파일이 없으면 라벨 없이 코드만 저장한다 — 구 동작과 동일.
+CODEBOOK_PATH = Path(__file__).resolve().parents[1] / "data/input/skin_codebook.json"
+
+
+def load_skin_codebook(path=CODEBOOK_PATH):
+    """코드북 파일 → (skinType, skinTone, skinTrouble) 라벨 dict 3개."""
+    try:
+        book = json.loads(Path(path).read_text(encoding="utf-8"))
+    except FileNotFoundError:
+        print(f"  ! 코드북 없음 ({path}) — 피부정보를 코드 그대로 저장한다")
+        return {}, {}, {}
+    return book["skinType"], book["skinTone"], book["skinTrouble"]
+
+
+SKIN_TYPE_LABELS, SKIN_TONE_LABELS, SKIN_TROUBLE_LABELS = load_skin_codebook()
 
 DEFAULT_OUTPUT = "data/reviews.json"
 
