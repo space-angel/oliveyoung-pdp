@@ -7,9 +7,9 @@ import json
 from pathlib import Path
 from collections import defaultdict
 
-INPUT_CLAIMS = Path(__file__).parents[2] / "data/intermediate/step1_claims.json"
-INPUT_GROUPED = Path(__file__).parents[2] / "data/intermediate/step0_grouped.json"
-OUTPUT_PATH = Path(__file__).parents[2] / "data/intermediate/step2_clusters.json"
+INPUT_CLAIMS = Path(__file__).parents[1] / "data/intermediate/step1_claims.json"
+INPUT_GROUPED = Path(__file__).parents[1] / "data/intermediate/step0_grouped.json"
+OUTPUT_PATH = Path(__file__).parents[1] / "data/intermediate/step2_clusters.json"
 
 MIN_SUPPORT = 5          # minimum reviews per cluster
 MAX_SNIPPETS = 3         # top snippets per sentiment

@@ -27,10 +27,10 @@ except ImportError:
 ROOT = Path(__file__).resolve().parent.parent
 CONCERNS_PATH = ROOT / "data/output/concerns_v4.json"
 REVIEWS_PATH = ROOT / "data/input/reviews_200_normalized.json"
-GOLDEN_PATH = ROOT / "data/eval/golden_set.json"
+GOLDEN_PATH = ROOT / "eval/golden_set.json"
 
 VALID_CATEGORIES = {"적합성", "리스크", "실사용", "비교"}
-MODEL = "claude-sonnet-5"  # DEV는 Haiku 사용 → cross-model 검증 (3_EVAL/CLAUDE.md 제약)
+MODEL = "claude-sonnet-5"  # DEV는 Haiku 사용 → cross-model 검증 (docs/v4/eval/CLAUDE.md 제약)
 MAX_RETRIES = 3
 RETRY_DELAY = 2
 
@@ -444,7 +444,7 @@ def main():
     }
 
     if args.output:
-        out_path = ROOT / "3_EVAL" / args.output if not os.path.isabs(args.output) else Path(args.output)
+        out_path = ROOT / "eval" / args.output if not os.path.isabs(args.output) else Path(args.output)
         with open(out_path, "w", encoding="utf-8") as f:
             json.dump(report, f, ensure_ascii=False, indent=2)
         print(f"\n💾 결과 저장 → {out_path}")

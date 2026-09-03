@@ -7,8 +7,8 @@ import json
 from pathlib import Path
 from schemas import Review, Sentiment
 
-INPUT_PATH = Path(__file__).parents[2] / "data/input/reviews_200_normalized.json"
-OUTPUT_PATH = Path(__file__).parents[2] / "data/intermediate/step0_grouped.json"
+INPUT_PATH = Path(__file__).parents[1] / "data/input/reviews_200_normalized.json"
+OUTPUT_PATH = Path(__file__).parents[1] / "data/intermediate/step0_grouped.json"
 MIN_CONTENT_LEN = 30
 
 

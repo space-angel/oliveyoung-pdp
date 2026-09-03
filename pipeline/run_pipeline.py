@@ -7,7 +7,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-PIPELINE_DIR = Path(__file__).parent / "pipeline"
+PIPELINE_DIR = Path(__file__).parent
 PYTHON = Path(__file__).parents[1] / ".venv/bin/python3"
 
 STEPS = {

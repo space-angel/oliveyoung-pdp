@@ -12,8 +12,10 @@ venv/
 *.egg-info/
 
 # 재실행하면 다시 생기는 중간 산출물 (정본은 data/output/)
-data/intermediate/
-data/cache/
+data/intermediate/*
+!data/intermediate/.gitkeep
+data/cache/*
+!data/cache/.gitkeep
 
 # macOS
 .DS_Store
