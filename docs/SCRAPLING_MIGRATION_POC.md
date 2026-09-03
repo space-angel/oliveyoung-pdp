@@ -509,6 +509,8 @@ usefulPoint 범위 예: 클리오 쿠션 6534.0 → 30.0
 ```
 
 미해결(영향 없음): 피부정보 코드→라벨 매핑 미발견 (API·필터 UI·JS 번들 모두 탐색 실패).
+> **2026-09-03 해소** — 실브라우저로 PDP 리뷰 위젯(Lit/Shadow DOM)에서 26종 전부 실측.
+> `data/input/skin_codebook.json` 참조. 아래 본문은 2026-08 시점 기록이라 그대로 둔다.
 `skinType=A01~A07`, `skinTone=B01~B06`, `skinTrouble=C01~C13` 을 **코드 그대로 저장**한다.
 파이프라인이 쓰지 않는 필드라 블로커 아님. 매핑을 찾으면 `oliveyoung_crawler.py` 상단
 `SKIN_*_LABELS` dict를 채우면 라벨 필드가 자동 추가된다.
