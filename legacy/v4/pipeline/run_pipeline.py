@@ -8,7 +8,9 @@ import sys
 from pathlib import Path
 
 PIPELINE_DIR = Path(__file__).parent
-PYTHON = Path(__file__).parents[1] / ".venv/bin/python3"
+PYTHON = Path(__file__).parents[3] / ".venv/bin/python3"
+if not PYTHON.exists():
+    PYTHON = Path(sys.executable)
 
 STEPS = {
     0: "step0_preprocess.py",
@@ -46,7 +48,7 @@ def main():
 
     print("\n" + "=" * 50)
     print("파이프라인 완료!")
-    output = Path(__file__).parent.parent / "data/output/concerns_v4.json"
+    output = Path(__file__).parents[3] / "data/output/concerns_v4.json"
     if output.exists():
         import json
         data = json.loads(output.read_text())

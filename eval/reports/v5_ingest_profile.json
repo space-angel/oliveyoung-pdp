@@ -1,0 +1,29 @@
+{
+  "issue": "PER-173",
+  "records": 25000,
+  "products": 50,
+  "reviewsPerProduct": {
+    "min": 500,
+    "median": 500,
+    "max": 500
+  },
+  "conditionStatedPct": {
+    "skinType": 57.11,
+    "skinTrouble": 53.92,
+    "option": 68.06
+  },
+  "missingSegmentLabel": "미기재",
+  "duplication": {
+    "uniqueAuthorProductPairs": 19389,
+    "excessVotes": 5611,
+    "excessVotesPct": 22.44,
+    "identicalContentGroups": 587,
+    "excessByContentHash": 846
+  },
+  "skinTypeCells": {
+    "cells": 393,
+    "atLeast8Raw": 310,
+    "atLeast8AfterAuthorDedup": 294
+  },
+  "skinTroubleSegments": 14
+}

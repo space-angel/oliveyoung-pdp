@@ -69,7 +69,7 @@ catalog = load_catalog()
 product = catalog.product_of_goods_no(row["goodsNo"])   # 미등록이면 UnknownGoodsNoError
 ```
 
-1. **리뷰 행의 `productKey` 문자열을 읽지 않는다.** 제품은 `goodsNo` → 카탈로그로만 확정한다. `step0_preprocess.py`가 그 경계다.
+1. **리뷰 행의 `productKey` 문자열을 읽지 않는다.** 제품은 `goodsNo` → 카탈로그로만 확정한다. `pipeline/ingest.py`가 그 경계이고, v5 레코드의 최상위 키가 `productId`다.
 2. **미등록 `goodsNo`는 조용히 폴백하지 않고 에러다.** 폴백은 같은 제품을 두 개로 쪼개고, 충분성 게이트에서 근거 수가 조용히 줄어든다.
 3. **매핑을 코드 상수로 들지 않는다.** 유일한 정본은 카탈로그 파일이다.
 4. **집계 단위는 `productId`.** `goodsNo`로 그룹핑하면 리뷰 1~7건 상품이 139개 생겨 충분성 게이트가 대량 실패한다(`docs/V5_INPUTS_AND_LEGACY_AUDIT.md` §3-1).
@@ -102,16 +102,22 @@ python3 -m unittest discover -s pipeline -p 'test_*.py'     # 계약 테스트
 | 항목 | 결과 |
 |---|---|
 | 25K 스냅샷 25,000건 | `goodsNo` 153개 전부 해석 → **미해결 0** |
-| v4 입력 2파일(각 500건) | `goodsNo` 12개 전부 해석 → **미해결 0**, 그룹 키·카테고리가 v4와 동일 |
+| v4 입력 2파일(각 500건) | `goodsNo` 12개 전부 해석 → **미해결 0** (레거시 재현 경로 유지) |
 | v4 맵 엔트리 50개 | 이름 드리프트 10건 재조정, **고아 0건** |
 | 계약 테스트 | 15 케이스 통과 (미등록 폴백 금지 · 로드 검증 7종 · 레거시 표시명 조회) |
+| v5 입수 연동 | `pipeline/ingest.py` 가 25,000건을 50 `productId` 로 해석 — 프로파일 `eval/reports/v5_ingest_profile.json` |
 
-v4 베이스라인은 그대로 재현된다 — step0 재실행 결과가 리뷰 499건 / 5제품이고 그룹 키와 카테고리가 이전과 같다. 추가된 것은 `productId`·`displayName` 필드뿐이다.
+v4 베이스라인은 `legacy/v4/`에서 그대로 재현된다 — step0 재실행이 리뷰 499건 / 5제품이다. v5는 같은 카탈로그를 `pipeline/ingest.py`에서 쓴다 (25K 25,000건 → 50 `productId`, 미해결 0).
 
 ---
 
-## 5. 남은 것
+## 5. v4와의 관계
 
-- **`productId`를 파이프라인 전 구간의 그룹 키로 승격** — 현재 step0의 중간 산출물은 v4 호환을 위해 표시명으로 키를 잡고 `productId`를 필드로 싣는다. v4의 step1~4는 이 문자열을 프롬프트·`concernId` 접두사·출력 스키마에 그대로 쓰기 때문에, 키를 바꾸면 v4 베이스라인 산출물이 달라진다. v5 생성 단계(#5)를 새로 쓸 때 `productId`로 승격한다.
+v4는 `legacy/v4/`로 동결했다(`legacy/v4/README.md`). v4의 `step0_preprocess.py`는 행의 `productKey`로 그룹핑하던 원래 상태로 되돌려 뒀다 — 비교 기준선을 재현하는 코드이므로 카탈로그를 끼우지 않는다.
+
+**`productId`는 v5 파이프라인 전 구간의 그룹 키다.** v4 호환을 위해 표시명을 키로 쓰던 과도기 조치는 v4 동결과 함께 없어졌다.
+
+## 6. 남은 것
+
 - **`renewalPolicy`** — PER-172.
 - **입력 계약 문서화** — PER-176이 이 문서를 참조해 계약으로 고정한다.

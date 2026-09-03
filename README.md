@@ -17,27 +17,41 @@ v5는 25,000건 규모라 재현성이 결과의 신뢰도를 좌우하므로, *
 
 ```
 crawler/     올리브영 cursor API 크롤러 (상품당 최대 500건)
-pipeline/    step0 전처리 → step1 클레임 추출 → step2 집계 → step3 축분류 → step4 질문생성
-eval/        평가 스크립트 + 골든셋 + 리포트
+pipeline/    v5 — catalog(제품 동일성) → ingest(3층 입수) → tag → gates → claims → judge
+  contracts.py           v5 입력 계약: 원문/조건/파생 3층
+  catalog.py             goodsNo → productId. 미등록은 에러
+  ingest.py              25K → v5 레코드 (LLM 없음, 재실행 일치)
+  run_v5.py              단계 레지스트리 (미구현 단계는 이슈 번호와 함께 에러)
+  test_*.py              계약 테스트 (python3 -m unittest discover -s pipeline)
+legacy/v4/   v4 동결 — 비교 기준선. 고치지 않는다 (legacy/v4/README.md)
+eval/        v5 평가 스크립트 + 리포트 (v4 리포트도 이 아래 유지)
 data/
   input/         수집 결과·정규화 입력 + product_catalog.json (커밋됨 — 평가 수치의 근거)
-  intermediate/  step0~3 중간 산출물 (gitignore, 재생성 가능)
+  intermediate/  중간 산출물 (gitignore, 재생성 가능) — v4는 step*_*, v5는 v5_*
   output/        concerns_*.json (커밋됨)
 docs/
   SCRAPLING_MIGRATION_POC.md    크롤러 설계 근거 (엔드포인트·size 상한·레이트리밋 실측)
   PDP_EXPERIMENT_CONTEXT.md     PDP 화면 명세 + 스킨코드 라벨 표
   V5_INPUTS_AND_LEGACY_AUDIT.md 입력 인벤토리 · 25K 프로파일 · 레거시 감사
-  v4/                           v4 하네스 원본 (planning / dev / eval 산출물)
+  V5_SPRINT_PLAN.md             스프린트·백로그 설계 (마일스톤 9개 / 이슈 42개)
+  PRODUCT_CATALOG.md            제품 동일성 레이어 규칙·운영 절차
+  DECISION_PER170_AUTHOR_IDENTIFIER.md  작성자 식별자 결정과 근거
+  v4/                           v4 하네스 문서 원본 (planning / dev / eval)
 ```
 
 ## 시작하기
 
 ```bash
-# 파이프라인·평가
+# v5 파이프라인
 python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
 cp .env.example .env        # ANTHROPIC_API_KEY 입력
-.venv/bin/python pipeline/run_pipeline.py --steps 0,1,2,3,4
-.venv/bin/python eval/eval_v4.py
+.venv/bin/python pipeline/run_v5.py --list        # 단계와 구현 상태
+.venv/bin/python pipeline/run_v5.py               # 구현된 단계까지 (catalog → ingest)
+.venv/bin/python -m unittest discover -s pipeline -p 'test_*.py'
+
+# v4 (동결 — 비교 기준선 재현용)
+.venv/bin/python legacy/v4/pipeline/run_pipeline.py --steps 0,1,2,3,4
+.venv/bin/python legacy/v4/eval/eval_v4.py
 
 # 크롤러 (별도 venv 권장 — 브라우저 포함으로 무겁다)
 python3 -m venv crawler/.venv

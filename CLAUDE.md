@@ -5,6 +5,8 @@
 올리브영 PDP 리뷰 → 구매 고민 질문(concern) 생성. 크롤러와 파이프라인이 한 저장소에 있다.
 구조와 현재 상태는 `README.md`, 근거 인벤토리는 `docs/V5_INPUTS_AND_LEGACY_AUDIT.md`.
 
+**작업 대상은 `pipeline/`(v5)다.** v4는 `legacy/v4/`로 동결했다 — 비교 기준선이므로 고치지 않는다. v5는 v4 코드를 수정해 쓰지 않고 새로 쓴다. v5 입력 계약은 `pipeline/contracts.py`(원문/조건/파생 3층), 단계 목록은 `pipeline/run_v5.py --list`.
+
 ## 데이터 규칙
 
 - `data/input/` 은 **read-only로 취급한다.** 새 수집분은 파일명을 바꿔 추가하고 기존 파일을 덮어쓰지 않는다.
@@ -24,5 +26,7 @@
 ## 커밋 규칙
 
 - v5 변경은 v4 베이스라인 위에 쌓는다. `git log -p`가 개선 근거이므로, 무관한 정리와 로직 변경을 한 커밋에 섞지 않는다.
+- `legacy/v4/`와 v4 산출물(`data/output/concerns_v4.json`, `eval/reports/eval_report_v4.*`)은 건드리지 않는다. PER-201 v4 대비 비교의 근거다.
+- v5 코드는 계약 테스트를 함께 낸다 — `python3 -m unittest discover -s pipeline -p 'test_*.py'`. "에러를 낸다"는 완료 조건은 테스트로 고정한다.
 - `.env` 는 절대 커밋하지 않는다. 키가 필요하면 `.env.example` 을 갱신한다.
 - 리뷰 데이터의 `userName`·`profileImageUrl`은 프로덕션 PDP에 그대로 노출되는 값이고 개인정보법상 제약이 없음을 확인했다 (2026-09-03). 중복 판정에 필요하므로 드롭하지 않는다.
