@@ -1,0 +1,2 @@
+# crawler/ 실행용 — Patchright 브라우저 포함, 설치 후 `scrapling install` 필요
+scrapling==0.4.12

@@ -1,0 +1,23 @@
+# 비밀키
+.env
+.env.local
+.env.*.local
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+*.egg-info/
+
+# 재실행하면 다시 생기는 중간 산출물 (정본은 data/output/)
+data/intermediate/
+data/cache/
+
+# macOS
+.DS_Store
+
+# 편집기
+.vscode/settings.json
+.idea/
