@@ -1,0 +1,49 @@
+{
+  "endpoints": {
+    "https://m.oliveyoung.co.kr/review/api/v1/reviews/skin-info": {
+      "status": 0,
+      "hit": false,
+      "head": "TypeError: Failed to fetch"
+    },
+    "https://m.oliveyoung.co.kr/review/api/v2/reviews/skin-info": {
+      "status": 200,
+      "hit": false,
+      "head": "{\"status\":\"BAD_REQUEST\",\"code\":400,\"message\":\"올바르지 않은 요청입니다.\",\"pagination\":null,\"data\":null,\"totalCnt\":null,\"pageData\":null}"
+    },
+    "https://m.oliveyoung.co.kr/review/api/v1/skin-info": {
+      "status": 200,
+      "hit": false,
+      "head": "{\"status\":\"SUCCESS\",\"code\":3000,\"message\":null,\"pagination\":null,\"data\":null,\"totalCnt\":null,\"pageData\":null}"
+    },
+    "https://m.oliveyoung.co.kr/review/api/v2/reviews/filters": {
+      "status": 200,
+      "hit": false,
+      "head": "{\"status\":\"BAD_REQUEST\",\"code\":400,\"message\":\"올바르지 않은 요청입니다.\",\"pagination\":null,\"data\":null,\"totalCnt\":null,\"pageData\":null}"
+    },
+    "https://m.oliveyoung.co.kr/review/api/v1/reviews/filter-options": {
+      "status": 0,
+      "hit": false,
+      "head": "TypeError: Failed to fetch"
+    },
+    "https://m.oliveyoung.co.kr/review/api/v2/reviews/options/A000000158513/skin": {
+      "status": 0,
+      "hit": false,
+      "head": "TypeError: Failed to fetch"
+    },
+    "https://m.oliveyoung.co.kr/review/api/v1/common/codes": {
+      "status": 0,
+      "hit": false,
+      "head": "TypeError: Failed to fetch"
+    },
+    "https://m.oliveyoung.co.kr/review/api/v2/common/codes": {
+      "status": 0,
+      "hit": false,
+      "head": "TypeError: Failed to fetch"
+    }
+  },
+  "dom": {
+    "labels": [],
+    "byGroup": {}
+  },
+  "bundle": []
+}

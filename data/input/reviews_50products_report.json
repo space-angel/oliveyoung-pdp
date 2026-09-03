@@ -1,0 +1,690 @@
+[
+  {
+    "goodsNo": "A000000230208",
+    "productKey": "이니스프리 레티놀 시카 흔적 앰플",
+    "title": "올리브영 온라인몰",
+    "blocked": false,
+    "passes": {
+      "도움순": {
+        "fetched": 500,
+        "new": 500,
+        "stop": "target 도달"
+      }
+    },
+    "rate_limited": false,
+    "elapsed": 49.2,
+    "count": 500
+  },
+  {
+    "goodsNo": "A000000224494",
+    "productKey": "셀라딕스 트러블 세범 리밸런싱 앰플",
+    "title": "[조유리 PICK/트러블1등] 셀라딕스 트러블 세범 리밸런싱 131 앰플 30ml | 올리브영",
+    "blocked": false,
+    "passes": {
+      "도움순": {
+        "fetched": 500,
+        "new": 500,
+        "stop": "target 도달"
+      }
+    },
+    "rate_limited": false,
+    "elapsed": 48.6,
+    "count": 500
+  },
+  {
+    "goodsNo": "A000000184060",
+    "productKey": "아이오페 레티놀 슈퍼 바운스 세럼",
+    "title": "[1등레티놀] 아이오페 레티놀 슈퍼 바운스 세럼 30ml 기획 (+세럼 10ml+바이오에센스48ml) | 올리브영",
+    "blocked": false,
+    "passes": {
+      "도움순": {
+        "fetched": 500,
+        "new": 500,
+        "stop": "target 도달"
+      }
+    },
+    "rate_limited": false,
+    "elapsed": 49.6,
+    "count": 500
+  },
+  {
+    "goodsNo": "A000000207225",
+    "productKey": "넘버즈인 판토텐산 액티브업 수딩세럼",
+    "title": "[8월올영픽/트러블진정세럼] 넘버즈인 1번 판토텐산 액티브업 수딩세럼 50ml 리필기획 (50ml+50ml) | 올리브영",
+    "blocked": false,
+    "passes": {
+      "도움순": {
+        "fetched": 500,
+        "new": 500,
+        "stop": "target 도달"
+      }
+    },
+    "rate_limited": false,
+    "elapsed": 48.7,
+    "count": 500
+  },
+  {
+    "goodsNo": "A000000219609",
+    "productKey": "파티온 노스카나인 트러블 세럼",
+    "title": "[대용량] 파티온 노스카나인 트러블 세럼 50ml 리필 기획(+리필40ml+크림10ml) | 올리브영",
+    "blocked": false,
+    "passes": {
+      "도움순": {
+        "fetched": 500,
+        "new": 500,
+        "stop": "target 도달"
+      }
+    },
+    "rate_limited": false,
+    "elapsed": 49.0,
+    "count": 500
+  },
+  {
+    "goodsNo": "A000000247774",
+    "productKey": "구달 청귤 비타C 잡티케어 세럼",
+    "title": "올리브영 온라인몰",
+    "blocked": false,
+    "passes": {
+      "도움순": {
+        "fetched": 500,
+        "new": 500,
+        "stop": "target 도달"
+      }
+    },
+    "rate_limited": false,
+    "elapsed": 48.5,
+    "count": 500
+  },
+  {
+    "goodsNo": "A000000206904",
+    "productKey": "라로슈포제 시카플라스트 밤 B5+",
+    "title": "[손상장벽집중케어] 라로슈포제 시카플라스트 밤 B5+ 100ml 기획 (+3ml 추가증정) | 올리브영",
+    "blocked": false,
+    "passes": {
+      "도움순": {
+        "fetched": 500,
+        "new": 500,
+        "stop": "target 도달"
+      }
+    },
+    "rate_limited": false,
+    "elapsed": 78.6,
+    "count": 500
+  },
+  {
+    "goodsNo": "A000000238634",
+    "productKey": "에스트라 아토베리어365 크림",
+    "title": "에스트라 아토베리어365 크림 80ml 어워즈 한정기획 (+30ml+앰플 3ml) | 올리브영",
+    "blocked": false,
+    "passes": {
+      "도움순": {
+        "fetched": 500,
+        "new": 500,
+        "stop": "target 도달"
+      }
+    },
+    "rate_limited": false,
+    "elapsed": 78.6,
+    "count": 500
+  },
+  {
+    "goodsNo": "A000000192782",
+    "productKey": "에스네이처 아쿠아 스쿠알란 수분크림",
+    "title": "[1+1/1등 모공 수분천재크림] 에스네이처 아쿠아 스쿠알란 수분크림 60ml 더블기획 | 올리브영",
+    "blocked": false,
+    "passes": {
+      "도움순": {
+        "fetched": 500,
+        "new": 500,
+        "stop": "target 도달"
+      }
+    },
+    "rate_limited": false,
+    "elapsed": 78.6,
+    "count": 500
+  },
+  {
+    "goodsNo": "A000000164615",
+    "productKey": "닥터지 레드 블레미쉬 클리어 수딩크림",
+    "title": "올리브영 온라인몰",
+    "blocked": false,
+    "passes": {
+      "도움순": {
+        "fetched": 500,
+        "new": 500,
+        "stop": "target 도달"
+      }
+    },
+    "rate_limited": false,
+    "elapsed": 78.7,
+    "count": 500
+  },
+  {
+    "goodsNo": "A000000200454",
+    "productKey": "유세린 하이알루론 3X 아이크림",
+    "title": "올리브영 온라인몰",
+    "blocked": false,
+    "passes": {
+      "도움순": {
+        "fetched": 500,
+        "new": 500,
+        "stop": "target 도달"
+      }
+    },
+    "rate_limited": false,
+    "elapsed": 78.5,
+    "count": 500
+  },
+  {
+    "goodsNo": "A000000231590",
+    "productKey": "제로이드 인텐시브 크림",
+    "title": "[대용량] 제로이드 인텐시브 크림 80ml 기획 (+50ml) | 올리브영",
+    "blocked": false,
+    "passes": {
+      "도움순": {
+        "fetched": 500,
+        "new": 500,
+        "stop": "target 도달"
+      }
+    },
+    "rate_limited": false,
+    "elapsed": 78.7,
+    "count": 500
+  },
+  {
+    "goodsNo": "A000000180233",
+    "productKey": "피지오겔 DMT 페이셜크림",
+    "title": "[10년연속1위/장벽크림] 피지오겔 DMT 페이셜크림 100ml+100ml 더블기획 | 올리브영",
+    "blocked": false,
+    "passes": {
+      "도움순": {
+        "fetched": 500,
+        "new": 500,
+        "stop": "target 도달"
+      }
+    },
+    "rate_limited": false,
+    "elapsed": 78.6,
+    "count": 500
+  },
+  {
+    "goodsNo": "A000000231892",
+    "productKey": "아누아 피디알엔 히알루론산 100 수분크림",
+    "title": "[수지 PICK/단독기획] 아누아 피디알엔 히알루론산 100 수분 크림 60mL 2입 기획 | 올리브영",
+    "blocked": false,
+    "passes": {
+      "도움순": {
+        "fetched": 500,
+        "new": 500,
+        "stop": "target 도달"
+      }
+    },
+    "rate_limited": false,
+    "elapsed": 79.2,
+    "count": 500
+  },
+  {
+    "goodsNo": "A000000248826",
+    "productKey": "메디큐브 PDRN 핑크 콜라겐 캡슐크림",
+    "title": "[여배우광채크림] 메디큐브 PDRN 핑크 콜라겐 캡슐크림 55g 기획 (+4.5g*2ea) | 올리브영",
+    "blocked": false,
+    "passes": {
+      "도움순": {
+        "fetched": 500,
+        "new": 500,
+        "stop": "target 도달"
+      }
+    },
+    "rate_limited": false,
+    "elapsed": 79.0,
+    "count": 500
+  },
+  {
+    "goodsNo": "A000000226201",
+    "productKey": "아누아 TXA 나이아신 흔적 세럼",
+    "title": "[단독기획] 아누아 TXA 나이아신 흔적 세럼 30ml 2입 | 올리브영",
+    "blocked": false,
+    "passes": {
+      "도움순": {
+        "fetched": 500,
+        "new": 500,
+        "stop": "target 도달"
+      }
+    },
+    "rate_limited": false,
+    "elapsed": 79.0,
+    "count": 500
+  },
+  {
+    "goodsNo": "A000000232179",
+    "productKey": "메디힐 PDRN 모공 탄력 세럼",
+    "title": "올리브영 온라인몰",
+    "blocked": false,
+    "passes": {
+      "도움순": {
+        "fetched": 500,
+        "new": 500,
+        "stop": "target 도달"
+      }
+    },
+    "rate_limited": false,
+    "elapsed": 78.9,
+    "count": 500
+  },
+  {
+    "goodsNo": "A000000165598",
+    "productKey": "토리든 다이브인 히알루론산 수딩 크림",
+    "title": "올리브영 온라인몰",
+    "blocked": false,
+    "passes": {
+      "도움순": {
+        "fetched": 500,
+        "new": 500,
+        "stop": "target 도달"
+      }
+    },
+    "rate_limited": false,
+    "elapsed": 78.8,
+    "count": 500
+  },
+  {
+    "goodsNo": "A000000232098",
+    "productKey": "클리오 킬 커버 파운웨어 쿠션",
+    "title": "클리오 킬 커버 파운웨어 쿠션 | 올리브영",
+    "blocked": false,
+    "passes": {
+      "도움순": {
+        "fetched": 500,
+        "new": 500,
+        "stop": "target 도달"
+      }
+    },
+    "rate_limited": false,
+    "elapsed": 78.5,
+    "count": 500
+  },
+  {
+    "goodsNo": "A000000139063",
+    "productKey": "정샘물 에센셜 스킨 누더 쿠션",
+    "title": "[촉촉윤광쿠션] 정샘물 에센셜 스킨 누더 쿠션/본품+리필 | 올리브영",
+    "blocked": false,
+    "passes": {
+      "도움순": {
+        "fetched": 500,
+        "new": 500,
+        "stop": "target 도달"
+      }
+    },
+    "rate_limited": false,
+    "elapsed": 79.0,
+    "count": 500
+  },
+  {
+    "goodsNo": "A000000202777",
+    "productKey": "헤라 블랙 쿠션 파운데이션",
+    "title": "[프리미엄 1위] 헤라 블랙 쿠션 파운데이션 기획 (15g+15g) 9 Colors | 올리브영",
+    "blocked": false,
+    "passes": {
+      "도움순": {
+        "fetched": 500,
+        "new": 500,
+        "stop": "target 도달"
+      }
+    },
+    "rate_limited": false,
+    "elapsed": 78.6,
+    "count": 500
+  },
+  {
+    "goodsNo": "A000000238740",
+    "productKey": "오프라 미니 하이라이터",
+    "title": "[압도적광채] 오프라 미니 하이라이터 (+기획/단품) | 올리브영",
+    "blocked": false,
+    "passes": {
+      "도움순": {
+        "fetched": 500,
+        "new": 500,
+        "stop": "target 도달"
+      }
+    },
+    "rate_limited": false,
+    "elapsed": 79.1,
+    "count": 500
+  },
+  {
+    "goodsNo": "A000000213943",
+    "productKey": "연작 스킨 퍼펙팅 프로텍티브 베이스프렙",
+    "title": "[화잘먹베이스] 연작 스킨 퍼펙팅 프로텍티브 베이스 프렙 25ml/40ml 기획/단품 | 올리브영",
+    "blocked": false,
+    "passes": {
+      "도움순": {
+        "fetched": 500,
+        "new": 500,
+        "stop": "target 도달"
+      }
+    },
+    "rate_limited": false,
+    "elapsed": 78.7,
+    "count": 500
+  },
+  {
+    "goodsNo": "A000000212749",
+    "productKey": "프레시안 에그라이크 크림 블러셔",
+    "title": "[1등품절템/웜쿨대통합] 프레시안 에그라이크 크림 블러쉬 (단독 기획) | 올리브영",
+    "blocked": false,
+    "passes": {
+      "도움순": {
+        "fetched": 500,
+        "new": 500,
+        "stop": "target 도달"
+      }
+    },
+    "rate_limited": false,
+    "elapsed": 78.6,
+    "count": 500
+  },
+  {
+    "goodsNo": "A000000165215",
+    "productKey": "바닐라코 프라임 프라이머 피니쉬 파우더",
+    "title": "올리브영 온라인몰",
+    "blocked": false,
+    "passes": {
+      "도움순": {
+        "fetched": 500,
+        "new": 500,
+        "stop": "target 도달"
+      }
+    },
+    "rate_limited": false,
+    "elapsed": 78.5,
+    "count": 500
+  },
+  {
+    "goodsNo": "A000000184299",
+    "productKey": "VDL 치크스테인 블러셔",
+    "title": "[레몬코어/퍼프2개증정] VDL 치크스테인 블러셔/블러셔 듀오 6g | 올리브영",
+    "blocked": false,
+    "passes": {
+      "도움순": {
+        "fetched": 500,
+        "new": 500,
+        "stop": "target 도달"
+      }
+    },
+    "rate_limited": false,
+    "elapsed": 78.6,
+    "count": 500
+  },
+  {
+    "goodsNo": "A000000238763",
+    "productKey": "더샘 커버 퍼펙션 트리플 팟 컨실러",
+    "title": "[베이스1위/브라이트너 증정 기획] 더샘 커버 퍼펙션 트리플 팟 컨실러 5colors(단품/기획) | 올리브영",
+    "blocked": false,
+    "passes": {
+      "도움순": {
+        "fetched": 500,
+        "new": 500,
+        "stop": "target 도달"
+      }
+    },
+    "rate_limited": false,
+    "elapsed": 78.7,
+    "count": 500
+  },
+  {
+    "goodsNo": "A000000184222",
+    "productKey": "에스쁘아 비벨벳 커버쿠션",
+    "title": "[100시간 지속/고커버] 에스쁘아 비벨벳 커버쿠션 SPF42 PA++ 본품+리필 | 올리브영",
+    "blocked": false,
+    "passes": {
+      "도움순": {
+        "fetched": 500,
+        "new": 500,
+        "stop": "target 도달"
+      }
+    },
+    "rate_limited": false,
+    "elapsed": 78.6,
+    "count": 500
+  },
+  {
+    "goodsNo": "A000000202912",
+    "productKey": "힌스 로 글로우 젤 틴트",
+    "title": "[올리브영 단독 컬러/플럼핑 립펜슬 증정] 힌스 로 글로우 젤 틴트 26 Colors 한정 기획 | 올리브영",
+    "blocked": false,
+    "passes": {
+      "도움순": {
+        "fetched": 500,
+        "new": 500,
+        "stop": "target 도달"
+      }
+    },
+    "rate_limited": false,
+    "elapsed": 79.3,
+    "count": 500
+  },
+  {
+    "goodsNo": "A000000246445",
+    "productKey": "퓌 3D 볼류밍 글로스",
+    "title": "[바닐라에디션 단품 런칭] 퓌 3D 볼류밍 글로스 5.3g 단품/기획 | 올리브영",
+    "blocked": false,
+    "passes": {
+      "도움순": {
+        "fetched": 500,
+        "new": 500,
+        "stop": "target 도달"
+      }
+    },
+    "rate_limited": false,
+    "elapsed": 78.6,
+    "count": 500
+  },
+  {
+    "goodsNo": "A000000235485",
+    "productKey": "유리아쥬 스틱레브르 컬러드",
+    "title": "[고발색/데일리 생기 컬러립밤] 유리아쥬 스틱레브르 컬러드 5종 | 올리브영",
+    "blocked": false,
+    "passes": {
+      "도움순": {
+        "fetched": 500,
+        "new": 500,
+        "stop": "target 도달"
+      }
+    },
+    "rate_limited": false,
+    "elapsed": 78.6,
+    "count": 500
+  },
+  {
+    "goodsNo": "A000000241210",
+    "productKey": "롬앤 더 쥬시 래스팅 틴트",
+    "title": "[NEW두유코어/1등틴트] 롬앤 더 쥬시 래스팅 틴트 단품/기획 | 올리브영",
+    "blocked": false,
+    "passes": {
+      "도움순": {
+        "fetched": 500,
+        "new": 500,
+        "stop": "target 도달"
+      }
+    },
+    "rate_limited": false,
+    "elapsed": 79.2,
+    "count": 500
+  },
+  {
+    "goodsNo": "A000000174066",
+    "productKey": "하트퍼센트 도트 온 무드 립펜슬",
+    "title": "[태산 PICK / NEW 컬러] 하트퍼센트 도트 온 무드 립펜슬 0.8g 25종 | 올리브영",
+    "blocked": false,
+    "passes": {
+      "도움순": {
+        "fetched": 500,
+        "new": 500,
+        "stop": "target 도달"
+      }
+    },
+    "rate_limited": false,
+    "elapsed": 78.7,
+    "count": 500
+  },
+  {
+    "goodsNo": "A000000230581",
+    "productKey": "컬러그램 누디 블러 틴트",
+    "title": "[입술보정틴트] 컬러그램 누디 블러 틴트 25COLOR(단품/기획) | 올리브영",
+    "blocked": false,
+    "passes": {
+      "도움순": {
+        "fetched": 500,
+        "new": 500,
+        "stop": "target 도달"
+      }
+    },
+    "rate_limited": false,
+    "elapsed": 79.2,
+    "count": 500
+  },
+  {
+    "goodsNo": "A000000212004",
+    "productKey": "3CE 캐시미어 허그 립스틱",
+    "title": "[포근매트] 3CE 캐시미어 허그 립스틱 3.5g 14종 | 올리브영",
+    "blocked": false,
+    "passes": {
+      "도움순": {
+        "fetched": 500,
+        "new": 500,
+        "stop": "target 도달"
+      }
+    },
+    "rate_limited": false,
+    "elapsed": 78.6,
+    "count": 500
+  },
+  {
+    "goodsNo": "A000000174309",
+    "productKey": "홀리카홀리카 마이페이브 피스 아이섀도우",
+    "title": "[NEW젤테일] 홀리카홀리카 마이페이브 피스 아이섀도우/젤테일/피스 빔/피스 밤 | 올리브영",
+    "blocked": false,
+    "passes": {
+      "도움순": {
+        "fetched": 500,
+        "new": 500,
+        "stop": "target 도달"
+      }
+    },
+    "rate_limited": false,
+    "elapsed": 79.1,
+    "count": 500
+  },
+  {
+    "goodsNo": "A000000138671",
+    "productKey": "페리페라 스피디 스키니 브로우",
+    "title": "페리페라 스피디 스키니 브로우 8 Colors | 올리브영",
+    "blocked": false,
+    "passes": {
+      "도움순": {
+        "fetched": 500,
+        "new": 500,
+        "stop": "target 도달"
+      }
+    },
+    "rate_limited": false,
+    "elapsed": 79.6,
+    "count": 500
+  },
+  {
+    "goodsNo": "A000000185046",
+    "productKey": "투크 워터프루프 슬림 아이라이너",
+    "title": "[NEW한정컬러] 투크 워터프루프 슬림 아이라이너 15 colors | 올리브영",
+    "blocked": false,
+    "passes": {
+      "도움순": {
+        "fetched": 500,
+        "new": 500,
+        "stop": "target 도달"
+      }
+    },
+    "rate_limited": false,
+    "elapsed": 79.0,
+    "count": 500
+  },
+  {
+    "goodsNo": "A000000140618",
+    "productKey": "코스노리 아이래쉬 세럼 비건 속눈썹영양제",
+    "title": "[1등속눈썹영양제] 코스노리 아이래쉬 세럼 속눈썹영양제 9g (클리어/블랙) | 올리브영",
+    "blocked": false,
+    "passes": {
+      "도움순": {
+        "fetched": 500,
+        "new": 500,
+        "stop": "target 도달"
+      }
+    },
+    "rate_limited": false,
+    "elapsed": 78.6,
+    "count": 500
+  },
+  {
+    "goodsNo": "A000000147801",
+    "productKey": "데이지크 섀도우팔레트",
+    "title": "[스틱섀도우 기획] 데이지크 섀도우팔레트 25 colors (단품/기획) | 올리브영",
+    "blocked": false,
+    "passes": {
+      "도움순": {
+        "fetched": 500,
+        "new": 500,
+        "stop": "target 도달"
+      }
+    },
+    "rate_limited": false,
+    "elapsed": 78.7,
+    "count": 500
+  },
+  {
+    "goodsNo": "A000000180532",
+    "productKey": "웨이크메이크 소프트 블러링 아이팔레트",
+    "title": "[NEW/올영 1등 아이팔레트] 웨이크메이크 소프트 블러링 아이팔레트(단품/기획) | 올리브영",
+    "blocked": false,
+    "passes": {
+      "도움순": {
+        "fetched": 500,
+        "new": 500,
+        "stop": "target 도달"
+      }
+    },
+    "rate_limited": false,
+    "elapsed": 79.0,
+    "count": 500
+  },
+  {
+    "goodsNo": "A000000203943",
+    "productKey": "에뛰드 컬 픽스 마스카라",
+    "title": "[8월 올영픽/1등 컬링] 에뛰드 컬 픽스 마스카라 1+1 기획 (쌍쌍바 케이블 홀더 증정 기획 / 단품) | 올리브영",
+    "blocked": false,
+    "passes": {
+      "도움순": {
+        "fetched": 500,
+        "new": 500,
+        "stop": "target 도달"
+      }
+    },
+    "rate_limited": false,
+    "elapsed": 79.4,
+    "count": 500
+  },
+  {
+    "goodsNo": "A000000227157",
+    "productKey": "리필드 사이토카인 아이래쉬 듀얼 앰플",
+    "title": "[몰티즈&리트리버] 리필드 사이토카인 아이래쉬 듀얼 앰플 10ml 기획 (+핸드미러) | 올리브영",
+    "blocked": false,
+    "passes": {
+      "도움순": {
+        "fetched": 500,
+        "new": 500,
+        "stop": "target 도달"
+      }
+    },
+    "rate_limited": false,
+    "elapsed": 78.7,
+    "count": 500
+  }
+]
