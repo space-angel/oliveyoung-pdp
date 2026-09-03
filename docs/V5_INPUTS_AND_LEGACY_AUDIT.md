@@ -210,7 +210,7 @@ v5 코드는 `OLY/concern-pipeline-v5/`로 (v4 하네스 구조 승계), 이 저
 
 ## 5. v5 착수 전 결정해야 할 것
 
-1. **집계 단위** — `productKey`(50) 확정. goodsNo(153) 사용 시 Gate 대량 실패 (§3-1)
+1. ~~**집계 단위**~~ — **해소** (2026-09-03, PER-171). 카탈로그 레이어(`data/input/product_catalog.json`)가 `goodsNo`(167) → `productId`(50)를 소유하고, 미등록 ID는 에러다. `docs/PRODUCT_CATALOG.md`
 2. **리센시 컷** — 2018년 리뷰 포함 여부 (§3-3)
 3. **부정 신호 표본** — 1~2점 407건(1.6%)으로 "위험 신호 재현율"을 어떻게 측정할지 (§3-3)
 4. ~~**PII 드롭 목록**~~ — **해소** (2026-09-03, PER-170). 닉네임·프로필 URL은 프로덕션 PDP 공개 값이고 법적 제약이 없음을 확인해 **드롭 논점 자체가 사라졌다.** 식별자는 중복 판정 정확도로만 결정 — 작성자 키 = `NFC(userName)`, `profileImageUrl`은 감사 필드로 유지. 결정과 근거: `docs/DECISION_PER170_AUTHOR_IDENTIFIER.md`, 실측: `eval/reports/author_identity_per170.json`

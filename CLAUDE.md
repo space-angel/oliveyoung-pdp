@@ -10,7 +10,8 @@
 - `data/input/` 은 **read-only로 취급한다.** 새 수집분은 파일명을 바꿔 추가하고 기존 파일을 덮어쓰지 않는다.
 - `data/intermediate/`, `data/cache/` 는 gitignore. 재실행하면 다시 생긴다.
 - `data/output/` 과 `eval/reports/` 는 **커밋한다.** 평가 수치의 1차 근거다.
-- 집계 단위는 `productKey`(50개)다. `goodsNo`(153개)는 변형 SKU가 섞인 단위이므로 그룹핑 키로 쓰지 않는다.
+- 집계 단위는 `productId`(50개, `data/input/product_catalog.json`)다. `goodsNo`(153개)는 변형 SKU가 섞인 단위이므로 그룹핑 키로 쓰지 않는다.
+- **제품 동일성은 카탈로그 레이어가 소유한다** (PER-171). 리뷰 행의 `productKey` 문자열을 읽지 말고 `goodsNo`를 `pipeline/catalog.py`에 물어라. **미등록 `goodsNo`는 조용히 폴백하지 않고 에러다.** 매핑을 코드 상수로 들지 않는다. 카탈로그는 생성물이므로 손으로 고치지 말고 `pipeline/build_product_catalog.py`를 다시 돌린다. 규칙·운영 절차는 `docs/PRODUCT_CATALOG.md`.
 - **작성자 키는 `NFC(userName)` 원문이다** (PER-170 확정). 중복 판정 단위는 `(작성자 키, productKey)`이고 근거 카운트는 리뷰 수가 아니라 **고유 작성자 수**를 센다. 게이트를 안 걸면 카운트가 코퍼스의 19.7% 부풀고, 본문 해시는 그 중 12.1%만 잡는다. 근거·한계는 `docs/DECISION_PER170_AUTHOR_IDENTIFIER.md`.
 - `profileImageUrl`은 키에 넣지 않고 **감사 필드로 유지한다.** 한 이름에 서로 다른 URL이 2개 이상 나타나면 분리 후보로 플래그하되 자동 분리는 하지 않는다 (현 스냅샷 0건).
 

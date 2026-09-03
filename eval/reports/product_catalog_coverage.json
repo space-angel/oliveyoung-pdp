@@ -1,0 +1,476 @@
+{
+  "issue": "PER-171",
+  "sources": [
+    {
+      "path": "crawler/products_50.json",
+      "sha256": "9d4b025db43aecb6a8576e3b347db160d08bef0fa5b048bddf755bd9685077be",
+      "role": "정본 제품 목록"
+    },
+    {
+      "path": "data/input/reviews_50products.json",
+      "sha256": "04e089d078d5482855f04481b7144661834b391d55b3cec0033431454903a773",
+      "role": "관측된 변형 SKU"
+    },
+    {
+      "path": "data/input/product_canonical_map.json",
+      "sha256": "b29e1132423fcd447cef4db997b7b59048b565dcba4e51b36c25685de06c83f9",
+      "role": "v4 매핑"
+    },
+    {
+      "path": "data/input/reviews_200_normalized.json",
+      "sha256": "88f4fb83b1dab858cc05ae1e1322ba0a05416f248e6eb7ec547b2afaf308008e",
+      "role": "v4 입력"
+    },
+    {
+      "path": "data/input/v4_reviews_500.json",
+      "sha256": "d1fa38ee7e16f817e179d55797d23a06fc6177e69cab479f0321800dc96847ec",
+      "role": "v4 입력"
+    }
+  ],
+  "products": 50,
+  "goodsNosTotal": 167,
+  "goodsNosBySource": {
+    "crawl_request": 50,
+    "observed_variant": 103,
+    "legacy_v4": 14
+  },
+  "snapshot25k": {
+    "reviews": 25000,
+    "goodsNos": 153,
+    "unresolvedGoodsNos": [],
+    "unresolvedReviews": 0
+  },
+  "legacyV4Inputs": {
+    "reviews": 1000,
+    "goodsNos": 12,
+    "unresolvedGoodsNos": []
+  },
+  "legacyMapReconciliation": {
+    "entries": 50,
+    "nameDrift": [
+      {
+        "legacyName": "구달 청귤 비타C 잡티케어 세럼 알파",
+        "resolvedTo": "구달 청귤 비타C 잡티케어 세럼",
+        "overlapGoodsNos": 4,
+        "brandMatch": true,
+        "note": null
+      },
+      {
+        "legacyName": "셀라딕스 세범 리밸런싱 RX 131 앰플",
+        "resolvedTo": "셀라딕스 트러블 세범 리밸런싱 앰플",
+        "overlapGoodsNos": 2,
+        "brandMatch": true,
+        "note": null
+      },
+      {
+        "legacyName": "넘버즈인 1번 판토텐산 액티브업 수딩세럼",
+        "resolvedTo": "넘버즈인 판토텐산 액티브업 수딩세럼",
+        "overlapGoodsNos": 3,
+        "brandMatch": true,
+        "note": null
+      },
+      {
+        "legacyName": "아누아 피디알엔 히알루론산 100 수분 크림",
+        "resolvedTo": "아누아 피디알엔 히알루론산 100 수분크림",
+        "overlapGoodsNos": 3,
+        "brandMatch": true,
+        "note": null
+      },
+      {
+        "legacyName": "라로슈포제 시카플라스트 밤B5+",
+        "resolvedTo": "라로슈포제 시카플라스트 밤 B5+",
+        "overlapGoodsNos": 4,
+        "brandMatch": true,
+        "note": null
+      },
+      {
+        "legacyName": "피지오겔 DMT 페이셜 크림",
+        "resolvedTo": "피지오겔 DMT 페이셜크림",
+        "overlapGoodsNos": 7,
+        "brandMatch": true,
+        "note": null
+      },
+      {
+        "legacyName": "닥터자르트 레드 블레미쉬 클리어 수딩 크림",
+        "resolvedTo": "닥터지 레드 블레미쉬 클리어 수딩크림",
+        "overlapGoodsNos": 1,
+        "brandMatch": false,
+        "note": "v4 맵 표시명 '닥터자르트 레드 블레미쉬 클리어 수딩 크림' 정정: A000000166641 의 리뷰 productName 은 '레드 블레미쉬 클리어 수딩 크림'이고 이 제품은 닥터지(Dr.G) 상품이다. v4 맵의 '닥터자르트' 표기가 오기다"
+      },
+      {
+        "legacyName": "롬앤 쥬시 래스팅 틴트",
+        "resolvedTo": "롬앤 더 쥬시 래스팅 틴트",
+        "overlapGoodsNos": 2,
+        "brandMatch": true,
+        "note": null
+      },
+      {
+        "legacyName": "코스노리 아이래쉬 세럼",
+        "resolvedTo": "코스노리 아이래쉬 세럼 비건 속눈썹영양제",
+        "overlapGoodsNos": 1,
+        "brandMatch": true,
+        "note": null
+      },
+      {
+        "legacyName": "홀리카홀리카 마이페이브 아이섀도우",
+        "resolvedTo": "홀리카홀리카 마이페이브 피스 아이섀도우",
+        "overlapGoodsNos": 2,
+        "brandMatch": true,
+        "note": null
+      }
+    ],
+    "orphans": []
+  },
+  "perProduct": [
+    {
+      "productId": "p001",
+      "displayName": "3CE 캐시미어 허그 립스틱",
+      "category": "립메이크업",
+      "goodsNos": 1,
+      "reviews25k": 500
+    },
+    {
+      "productId": "p002",
+      "displayName": "롬앤 더 쥬시 래스팅 틴트",
+      "category": "립메이크업",
+      "goodsNos": 3,
+      "reviews25k": 500
+    },
+    {
+      "productId": "p003",
+      "displayName": "유리아쥬 스틱레브르 컬러드",
+      "category": "립메이크업",
+      "goodsNos": 1,
+      "reviews25k": 500
+    },
+    {
+      "productId": "p004",
+      "displayName": "컬러그램 누디 블러 틴트",
+      "category": "립메이크업",
+      "goodsNos": 2,
+      "reviews25k": 500
+    },
+    {
+      "productId": "p005",
+      "displayName": "퓌 3D 볼류밍 글로스",
+      "category": "립메이크업",
+      "goodsNos": 2,
+      "reviews25k": 500
+    },
+    {
+      "productId": "p006",
+      "displayName": "하트퍼센트 도트 온 무드 립펜슬",
+      "category": "립메이크업",
+      "goodsNos": 1,
+      "reviews25k": 500
+    },
+    {
+      "productId": "p007",
+      "displayName": "힌스 로 글로우 젤 틴트",
+      "category": "립메이크업",
+      "goodsNos": 1,
+      "reviews25k": 500
+    },
+    {
+      "productId": "p008",
+      "displayName": "VDL 치크스테인 블러셔",
+      "category": "베이스메이크업",
+      "goodsNos": 1,
+      "reviews25k": 500
+    },
+    {
+      "productId": "p009",
+      "displayName": "더샘 커버 퍼펙션 트리플 팟 컨실러",
+      "category": "베이스메이크업",
+      "goodsNos": 2,
+      "reviews25k": 500
+    },
+    {
+      "productId": "p010",
+      "displayName": "바닐라코 프라임 프라이머 피니쉬 파우더",
+      "category": "베이스메이크업",
+      "goodsNos": 1,
+      "reviews25k": 500
+    },
+    {
+      "productId": "p011",
+      "displayName": "에스쁘아 비벨벳 커버쿠션",
+      "category": "베이스메이크업",
+      "goodsNos": 1,
+      "reviews25k": 500
+    },
+    {
+      "productId": "p012",
+      "displayName": "연작 스킨 퍼펙팅 프로텍티브 베이스프렙",
+      "category": "베이스메이크업",
+      "goodsNos": 2,
+      "reviews25k": 500
+    },
+    {
+      "productId": "p013",
+      "displayName": "오프라 미니 하이라이터",
+      "category": "베이스메이크업",
+      "goodsNos": 2,
+      "reviews25k": 500
+    },
+    {
+      "productId": "p014",
+      "displayName": "정샘물 에센셜 스킨 누더 쿠션",
+      "category": "베이스메이크업",
+      "goodsNos": 2,
+      "reviews25k": 500
+    },
+    {
+      "productId": "p015",
+      "displayName": "클리오 킬 커버 파운웨어 쿠션",
+      "category": "베이스메이크업",
+      "goodsNos": 1,
+      "reviews25k": 500
+    },
+    {
+      "productId": "p016",
+      "displayName": "프레시안 에그라이크 크림 블러셔",
+      "category": "베이스메이크업",
+      "goodsNos": 1,
+      "reviews25k": 500
+    },
+    {
+      "productId": "p017",
+      "displayName": "헤라 블랙 쿠션 파운데이션",
+      "category": "베이스메이크업",
+      "goodsNos": 3,
+      "reviews25k": 500
+    },
+    {
+      "productId": "p018",
+      "displayName": "데이지크 섀도우팔레트",
+      "category": "아이메이크업",
+      "goodsNos": 3,
+      "reviews25k": 500
+    },
+    {
+      "productId": "p019",
+      "displayName": "리필드 사이토카인 아이래쉬 듀얼 앰플",
+      "category": "아이메이크업",
+      "goodsNos": 1,
+      "reviews25k": 500
+    },
+    {
+      "productId": "p020",
+      "displayName": "에뛰드 컬 픽스 마스카라",
+      "category": "아이메이크업",
+      "goodsNos": 3,
+      "reviews25k": 500
+    },
+    {
+      "productId": "p021",
+      "displayName": "웨이크메이크 소프트 블러링 아이팔레트",
+      "category": "아이메이크업",
+      "goodsNos": 2,
+      "reviews25k": 500
+    },
+    {
+      "productId": "p022",
+      "displayName": "코스노리 아이래쉬 세럼 비건 속눈썹영양제",
+      "category": "아이메이크업",
+      "goodsNos": 3,
+      "reviews25k": 500
+    },
+    {
+      "productId": "p023",
+      "displayName": "투크 워터프루프 슬림 아이라이너",
+      "category": "아이메이크업",
+      "goodsNos": 1,
+      "reviews25k": 500
+    },
+    {
+      "productId": "p024",
+      "displayName": "페리페라 스피디 스키니 브로우",
+      "category": "아이메이크업",
+      "goodsNos": 1,
+      "reviews25k": 500
+    },
+    {
+      "productId": "p025",
+      "displayName": "홀리카홀리카 마이페이브 피스 아이섀도우",
+      "category": "아이메이크업",
+      "goodsNos": 4,
+      "reviews25k": 500
+    },
+    {
+      "productId": "p026",
+      "displayName": "구달 청귤 비타C 잡티케어 세럼",
+      "category": "에센스/세럼",
+      "goodsNos": 5,
+      "reviews25k": 500
+    },
+    {
+      "productId": "p027",
+      "displayName": "넘버즈인 판토텐산 액티브업 수딩세럼",
+      "category": "에센스/세럼",
+      "goodsNos": 3,
+      "reviews25k": 500
+    },
+    {
+      "productId": "p028",
+      "displayName": "달바 퍼스트 스프레이 세럼",
+      "category": "에센스/세럼",
+      "goodsNos": 4,
+      "reviews25k": 500
+    },
+    {
+      "productId": "p029",
+      "displayName": "메디큐브 PDRN 핑크 앰플",
+      "category": "에센스/세럼",
+      "goodsNos": 3,
+      "reviews25k": 500
+    },
+    {
+      "productId": "p030",
+      "displayName": "메디힐 PDRN 모공 탄력 세럼",
+      "category": "에센스/세럼",
+      "goodsNos": 2,
+      "reviews25k": 500
+    },
+    {
+      "productId": "p031",
+      "displayName": "메디힐 마데카소사이드 흔적 리페어 세럼",
+      "category": "에센스/세럼",
+      "goodsNos": 4,
+      "reviews25k": 500
+    },
+    {
+      "productId": "p032",
+      "displayName": "성분에디터 그린토마토 NMN 포어 리프팅 앰플",
+      "category": "에센스/세럼",
+      "goodsNos": 2,
+      "reviews25k": 500
+    },
+    {
+      "productId": "p033",
+      "displayName": "셀라딕스 트러블 세범 리밸런싱 앰플",
+      "category": "에센스/세럼",
+      "goodsNos": 2,
+      "reviews25k": 500
+    },
+    {
+      "productId": "p034",
+      "displayName": "아누아 TXA 나이아신 흔적 세럼",
+      "category": "에센스/세럼",
+      "goodsNos": 2,
+      "reviews25k": 500
+    },
+    {
+      "productId": "p035",
+      "displayName": "아누아 피디알엔 히알루론산 캡슐 100 세럼",
+      "category": "에센스/세럼",
+      "goodsNos": 7,
+      "reviews25k": 500
+    },
+    {
+      "productId": "p036",
+      "displayName": "아이오페 레티놀 슈퍼 바운스 세럼",
+      "category": "에센스/세럼",
+      "goodsNos": 6,
+      "reviews25k": 500
+    },
+    {
+      "productId": "p037",
+      "displayName": "웰라쥬 리얼 히알루로닉 블루 100 앰플",
+      "category": "에센스/세럼",
+      "goodsNos": 3,
+      "reviews25k": 500
+    },
+    {
+      "productId": "p038",
+      "displayName": "이니스프리 레티놀 시카 흔적 앰플",
+      "category": "에센스/세럼",
+      "goodsNos": 7,
+      "reviews25k": 500
+    },
+    {
+      "productId": "p039",
+      "displayName": "토리든 다이브인 저분자 히알루론산 세럼",
+      "category": "에센스/세럼",
+      "goodsNos": 11,
+      "reviews25k": 500
+    },
+    {
+      "productId": "p040",
+      "displayName": "파티온 노스카나인 트러블 세럼",
+      "category": "에센스/세럼",
+      "goodsNos": 4,
+      "reviews25k": 500
+    },
+    {
+      "productId": "p041",
+      "displayName": "닥터지 레드 블레미쉬 클리어 수딩크림",
+      "category": "크림",
+      "goodsNos": 3,
+      "reviews25k": 500
+    },
+    {
+      "productId": "p042",
+      "displayName": "라로슈포제 시카플라스트 밤 B5+",
+      "category": "크림",
+      "goodsNos": 9,
+      "reviews25k": 500
+    },
+    {
+      "productId": "p043",
+      "displayName": "메디큐브 PDRN 핑크 콜라겐 캡슐크림",
+      "category": "크림",
+      "goodsNos": 2,
+      "reviews25k": 500
+    },
+    {
+      "productId": "p044",
+      "displayName": "아누아 피디알엔 히알루론산 100 수분크림",
+      "category": "크림",
+      "goodsNos": 4,
+      "reviews25k": 500
+    },
+    {
+      "productId": "p045",
+      "displayName": "에스네이처 아쿠아 스쿠알란 수분크림",
+      "category": "크림",
+      "goodsNos": 3,
+      "reviews25k": 500
+    },
+    {
+      "productId": "p046",
+      "displayName": "에스트라 아토베리어365 크림",
+      "category": "크림",
+      "goodsNos": 6,
+      "reviews25k": 500
+    },
+    {
+      "productId": "p047",
+      "displayName": "유세린 하이알루론 3X 아이크림",
+      "category": "크림",
+      "goodsNos": 3,
+      "reviews25k": 500
+    },
+    {
+      "productId": "p048",
+      "displayName": "제로이드 인텐시브 크림",
+      "category": "크림",
+      "goodsNos": 7,
+      "reviews25k": 500
+    },
+    {
+      "productId": "p049",
+      "displayName": "토리든 다이브인 히알루론산 수딩 크림",
+      "category": "크림",
+      "goodsNos": 3,
+      "reviews25k": 500
+    },
+    {
+      "productId": "p050",
+      "displayName": "피지오겔 DMT 페이셜크림",
+      "category": "크림",
+      "goodsNos": 17,
+      "reviews25k": 500
+    }
+  ]
+}

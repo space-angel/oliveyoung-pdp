@@ -20,7 +20,7 @@ crawler/     올리브영 cursor API 크롤러 (상품당 최대 500건)
 pipeline/    step0 전처리 → step1 클레임 추출 → step2 집계 → step3 축분류 → step4 질문생성
 eval/        평가 스크립트 + 골든셋 + 리포트
 data/
-  input/         수집 결과·정규화 입력 (커밋됨 — 평가 수치의 근거)
+  input/         수집 결과·정규화 입력 + product_catalog.json (커밋됨 — 평가 수치의 근거)
   intermediate/  step0~3 중간 산출물 (gitignore, 재생성 가능)
   output/        concerns_*.json (커밋됨)
 docs/
