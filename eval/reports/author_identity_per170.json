@@ -1,0 +1,116 @@
+{
+  "issue": "PER-170",
+  "scale": {
+    "reviews": 25000,
+    "uniqueUserNames": 13876,
+    "multiReviewAuthors": 4517,
+    "reviewsByMultiReviewAuthors": 15641,
+    "reviewsByMultiReviewAuthorsPct": 62.56,
+    "maxReviewsBySingleAuthor": 59,
+    "authorProductPairs": 19389,
+    "duplicateAuthorProductPairs": 3506,
+    "excessVotes": 5611,
+    "excessVotesPct": 22.44,
+    "perProductInflationPct": {
+      "min": 6.8,
+      "median": 22.9,
+      "p95": 39.8,
+      "max": 41.8
+    },
+    "worstInflationProducts": [
+      {
+        "productKey": "아누아 TXA 나이아신 흔적 세럼",
+        "reviews": 500,
+        "uniqueAuthors": 291,
+        "inflationPct": 41.8
+      },
+      {
+        "productKey": "달바 퍼스트 스프레이 세럼",
+        "reviews": 500,
+        "uniqueAuthors": 293,
+        "inflationPct": 41.4
+      },
+      {
+        "productKey": "아이오페 레티놀 슈퍼 바운스 세럼",
+        "reviews": 500,
+        "uniqueAuthors": 301,
+        "inflationPct": 39.8
+      }
+    ]
+  },
+  "option3_dropAuthorVote": {
+    "identicalContentGroups": 587,
+    "removedByContentHashWithinProduct": 678,
+    "residualContamination": 4933,
+    "residualContaminationPctOfCorpus": 19.73,
+    "contentHashCoverageOfExcessVotesPct": 12.08
+  },
+  "option2_profileImageUrl": {
+    "reviewsWithProfileImage": 13587,
+    "reviewsWithProfileImagePct": 54.35,
+    "uniqueProfileImageUrls": 6187,
+    "multiReviewAuthorsWithImage": 2535,
+    "multiReviewAuthorsWithTwoOrMoreImages": 0,
+    "profileImageUrlsSharedAcrossNames": 0,
+    "authorsFalseSplitByCombinedKey": 12,
+    "maskedNames": 3733,
+    "maskedNameReviews": 5602,
+    "maskedMultiReviewAuthors": 977,
+    "maskedMultiReviewAuthorsWithImage": 30,
+    "maskedMultiReviewAuthorsWithTwoOrMoreImages": 0
+  },
+  "homonymRisk": {
+    "duplicatePairVerdicts": {
+      "same_account": 2403,
+      "unknown": 1103
+    },
+    "duplicatePairSameAccountPct": 68.54,
+    "duplicatePairSkinTypeConflict": 54,
+    "duplicatePairSkinTypeConflictPct": 1.54,
+    "duplicatePairSkinToneConflict": 67,
+    "skinTypeConflictAuthors": 115,
+    "skinTypeConflictAuthorsPct": 2.55,
+    "skinTypeConflictAuthorVerdicts": {
+      "same_account": 108,
+      "unknown": 7
+    },
+    "skinTypeConflictSpanMonthsMedian": 18,
+    "skinTypeConflictSpanMonthsMax": 73,
+    "sameMonthSkinTypeConflictAuthors": 14,
+    "sameMonthSkinTypeConflictPctOfMultiAuthors": 0.31
+  },
+  "option1_hashSpec": {
+    "algorithm": "HMAC-SHA256(salt, NFC(userName))[:16]",
+    "emptyUserNames": 0,
+    "namesNotNfc": 0,
+    "namesMergedByStripLower": 0,
+    "collisionsByHexLength": {
+      "8hex": 0,
+      "12hex": 0,
+      "16hex": 0,
+      "32hex": 0
+    },
+    "nameLength": {
+      "min": 1,
+      "median": 5.0,
+      "max": 20
+    },
+    "namesUpToTwoChars": 896,
+    "reviewsByNamesUpToTwoChars": 1637
+  },
+  "downstreamSufficiencyGate": {
+    "cellDefinition": "productKey x skinType (미기재는 MISSING 세그먼트로 별도 계산)",
+    "cells": 393,
+    "cellsAtLeast8Before": 310,
+    "cellsAtLeast8After": 294,
+    "cellsFallingBelow8": 16,
+    "cellMedianBefore": 35,
+    "cellMedianAfter": 26,
+    "minUniqueAuthorsPerProduct": 291
+  },
+  "source": {
+    "path": "data/input/reviews_50products.json",
+    "sha256": "04e089d078d5482855f04481b7144661834b391d55b3cec0033431454903a773",
+    "records": 25000
+  }
+}
