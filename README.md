@@ -78,7 +78,7 @@ catalog → ingest → tag → gates → claims → judge
 |---|---|---|---|
 | `catalog` | `goodsNo` → `productId`. 제품 동일성 확정 | **구현** | PER-171 |
 | `ingest` | 25K를 원문/조건/파생 3층으로 적재. LLM 없음 | **구현** | PER-173 |
-| `tag` | 전수 aspect/polarity 태깅 (Batch API) | 미구현 | PER-175 |
+| `tag` | 전수 aspect/polarity 태깅 (Batch API) | 계약·정답셋 **완료** / 배치 실행 미완 | PER-175 |
 | `gates` | 동일성 → 중복 → 방향성 → 충분성 4게이트 + `rejected[]` | 미구현 | PER-182~188 |
 | `claims` | 주장 생성 + 인용 원문 부분문자열 강제 + 스키마 검증 | 미구현 | PER-189~195 |
 | `judge` | 루브릭 judge(생성과 다른 모델) + 전수 평가 | 미구현 | PER-196~201 |
@@ -127,6 +127,8 @@ catalog → ingest → tag → gates → claims → judge
 | **스킨 코드북** | A01~A07 · B01~B06 · C01~C13 **26종 DOM 실측**. 라벨은 입수가 아니라 표기 단계에서 붙인다 | `data/input/skin_codebook.json` · `crawler/verify_skin_codebook.py` |
 | **리뉴얼** | **별개 제품**(PRD 권장안 채택). 세대 경계 키는 `goodsNo`가 아니라 `(goodsNo, reviewDate)`. `renewalPolicy`는 `null` 대신 **`unobserved` 명시** — 현 스냅샷 전 제품 | [`docs/DECISION_PER172_RENEWAL_AND_RECENCY.md`](docs/DECISION_PER172_RENEWAL_AND_RECENCY.md) · `eval/reports/renewal_recency_per172.json` |
 | **리센시 컷** | 스냅샷 최신 월(2026-08) 기준 **24개월 = `2024-09`~**. `today` 롤링은 재현성과 충돌해 쓰지 않는다 | 같음 |
+| **태그 단위** | 리뷰가 아니라 **`(리뷰 × aspect)`**. 한 리뷰 안 방향 갈림 20.5% · 별점 불일치 12.9%라 별점을 방향 대리값으로 쓰지 않는다 | [`docs/DECISION_PER175_TAGGING_CONTRACT.md`](docs/DECISION_PER175_TAGGING_CONTRACT.md) · `eval/reports/v5_tag_pilot.md` |
+| **인용 정규화** | 원문 부분문자열이되 **보이지 않는 문자만 접는다**(CRLF 46.3% · 공백 변종 1.1%). 공백 전체 squeeze 금지 | 같음 |
 
 ### 조건부 진실 — 이 도메인의 핵심 설계
 
@@ -280,6 +282,8 @@ v5가 넘어야 하는 선: **인용 정확도 100%** (생성 시점에 원문 �
 | [`docs/PRODUCT_CATALOG.md`](docs/PRODUCT_CATALOG.md) | 제품 동일성 레이어 규칙·운영 절차 |
 | [`docs/DECISION_PER170_AUTHOR_IDENTIFIER.md`](docs/DECISION_PER170_AUTHOR_IDENTIFIER.md) | 작성자 식별자 결정과 근거 |
 | [`docs/DECISION_PER172_RENEWAL_AND_RECENCY.md`](docs/DECISION_PER172_RENEWAL_AND_RECENCY.md) | 리뉴얼 취급 · 리센시 컷 결정과 근거 |
+| [`docs/DECISION_PER175_TAGGING_CONTRACT.md`](docs/DECISION_PER175_TAGGING_CONTRACT.md) | 태깅 계약 — 태그 단위 · 힌트 · 인용 정규화 · 택소노미 동결 |
+| [`eval/gold/README.md`](eval/gold/README.md) | 평가 고정물(표본·정답셋) 규칙과 재현 절차 |
 | [`docs/V5_INPUTS_AND_LEGACY_AUDIT.md`](docs/V5_INPUTS_AND_LEGACY_AUDIT.md) | 입력 인벤토리 · 25K 프로파일 · 레거시 감사 |
 | [`docs/SCRAPLING_MIGRATION_POC.md`](docs/SCRAPLING_MIGRATION_POC.md) | 크롤러 설계 근거 (엔드포인트·size 상한·레이트리밋 실측) |
 | [`docs/PDP_EXPERIMENT_CONTEXT.md`](docs/PDP_EXPERIMENT_CONTEXT.md) | PDP 화면 명세 + 스킨 코드북 |
