@@ -1,0 +1,72 @@
+{
+  "_meta": {
+    "description": "올리브영 리뷰 피부정보 코드 → 라벨 사전. profileDto.skinType / skinTone / skinTrouble 에 대응한다.",
+    "source": "PDP DOM 실측",
+    "sourceDetail": "www.oliveyoung.co.kr PDP(goodsNo=A000000158513) 리뷰 탭의 리뷰 위젯(Lit web component, Shadow DOM)에서 직접 추출. 추정 아님.",
+    "verifiedAt": "2026-09-03",
+    "verifiedBy": "wonderhy11@naver.com (Chrome 실세션)",
+    "evidence": [
+      "OY-REVIEW-SKIN-FIT-SHEET._renderFilterContent() 의 SKIN_TYPES / SKIN_TONES 옵션 배열 — 칩의 {id, text} 쌍 (skinType 7개, skinTone 6개)",
+      "OY-REVIEW-REVIEW-USER._getSkinTypeText / _getSkinToneText / _getSkinTroubleText — 코드 입력 → 라벨 반환 (skinTrouble 13개 포함, 위 두 그룹과 교차 일치)",
+      "화면 캡처: 피부 필터 모달의 피부 타입 7개 · 피부 톤 6개 칩 (docs/evidence/skin_filter_modal_2026-09-03.jpg)",
+      "경계 확인: A08 / B07 / C14 이상은 라벨이 없고 코드 문자열이 그대로 반환됨 → 도메인은 A01~A07, B01~B06, C01~C13 으로 닫혀 있다",
+      "빈 문자열 입력 시 빈 문자열 반환 (미기재와 구분됨)"
+    ],
+    "constraints": {
+      "skinType": "단일 선택",
+      "skinTone": "단일 선택",
+      "skinTrouble": "최대 2개 선택 — data/input/reviews_50products.json 25,000건에서 선택 개수 분포가 0/1/2 뿐 (11519 / 1500 / 11981)",
+      "filterUI": "PDP 리뷰 '피부 필터' 모달에는 피부타입·피부톤만 노출된다. 피부고민(C)은 필터 항목이 아니라 리뷰 카드 표시 전용."
+    },
+    "note": "docs/PDP_EXPERIMENT_CONTEXT.md §6 의 구 표는 추정이었고 실측과 다르다 (A01/A02 뒤바뀜, A04=중성 오류, A05~A07·B05~B06·C11~C13 누락). 해당 표는 이 파일로 대체한다.",
+    "crossCheck": {
+      "method": "DOM 실측과 독립적으로, 25,000건 리뷰 본문에서 라벨 문자열 출현률의 lift/z를 계산해 코드-라벨 대응을 재확인했다. (data/input/reviews_50products.json)",
+      "result": [
+        "A01=지성: 본문 '지성' lift 2.17, z 14.6 (n=2180)",
+        "A02=건성: 본문 '건성' lift 2.07, z 20.2 (n=3542)",
+        "A03=복합성: 본문 '복합성' lift 1.62, z 8.1 (n=5799)",
+        "A06=트러블성: 본문 '트러블성' lift 5.82, z 5.3 (n=715)",
+        "B03=봄웜톤: 본문 '봄웜' lift 3.24, z 14.4 (n=2438)",
+        "B05=가을웜톤: 본문 '가을웜' lift 5.77, z 10.1 (n=1625)",
+        "B06=겨울쿨톤: 본문 '겨울쿨' lift 10.75, z 20.2 (n=1107)",
+        "C03=주름: 본문 '주름' lift 1.55, z 4.8 (n=2221)",
+        "C05=트러블: 본문 '트러블' lift 1.16, z 2.9 (n=4132)",
+        "C07=피지과다: 본문 '피지' lift 1.59, z 2.9 (n=640)",
+        "C10=탄력: 본문 '탄력' lift 2.08, z 3.3 (n=427)"
+      ],
+      "note": "C01(잡티)·C06(블랙헤드)·C12(가려움) 등은 본문 언급이 드물어 상관으로는 검증되지 않는다. 이들의 근거는 DOM 실측뿐이다."
+    }
+  },
+  "skinType": {
+    "A01": "지성",
+    "A02": "건성",
+    "A03": "복합성",
+    "A04": "민감성",
+    "A05": "약건성",
+    "A06": "트러블성",
+    "A07": "중성"
+  },
+  "skinTone": {
+    "B01": "쿨톤",
+    "B02": "웜톤",
+    "B03": "봄웜톤",
+    "B04": "여름쿨톤",
+    "B05": "가을웜톤",
+    "B06": "겨울쿨톤"
+  },
+  "skinTrouble": {
+    "C01": "잡티",
+    "C02": "미백",
+    "C03": "주름",
+    "C04": "각질",
+    "C05": "트러블",
+    "C06": "블랙헤드",
+    "C07": "피지과다",
+    "C08": "민감성",
+    "C09": "모공",
+    "C10": "탄력",
+    "C11": "붉은기",
+    "C12": "가려움",
+    "C13": "다크서클"
+  }
+}

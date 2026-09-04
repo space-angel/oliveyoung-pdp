@@ -75,4 +75,4 @@ v4 평가 결과 ([`eval/reports/eval_report_v4.md`](eval/reports/eval_report_v4
 
 - **집계 단위** — 25K 데이터의 `productKey`는 50개지만 `goodsNo`는 153개다 (cursor API가 변형 SKU 리뷰를 합산). goodsNo로 그룹핑하면 리뷰 1~7건 상품이 139개 생겨 `supportingReviewIds ≥ 5` Gate가 대량 실패한다.
 - **부정 신호 희소성** — 평점 5점이 85%, 1~2점은 407건(1.6%). "위험 신호 재현율"을 어떻게 측정할지 정해야 한다.
-- **스킨 코드 사전** — `skinType`/`skinTrouble` 코드→라벨 매핑을 API에서 받지 못했다 (`data/input/skin_codes_probe_result.json`이 실패 근거). 현재 유일한 사전은 `docs/PDP_EXPERIMENT_CONTEXT.md` §6의 수동 표다.
+- ~~**스킨 코드 사전**~~ — **해소 (2026-09-03).** API 8개 엔드포인트는 전부 실패했지만(`data/input/skin_codes_probe_result.json`) 실브라우저로 PDP 리뷰 위젯 DOM을 열어 A01~A07 · B01~B06 · C01~C13 **26종 전부 실측**했다. 정본은 `data/input/skin_codebook.json`, 검증은 `python crawler/verify_skin_codebook.py`. 구 `PDP_EXPERIMENT_CONTEXT.md` §6 수동 표는 A01/A02가 뒤바뀐 추정이었다.

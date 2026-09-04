@@ -106,14 +106,27 @@ skinType skinTone skinTrouble reviewImages
 | `reviewImages` | 리뷰 첨부 이미지 URL | v5 텍스트 파이프라인 미사용 → 드롭 (PDP 렌더링은 별도 조회) |
 | `reviewerRank`, `isTopReviewer` | 등급 | 가중치로 쓸 계획 없으면 드롭 |
 
-### 3-5. 미해결 블로커 — 스킨 코드 사전
+### 3-5. ~~미해결 블로커~~ 해소 — 스킨 코드 사전 〔2026-09-03 DOM 실측〕
 
-`skinType` = `A01~A04`+공백, `skinTone` = `B01~B04`+공백, `skinTrouble` = `["C01".."C0n"]` (89조합).
-**코드→라벨 매핑을 API에서 못 받았다** — `data/probe_skin_codes.json` 실측 결과 후보 엔드포인트 8개 전부 실패
-(400 / `data:null` / fetch 실패), DOM 라벨 수집도 빈 결과.
+관측 코드(25,000건): `skinType` = **A01~A07**(7종, 기재 57.1%), `skinTone` = **B01~B06**(6종, 54.8%),
+`skinTrouble` = **C01~C13**(13종, 53.9%, 최대 2개 선택 · 88조합).
+*본 문서 구버전의 `A01~A04` / `B01~B04` 표기는 축소 오기였다. `SCRAPLING_MIGRATION_POC.md:512`가 처음부터 맞았다.*
 
-→ `PDP_EXPERIMENT_CONTEXT.md` §6에 수동 작성된 라벨 표가 **현재 유일한 사전**이다.
-v4의 적합성 축 복구(PER-162)가 이 매핑에 의존하므로, 출처가 추정인지 실측인지 확인 필요.
+**API 조회 실패는 사실이다** — `data/input/skin_codes_probe_result.json`: 후보 엔드포인트 8개 전부 실패
+(400 / `data:null` / fetch 실패). 다만 그건 **API 경로가 없다는 뜻이지 라벨이 없다는 뜻이 아니었다.**
+실제 브라우저 세션으로 PDP 리뷰 위젯(Lit / Shadow DOM)에 접근하니 라벨이 그대로 나왔다:
+필터 시트의 `{id, text}` 칩 배열과 리뷰 카드의 `_getSkinTypeText / _getSkinToneText / _getSkinTroubleText`,
+두 경로가 서로 일치. HTTP 직접 호출은 WAF 403이라 실브라우저가 필요하다.
+
+| 산출물 | 경로 |
+|---|---|
+| **코드북 (정본)** | `data/input/skin_codebook.json` — 26종, `_meta`에 출처·근거·제약 |
+| 커버리지 검증 | `python crawler/verify_skin_codebook.py` → 미지 코드 0 |
+| 화면 캡처 | `docs/evidence/skin_filter_modal_2026-09-03.jpg` |
+| 라벨 표 (사본) | `PDP_EXPERIMENT_CONTEXT.md` §6 |
+
+→ 크롤러는 상수 하드코딩 대신 `load_skin_codebook()`으로 이 파일을 읽는다.
+v4 적합성 축 복구(PER-162)의 사전 의존성은 풀렸다.
 
 ---
 
