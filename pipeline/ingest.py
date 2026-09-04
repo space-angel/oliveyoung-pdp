@@ -14,6 +14,7 @@ v5 Step 1 — 입수 태깅 (PER-173 / PRD §3-1).
   - 카탈로그에 없는 `goodsNo`      → UnknownGoodsNoError
   - 필수 필드 누락                 → ValueError
   - `reviewId` 중복                → SystemExit
+  - 가중치 설정 위반 (PER-174)     → TrustConfigError
 
 사용:
   .venv/bin/python pipeline/ingest.py
@@ -32,6 +33,7 @@ sys.path.insert(0, str(Path(__file__).parent))
 
 from catalog import load_catalog  # noqa: E402
 from policy import assert_snapshot_current  # noqa: E402
+from trust import ScoringContext, TrustWeights, trust_prior  # noqa: E402
 from contracts import (  # noqa: E402
     CONDITION_AXES,
     DROPPED_FIELDS,
@@ -70,6 +72,14 @@ def ingest(input_path: Path = INPUT_PATH) -> tuple[list[dict], dict, dict]:
         product_id = catalog.resolve_goods_no(row["goodsNo"], row["reviewDate"])
         records.append(build_record(row, product_id).to_dict())
 
+    # 신뢰도 사전 점수 (PER-174). 중복 본문 그룹 크기와 제품별 좋아요 백분위는 리뷰
+    # 1건만 봐서는 알 수 없어 두 번째 패스로 매긴다. **필터가 아니라 가중치다** —
+    # 점수가 낮아도 여기서 버리지 않는다. 버리는 판단은 게이트(PER-182~188)에서만 한다.
+    weights = TrustWeights.load()
+    context = ScoringContext.from_records(records)
+    for record in records:
+        record["derived"]["trustPrior"] = trust_prior(record, context, weights)
+
     meta = {
         "schemaVersion": SCHEMA_VERSION,
         "issue": "PER-173",
@@ -82,6 +92,7 @@ def ingest(input_path: Path = INPUT_PATH) -> tuple[list[dict], dict, dict]:
         },
         "conditionAxes": list(CONDITION_AXES),
         "droppedFields": DROPPED_FIELDS,
+        "trustPrior": weights.as_dict(),
     }
     return records, meta, profile(records)
 
@@ -133,6 +144,29 @@ def profile(records: list[dict]) -> dict:
         "skinTroubleSegments": len(
             {s for r in records for s in r["condition"]["skinTrouble"]["segments"]}
         ),
+        # 사전 점수 분포 (PER-174). 점수가 한쪽으로 뭉치면 정렬 신호로서 무의미해지므로
+        # 분포를 커밋된 프로파일에 남긴다.
+        "trustPrior": trust_prior_profile(records),
+    }
+
+
+def trust_prior_profile(records: list[dict]) -> dict:
+    scores = sorted(r["derived"]["trustPrior"]["score"] for r in records)
+    n = len(scores)
+    if not n:
+        return {}
+    q = lambda p: scores[min(n - 1, int(n * p))]  # noqa: E731
+    unavailable = sorted({s for r in records for s in r["derived"]["trustPrior"].get("unavailable", [])})
+    return {
+        "issue": "PER-174",
+        "min": scores[0],
+        "p25": q(0.25),
+        "median": q(0.5),
+        "p75": q(0.75),
+        "p95": q(0.95),
+        "max": scores[-1],
+        "distinctScores": len(set(scores)),
+        "unavailableSignals": unavailable,
     }
 
 

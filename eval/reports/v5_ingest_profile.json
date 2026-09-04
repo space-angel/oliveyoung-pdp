@@ -25,5 +25,18 @@
     "atLeast8Raw": 314,
     "atLeast8AfterAuthorDedup": 297
   },
-  "skinTroubleSegments": 14
+  "skinTroubleSegments": 14,
+  "trustPrior": {
+    "issue": "PER-174",
+    "min": 0.1315,
+    "p25": 0.5288,
+    "median": 0.623,
+    "p75": 0.7598,
+    "p95": 0.9853,
+    "max": 1.0,
+    "distinctScores": 757,
+    "unavailableSignals": [
+      "onTopic"
+    ]
+  }
 }

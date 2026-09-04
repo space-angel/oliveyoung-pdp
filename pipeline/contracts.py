@@ -148,7 +148,7 @@ DROPPED_FIELDS = {
     "category": "카탈로그의 category 를 쓴다 (같은 제품인데 행마다 다를 수 있다)",
     "profileImageUrl": "식별자 조합키로는 증가분 0 (PER-170). 감사 리포트에서만 쓴다",
     "reviewImages": "v5 텍스트 파이프라인 미사용. PDP 렌더링은 별도 조회",
-    "reviewerRank": "신뢰도 산식이 등급 신호를 쓸지 미결 (PER-174)",
+    "reviewerRank": "신뢰도 산식이 등급 신호를 쓰지 않기로 확정 (PER-174). isTopReviewer 와 사실상 같은 신호이고(3,070/3,083 중첩) 효과 구간이 0을 포함한다",
     "isTopReviewer": "같음 (PER-174)",
 }
 

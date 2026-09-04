@@ -1,0 +1,18 @@
+{
+  "issue": "PER-174",
+  "version": "trust-v1",
+  "note": "신호별 가중치. 코드 상수가 아니라 여기서 고친다 (PER-174 완료 조건). 0.0 은 '신호를 뺐다'가 아니라 '측정에서 효과가 0과 구별되지 않았다'는 뜻이고, 근거는 eval/reports/trust_signals_per174.json 이다.",
+  "weights": {
+    "contentLength": 0.6,
+    "uniqueContent": 0.4,
+    "onTopic": 0.5,
+    "hasPhoto": 0.0,
+    "usagePeriod": 0.0,
+    "likes": 0.0
+  },
+  "contentLength": {
+    "floorChars": 22,
+    "capChars": 478,
+    "shape": "sqrt"
+  }
+}
