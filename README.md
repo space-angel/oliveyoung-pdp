@@ -62,7 +62,7 @@ Linear: [올리브영 PDP 개선 (PRD 기반)](https://linear.app/banjax/project
 | 같은 제품인가 | **규칙** | 카탈로그의 책임 (`pipeline/catalog.py`) |
 | 중복 리뷰인가 | **규칙 + 임베딩** | 결정론적으로 가능 |
 | 몇 건 이상이어야 하는가 | **규칙** | 임계값은 제품 결정이지 모델 판단이 아니다 |
-| 무엇을 상위 N개로 보여줄까 | **규칙** | 랭킹 기준은 명시적이어야 재현·설명 가능 |
+| 무엇을 상위 N개로 보여줄까 | **규칙** | 랭킹 기준은 명시적이어야 재현·설명 가능 (`pipeline/trust.py`) |
 
 ---
 
@@ -129,6 +129,7 @@ catalog → ingest → tag → gates → claims → judge
 | **리센시 컷** | 스냅샷 최신 월(2026-08) 기준 **24개월 = `2024-09`~**. `today` 롤링은 재현성과 충돌해 쓰지 않는다 | 같음 |
 | **태그 단위** | 리뷰가 아니라 **`(리뷰 × aspect)`**. 한 리뷰 안 방향 갈림 20.5% · 별점 불일치 12.9%라 별점을 방향 대리값으로 쓰지 않는다 | [`docs/DECISION_PER175_TAGGING_CONTRACT.md`](docs/DECISION_PER175_TAGGING_CONTRACT.md) · `eval/reports/v5_tag_pilot.md` |
 | **인용 정규화** | 원문 부분문자열이되 **보이지 않는 문자만 접는다**(CRLF 46.3% · 공백 변종 1.1%). 공백 전체 squeeze 금지 | 같음 |
+| **신뢰도 사전 점수** | **필터가 아니라 가중치**. 채택 신호는 `contentLength`(0.6)·`uniqueContent`(0.4)·`onTopic`(0.5, 태깅 후). `usefulPoint`는 올리브영의 정렬 점수라 **쓰지 않는다**(`recommendCount`와 순위상관 0.008) | [`docs/DECISION_PER174_TRUST_PRIOR.md`](docs/DECISION_PER174_TRUST_PRIOR.md) · `eval/reports/trust_signals_per174.json` |
 
 ### 조건부 진실 — 이 도메인의 핵심 설계
 
@@ -160,6 +161,8 @@ UI 정리가 아니라 정확도 문제다. 조건을 붙이면 상충하는 리
 | 수집 기간 | 2018.12 ~ 2026.08 (2026년이 74.6%) | 24개월 컷 확정 — 잔존 88.8%, N≥8 셀 294→284 (PER-172) |
 | 리뉴얼 신호 | 멀티 `goodsNo` 계보 36개 중 교체형 **1개** / 본문 언급 303건(1.21%) | `goodsNo` 교체는 자동 신호가 아니다. 세대는 사람이 외부 근거로 확정한다 |
 | 리뉴얼 컷 순증분 | 리센시 24개월 기준 **7건** (컷 없으면 170건) | 리센시 컷이 이전 세대의 96%를 이미 흡수한다 — 세대 확정은 컷 값에 대한 보험이다 |
+| 신뢰도 사전 점수 | 중앙 0.623 · 서로 다른 점수 **757개** | 25,000건에 757개뿐이라 동점이 흔하다 → 정렬에 결정적 tiebreak 필수 (PER-174) |
+| 좋아요 신호 | `usefulPoint`↔`recommendCount` 순위상관 **0.008** | 둘은 같은 것이 아니다. `usefulPoint`는 크롤러의 수집 정렬 키(153/153 goodsNo 단조)라 쓰지 않는다 |
 
 ---
 
@@ -190,8 +193,10 @@ pipeline/    v5 — 작업 대상
   policy.py                리뉴얼 취급 · 리센시 컷 (PER-172). 게이트1이 소비한다
   build_product_catalog.py 카탈로그 생성기 (--check 로 재현 확인)
   ingest.py                25K → v5 레코드 (LLM 없음, 재실행 일치)
+  trust.py                 신뢰도 사전 점수 (PER-174). 필터가 아니라 가중치
+  trust_weights.json       신호별 가중치 — 코드가 아니라 여기서 고친다
   run_v5.py                단계 레지스트리
-  test_*.py                계약 테스트 110케이스 (catalog·policy·ingest·tag)
+  test_*.py                계약 테스트 133케이스 (catalog·policy·ingest·tag·trust)
 legacy/v4/   v4 동결 — 비교 기준선. 고치지 않는다
 crawler/     올리브영 cursor API 크롤러 (상품당 최대 500건)
 eval/        평가 스크립트 + 리포트 (커밋됨 — 수치의 1차 근거)
@@ -267,7 +272,6 @@ v5가 넘어야 하는 선: **인용 정확도 100%** (생성 시점에 원문 �
 
 | 미결 | 내용 | 이슈 |
 |---|---|---|
-| 신뢰도 사전 점수 | §3-4 6개 신호 확정. `reviewerRank`·`isTopReviewer` 드롭 여부가 여기 걸려 있다 | PER-174 |
 | 부정 신호 표본 | 1~2점 407건(1.6%)으로 "위험 신호 재현율"을 어떻게 측정할지. 아직 이슈 미할당 — FP 임계값 튜닝(PER-199)과 함께 정한다 | `docs/V5_INPUTS_AND_LEGACY_AUDIT.md` §5-3 |
 | 입력 계약 문서 | 위 결정들을 하나의 계약으로 고정 | PER-176 |
 | 리뉴얼 세대 (나머지 45계보) | 5개는 외부 근거로 확정했다. 나머지는 `unobserved`이고, 현행 24개월 컷에서 순증분이 작아 우선순위는 낮다 — **리센시 컷을 완화하려면 먼저 확정해야 한다**(36개월에서 순증분 7→47) | PER-172 → PER-182 |
@@ -284,6 +288,7 @@ v5가 넘어야 하는 선: **인용 정확도 100%** (생성 시점에 원문 �
 | [`docs/DECISION_PER170_AUTHOR_IDENTIFIER.md`](docs/DECISION_PER170_AUTHOR_IDENTIFIER.md) | 작성자 식별자 결정과 근거 |
 | [`docs/DECISION_PER172_RENEWAL_AND_RECENCY.md`](docs/DECISION_PER172_RENEWAL_AND_RECENCY.md) | 리뉴얼 취급 · 리센시 컷 결정과 근거 |
 | [`docs/DECISION_PER175_TAGGING_CONTRACT.md`](docs/DECISION_PER175_TAGGING_CONTRACT.md) | 태깅 계약 — 태그 단위 · 힌트 · 인용 정규화 · 택소노미 동결 |
+| [`docs/DECISION_PER174_TRUST_PRIOR.md`](docs/DECISION_PER174_TRUST_PRIOR.md) | 신뢰도 사전 점수 — 6개 신호 실측 · 가중치 근거 · `usefulPoint` 기각 |
 | [`eval/gold/README.md`](eval/gold/README.md) | 평가 고정물(표본·정답셋) 규칙과 재현 절차 |
 | [`docs/V5_INPUTS_AND_LEGACY_AUDIT.md`](docs/V5_INPUTS_AND_LEGACY_AUDIT.md) | 입력 인벤토리 · 25K 프로파일 · 레거시 감사 |
 | [`docs/SCRAPLING_MIGRATION_POC.md`](docs/SCRAPLING_MIGRATION_POC.md) | 크롤러 설계 근거 (엔드포인트·size 상한·레이트리밋 실측) |
