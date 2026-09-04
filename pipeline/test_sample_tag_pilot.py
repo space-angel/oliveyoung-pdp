@@ -12,7 +12,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
 
-from sample_tag_pilot import ROOT, SEED, STRATA, load_reviews, rel
+from sample_tag_pilot import ROOT, SEED, STRATA, diagnose, load_reviews, rel
 
 
 class TestMissingInput(unittest.TestCase):
@@ -42,6 +42,55 @@ class TestStrata(unittest.TestCase):
     def test_seed_is_fixed(self):
         """시드가 바뀌면 표본이 바뀌고 정답셋이 무의미해진다."""
         self.assertEqual(SEED, 20260904)
+
+
+def rec(review_id: int, product_id: str = "p001", author: str = "a") -> dict:
+    return {
+        "reviewId": review_id,
+        "productId": product_id,
+        "raw": {"content": "본문", "rating": 5},
+        "condition": {},
+        "derived": {"authorKey": author},
+    }
+
+
+class TestDiagnose(unittest.TestCase):
+    """FAIL 메시지가 '치명'과 '양성'을 구분해야 한다.
+
+    구분이 없으면 발견한 사람이 파일 주인에게 물어보고 별도 스크립트를 짜야 한다
+    (2026-09-04 카탈로그 세대 분할 때 실제로 그랬다).
+    """
+
+    def test_review_id_dropped_is_fatal(self):
+        ok, why = diagnose([rec(1)], [rec(1), rec(2)])
+        self.assertFalse(ok)
+        self.assertIn("치명", why)
+        self.assertIn("덮어쓰지 마라", why)
+
+    def test_review_id_added_is_fatal(self):
+        _, why = diagnose([rec(1), rec(2)], [rec(1)])
+        self.assertIn("치명", why)
+
+    def test_same_ids_different_order_is_fatal_and_points_at_seed(self):
+        _, why = diagnose([rec(2), rec(1)], [rec(1), rec(2)])
+        self.assertIn("치명", why)
+        self.assertIn("SEED", why)
+
+    def test_product_id_only_change_is_benign(self):
+        """세대 분할이 productId 만 바꾼 경우 — 재생성하면 된다."""
+        _, why = diagnose([rec(1, "p053")], [rec(1, "p017")])
+        self.assertIn("양성", why)
+        self.assertIn("무효화되는 태그가 없다", why)
+        self.assertIn("p017 → p053", why)
+
+    def test_benign_message_names_the_regeneration_command(self):
+        _, why = diagnose([rec(1, "p053")], [rec(1, "p017")])
+        self.assertIn("sample_tag_pilot.py", why)
+
+    def test_derived_change_is_benign_too(self):
+        _, why = diagnose([rec(1, author="b")], [rec(1, author="a")])
+        self.assertIn("양성", why)
+        self.assertIn("derived", why)
 
 
 if __name__ == "__main__":

@@ -159,6 +159,57 @@ def write(picked: list[dict], meta: dict) -> None:
         path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n")
 
 
+def diagnose(new: list[dict], pinned: list[dict]) -> tuple[bool, str]:
+    """고정물과 재실행 결과의 차이를 **치명 / 양성** 으로 가른다.
+
+    둘은 대응이 정반대다. 메시지가 이걸 구분 못 하면, 발견한 사람이 파일 주인에게
+    물어보고 별도 스크립트를 짜서 계산해야 한다 (2026-09-04 카탈로그 세대 분할 때
+    실제로 그랬다). 정답셋을 지키는 건 파일 소유권이 아니라 이 판정이어야 한다.
+
+      치명  reviewId 집합이 바뀜  → 정답셋 일부가 무효. 덮어쓰면 안 된다
+      양성  reviewId 는 그대로고 파생 필드만 바뀜 → 재생성하면 된다
+    """
+    new_ids = [r["reviewId"] for r in new]
+    old_ids = [r["reviewId"] for r in pinned]
+    gone, added = set(old_ids) - set(new_ids), set(new_ids) - set(old_ids)
+
+    if gone or added:
+        dead = 0
+        if GOLD_PATH.exists():
+            gold = [json.loads(line) for line in GOLD_PATH.read_text().splitlines() if line]
+            dead = sum(1 for t in gold if t["reviewId"] not in set(new_ids))
+        return False, (
+            f"치명 — reviewId 집합이 바뀌었다 (빠짐 {len(gone)} / 신규 {len(added)}).\n"
+            f"  정답셋 태그 {dead}개가 무효가 된다 ({rel(GOLD_PATH)}).\n"
+            "  표본을 덮어쓰지 마라. 입수 결과가 왜 달라졌는지부터 확인하라."
+        )
+
+    if new_ids != old_ids:
+        return False, (
+            "치명 — reviewId 는 같은데 순서가 다르다. 시드나 층화 로직이 바뀌었다.\n"
+            f"  SEED={SEED} 와 STRATA 를 확인하라. 정답셋 자체는 살아 있다."
+        )
+
+    by_id = {r["reviewId"]: r for r in pinned}
+    changed: collections.Counter = collections.Counter()
+    examples: list[str] = []
+    for r in new:
+        old = by_id[r["reviewId"]]
+        for key in ("productId", "raw", "condition", "derived"):
+            if old[key] != r[key]:
+                changed[key] += 1
+                if key == "productId" and len(examples) < 3:
+                    examples.append(f"{r['reviewId']}: {old[key]} → {r[key]}")
+    detail = ", ".join(f"{k} {n}건" for k, n in changed.most_common()) or "메타만"
+    lines = [
+        f"양성 — reviewId 집합·순서 모두 같고 파생 필드만 바뀌었다 ({detail}).",
+        "  정답셋은 (reviewId, aspect) 로 키를 잡으므로 무효화되는 태그가 없다.",
+        f"  사유를 확인했으면 재생성하라: python3 {rel(Path(__file__))}",
+    ]
+    lines[2:2] = [f"    {e}" for e in examples]
+    return False, "\n".join(lines)
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--check", action="store_true", help="재실행이 같은 표본을 주는지만 확인")
@@ -171,11 +222,9 @@ def main() -> None:
         if not SAMPLE_PATH.exists():
             raise SystemExit(f"FAIL: 표본이 없다 ({SAMPLE_PATH.relative_to(ROOT)})")
         if SAMPLE_PATH.read_text() != payload:
-            raise SystemExit(
-                "FAIL: 재실행 표본이 고정물과 다르다.\n"
-                "  시드가 풀렸거나 입수 결과가 바뀌었다. 표본을 덮어쓰면 "
-                f"{GOLD_PATH.relative_to(ROOT)} 의 정답셋이 무의미해진다 — 원인을 먼저 확인하라."
-            )
+            pinned = [json.loads(line) for line in SAMPLE_PATH.read_text().splitlines() if line]
+            _, why = diagnose(picked, pinned)
+            raise SystemExit(f"FAIL: 재실행 표본이 고정물과 다르다.\n  {why}")
         print(f"OK: 표본 재현 확인 ({meta['sampled']}건)")
         return
 
