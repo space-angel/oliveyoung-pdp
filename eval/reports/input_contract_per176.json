@@ -1,0 +1,216 @@
+{
+  "issue": "PER-176",
+  "doc": "docs/INPUT_CONTRACT.md",
+  "source": {
+    "path": "data/input/reviews_50products.json",
+    "reviews": 25000
+  },
+  "sufficiencyNMin": 8,
+  "aggregationUnit": {
+    "goodsNo": {
+      "units": 153,
+      "reviewsPerUnit": {
+        "min": 1,
+        "median": 79,
+        "max": 500
+      },
+      "unitsBelowNMin": 26,
+      "reviewsStrandedBelowNMin": 93,
+      "cellsWithSkinType": 905,
+      "cellsAtLeastNMinAfterAuthorDedup": 429,
+      "belowCrawlTarget500": 139
+    },
+    "productId": {
+      "units": 53,
+      "reviewsPerUnit": {
+        "min": 4,
+        "median": 500,
+        "max": 500
+      },
+      "unitsBelowNMin": 2,
+      "reviewsStrandedBelowNMin": 11,
+      "cellsWithSkinType": 407,
+      "cellsAtLeastNMinAfterAuthorDedup": 297
+    },
+    "productKeyRowString": {
+      "units": 50,
+      "reviewsPerUnit": {
+        "min": 500,
+        "median": 500,
+        "max": 500
+      },
+      "unitsBelowNMin": 0,
+      "reviewsStrandedBelowNMin": 0,
+      "cellsWithSkinType": 393,
+      "cellsAtLeastNMinAfterAuthorDedup": 294,
+      "lineagesHidingMultipleGenerations": 3,
+      "example": {
+        "productKey": "헤라 블랙 쿠션 파운데이션",
+        "productIds": [
+          "p017",
+          "p053"
+        ]
+      }
+    },
+    "fragmentation": {
+      "productsWithMultipleGoodsNos": 35,
+      "products": 53,
+      "maxGoodsNosPerProduct": 17,
+      "goodsNosPerProductHistogram": {
+        "1": 18,
+        "2": 13,
+        "3": 10,
+        "4": 5,
+        "5": 1,
+        "6": 1,
+        "7": 3,
+        "11": 1,
+        "17": 1
+      }
+    }
+  },
+  "inputProfile": {
+    "reviews": 25000,
+    "schema": {
+      "fieldsPerRow": [
+        "category",
+        "content",
+        "goodsNo",
+        "hasPhoto",
+        "isMonthOverReview",
+        "isMonthUseReview",
+        "isRepurchase",
+        "isTopReviewer",
+        "option",
+        "productKey",
+        "productName",
+        "profileImageUrl",
+        "rating",
+        "recommendCount",
+        "requestedGoodsNo",
+        "reviewDate",
+        "reviewId",
+        "reviewImages",
+        "reviewType",
+        "reviewerRank",
+        "skinTone",
+        "skinTrouble",
+        "skinType",
+        "usefulPoint",
+        "userName"
+      ],
+      "distinctFieldSets": 1,
+      "matchesContract": true,
+      "rawFields": 18
+    },
+    "identifiers": {
+      "reviewIdDuplicates": 0,
+      "reviewIdNonPositiveInt": 0,
+      "reviewIdsSpanningMultipleGoodsNos": 0,
+      "unresolvedGoodsNos": []
+    },
+    "requiredFieldMissing": {
+      "content": 0,
+      "reviewDate": 0,
+      "userName": 0
+    },
+    "nullOrBlankByField": {
+      "option (공백)": 7984,
+      "profileImageUrl (공백)": 11413,
+      "reviewerRank": 21917,
+      "skinTone (공백)": 11292,
+      "skinType (공백)": 10723
+    },
+    "rating": {
+      "distribution": {
+        "1": 223,
+        "2": 184,
+        "3": 828,
+        "4": 2403,
+        "5": 21362
+      },
+      "outOfRange": 0
+    },
+    "reviewDate": {
+      "formatViolations": 0,
+      "earliest": "2018.12.26",
+      "latest": "2026.08.10",
+      "insideRecencyWindow": 22194,
+      "insideRecencyWindowPct": 88.78
+    },
+    "conditionAxes": {
+      "statedPct": {
+        "skinType": 57.11,
+        "skinTrouble": 53.92,
+        "skinTone": 54.83,
+        "option": 68.06
+      },
+      "outOfCodebookDomain": {},
+      "codebookCodes": {
+        "skinType": 7,
+        "skinTone": 6,
+        "skinTrouble": 13
+      },
+      "optionDistinctValues": 797
+    },
+    "authorKey": {
+      "distinct": 13876,
+      "nonNfcNames": 0
+    }
+  },
+  "enforcement": {
+    "cases": 12,
+    "raising": 12,
+    "silentlyAccepted": [],
+    "byCase": {
+      "필수 필드 결측": {
+        "raises": true,
+        "error": "[reviewId=1] content 가 비었거나 문자열이 아니다 (받은 값 None)"
+      },
+      "필수 필드 공백": {
+        "raises": true,
+        "error": "[reviewId=1] userName 가 비었거나 문자열이 아니다 (받은 값 '   ')"
+      },
+      "reviewId 타입": {
+        "raises": true,
+        "error": "[reviewId='1'] reviewId 는 양의 정수여야 한다 (받은 값 '1')"
+      },
+      "reviewId 비양수": {
+        "raises": true,
+        "error": "[reviewId=0] reviewId 는 양의 정수여야 한다 (받은 값 0)"
+      },
+      "rating 범위 밖": {
+        "raises": true,
+        "error": "[reviewId=1] rating 은 1~5 의 정수여야 한다 (받은 값 7)"
+      },
+      "rating 타입": {
+        "raises": true,
+        "error": "[reviewId=1] rating 은 1~5 의 정수여야 한다 (받은 값 '4')"
+      },
+      "날짜 파싱 불가": {
+        "raises": true,
+        "error": "[reviewId=1] 리뷰 날짜를 월로 읽을 수 없다: '어제' (기대: 2026.07.19) — 리센시 컷이 이 값을 읽는다"
+      },
+      "조건 코드 도메인 밖": {
+        "raises": true,
+        "error": "[reviewId=1] skinType='A99': 코드북 도메인 밖이다. 실제로 새 코드가 생겼다면 crawler/verify_skin_codebook.py 로 코드북을 다시 뽑아라 (추정으로 채우지 않는다). 알려진 코드 ['A01', 'A02', 'A03', 'A04', 'A05'"
+      },
+      "조건 코드가 라벨": {
+        "raises": true,
+        "error": "[reviewId=1] skinType='건성': 코드가 아닌 값이다. 라벨이 아니라 코드(A01…)로 받아야 조건축과 어휘가 합쳐진다 (v4 카테고리 분포 FAIL 의 원인). 알려진 코드 ['A01', 'A02', 'A03', 'A04', 'A05', 'A06', 'A07']"
+      },
+      "조건축 혼용": {
+        "raises": true,
+        "error": "[reviewId=1] skinType='B03': 축이 섞였다 — B03 는 skinTone 의 코드다. 알려진 코드 ['A01', 'A02', 'A03', 'A04', 'A05', 'A06', 'A07']"
+      },
+      "다중 조건축이 문자열": {
+        "raises": true,
+        "error": "skinTrouble 은 코드 배열이어야 한다 (받은 값 'C05'). 문자열을 넘기면 문자 단위로 쪼개진다"
+      },
+      "모르는 필드": {
+        "raises": true,
+        "error": "[reviewId=1] 계약에 없는 필드 ['usagePeriod']. 크롤러가 바뀌었거나 새 수집분이다 — RAW_FIELDS(원문에 싣는다) 나 DROPPED_FIELDS(버리는 사유를 적는다) 중 어디에 속하는지 정하라"
+      }
+    }
+  }
+}
