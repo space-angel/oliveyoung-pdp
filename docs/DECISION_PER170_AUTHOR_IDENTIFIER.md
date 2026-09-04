@@ -165,6 +165,7 @@ PER-173은 `profileImageUrl`·`reviewImages`·`reviewerRank`·`isTopReviewer`를
 
 - `profileImageUrl` — **유지로 변경**(§4 감사 규칙). 이 문서가 정한다.
 - `reviewerRank`·`isTopReviewer` — 신뢰도 사전 점수(PER-174, PRD §3-4의 6개 신호)가 등급 신호를 쓰기로 하면 드롭과 충돌한다. **6개 신호를 확정할 때 함께 정한다** — 이 문서는 작성자 식별자만 결정한다.
+  → **닫혔다 (PER-174): 드롭 유지.** 두 필드가 사실상 같은 신호이고(3,070/3,083 중첩, 등급 없는 top reviewer 0건) 효과 구간이 0을 포함한다 ([`DECISION_PER174_TRUST_PRIOR.md`](DECISION_PER174_TRUST_PRIOR.md) §5).
 - `reviewImages` — 텍스트 파이프라인 미사용이 맞다. PDP 렌더링은 별도 조회.
 
 ---
