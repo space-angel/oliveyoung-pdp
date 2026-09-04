@@ -1,0 +1,43 @@
+{
+  "issue": "PER-175",
+  "reviews": 25000,
+  "batches": 1250,
+  "measured": {
+    "inputTokensPerBatch": 5693,
+    "systemTokensV4": 829,
+    "tagsPerReviewPilotCorpusWeighted": 2.06,
+    "source": "eval/reports/v5_tag_pilot.json · PER-175 count_tokens"
+  },
+  "estimated": {
+    "systemTokensV5": 1139,
+    "basis": "프롬프트 문자수 1133→1557 비례. count_tokens 미실행 (API 키 없음)",
+    "inputTokens": 7503750,
+    "outputTokens": 3271030,
+    "outputVsIssueAssumption": "1.25배 (1.65 → 2.06)"
+  },
+  "usd": {
+    "haiku-4-5": {
+      "standard": 23.86,
+      "batch": 11.93,
+      "cached": 22.58,
+      "batchAndCached": 11.29
+    },
+    "sonnet-5": {
+      "standard": 47.72,
+      "batch": 23.86,
+      "cached": 45.16,
+      "batchAndCached": 22.58
+    }
+  },
+  "prices": {
+    "note": "claude-api 스킬 표 (캐시 2026-06-24), Batch 50%, 캐시 읽기 0.1x",
+    "haiku-4-5": [
+      1.0,
+      5.0
+    ],
+    "sonnet-5": [
+      2.0,
+      10.0
+    ]
+  }
+}

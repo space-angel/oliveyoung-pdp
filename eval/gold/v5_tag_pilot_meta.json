@@ -1,0 +1,48 @@
+{
+  "issue": "PER-175",
+  "purpose": "Batch API 전수 실행 전 정답셋. 배치 결과를 이 표본 위에서 채점한다",
+  "seed": 20260904,
+  "batchSize": 20,
+  "sampled": 200,
+  "corpus": 25000,
+  "source": {
+    "path": "data/intermediate/v5_reviews.jsonl",
+    "sha256": "8a13c6b782e978e730716cc05bd54c3c12e819d838ccb6d0594a9c005785b498"
+  },
+  "strata": [
+    {
+      "name": "rating_1_2",
+      "population": 407,
+      "sampled": 60,
+      "skinTypeStated": 30,
+      "skinTypeMissing": 30,
+      "weight": 6.7833
+    },
+    {
+      "name": "rating_3",
+      "population": 828,
+      "sampled": 40,
+      "skinTypeStated": 20,
+      "skinTypeMissing": 20,
+      "weight": 20.7
+    },
+    {
+      "name": "rating_4",
+      "population": 2403,
+      "sampled": 40,
+      "skinTypeStated": 20,
+      "skinTypeMissing": 20,
+      "weight": 60.075
+    },
+    {
+      "name": "rating_5",
+      "population": 21362,
+      "sampled": 60,
+      "skinTypeStated": 30,
+      "skinTypeMissing": 30,
+      "weight": 356.0333
+    }
+  ],
+  "products": 50,
+  "note": "층별 sampled/population 이 코퍼스와 다르다. 표본 비율을 코퍼스 비율로 읽지 말 것 — weight 로 되돌린다"
+}
