@@ -18,4 +18,9 @@ echo "== 생성물 재현 확인 =="
 "$PY" pipeline/sample_tag_pilot.py --check
 
 echo
+echo "== 입력 계약 강제 (PER-176) =="
+# 위반 클래스가 하나라도 조용히 통과하면 종료 코드 1 이다
+"$PY" eval/measure_input_contract.py
+
+echo
 echo "verify.sh OK"

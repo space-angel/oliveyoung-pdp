@@ -10,10 +10,14 @@ v5 Step 1 — 입수 태깅 (PER-173 / PRD §3-1).
         data/intermediate/v5_reviews_meta.json  (재현 메타)
         eval/reports/v5_ingest_profile.json     (커밋되는 프로파일 — 조건 기재율·중복 규모)
 
-멈추는 조건 (조용한 폴백 금지)
-  - 카탈로그에 없는 `goodsNo`      → UnknownGoodsNoError
-  - 필수 필드 누락                 → ValueError
-  - `reviewId` 중복                → SystemExit
+멈추는 조건 (조용한 폴백 금지 — 계약은 `docs/INPUT_CONTRACT.md`)
+  - 카탈로그에 없는 `goodsNo`      → UnknownGoodsNoError (PER-171)
+  - 스냅샷 최신 월이 정책보다 새로움 → PolicyError (PER-172)
+  - 필드 집합이 계약과 다름         → ContractError (PER-176)
+  - 필수 필드 결측·공백·타입·범위   → ContractError
+  - 날짜를 월로 읽을 수 없음        → ContractError
+  - 코드북 도메인 밖 조건 코드      → ContractError (PER-169)
+  - `reviewId` 중복                → ContractError
   - 가중치 설정 위반 (PER-174)     → TrustConfigError
 
 사용:
@@ -31,14 +35,19 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
 
-from catalog import load_catalog  # noqa: E402
-from policy import assert_snapshot_current  # noqa: E402
+from catalog import CatalogError, load_catalog  # noqa: E402
+from codebook import load_codebook  # noqa: E402
+from policy import PolicyError, assert_snapshot_current  # noqa: E402
 from trust import ScoringContext, TrustWeights, trust_prior  # noqa: E402
 from contracts import (  # noqa: E402
     CONDITION_AXES,
     DROPPED_FIELDS,
     MISSING_SEGMENT,
+    RATING_RANGE,
+    REQUIRED_FIELDS,
     SCHEMA_VERSION,
+    ContractError,
+    assert_row_schema,
     build_record,
 )
 
@@ -63,8 +72,14 @@ def ingest(input_path: Path = INPUT_PATH) -> tuple[list[dict], dict, dict]:
     records: list[dict] = []
     seen_ids: set[int] = set()
     for row in rows:
+        # 필드 집합 → 값 순서로 검증한다. 필드가 통째로 바뀐 스냅샷에서 값 오류 25,000줄이
+        # 쏟아지는 것보다, "크롤러가 바뀌었다" 한 줄이 낫다.
+        assert_row_schema(row)
         if row["reviewId"] in seen_ids:
-            raise SystemExit(f"reviewId 중복: {row['reviewId']}")
+            raise ContractError(
+                f"reviewId 중복: {row['reviewId']} — 식별자가 겹치면 중복 게이트(PER-183)의 "
+                "판정 단위가 무너진다"
+            )
         seen_ids.add(row["reviewId"])
         # 날짜를 함께 넘긴다 — 리뉴얼 세대가 나뉜 제품은 (goodsNo, reviewDate) 로만
         # 세대가 정해진다 (PER-172). 지금은 전 제품 단일 세대라 결과가 같지만,
@@ -93,6 +108,26 @@ def ingest(input_path: Path = INPUT_PATH) -> tuple[list[dict], dict, dict]:
         "conditionAxes": list(CONDITION_AXES),
         "droppedFields": DROPPED_FIELDS,
         "trustPrior": weights.as_dict(),
+        # 이 실행이 실제로 강제한 계약. 어떤 규칙 아래 나온 산출물인지 산출물만 보고 알 수 있게 한다.
+        "contract": {
+            "doc": "docs/INPUT_CONTRACT.md",
+            "issue": "PER-176",
+            "codebook": {
+                "path": "data/input/skin_codebook.json",
+                "sha256": sha256(ROOT / "data/input/skin_codebook.json"),
+                "codes": len(load_codebook()),
+            },
+            "requiredFields": list(REQUIRED_FIELDS),
+            "ratingRange": list(RATING_RANGE),
+            "enforced": [
+                "필드 집합이 계약과 정확히 같아야 한다 (모르는 필드도, 사라진 필드도 에러)",
+                "필수 필드는 결측·공백·타입·범위 위반이면 에러",
+                "reviewDate 는 월로 파싱돼야 한다 (리센시 컷의 입력)",
+                "조건 코드는 코드북 도메인 안이어야 한다 (라벨·축 혼용 포함)",
+                "reviewId 는 스냅샷 안에서 유일해야 한다",
+                "goodsNo 는 카탈로그에 등록돼 있어야 한다",
+            ],
+        },
     }
     return records, meta, profile(records)
 
@@ -184,7 +219,11 @@ def main() -> None:
     ap.add_argument("--check", action="store_true", help="재실행 결과가 기존 출력과 같은지만 확인")
     args = ap.parse_args()
 
-    records, meta, prof = ingest(args.input)
+    try:
+        records, meta, prof = ingest(args.input)
+    except (ContractError, CatalogError, PolicyError) as e:
+        # 계약 위반은 버그가 아니라 판정이다. 스택트레이스 대신 무엇을 정해야 하는지 낸다.
+        raise SystemExit(f"[입수 중단] 입력이 계약을 위반했다 (docs/INPUT_CONTRACT.md)\n  {e}")
 
     if args.check:
         payload = "".join(json.dumps(r, ensure_ascii=False) + "\n" for r in records)
