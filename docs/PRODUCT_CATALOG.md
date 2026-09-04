@@ -32,14 +32,15 @@ v4는 `data/input/product_canonical_map.json`에서 **한글 제품명을 키**�
 
 ```json
 {
-  "_meta": { "schemaVersion": "v5-1", "rules": [...], "sources": [{"path", "sha256", "role"}] },
+  "_meta": { "schemaVersion": "v5-2", "rules": [...], "sources": [{"path", "sha256", "role"}] },
   "products": [
     {
       "productId": "p041",
       "displayName": "닥터지 레드 블레미쉬 클리어 수딩크림",
       "category": "크림",
       "requestedGoodsNo": "A000000164615",
-      "renewalPolicy": null,
+      "lineageId": "L041",
+      "renewalPolicy": { "policy": "unobserved", "fromMonth": null, "toMonth": null, "evidence": null },
       "notes": ["v4 맵 표시명 '닥터자르트 …' 정정: …"],
       "goodsNos": [{"goodsNo": "A000000164615", "source": "crawl_request"}, ...]
     }
@@ -53,7 +54,8 @@ v4는 `data/input/product_canonical_map.json`에서 **한글 제품명을 키**�
 | `displayName` | 사람이 읽는 이름. 프롬프트·UI·레거시 조회용. 바뀌어도 `productId`는 유지 |
 | `requestedGoodsNo` | 이 제품을 대표하는 SKU(크롤 요청에 쓴 값) |
 | `goodsNos[].source` | `crawl_request`(요청 목록) / `observed_variant`(스냅샷에서 관측) / `legacy_v4`(v4 시절 SKU, 레거시 재현용) |
-| `renewalPolicy` | **PER-172 결정 슬롯.** 현재 전 제품 `null` — 리뉴얼을 별개 제품으로 볼지 시점 컷으로 볼지는 여기서 정하지 않는다 |
+| `lineageId` | 리뉴얼 계보 키 (`L001`~). 세대를 나누면 `productId`는 새로 생기지만 `lineageId`는 조상 것을 물려받는다. 현재는 제품당 1개 |
+| `renewalPolicy` | **리뉴얼 취급 (PER-172 확정).** `separate`(세대 분할, `fromMonth`·`toMonth`·`evidence` 필수) / `single`(리뉴얼 없음 확인) / `unobserved`(미확정 — 현 스냅샷 전 제품). **`null`은 허용하지 않는다** |
 | `notes` | 정정 이력. 위 브랜드 오기처럼 사람이 판단한 근거를 남긴다 |
 
 현재 상태: **제품 50개 / `goodsNo` 167개** (`crawl_request` 50 + `observed_variant` 103 + `legacy_v4` 14).
@@ -73,7 +75,9 @@ product = catalog.product_of_goods_no(row["goodsNo"])   # 미등록이면 Unknow
 2. **미등록 `goodsNo`는 조용히 폴백하지 않고 에러다.** 폴백은 같은 제품을 두 개로 쪼개고, 충분성 게이트에서 근거 수가 조용히 줄어든다.
 3. **매핑을 코드 상수로 들지 않는다.** 유일한 정본은 카탈로그 파일이다.
 4. **집계 단위는 `productId`.** `goodsNo`로 그룹핑하면 리뷰 1~7건 상품이 139개 생겨 충분성 게이트가 대량 실패한다(`docs/V5_INPUTS_AND_LEGACY_AUDIT.md` §3-1).
-5. 카탈로그가 계약을 위반한 상태면 **로드 시점에** 에러다 — 한 `goodsNo`가 두 제품에 걸침, 표시명 중복, `schemaVersion` 불일치, ID·`goodsNo` 형식 위반, 미지의 `source`.
+5. 카탈로그가 계약을 위반한 상태면 **로드 시점에** 에러다 — 한 `goodsNo`가 **서로 다른 계보**에 걸침, 표시명 중복, `schemaVersion` 불일치, ID·`lineageId`·`goodsNo` 형식 위반, 미지의 `source`, `renewalPolicy`가 `null`이거나 반쯤 적힌 `separate`, 세대 구간이 겹치거나 현행 세대가 둘.
+6. **리뉴얼 세대는 날짜로 가른다 (PER-172).** 한 `goodsNo`가 여러 세대에 걸치는 것은 **같은 계보 안에서만** 허용되고, 그때 `resolve_goods_no()`는 `review_date`를 요구한다 — 날짜 없이 부르면 `AmbiguousGenerationError`다. 근거는 `docs/DECISION_PER172_RENEWAL_AND_RECENCY.md`.
+7. **`renewalPolicy`는 생성기가 추론하지 않는다.** 사람이 근거와 함께 적고 재생성 시 승계된다 — `goodsNo` 교체는 리뉴얼 신호가 아니기 때문이다(멀티-SKU 제품 36개 중 교체형 1개).
 
 ---
 
@@ -119,5 +123,5 @@ v4는 `legacy/v4/`로 동결했다(`legacy/v4/README.md`). v4의 `step0_preproce
 
 ## 6. 남은 것
 
-- **`renewalPolicy`** — PER-172.
+- **리뉴얼 세대 데이터** — 스키마와 게이트는 준비됐고 값이 비었다(전 제품 `unobserved`). 후보 큐 5개(p017·p032·p011·p004·p026)의 `cutoverDate`를 확정하기 전까지 **리뉴얼 컷의 실효는 0**이고, 그 사실은 주장의 `limitation: renewal_unobserved`로 노출된다.
 - **입력 계약 문서화** — PER-176이 이 문서를 참조해 계약으로 고정한다.

@@ -14,6 +14,9 @@
 - `data/output/` 과 `eval/reports/` 는 **커밋한다.** 평가 수치의 1차 근거다.
 - 집계 단위는 `productId`(50개, `data/input/product_catalog.json`)다. `goodsNo`(153개)는 변형 SKU가 섞인 단위이므로 그룹핑 키로 쓰지 않는다.
 - **제품 동일성은 카탈로그 레이어가 소유한다** (PER-171). 리뷰 행의 `productKey` 문자열을 읽지 말고 `goodsNo`를 `pipeline/catalog.py`에 물어라. **미등록 `goodsNo`는 조용히 폴백하지 않고 에러다.** 매핑을 코드 상수로 들지 않는다. 카탈로그는 생성물이므로 손으로 고치지 말고 `pipeline/build_product_catalog.py`를 다시 돌린다. 규칙·운영 절차는 `docs/PRODUCT_CATALOG.md`.
+- **리뉴얼은 별개 제품이다** (PER-172). 세대 경계의 키는 `goodsNo`가 아니라 **`(goodsNo, reviewDate)`** 다 — `goodsNo` 교체는 멀티-SKU 제품 36개 중 1개만 리뉴얼이고, 세대가 SKU 코드 안쪽에서 갈리는 제품이 11개다. 세대는 별개 `productId` + 같은 `lineageId`. **`renewalPolicy`에 `null`을 쓰지 않는다** — 정하지 않았으면 `unobserved`로 명시하고, 그 사실이 주장의 `limitation`으로 나간다. 현 스냅샷은 전 제품 `unobserved`라 **리뉴얼 컷의 실효는 0**이다.
+- **리센시 컷은 스냅샷 최신 월 기준 24개월(`2024-09`~)이다.** `today` 기준 롤링을 쓰면 재현성이 깨지므로 금지. 새 수집분이 들어오면 `pipeline/policy.py`의 `SNAPSHOT_LATEST_MONTH`를 갱신해야 하고, 안 하면 입수가 에러를 낸다. 근거는 `docs/DECISION_PER172_RENEWAL_AND_RECENCY.md`.
+- **두 컷 모두 드롭이 아니라 `rejected[]` 행이다.** 리뷰를 지우면 재현율을 영영 못 잰다.
 - **작성자 키는 `NFC(userName)` 원문이다** (PER-170 확정). 중복 판정 단위는 `(작성자 키, productKey)`이고 근거 카운트는 리뷰 수가 아니라 **고유 작성자 수**를 센다. 게이트를 안 걸면 카운트가 코퍼스의 19.7% 부풀고, 본문 해시는 그 중 12.1%만 잡는다. 근거·한계는 `docs/DECISION_PER170_AUTHOR_IDENTIFIER.md`.
 - `profileImageUrl`은 키에 넣지 않고 **감사 필드로 유지한다.** 한 이름에 서로 다른 URL이 2개 이상 나타나면 분리 후보로 플래그하되 자동 분리는 하지 않는다 (현 스냅샷 0건).
 

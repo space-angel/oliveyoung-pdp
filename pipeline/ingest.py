@@ -31,6 +31,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent))
 
 from catalog import load_catalog  # noqa: E402
+from policy import assert_snapshot_current  # noqa: E402
 from contracts import (  # noqa: E402
     CONDITION_AXES,
     DROPPED_FIELDS,
@@ -53,6 +54,9 @@ def sha256(path: Path) -> str:
 def ingest(input_path: Path = INPUT_PATH) -> tuple[list[dict], dict, dict]:
     catalog = load_catalog()
     rows = json.loads(input_path.read_text())
+    # 새 수집분이 들어왔는데 리센시 컷 기준을 안 고치면 24개월 윈도우가 조용히
+    # 과거로 밀린다 (PER-172). 그 전에 멈춘다.
+    assert_snapshot_current(max(r["reviewDate"] for r in rows))
 
     records: list[dict] = []
     seen_ids: set[int] = set()
@@ -60,7 +64,10 @@ def ingest(input_path: Path = INPUT_PATH) -> tuple[list[dict], dict, dict]:
         if row["reviewId"] in seen_ids:
             raise SystemExit(f"reviewId 중복: {row['reviewId']}")
         seen_ids.add(row["reviewId"])
-        product_id = catalog.resolve_goods_no(row["goodsNo"])
+        # 날짜를 함께 넘긴다 — 리뉴얼 세대가 나뉜 제품은 (goodsNo, reviewDate) 로만
+        # 세대가 정해진다 (PER-172). 지금은 전 제품 단일 세대라 결과가 같지만,
+        # 세대가 생기는 순간 여기서 조용히 틀리지 않게 하려는 것이다.
+        product_id = catalog.resolve_goods_no(row["goodsNo"], row["reviewDate"])
         records.append(build_record(row, product_id).to_dict())
 
     meta = {

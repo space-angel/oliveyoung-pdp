@@ -1,5 +1,9 @@
 {
-  "issue": "PER-171",
+  "issue": "PER-171 / PER-172",
+  "lineages": 50,
+  "renewalPolicyCounts": {
+    "unobserved": 50
+  },
   "sources": [
     {
       "path": "crawler/products_50.json",
