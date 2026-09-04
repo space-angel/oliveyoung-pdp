@@ -6,7 +6,7 @@ EVAL — concerns_v4.json 자동 평가 스크립트
 실행:
   python3 eval_v4.py                  # Gate + 인용정확도 + 3차검증(결정론적 항목만)
   python3 eval_v4.py --llm            # 위 항목 + Sonnet 기반 구체성/적합도/polarity 평가
-  python3 eval_v4.py --golden         # 위 항목 + golden set 일치율 (data/eval/golden_set.json 필요)
+  python3 eval_v4.py --golden         # 위 항목 + golden set 일치율 (legacy/v4/eval/golden_set.json)
   python3 eval_v4.py --all --output reports/eval_report_v4.json
 """
 
@@ -20,14 +20,14 @@ from pathlib import Path
 
 try:
     from dotenv import load_dotenv
-    load_dotenv(Path(__file__).resolve().parent.parent / ".env")
+    load_dotenv(Path(__file__).resolve().parents[3] / ".env")
 except ImportError:
     pass
 
-ROOT = Path(__file__).resolve().parent.parent
+ROOT = Path(__file__).resolve().parents[3]
 CONCERNS_PATH = ROOT / "data/output/concerns_v4.json"
 REVIEWS_PATH = ROOT / "data/input/reviews_200_normalized.json"
-GOLDEN_PATH = ROOT / "eval/golden_set.json"
+GOLDEN_PATH = Path(__file__).resolve().parent / "golden_set.json"
 
 VALID_CATEGORIES = {"적합성", "리스크", "실사용", "비교"}
 MODEL = "claude-sonnet-5"  # DEV는 Haiku 사용 → cross-model 검증 (docs/v4/eval/CLAUDE.md 제약)

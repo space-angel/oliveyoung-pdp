@@ -101,8 +101,8 @@ skinType skinTone skinTrouble reviewImages
 
 | 필드 | 성격 | 권고 |
 |---|---|---|
-| `userName` | 사용자 닉네임 | 입력 단계에서 **드롭** — 파이프라인 어디에도 불필요 |
-| `profileImageUrl` | 프로필 이미지 URL | 드롭 |
+| `userName` | 사용자 닉네임 | **유지 확정** (PER-170) — 게이트2 작성자 1표의 유일한 키다. 드롭하면 카운트가 19.7% 오염된다. `docs/DECISION_PER170_AUTHOR_IDENTIFIER.md` |
+| `profileImageUrl` | 프로필 이미지 URL | **감사 필드로 유지** (PER-170) — 조합키로는 식별력 증가분 0이지만 동명이인 상한을 재측정할 유일한 신호다 |
 | `reviewImages` | 리뷰 첨부 이미지 URL | v5 텍스트 파이프라인 미사용 → 드롭 (PDP 렌더링은 별도 조회) |
 | `reviewerRank`, `isTopReviewer` | 등급 | 가중치로 쓸 계획 없으면 드롭 |
 
@@ -210,9 +210,9 @@ v5 코드는 `OLY/concern-pipeline-v5/`로 (v4 하네스 구조 승계), 이 저
 
 ## 5. v5 착수 전 결정해야 할 것
 
-1. **집계 단위** — `productKey`(50) 확정. goodsNo(153) 사용 시 Gate 대량 실패 (§3-1)
+1. ~~**집계 단위**~~ — **해소** (2026-09-03, PER-171). 카탈로그 레이어(`data/input/product_catalog.json`)가 `goodsNo`(167) → `productId`(50)를 소유하고, 미등록 ID는 에러다. `docs/PRODUCT_CATALOG.md`
 2. **리센시 컷** — 2018년 리뷰 포함 여부 (§3-3)
 3. **부정 신호 표본** — 1~2점 407건(1.6%)으로 "위험 신호 재현율"을 어떻게 측정할지 (§3-3)
-4. **PII 드롭 목록** — §3-4 확정 후 입력 계약에 고정
+4. ~~**PII 드롭 목록**~~ — **해소** (2026-09-03, PER-170). 닉네임·프로필 URL은 프로덕션 PDP 공개 값이고 법적 제약이 없음을 확인해 **드롭 논점 자체가 사라졌다.** 식별자는 중복 판정 정확도로만 결정 — 작성자 키 = `NFC(userName)`, `profileImageUrl`은 감사 필드로 유지. 결정과 근거: `docs/DECISION_PER170_AUTHOR_IDENTIFIER.md`, 실측: `eval/reports/author_identity_per170.json`
 5. **스킨 코드 사전 출처** — `PDP_EXPERIMENT_CONTEXT.md` §6이 실측인지 추정인지 (§3-5). PER-162 선행 조건
 6. **v4 인용 검증** — 88.8%의 원인은 파라프레이즈. Step 4를 "추출"로 강제할지, 별도 검증 단계를 붙일지 (v4 권고사항 2)

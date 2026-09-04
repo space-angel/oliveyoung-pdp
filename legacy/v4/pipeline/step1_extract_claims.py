@@ -11,11 +11,11 @@ from pathlib import Path
 import anthropic
 from dotenv import load_dotenv
 
-load_dotenv(Path(__file__).parents[1] / ".env")
+load_dotenv(Path(__file__).parents[3] / ".env")
 
-INPUT_PATH = Path(__file__).parents[1] / "data/intermediate/step0_grouped.json"
-OUTPUT_PATH = Path(__file__).parents[1] / "data/intermediate/step1_claims.json"
-CACHE_PATH = Path(__file__).parents[1] / "data/cache/step1_cache.json"
+INPUT_PATH = Path(__file__).parents[3] / "data/intermediate/step0_grouped.json"
+OUTPUT_PATH = Path(__file__).parents[3] / "data/intermediate/step1_claims.json"
+CACHE_PATH = Path(__file__).parents[3] / "data/cache/step1_cache.json"
 PROMPT_PATH = Path(__file__).parent / "prompts/step1/v1.md"
 
 BATCH_SIZE = 20

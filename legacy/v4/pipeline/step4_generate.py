@@ -11,11 +11,11 @@ from pathlib import Path
 import anthropic
 from dotenv import load_dotenv
 
-load_dotenv(Path(__file__).parents[1] / ".env")
+load_dotenv(Path(__file__).parents[3] / ".env")
 
-INPUT_PATH = Path(__file__).parents[1] / "data/intermediate/step3_classified.json"
-INPUT_GROUPED = Path(__file__).parents[1] / "data/intermediate/step0_grouped.json"
-OUTPUT_PATH = Path(__file__).parents[1] / "data/output/concerns_v4.json"
+INPUT_PATH = Path(__file__).parents[3] / "data/intermediate/step3_classified.json"
+INPUT_GROUPED = Path(__file__).parents[3] / "data/intermediate/step0_grouped.json"
+OUTPUT_PATH = Path(__file__).parents[3] / "data/output/concerns_v4.json"
 PROMPT_PATH = Path(__file__).parent / "prompts/step4/v1.md"
 
 MODEL = "claude-haiku-4-5-20251001"
