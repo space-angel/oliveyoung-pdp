@@ -56,10 +56,16 @@ STRATA = (
 )
 
 
-def load_reviews() -> list[dict]:
-    if not REVIEWS_PATH.exists():
-        raise SystemExit(f"입수 결과가 없다 ({REVIEWS_PATH.relative_to(ROOT)}). 먼저 pipeline/ingest.py 를 돌려라")
-    return [json.loads(line) for line in REVIEWS_PATH.read_text().splitlines() if line]
+def rel(path: Path) -> str:
+    """안내 메시지용 경로. 저장소 밖 경로여도 여기서 터지면 안 된다."""
+    return str(path.relative_to(ROOT)) if path.is_relative_to(ROOT) else str(path)
+
+
+def load_reviews(path: Path | None = None) -> list[dict]:
+    path = path or REVIEWS_PATH
+    if not path.exists():
+        raise SystemExit(f"입수 결과가 없다 ({rel(path)}). 먼저 pipeline/ingest.py 를 돌려라")
+    return [json.loads(line) for line in path.read_text().splitlines() if line]
 
 
 def _spread_by_product(pool: list[dict], want: int, rng: random.Random) -> list[dict]:
