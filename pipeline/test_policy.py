@@ -147,13 +147,35 @@ class CommittedCatalogUnderPolicy(unittest.TestCase):
     """커밋된 카탈로그 전체가 정책을 통과하는지 (정책과 데이터가 어긋나지 않게)."""
 
     def test_every_product_is_gateable(self):
+        """전 제품이 판정 가능하고, 미확정 제품만 한계를 달고 나간다."""
         from catalog import load_catalog
 
-        for p in load_catalog().products:
+        catalog = load_catalog()
+        unobserved = 0
+        for p in catalog.products:
             with self.subTest(product=p.product_id):
                 decision = renewal_gate(p, "2026.08.10")
-                self.assertTrue(decision.passed)
-                self.assertEqual(decision.limitation, LIMIT_RENEWAL_UNOBSERVED)
+                if p.renewal_policy == RENEWAL_UNOBSERVED:
+                    unobserved += 1
+                    self.assertTrue(decision.passed)
+                    self.assertEqual(decision.limitation, LIMIT_RENEWAL_UNOBSERVED)
+                else:
+                    self.assertIsNone(decision.limitation)
+        # 확정한 5개 계보(세대 분할 3 + single 2, 이전 세대 3 포함 = 8개 엔트리)를 뺀 나머지
+        self.assertEqual(unobserved, len(catalog) - 8)
+
+    def test_confirmed_generations_cut_by_date(self):
+        """날짜로 갈리는 계보에서 구세대 구간 밖 리뷰가 실제로 컷된다 (L011)."""
+        from catalog import load_catalog
+
+        catalog = load_catalog()
+        previous = catalog.product("p052")   # 에스쁘아 비벨벳 커버쿠션 (2025 리뉴얼 이전)
+        current = catalog.product("p011")
+        self.assertTrue(renewal_gate(previous, "2024.06.01").passed)
+        self.assertFalse(renewal_gate(previous, "2025.03.01").passed)
+        self.assertEqual(renewal_gate(previous, "2025.03.01").reason, REJECT_RENEWAL)
+        self.assertTrue(renewal_gate(current, "2025.03.01").passed)
+        self.assertFalse(renewal_gate(current, "2024.06.01").passed)
 
 
 if __name__ == "__main__":

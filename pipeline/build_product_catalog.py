@@ -53,12 +53,171 @@ RESOLVED_BRAND_CONFLICTS = {
 }
 
 
+# --- 리뉴얼 세대 (PER-172) ---
+# **생성기가 추론하지 않는다.** goodsNo 교체는 리뉴얼 신호가 아니므로(멀티-SKU 제품 36개 중
+# 교체형 1개) 자동 분할하면 기획전마다 제품이 쪼개진다. 사람이 외부 근거로 확정한 것만 여기
+# 적고, 근거 문자열이 그대로 카탈로그의 renewalPolicy.evidence 가 된다.
+# 근거 확인일 2026-09-04. 측정은 eval/reports/renewal_recency_per172.json.
+#
+# 세대는 오래된 순으로 적는다. current=True 인 세대가 씨앗의 productId·displayName 을
+# 유지하고(append-only), 이전 세대는 새 productId 를 받되 같은 lineageId 로 묶인다.
+RENEWAL_GENERATIONS = {
+    "헤라 블랙 쿠션 파운데이션": [
+        {
+            "displayName": "헤라 블랙 쿠션 (2024 리뉴얼 이전)",
+            "goodsNos": ["A000000149846"],
+            "fromMonth": None,
+            "toMonth": "2024-07",
+            "evidence": (
+                "2024-03-25 네이버 선런칭 / 04-01 전국 리뉴얼 출시. 제품명이 '블랙 쿠션'에서 "
+                "'블랙 쿠션 파운데이션'으로 바뀌고 컬러 9종으로 재편됐다 "
+                "(아모레퍼시픽 뉴스룸 apgroup.com/int/ko/news/2024-03-26-1.html, 확인 2026-09-04). "
+                "구세대 SKU 는 리뉴얼 전 재고 리뷰 때문에 2024.07 까지 리뷰를 받았다 — "
+                "세대는 goodsNo 로 갈리므로 이 중첩은 해석을 흐리지 않는다"
+            ),
+        },
+        {
+            "current": True,
+            "goodsNos": ["A000000202777", "A000000232323"],
+            "fromMonth": "2024-04",
+            "toMonth": None,
+            "evidence": (
+                "2024-03/04 리뉴얼판. 신세대 SKU 첫 리뷰 2024.04.18 "
+                "(아모레퍼시픽 뉴스룸, 확인 2026-09-04)"
+            ),
+        },
+    ],
+    "컬러그램 누디 블러 틴트": [
+        {
+            "displayName": "컬러그램 누디 블러 틴트 (기존 용기)",
+            "goodsNos": ["A000000209953"],
+            "fromMonth": None,
+            "toMonth": None,
+            "evidence": (
+                "용기 리뉴얼. 올리브영이 구세대 SKU 를 상품명 '[기존용기] 컬러그램 누디 블러 "
+                "틴트 5 COLOR' 로 따로 표기한다 (goodsNo A000000209953, 확인 2026-09-04). "
+                "리뉴얼 일자는 확인하지 못했으나 세대가 goodsNo 로 갈리므로 날짜는 판별자가 "
+                "아니다. 용기 변경은 '내용물이 안 나온다'는 주장을 무효화한다"
+            ),
+        },
+        {
+            "current": True,
+            "goodsNos": ["A000000230581"],
+            "fromMonth": None,
+            "toMonth": None,
+            "evidence": "리뉴얼 용기판 (goodsNo A000000230581). 위 '[기존용기]' 표기의 대응 세대",
+        },
+    ],
+    "에스쁘아 비벨벳 커버쿠션": [
+        {
+            "displayName": "에스쁘아 비벨벳 커버쿠션 (2025 리뉴얼 이전)",
+            "goodsNos": ["A000000184222"],
+            "fromMonth": None,
+            "toMonth": "2025-01",
+            "evidence": (
+                "2025-02 리뉴얼 출시 — 커버력·제형·지속력 개선, 컬러 8단계로 재편 "
+                "(아모레퍼시픽 스토리 '비벨벳 쿠션 글로벌 쉐이드 확장기', 확인 2026-09-04). "
+                "코퍼스의 첫 리뉴얼 언급 2025.02.07 과 일치한다. "
+                "**goodsNo 가 하나뿐이라 세대를 날짜로만 가를 수 있다** — 이 제품이 "
+                "(goodsNo, reviewDate) 키가 필요한 이유의 실례다"
+            ),
+        },
+        {
+            "current": True,
+            "goodsNos": ["A000000184222"],
+            "fromMonth": "2025-02",
+            "toMonth": None,
+            "evidence": "2025-02 리뉴얼판 (아모레퍼시픽 스토리, 확인 2026-09-04). 같은 goodsNo 를 공유한다",
+        },
+    ],
+}
+
+# 리뉴얼이 있었지만 **코퍼스 전체가 리뉴얼 후**여서 세대를 나눌 필요가 없는 제품.
+# 'unobserved'(아직 안 봤다)와 구분하기 위해 근거와 함께 'single' 로 확정한다.
+RENEWAL_SINGLE_CONFIRMED = {
+    "구달 청귤 비타C 잡티케어 세럼": (
+        "'청귤 비타C 잡티 케어 알파' 라인으로 리뉴얼됐고 코퍼스의 goodsNo 5개가 전부 "
+        "상품명에 '알파'를 달고 있다 — 즉 수집분 500건이 모두 리뉴얼 후다 "
+        "(클리오 공식몰 clubclio.co.kr, 이데일리 2025 알파라인 출시 기사, 확인 2026-09-04). "
+        "세대 경계가 코퍼스 밖이므로 나눌 것이 없다"
+    ),
+    "성분에디터 그린토마토 NMN 포어 리프팅 앰플": (
+        "2025-07 리뉴얼(30ml→40ml, 용기 변경)판이 코퍼스의 시작이다 — goodsNo 2개 모두 "
+        "40ml 리뉴얼판이고 첫 리뷰가 2025.07.03 이다 "
+        "(올리브영 A000000229522 상품명 '[리뉴얼/1등모공앰플]', 확인 2026-09-04). "
+        "세대 경계가 코퍼스 밖이므로 나눌 것이 없다"
+    ),
+}
+
+
 def sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
 def brand_token(name: str) -> str:
     return name.split()[0] if name.split() else ""
+
+
+def apply_renewal_generations(products: dict) -> None:
+    """사람이 확정한 리뉴얼 세대를 제품 목록에 반영한다 (PER-172).
+
+    추측하지 않는다 — 선언과 실제 SKU 가 어긋나면 에러를 내고 멈춘다.
+    """
+    for seed_name, generations in RENEWAL_GENERATIONS.items():
+        if seed_name not in products:
+            raise SystemExit(
+                f"RENEWAL_GENERATIONS 의 '{seed_name}' 이 products_50.json 에 없다. "
+                "표시명이 바뀌었으면 선언을 함께 고쳐야 한다"
+            )
+        seed = products[seed_name]
+        seed_goods = dict(seed["goodsNos"])
+        declared = {g for gen in generations for g in gen["goodsNos"]}
+        unknown = sorted(declared - set(seed_goods))
+        if unknown:
+            raise SystemExit(f"'{seed_name}' 세대 선언의 goodsNo {unknown} 가 이 제품에 없다")
+        unassigned = sorted(set(seed_goods) - declared)
+        if unassigned:
+            raise SystemExit(
+                f"'{seed_name}' 의 goodsNo {unassigned} 가 어느 세대에도 배정되지 않았다. "
+                "세대를 나눴으면 모든 SKU 의 소속을 정해야 한다 (조용히 버리지 않는다)"
+            )
+        currents = [g for g in generations if g.get("current")]
+        if len(currents) != 1:
+            raise SystemExit(f"'{seed_name}': current=True 인 세대가 {len(currents)}개다. 하나여야 한다")
+
+        for gen in generations:
+            policy = {
+                "policy": "separate",
+                "fromMonth": gen.get("fromMonth"),
+                "toMonth": gen.get("toMonth"),
+                "evidence": gen["evidence"],
+            }
+            goods = {g: seed_goods[g] for g in gen["goodsNos"]}
+            if gen.get("current"):
+                seed["goodsNos"] = goods
+                seed["renewalOverride"] = policy
+                seed["lineageSeed"] = seed_name
+                continue
+            name = gen["displayName"]
+            if name in products:
+                raise SystemExit(f"이전 세대 표시명 '{name}' 이 이미 다른 제품과 겹친다")
+            products[name] = {
+                "displayName": name,
+                "category": seed["category"],
+                # 크롤 요청 대상이 아니다 — 관측된 구세대 SKU 를 담는 엔트리다
+                "requestedGoodsNo": None,
+                "goodsNos": goods,
+                "notes": [f"'{seed_name}' 의 이전 세대 (PER-172)"],
+                "renewalOverride": policy,
+                "lineageSeed": seed_name,
+            }
+
+    for seed_name, evidence in RENEWAL_SINGLE_CONFIRMED.items():
+        if seed_name not in products:
+            raise SystemExit(f"RENEWAL_SINGLE_CONFIRMED 의 '{seed_name}' 이 products_50.json 에 없다")
+        products[seed_name]["renewalOverride"] = {
+            "policy": "single", "fromMonth": None, "toMonth": None, "evidence": evidence,
+        }
 
 
 def build() -> tuple[dict, dict]:
@@ -168,6 +327,8 @@ def build() -> tuple[dict, dict]:
                 existing_lineage[e["displayName"]] = e["lineageId"]
             if isinstance(e.get("renewalPolicy"), dict):
                 existing_renewal[e["displayName"]] = e["renewalPolicy"]
+    apply_renewal_generations(products)
+
     ordered = sorted(products.values(), key=lambda p: (p["category"], p["displayName"]))
     next_num = max((int(pid[1:]) for pid in existing.values()), default=0) + 1
     for entry in ordered:
@@ -176,11 +337,17 @@ def build() -> tuple[dict, dict]:
             pid = f"p{next_num:03d}"
             next_num += 1
         entry["productId"] = pid
-        # 계보를 새로 시작하는 제품은 자기 productId 번호를 계보 번호로 쓴다.
-        entry["lineageId"] = existing_lineage.get(entry["displayName"], f"L{pid[1:]}")
-        # 리뉴얼 취급은 생성기가 추론하지 않는다 — 사람이 근거와 함께 카탈로그에 적고,
-        # 재생성 시 그 값을 승계한다. 아직 정하지 않았으면 'unobserved' 로 명시한다.
-        entry["renewalPolicy"] = existing_renewal.get(
+    for entry in ordered:
+        # 계보를 새로 시작하는 제품은 자기 productId 번호를 계보 번호로 쓴다. 세대를
+        # 나눈 제품의 이전 세대는 **현행 세대의 계보 번호를 물려받는다** (PER-172).
+        source = entry.get("lineageSeed", entry["displayName"])
+        entry["lineageId"] = existing_lineage.get(
+            entry["displayName"], f"L{products[source]['productId'][1:]}"
+        )
+        # 리뉴얼 취급은 생성기가 추론하지 않는다. 사람이 RENEWAL_GENERATIONS /
+        # RENEWAL_SINGLE_CONFIRMED 에 근거와 함께 적은 것이 정본이고, 그 선언이 없으면
+        # 커밋본 값을 승계하되 그것도 없으면 'unobserved' 로 명시한다.
+        entry["renewalPolicy"] = entry.get("renewalOverride") or existing_renewal.get(
             entry["displayName"], {"policy": "unobserved", "fromMonth": None, "toMonth": None, "evidence": None}
         )
 

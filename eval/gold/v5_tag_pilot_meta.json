@@ -7,7 +7,7 @@
   "corpus": 25000,
   "source": {
     "path": "data/intermediate/v5_reviews.jsonl",
-    "sha256": "8a13c6b782e978e730716cc05bd54c3c12e819d838ccb6d0594a9c005785b498"
+    "sha256": "8709502516ff1b9bec4c7996d0e33d7d9c858e7c4ff43024ff0fd9c775b1c085"
   },
   "strata": [
     {
@@ -43,6 +43,6 @@
       "weight": 356.0333
     }
   ],
-  "products": 50,
+  "products": 51,
   "note": "층별 sampled/population 이 코퍼스와 다르다. 표본 비율을 코퍼스 비율로 읽지 말 것 — weight 로 되돌린다"
 }

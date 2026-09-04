@@ -1,9 +1,9 @@
 {
   "issue": "PER-173",
   "records": 25000,
-  "products": 50,
+  "products": 53,
   "reviewsPerProduct": {
-    "min": 500,
+    "min": 4,
     "median": 500,
     "max": 500
   },
@@ -14,16 +14,16 @@
   },
   "missingSegmentLabel": "미기재",
   "duplication": {
-    "uniqueAuthorProductPairs": 19389,
-    "excessVotes": 5611,
-    "excessVotesPct": 22.44,
+    "uniqueAuthorProductPairs": 19401,
+    "excessVotes": 5599,
+    "excessVotesPct": 22.4,
     "identicalContentGroups": 587,
     "excessByContentHash": 846
   },
   "skinTypeCells": {
-    "cells": 393,
-    "atLeast8Raw": 310,
-    "atLeast8AfterAuthorDedup": 294
+    "cells": 407,
+    "atLeast8Raw": 314,
+    "atLeast8AfterAuthorDedup": 297
   },
   "skinTroubleSegments": 14
 }

@@ -141,7 +141,8 @@ class FullSnapshot(unittest.TestCase):
     def test_all_product_ids_resolve_to_catalog(self):
         catalog = load_catalog()
         ids = {r["productId"] for r in self.records}
-        self.assertEqual(len(ids), 50)
+        # 53 = 크롤 대상 50 + 리뉴얼 이전 세대 3 (PER-172)
+        self.assertEqual(len(ids), 53)
         for pid in ids:
             catalog.product(pid)  # 없으면 raise
 
@@ -178,12 +179,17 @@ class FullSnapshot(unittest.TestCase):
             catalog.resolve_goods_no("A000000999999")
 
     def test_profile_matches_prior_measurements(self):
-        # PER-170 측정치(eval/reports/author_identity_per170.json)와 같은 수를 세는지
+        # PER-170 측정치(eval/reports/author_identity_per170.json)는 세대 분할 이전
+        # 값이다(19389 / 5611 / 294). PER-172 가 productId 를 3개 세대로 나누면서
+        # (작성자, productId) 쌍이 12개 늘었다 — 같은 사람이 구세대와 신세대에 각각 쓴
+        # 경우가 이제 별개 제품의 1표씩이 된다. 수치가 갈린 이유를 여기 고정한다.
         d = self.profile["duplication"]
-        self.assertEqual(d["uniqueAuthorProductPairs"], 19389)
-        self.assertEqual(d["excessVotes"], 5611)
-        self.assertEqual(self.profile["skinTypeCells"]["atLeast8Raw"], 310)
-        self.assertEqual(self.profile["skinTypeCells"]["atLeast8AfterAuthorDedup"], 294)
+        self.assertEqual(d["uniqueAuthorProductPairs"], 19401)
+        self.assertEqual(d["uniqueAuthorProductPairs"] - 19389, 12)
+        self.assertEqual(d["excessVotes"], 5599)
+        self.assertEqual(d["excessVotes"] + 12, 5611)
+        self.assertEqual(self.profile["skinTypeCells"]["atLeast8Raw"], 314)
+        self.assertEqual(self.profile["skinTypeCells"]["atLeast8AfterAuthorDedup"], 297)
 
 
 if __name__ == "__main__":

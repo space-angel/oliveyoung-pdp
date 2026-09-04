@@ -118,17 +118,13 @@
       "requestedGoodsNo": "A000000230581",
       "lineageId": "L004",
       "renewalPolicy": {
-        "policy": "unobserved",
+        "policy": "separate",
         "fromMonth": null,
         "toMonth": null,
-        "evidence": null
+        "evidence": "리뉴얼 용기판 (goodsNo A000000230581). 위 '[기존용기]' 표기의 대응 세대"
       },
       "notes": [],
       "goodsNos": [
-        {
-          "goodsNo": "A000000209953",
-          "source": "observed_variant"
-        },
         {
           "goodsNo": "A000000230581",
           "source": "crawl_request"
@@ -270,10 +266,10 @@
       "requestedGoodsNo": "A000000184222",
       "lineageId": "L011",
       "renewalPolicy": {
-        "policy": "unobserved",
-        "fromMonth": null,
+        "policy": "separate",
+        "fromMonth": "2025-02",
         "toMonth": null,
-        "evidence": null
+        "evidence": "2025-02 리뉴얼판 (아모레퍼시픽 스토리, 확인 2026-09-04). 같은 goodsNo 를 공유한다"
       },
       "notes": [],
       "goodsNos": [
@@ -402,17 +398,13 @@
       "requestedGoodsNo": "A000000202777",
       "lineageId": "L017",
       "renewalPolicy": {
-        "policy": "unobserved",
-        "fromMonth": null,
+        "policy": "separate",
+        "fromMonth": "2024-04",
         "toMonth": null,
-        "evidence": null
+        "evidence": "2024-03/04 리뉴얼판. 신세대 SKU 첫 리뷰 2024.04.18 (아모레퍼시픽 뉴스룸, 확인 2026-09-04)"
       },
       "notes": [],
       "goodsNos": [
-        {
-          "goodsNo": "A000000149846",
-          "source": "observed_variant"
-        },
         {
           "goodsNo": "A000000202777",
           "source": "crawl_request"
@@ -630,10 +622,10 @@
       "requestedGoodsNo": "A000000247774",
       "lineageId": "L026",
       "renewalPolicy": {
-        "policy": "unobserved",
+        "policy": "single",
         "fromMonth": null,
         "toMonth": null,
-        "evidence": null
+        "evidence": "'청귤 비타C 잡티 케어 알파' 라인으로 리뉴얼됐고 코퍼스의 goodsNo 5개가 전부 상품명에 '알파'를 달고 있다 — 즉 수집분 500건이 모두 리뉴얼 후다 (클리오 공식몰 clubclio.co.kr, 이데일리 2025 알파라인 출시 기사, 확인 2026-09-04). 세대 경계가 코퍼스 밖이므로 나눌 것이 없다"
       },
       "notes": [],
       "goodsNos": [
@@ -810,10 +802,10 @@
       "requestedGoodsNo": "A000000235178",
       "lineageId": "L032",
       "renewalPolicy": {
-        "policy": "unobserved",
+        "policy": "single",
         "fromMonth": null,
         "toMonth": null,
-        "evidence": null
+        "evidence": "2025-07 리뉴얼(30ml→40ml, 용기 변경)판이 코퍼스의 시작이다 — goodsNo 2개 모두 40ml 리뉴얼판이고 첫 리뷰가 2025.07.03 이다 (올리브영 A000000229522 상품명 '[리뉴얼/1등모공앰플]', 확인 2026-09-04). 세대 경계가 코퍼스 밖이므로 나눌 것이 없다"
       },
       "notes": [],
       "goodsNos": [
@@ -1510,6 +1502,72 @@
         {
           "goodsNo": "A000000180233",
           "source": "crawl_request"
+        }
+      ]
+    },
+    {
+      "productId": "p051",
+      "displayName": "컬러그램 누디 블러 틴트 (기존 용기)",
+      "category": "립메이크업",
+      "requestedGoodsNo": null,
+      "lineageId": "L004",
+      "renewalPolicy": {
+        "policy": "separate",
+        "fromMonth": null,
+        "toMonth": null,
+        "evidence": "용기 리뉴얼. 올리브영이 구세대 SKU 를 상품명 '[기존용기] 컬러그램 누디 블러 틴트 5 COLOR' 로 따로 표기한다 (goodsNo A000000209953, 확인 2026-09-04). 리뉴얼 일자는 확인하지 못했으나 세대가 goodsNo 로 갈리므로 날짜는 판별자가 아니다. 용기 변경은 '내용물이 안 나온다'는 주장을 무효화한다"
+      },
+      "notes": [
+        "'컬러그램 누디 블러 틴트' 의 이전 세대 (PER-172)"
+      ],
+      "goodsNos": [
+        {
+          "goodsNo": "A000000209953",
+          "source": "observed_variant"
+        }
+      ]
+    },
+    {
+      "productId": "p052",
+      "displayName": "에스쁘아 비벨벳 커버쿠션 (2025 리뉴얼 이전)",
+      "category": "베이스메이크업",
+      "requestedGoodsNo": null,
+      "lineageId": "L011",
+      "renewalPolicy": {
+        "policy": "separate",
+        "fromMonth": null,
+        "toMonth": "2025-01",
+        "evidence": "2025-02 리뉴얼 출시 — 커버력·제형·지속력 개선, 컬러 8단계로 재편 (아모레퍼시픽 스토리 '비벨벳 쿠션 글로벌 쉐이드 확장기', 확인 2026-09-04). 코퍼스의 첫 리뉴얼 언급 2025.02.07 과 일치한다. **goodsNo 가 하나뿐이라 세대를 날짜로만 가를 수 있다** — 이 제품이 (goodsNo, reviewDate) 키가 필요한 이유의 실례다"
+      },
+      "notes": [
+        "'에스쁘아 비벨벳 커버쿠션' 의 이전 세대 (PER-172)"
+      ],
+      "goodsNos": [
+        {
+          "goodsNo": "A000000184222",
+          "source": "crawl_request"
+        }
+      ]
+    },
+    {
+      "productId": "p053",
+      "displayName": "헤라 블랙 쿠션 (2024 리뉴얼 이전)",
+      "category": "베이스메이크업",
+      "requestedGoodsNo": null,
+      "lineageId": "L017",
+      "renewalPolicy": {
+        "policy": "separate",
+        "fromMonth": null,
+        "toMonth": "2024-07",
+        "evidence": "2024-03-25 네이버 선런칭 / 04-01 전국 리뉴얼 출시. 제품명이 '블랙 쿠션'에서 '블랙 쿠션 파운데이션'으로 바뀌고 컬러 9종으로 재편됐다 (아모레퍼시픽 뉴스룸 apgroup.com/int/ko/news/2024-03-26-1.html, 확인 2026-09-04). 구세대 SKU 는 리뉴얼 전 재고 리뷰 때문에 2024.07 까지 리뷰를 받았다 — 세대는 goodsNo 로 갈리므로 이 중첩은 해석을 흐리지 않는다"
+      },
+      "notes": [
+        "'헤라 블랙 쿠션 파운데이션' 의 이전 세대 (PER-172)"
+      ],
+      "goodsNos": [
+        {
+          "goodsNo": "A000000149846",
+          "source": "observed_variant"
         }
       ]
     }

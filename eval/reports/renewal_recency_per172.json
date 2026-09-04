@@ -23,7 +23,7 @@
       "coexistingType": 35,
       "replacementProducts": [
         {
-          "productId": "p033",
+          "productId": "L033",
           "goodsNos": 2
         }
       ],
@@ -61,7 +61,7 @@
   "skuSplitInfeasible": {
     "products": [
       {
-        "productId": "p011",
+        "productId": "L011",
         "displayName": "에스쁘아 비벨벳 커버쿠션",
         "goodsNos": 1,
         "mentions": 23,
@@ -69,7 +69,7 @@
         "goodsNoFirstReview": "2023.04.28"
       },
       {
-        "productId": "p010",
+        "productId": "L010",
         "displayName": "바닐라코 프라임 프라이머 피니쉬 파우더",
         "goodsNos": 1,
         "mentions": 12,
@@ -77,7 +77,7 @@
         "goodsNoFirstReview": "2022.05.13"
       },
       {
-        "productId": "p023",
+        "productId": "L023",
         "displayName": "투크 워터프루프 슬림 아이라이너",
         "goodsNos": 1,
         "mentions": 11,
@@ -85,7 +85,7 @@
         "goodsNoFirstReview": "2025.07.01"
       },
       {
-        "productId": "p015",
+        "productId": "L015",
         "displayName": "클리오 킬 커버 파운웨어 쿠션",
         "goodsNos": 1,
         "mentions": 7,
@@ -93,7 +93,7 @@
         "goodsNoFirstReview": "2025.09.03"
       },
       {
-        "productId": "p014",
+        "productId": "L014",
         "displayName": "정샘물 에센셜 스킨 누더 쿠션",
         "goodsNos": 1,
         "mentions": 7,
@@ -101,7 +101,7 @@
         "goodsNoFirstReview": "2023.05.27"
       },
       {
-        "productId": "p021",
+        "productId": "L021",
         "displayName": "웨이크메이크 소프트 블러링 아이팔레트",
         "goodsNos": 1,
         "mentions": 3,
@@ -109,7 +109,7 @@
         "goodsNoFirstReview": "2026.06.05"
       },
       {
-        "productId": "p007",
+        "productId": "L007",
         "displayName": "힌스 로 글로우 젤 틴트",
         "goodsNos": 1,
         "mentions": 2,
@@ -117,7 +117,7 @@
         "goodsNoFirstReview": "2024.07.02"
       },
       {
-        "productId": "p008",
+        "productId": "L008",
         "displayName": "VDL 치크스테인 블러셔",
         "goodsNos": 1,
         "mentions": 1,
@@ -125,7 +125,7 @@
         "goodsNoFirstReview": "2026.05.01"
       },
       {
-        "productId": "p006",
+        "productId": "L006",
         "displayName": "하트퍼센트 도트 온 무드 립펜슬",
         "goodsNos": 1,
         "mentions": 1,
@@ -133,7 +133,7 @@
         "goodsNoFirstReview": "2023.01.08"
       },
       {
-        "productId": "p001",
+        "productId": "L001",
         "displayName": "3CE 캐시미어 허그 립스틱",
         "goodsNos": 1,
         "mentions": 1,
@@ -141,7 +141,7 @@
         "goodsNoFirstReview": "2024.10.31"
       },
       {
-        "productId": "p024",
+        "productId": "L024",
         "displayName": "페리페라 스피디 스키니 브로우",
         "goodsNos": 1,
         "mentions": 1,
@@ -156,15 +156,15 @@
     "windowMonths": 24,
     "adoptedCutoffMonth": "2024-09",
     "sufficiencyNMin": 8,
-    "baselineCells": 393,
-    "baselineCellsPassingNMin": 294,
+    "baselineCells": 407,
+    "baselineCellsPassingNMin": 297,
     "simulations": [
       {
         "cutoffMonth": null,
         "reviewsKept": 25000,
         "reviewsKeptPct": 100.0,
-        "cells": 393,
-        "cellsPassingNMin": 294,
+        "cells": 407,
+        "cellsPassingNMin": 297,
         "cellsLostVsNoCut": 0,
         "renewalMentionsKept": 303,
         "minReviewsPerProduct": 500,
@@ -175,8 +175,8 @@
         "cutoffMonth": "2022-01",
         "reviewsKept": 24544,
         "reviewsKeptPct": 98.18,
-        "cells": 393,
-        "cellsPassingNMin": 293,
+        "cells": 407,
+        "cellsPassingNMin": 296,
         "cellsLostVsNoCut": 1,
         "renewalMentionsKept": 289,
         "minReviewsPerProduct": 281,
@@ -187,9 +187,9 @@
         "cutoffMonth": "2023-01",
         "reviewsKept": 24029,
         "reviewsKeptPct": 96.12,
-        "cells": 392,
-        "cellsPassingNMin": 292,
-        "cellsLostVsNoCut": 2,
+        "cells": 406,
+        "cellsPassingNMin": 293,
+        "cellsLostVsNoCut": 4,
         "renewalMentionsKept": 268,
         "minReviewsPerProduct": 116,
         "productsBelowNMin": 0,
@@ -199,9 +199,9 @@
         "cutoffMonth": "2023-09",
         "reviewsKept": 23547,
         "reviewsKeptPct": 94.19,
-        "cells": 391,
-        "cellsPassingNMin": 287,
-        "cellsLostVsNoCut": 7,
+        "cells": 403,
+        "cellsPassingNMin": 289,
+        "cellsLostVsNoCut": 8,
         "renewalMentionsKept": 257,
         "minReviewsPerProduct": 40,
         "productsBelowNMin": 0,
@@ -211,9 +211,9 @@
         "cutoffMonth": "2024-01",
         "reviewsKept": 23160,
         "reviewsKeptPct": 92.64,
-        "cells": 391,
+        "cells": 401,
         "cellsPassingNMin": 286,
-        "cellsLostVsNoCut": 8,
+        "cellsLostVsNoCut": 11,
         "renewalMentionsKept": 247,
         "minReviewsPerProduct": 28,
         "productsBelowNMin": 0,
@@ -223,9 +223,9 @@
         "cutoffMonth": "2024-09",
         "reviewsKept": 22194,
         "reviewsKeptPct": 88.78,
-        "cells": 389,
+        "cells": 394,
         "cellsPassingNMin": 284,
-        "cellsLostVsNoCut": 10,
+        "cellsLostVsNoCut": 13,
         "renewalMentionsKept": 218,
         "minReviewsPerProduct": 26,
         "productsBelowNMin": 0,
@@ -235,9 +235,9 @@
         "cutoffMonth": "2025-01",
         "reviewsKept": 21421,
         "reviewsKeptPct": 85.68,
-        "cells": 388,
+        "cells": 393,
         "cellsPassingNMin": 278,
-        "cellsLostVsNoCut": 16,
+        "cellsLostVsNoCut": 19,
         "renewalMentionsKept": 210,
         "minReviewsPerProduct": 26,
         "productsBelowNMin": 0,
@@ -247,9 +247,9 @@
         "cutoffMonth": "2025-09",
         "reviewsKept": 19529,
         "reviewsKeptPct": 78.12,
-        "cells": 383,
+        "cells": 388,
         "cellsPassingNMin": 266,
-        "cellsLostVsNoCut": 28,
+        "cellsLostVsNoCut": 31,
         "renewalMentionsKept": 148,
         "minReviewsPerProduct": 18,
         "productsBelowNMin": 0,
@@ -257,11 +257,178 @@
       }
     ]
   },
+  "confirmedRenewals": {
+    "confirmedAt": "2026-09-04",
+    "source": "pipeline/build_product_catalog.py 의 RENEWAL_GENERATIONS / RENEWAL_SINGLE_CONFIRMED",
+    "previousGenerationProductIds": [
+      "p051",
+      "p052",
+      "p053"
+    ],
+    "previousGenerationReviews": 170,
+    "lineages": [
+      {
+        "lineageId": "L004",
+        "displayName": "컬러그램 누디 블러 틴트",
+        "policy": "separate",
+        "generations": [
+          {
+            "productId": "p004",
+            "displayName": "컬러그램 누디 블러 틴트",
+            "current": true,
+            "goodsNos": [
+              "A000000230581"
+            ],
+            "fromMonth": null,
+            "toMonth": null,
+            "reviews": 493,
+            "evidence": "리뉴얼 용기판 (goodsNo A000000230581). 위 '[기존용기]' 표기의 대응 세대"
+          },
+          {
+            "productId": "p051",
+            "displayName": "컬러그램 누디 블러 틴트 (기존 용기)",
+            "current": false,
+            "goodsNos": [
+              "A000000209953"
+            ],
+            "fromMonth": null,
+            "toMonth": null,
+            "reviews": 7,
+            "evidence": "용기 리뉴얼. 올리브영이 구세대 SKU 를 상품명 '[기존용기] 컬러그램 누디 블러 틴트 5 COLOR' 로 따로 표기한다 (goodsNo A000000209953, 확인 2026-09-04). 리뉴얼 일자는 확인하지 못했으나 세대가 goodsNo 로 갈리므로 날짜는 판별자가 아니다. 용기 변경은 '내용물이 안 나온다'는 주장을 무효화한다"
+          }
+        ]
+      },
+      {
+        "lineageId": "L011",
+        "displayName": "에스쁘아 비벨벳 커버쿠션",
+        "policy": "separate",
+        "generations": [
+          {
+            "productId": "p052",
+            "displayName": "에스쁘아 비벨벳 커버쿠션 (2025 리뉴얼 이전)",
+            "current": false,
+            "goodsNos": [
+              "A000000184222"
+            ],
+            "fromMonth": null,
+            "toMonth": "2025-01",
+            "reviews": 4,
+            "evidence": "2025-02 리뉴얼 출시 — 커버력·제형·지속력 개선, 컬러 8단계로 재편 (아모레퍼시픽 스토리 '비벨벳 쿠션 글로벌 쉐이드 확장기', 확인 2026-09-04). 코퍼스의 첫 리뉴얼 언급 2025.02.07 과 일치한다. **goodsNo 가 하나뿐이라 세대를 날짜로만 가를 수 있다** — 이 제품이 (goodsNo, reviewDate) 키가 필요한 이유의 실례다"
+          },
+          {
+            "productId": "p011",
+            "displayName": "에스쁘아 비벨벳 커버쿠션",
+            "current": true,
+            "goodsNos": [
+              "A000000184222"
+            ],
+            "fromMonth": "2025-02",
+            "toMonth": null,
+            "reviews": 496,
+            "evidence": "2025-02 리뉴얼판 (아모레퍼시픽 스토리, 확인 2026-09-04). 같은 goodsNo 를 공유한다"
+          }
+        ]
+      },
+      {
+        "lineageId": "L017",
+        "displayName": "헤라 블랙 쿠션 파운데이션",
+        "policy": "separate",
+        "generations": [
+          {
+            "productId": "p053",
+            "displayName": "헤라 블랙 쿠션 (2024 리뉴얼 이전)",
+            "current": false,
+            "goodsNos": [
+              "A000000149846"
+            ],
+            "fromMonth": null,
+            "toMonth": "2024-07",
+            "reviews": 159,
+            "evidence": "2024-03-25 네이버 선런칭 / 04-01 전국 리뉴얼 출시. 제품명이 '블랙 쿠션'에서 '블랙 쿠션 파운데이션'으로 바뀌고 컬러 9종으로 재편됐다 (아모레퍼시픽 뉴스룸 apgroup.com/int/ko/news/2024-03-26-1.html, 확인 2026-09-04). 구세대 SKU 는 리뉴얼 전 재고 리뷰 때문에 2024.07 까지 리뷰를 받았다 — 세대는 goodsNo 로 갈리므로 이 중첩은 해석을 흐리지 않는다"
+          },
+          {
+            "productId": "p017",
+            "displayName": "헤라 블랙 쿠션 파운데이션",
+            "current": true,
+            "goodsNos": [
+              "A000000202777",
+              "A000000232323"
+            ],
+            "fromMonth": "2024-04",
+            "toMonth": null,
+            "reviews": 341,
+            "evidence": "2024-03/04 리뉴얼판. 신세대 SKU 첫 리뷰 2024.04.18 (아모레퍼시픽 뉴스룸, 확인 2026-09-04)"
+          }
+        ]
+      },
+      {
+        "lineageId": "L026",
+        "displayName": "구달 청귤 비타C 잡티케어 세럼",
+        "policy": "single",
+        "generations": 1,
+        "evidence": "'청귤 비타C 잡티 케어 알파' 라인으로 리뉴얼됐고 코퍼스의 goodsNo 5개가 전부 상품명에 '알파'를 달고 있다 — 즉 수집분 500건이 모두 리뉴얼 후다 (클리오 공식몰 clubclio.co.kr, 이데일리 2025 알파라인 출시 기사, 확인 2026-09-04). 세대 경계가 코퍼스 밖이므로 나눌 것이 없다"
+      },
+      {
+        "lineageId": "L032",
+        "displayName": "성분에디터 그린토마토 NMN 포어 리프팅 앰플",
+        "policy": "single",
+        "generations": 1,
+        "evidence": "2025-07 리뉴얼(30ml→40ml, 용기 변경)판이 코퍼스의 시작이다 — goodsNo 2개 모두 40ml 리뉴얼판이고 첫 리뷰가 2025.07.03 이다 (올리브영 A000000229522 상품명 '[리뉴얼/1등모공앰플]', 확인 2026-09-04). 세대 경계가 코퍼스 밖이므로 나눌 것이 없다"
+      }
+    ],
+    "note": "외부 근거(브랜드 뉴스룸·공식몰·올리브영 상품명)로 확정한 것만 담는다. 본문 언급은 후보 큐로만 쓰고 cutoverDate 로 승격하지 않는다"
+  },
+  "renewalCutMarginalEffect": {
+    "definition": "리센시 컷을 통과했는데 리뉴얼 컷(이전 세대 귀속)으로 현행 제품의 근거에서 빠지는 리뷰 수. 두 컷이 겹치는 만큼 리뉴얼 컷의 실효는 리센시 컷 값에 달려 있다",
+    "byRecencyCutoff": [
+      {
+        "cutoffMonth": null,
+        "previousGenerationReviewsSurvivingRecency": 170,
+        "adopted": false
+      },
+      {
+        "cutoffMonth": "2022-01",
+        "previousGenerationReviewsSurvivingRecency": 148,
+        "adopted": false
+      },
+      {
+        "cutoffMonth": "2023-01",
+        "previousGenerationReviewsSurvivingRecency": 95,
+        "adopted": false
+      },
+      {
+        "cutoffMonth": "2023-09",
+        "previousGenerationReviewsSurvivingRecency": 47,
+        "adopted": false
+      },
+      {
+        "cutoffMonth": "2024-01",
+        "previousGenerationReviewsSurvivingRecency": 22,
+        "adopted": false
+      },
+      {
+        "cutoffMonth": "2024-09",
+        "previousGenerationReviewsSurvivingRecency": 7,
+        "adopted": true
+      },
+      {
+        "cutoffMonth": "2025-01",
+        "previousGenerationReviewsSurvivingRecency": 7,
+        "adopted": false
+      },
+      {
+        "cutoffMonth": "2025-09",
+        "previousGenerationReviewsSurvivingRecency": 7,
+        "adopted": false
+      }
+    ],
+    "note": "현행 24개월 컷에서는 순증분이 작다. 리센시 컷을 완화할수록 커지므로 리뉴얼 세대 확정은 지금의 필터라기보다 **리센시 컷 값에 대한 보험**이다"
+  },
   "renewalCandidateQueue": {
     "minMentions": 10,
     "products": [
       {
-        "productId": "p017",
+        "productId": "L017",
         "displayName": "헤라 블랙 쿠션 파운데이션",
         "mentions": 64,
         "mentionPctOfProduct": 12.8,
@@ -272,7 +439,7 @@
         ]
       },
       {
-        "productId": "p032",
+        "productId": "L032",
         "displayName": "성분에디터 그린토마토 NMN 포어 리프팅 앰플",
         "mentions": 23,
         "mentionPctOfProduct": 4.6,
@@ -283,7 +450,7 @@
         ]
       },
       {
-        "productId": "p011",
+        "productId": "L011",
         "displayName": "에스쁘아 비벨벳 커버쿠션",
         "mentions": 23,
         "mentionPctOfProduct": 4.6,
@@ -294,7 +461,7 @@
         ]
       },
       {
-        "productId": "p004",
+        "productId": "L004",
         "displayName": "컬러그램 누디 블러 틴트",
         "mentions": 23,
         "mentionPctOfProduct": 4.6,
@@ -305,7 +472,7 @@
         ]
       },
       {
-        "productId": "p026",
+        "productId": "L026",
         "displayName": "구달 청귤 비타C 잡티케어 세럼",
         "mentions": 22,
         "mentionPctOfProduct": 4.4,
@@ -316,7 +483,7 @@
         ]
       },
       {
-        "productId": "p039",
+        "productId": "L039",
         "displayName": "토리든 다이브인 저분자 히알루론산 세럼",
         "mentions": 12,
         "mentionPctOfProduct": 2.4,
@@ -327,7 +494,7 @@
         ]
       },
       {
-        "productId": "p010",
+        "productId": "L010",
         "displayName": "바닐라코 프라임 프라이머 피니쉬 파우더",
         "mentions": 12,
         "mentionPctOfProduct": 2.4,
@@ -338,7 +505,7 @@
         ]
       },
       {
-        "productId": "p002",
+        "productId": "L002",
         "displayName": "롬앤 더 쥬시 래스팅 틴트",
         "mentions": 12,
         "mentionPctOfProduct": 2.4,
@@ -349,7 +516,7 @@
         ]
       },
       {
-        "productId": "p023",
+        "productId": "L023",
         "displayName": "투크 워터프루프 슬림 아이라이너",
         "mentions": 11,
         "mentionPctOfProduct": 2.2,
