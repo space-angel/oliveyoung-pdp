@@ -188,7 +188,7 @@ pipeline/    v5 — 작업 대상
   build_product_catalog.py 카탈로그 생성기 (--check 로 재현 확인)
   ingest.py                25K → v5 레코드 (LLM 없음, 재실행 일치)
   run_v5.py                단계 레지스트리
-  test_*.py                계약 테스트 68케이스 (catalog·policy·ingest)
+  test_*.py                계약 테스트 98케이스 (catalog·policy·ingest·tag)
 legacy/v4/   v4 동결 — 비교 기준선. 고치지 않는다
 crawler/     올리브영 cursor API 크롤러 (상품당 최대 500건)
 eval/        평가 스크립트 + 리포트 (커밋됨 — 수치의 1차 근거)

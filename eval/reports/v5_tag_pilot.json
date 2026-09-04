@@ -1,0 +1,217 @@
+{
+  "issue": "PER-175",
+  "label": "pilot_gold",
+  "tagger": "claude-opus-5[1m] (Claude Code 구독, 사람 검토 기준셋)",
+  "prompt": {
+    "path": "pipeline/prompts/tag/v1.md",
+    "sha256": "a8cc2a7d4cb7eb3583df4b2a7c80ca7336e8dface0d7ec9d1175abd9c23079eb",
+    "schemaVersion": "tag-v1"
+  },
+  "sample": {
+    "path": "eval/gold/v5_tag_pilot_sample.jsonl",
+    "sha256": "8a13c6b782e978e730716cc05bd54c3c12e819d838ccb6d0594a9c005785b498",
+    "seed": 20260904,
+    "strata": [
+      {
+        "name": "rating_1_2",
+        "population": 407,
+        "sampled": 60,
+        "skinTypeStated": 30,
+        "skinTypeMissing": 30,
+        "weight": 6.7833
+      },
+      {
+        "name": "rating_3",
+        "population": 828,
+        "sampled": 40,
+        "skinTypeStated": 20,
+        "skinTypeMissing": 20,
+        "weight": 20.7
+      },
+      {
+        "name": "rating_4",
+        "population": 2403,
+        "sampled": 40,
+        "skinTypeStated": 20,
+        "skinTypeMissing": 20,
+        "weight": 60.075
+      },
+      {
+        "name": "rating_5",
+        "population": 21362,
+        "sampled": 60,
+        "skinTypeStated": 30,
+        "skinTypeMissing": 30,
+        "weight": 356.0333
+      }
+    ]
+  },
+  "profile": {
+    "reviews": 200,
+    "tags": 365,
+    "tagsPerReview": 1.82,
+    "coverage": {
+      "reviewsWithTag": 176,
+      "pctReviewsWithTag": 88.0,
+      "silentReviews": 24
+    },
+    "snippet": {
+      "verbatimStrict": 365,
+      "pctVerbatimStrict": 100.0,
+      "verbatimAfterWhitespaceFold": 365,
+      "maxLen": 35,
+      "note": "v4 는 88.8% 였다. 계약은 100% 를 요구한다 — 미달이면 validate_tags 가 이미 세운다"
+    },
+    "polarity": {
+      "positive": 198,
+      "negative": 160,
+      "neutral": 7
+    },
+    "ratingDisagreement": {
+      "count": 47,
+      "pct": 12.9,
+      "note": "오류가 아니라 게이트3 플래그. 5점 리뷰의 불만을 잡았다는 뜻"
+    },
+    "mixedDirectionReviews": {
+      "count": 41,
+      "pct": 20.5,
+      "note": "리뷰 단위 감성으로는 표현 불가능한 몫. (리뷰 × 주제) 단위의 근거"
+    },
+    "aspects": {
+      "distinct": 13,
+      "unusedOfTaxonomy": [
+        "분사력"
+      ],
+      "top6Share": 74.0,
+      "counts": {
+        "발림감/텍스처": 55,
+        "발색": 52,
+        "보습감": 51,
+        "트러블/자극": 48,
+        "유분/번들거림": 33,
+        "지속성": 31,
+        "가성비": 30,
+        "밀착력": 22,
+        "흡수력": 15,
+        "향": 10,
+        "커버력": 10,
+        "광택/윤기": 5,
+        "탄력/탱탱함": 3
+      }
+    },
+    "skinTypeHint": {
+      "tagsWithHint": 73,
+      "reviewsWithHint": 28,
+      "onMissingCondition": 9,
+      "conflictWithCondition": [
+        {
+          "reviewId": 32320525,
+          "condition": "A02",
+          "hint": "A03"
+        },
+        {
+          "reviewId": 10551325,
+          "condition": "A03",
+          "hint": "A01"
+        },
+        {
+          "reviewId": 63636001,
+          "condition": "A04",
+          "hint": "A01"
+        },
+        {
+          "reviewId": 63327651,
+          "condition": "A06",
+          "hint": "A01"
+        },
+        {
+          "reviewId": 29934025,
+          "condition": "A05",
+          "hint": "A02"
+        },
+        {
+          "reviewId": 38248029,
+          "condition": "A03",
+          "hint": "A04"
+        }
+      ],
+      "note": "onMissingCondition 이 조건축을 실제로 늘린 몫이다 (v4 는 이 값을 집계에서 잃었다)"
+    },
+    "perStratum": {
+      "rating_1_2": {
+        "reviews": 60,
+        "tagged": 57,
+        "tags": 106,
+        "tagsPerReview": 1.77,
+        "polarity": {
+          "positive": 15,
+          "negative": 88,
+          "neutral": 3
+        }
+      },
+      "rating_3": {
+        "reviews": 40,
+        "tagged": 33,
+        "tags": 63,
+        "tagsPerReview": 1.57,
+        "polarity": {
+          "positive": 21,
+          "negative": 40,
+          "neutral": 2
+        }
+      },
+      "rating_4": {
+        "reviews": 40,
+        "tagged": 32,
+        "tags": 69,
+        "tagsPerReview": 1.73,
+        "polarity": {
+          "positive": 49,
+          "negative": 19,
+          "neutral": 1
+        }
+      },
+      "rating_5": {
+        "reviews": 60,
+        "tagged": 54,
+        "tags": 127,
+        "tagsPerReview": 2.12,
+        "polarity": {
+          "positive": 113,
+          "negative": 13,
+          "neutral": 1
+        }
+      }
+    }
+  },
+  "corpusEstimate": {
+    "corpusReviews": 25000,
+    "estTags": 51385,
+    "estTagsPerReview": 2.06,
+    "estNegativeShare": 14.0,
+    "sampleNegativeShare": 43.8,
+    "perStratum": {
+      "rating_1_2": {
+        "sampleTags": 106,
+        "weight": 6.7833,
+        "estCorpusTags": 719
+      },
+      "rating_3": {
+        "sampleTags": 63,
+        "weight": 20.7,
+        "estCorpusTags": 1304
+      },
+      "rating_4": {
+        "sampleTags": 69,
+        "weight": 60.075,
+        "estCorpusTags": 4145
+      },
+      "rating_5": {
+        "sampleTags": 127,
+        "weight": 356.0333,
+        "estCorpusTags": 45216
+      }
+    },
+    "note": "표본은 희소 클래스를 과표집했다. 코퍼스 수치는 가중치로 되돌린 추정이고 표본 수치와 다르다"
+  }
+}
