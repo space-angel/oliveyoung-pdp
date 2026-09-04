@@ -1,13 +1,16 @@
 {
   "_meta": {
-    "schemaVersion": "v5-1",
-    "issue": "PER-171",
+    "schemaVersion": "v5-2",
+    "issue": "PER-171 / PER-172",
     "description": "제품 동일성(goodsNo → productId)의 단일 정본. 파이프라인은 리뷰 행의 productKey 문자열을 신뢰하지 않고 goodsNo 를 이 파일에 물어 제품을 식별한다.",
     "rules": [
       "집계 단위는 productId 다. goodsNo 는 변형 SKU 단위이므로 그룹핑 키로 쓰지 않는다.",
       "미등록 goodsNo 는 조용히 폴백하지 않고 에러다 (pipeline/catalog.py).",
       "productId 는 한 번 부여하면 고정한다. 표시명이 바뀌어도 집계 키는 유지된다.",
-      "리뉴얼 취급(renewalPolicy)은 PER-172 에서 정한다. 지금은 전 제품 null."
+      "리뉴얼은 별개 제품이다 (PER-172). 세대는 별개 productId 를 갖고 lineageId 로 묶인다.",
+      "세대 경계는 goodsNo 가 아니라 날짜다 — 한 goodsNo 가 여러 세대에 걸치면 review_date 로 가른다.",
+      "renewalPolicy 는 null 을 허용하지 않는다. 정하지 않았으면 'unobserved' 로 명시한다.",
+      "renewalPolicy 는 생성기가 추론하지 않는다. 사람이 근거와 함께 적고 재생성 시 승계된다."
     ],
     "generatedBy": "pipeline/build_product_catalog.py",
     "supersedes": "data/input/product_canonical_map.json (v4, 표시명 키 기반)",
@@ -45,7 +48,13 @@
       "displayName": "3CE 캐시미어 허그 립스틱",
       "category": "립메이크업",
       "requestedGoodsNo": "A000000212004",
-      "renewalPolicy": null,
+      "lineageId": "L001",
+      "renewalPolicy": {
+        "policy": "unobserved",
+        "fromMonth": null,
+        "toMonth": null,
+        "evidence": null
+      },
       "notes": [],
       "goodsNos": [
         {
@@ -59,7 +68,13 @@
       "displayName": "롬앤 더 쥬시 래스팅 틴트",
       "category": "립메이크업",
       "requestedGoodsNo": "A000000241210",
-      "renewalPolicy": null,
+      "lineageId": "L002",
+      "renewalPolicy": {
+        "policy": "unobserved",
+        "fromMonth": null,
+        "toMonth": null,
+        "evidence": null
+      },
       "notes": [],
       "goodsNos": [
         {
@@ -81,7 +96,13 @@
       "displayName": "유리아쥬 스틱레브르 컬러드",
       "category": "립메이크업",
       "requestedGoodsNo": "A000000235485",
-      "renewalPolicy": null,
+      "lineageId": "L003",
+      "renewalPolicy": {
+        "policy": "unobserved",
+        "fromMonth": null,
+        "toMonth": null,
+        "evidence": null
+      },
       "notes": [],
       "goodsNos": [
         {
@@ -95,7 +116,13 @@
       "displayName": "컬러그램 누디 블러 틴트",
       "category": "립메이크업",
       "requestedGoodsNo": "A000000230581",
-      "renewalPolicy": null,
+      "lineageId": "L004",
+      "renewalPolicy": {
+        "policy": "unobserved",
+        "fromMonth": null,
+        "toMonth": null,
+        "evidence": null
+      },
       "notes": [],
       "goodsNos": [
         {
@@ -113,7 +140,13 @@
       "displayName": "퓌 3D 볼류밍 글로스",
       "category": "립메이크업",
       "requestedGoodsNo": "A000000246445",
-      "renewalPolicy": null,
+      "lineageId": "L005",
+      "renewalPolicy": {
+        "policy": "unobserved",
+        "fromMonth": null,
+        "toMonth": null,
+        "evidence": null
+      },
       "notes": [],
       "goodsNos": [
         {
@@ -131,7 +164,13 @@
       "displayName": "하트퍼센트 도트 온 무드 립펜슬",
       "category": "립메이크업",
       "requestedGoodsNo": "A000000174066",
-      "renewalPolicy": null,
+      "lineageId": "L006",
+      "renewalPolicy": {
+        "policy": "unobserved",
+        "fromMonth": null,
+        "toMonth": null,
+        "evidence": null
+      },
       "notes": [],
       "goodsNos": [
         {
@@ -145,7 +184,13 @@
       "displayName": "힌스 로 글로우 젤 틴트",
       "category": "립메이크업",
       "requestedGoodsNo": "A000000202912",
-      "renewalPolicy": null,
+      "lineageId": "L007",
+      "renewalPolicy": {
+        "policy": "unobserved",
+        "fromMonth": null,
+        "toMonth": null,
+        "evidence": null
+      },
       "notes": [],
       "goodsNos": [
         {
@@ -159,7 +204,13 @@
       "displayName": "VDL 치크스테인 블러셔",
       "category": "베이스메이크업",
       "requestedGoodsNo": "A000000184299",
-      "renewalPolicy": null,
+      "lineageId": "L008",
+      "renewalPolicy": {
+        "policy": "unobserved",
+        "fromMonth": null,
+        "toMonth": null,
+        "evidence": null
+      },
       "notes": [],
       "goodsNos": [
         {
@@ -173,7 +224,13 @@
       "displayName": "더샘 커버 퍼펙션 트리플 팟 컨실러",
       "category": "베이스메이크업",
       "requestedGoodsNo": "A000000238763",
-      "renewalPolicy": null,
+      "lineageId": "L009",
+      "renewalPolicy": {
+        "policy": "unobserved",
+        "fromMonth": null,
+        "toMonth": null,
+        "evidence": null
+      },
       "notes": [],
       "goodsNos": [
         {
@@ -191,7 +248,13 @@
       "displayName": "바닐라코 프라임 프라이머 피니쉬 파우더",
       "category": "베이스메이크업",
       "requestedGoodsNo": "A000000165215",
-      "renewalPolicy": null,
+      "lineageId": "L010",
+      "renewalPolicy": {
+        "policy": "unobserved",
+        "fromMonth": null,
+        "toMonth": null,
+        "evidence": null
+      },
       "notes": [],
       "goodsNos": [
         {
@@ -205,7 +268,13 @@
       "displayName": "에스쁘아 비벨벳 커버쿠션",
       "category": "베이스메이크업",
       "requestedGoodsNo": "A000000184222",
-      "renewalPolicy": null,
+      "lineageId": "L011",
+      "renewalPolicy": {
+        "policy": "unobserved",
+        "fromMonth": null,
+        "toMonth": null,
+        "evidence": null
+      },
       "notes": [],
       "goodsNos": [
         {
@@ -219,7 +288,13 @@
       "displayName": "연작 스킨 퍼펙팅 프로텍티브 베이스프렙",
       "category": "베이스메이크업",
       "requestedGoodsNo": "A000000213943",
-      "renewalPolicy": null,
+      "lineageId": "L012",
+      "renewalPolicy": {
+        "policy": "unobserved",
+        "fromMonth": null,
+        "toMonth": null,
+        "evidence": null
+      },
       "notes": [],
       "goodsNos": [
         {
@@ -237,7 +312,13 @@
       "displayName": "오프라 미니 하이라이터",
       "category": "베이스메이크업",
       "requestedGoodsNo": "A000000238740",
-      "renewalPolicy": null,
+      "lineageId": "L013",
+      "renewalPolicy": {
+        "policy": "unobserved",
+        "fromMonth": null,
+        "toMonth": null,
+        "evidence": null
+      },
       "notes": [],
       "goodsNos": [
         {
@@ -255,7 +336,13 @@
       "displayName": "정샘물 에센셜 스킨 누더 쿠션",
       "category": "베이스메이크업",
       "requestedGoodsNo": "A000000139063",
-      "renewalPolicy": null,
+      "lineageId": "L014",
+      "renewalPolicy": {
+        "policy": "unobserved",
+        "fromMonth": null,
+        "toMonth": null,
+        "evidence": null
+      },
       "notes": [],
       "goodsNos": [
         {
@@ -273,7 +360,13 @@
       "displayName": "클리오 킬 커버 파운웨어 쿠션",
       "category": "베이스메이크업",
       "requestedGoodsNo": "A000000232098",
-      "renewalPolicy": null,
+      "lineageId": "L015",
+      "renewalPolicy": {
+        "policy": "unobserved",
+        "fromMonth": null,
+        "toMonth": null,
+        "evidence": null
+      },
       "notes": [],
       "goodsNos": [
         {
@@ -287,7 +380,13 @@
       "displayName": "프레시안 에그라이크 크림 블러셔",
       "category": "베이스메이크업",
       "requestedGoodsNo": "A000000212749",
-      "renewalPolicy": null,
+      "lineageId": "L016",
+      "renewalPolicy": {
+        "policy": "unobserved",
+        "fromMonth": null,
+        "toMonth": null,
+        "evidence": null
+      },
       "notes": [],
       "goodsNos": [
         {
@@ -301,7 +400,13 @@
       "displayName": "헤라 블랙 쿠션 파운데이션",
       "category": "베이스메이크업",
       "requestedGoodsNo": "A000000202777",
-      "renewalPolicy": null,
+      "lineageId": "L017",
+      "renewalPolicy": {
+        "policy": "unobserved",
+        "fromMonth": null,
+        "toMonth": null,
+        "evidence": null
+      },
       "notes": [],
       "goodsNos": [
         {
@@ -323,7 +428,13 @@
       "displayName": "데이지크 섀도우팔레트",
       "category": "아이메이크업",
       "requestedGoodsNo": "A000000147801",
-      "renewalPolicy": null,
+      "lineageId": "L018",
+      "renewalPolicy": {
+        "policy": "unobserved",
+        "fromMonth": null,
+        "toMonth": null,
+        "evidence": null
+      },
       "notes": [],
       "goodsNos": [
         {
@@ -345,7 +456,13 @@
       "displayName": "리필드 사이토카인 아이래쉬 듀얼 앰플",
       "category": "아이메이크업",
       "requestedGoodsNo": "A000000227157",
-      "renewalPolicy": null,
+      "lineageId": "L019",
+      "renewalPolicy": {
+        "policy": "unobserved",
+        "fromMonth": null,
+        "toMonth": null,
+        "evidence": null
+      },
       "notes": [],
       "goodsNos": [
         {
@@ -359,7 +476,13 @@
       "displayName": "에뛰드 컬 픽스 마스카라",
       "category": "아이메이크업",
       "requestedGoodsNo": "A000000203943",
-      "renewalPolicy": null,
+      "lineageId": "L020",
+      "renewalPolicy": {
+        "policy": "unobserved",
+        "fromMonth": null,
+        "toMonth": null,
+        "evidence": null
+      },
       "notes": [],
       "goodsNos": [
         {
@@ -381,7 +504,13 @@
       "displayName": "웨이크메이크 소프트 블러링 아이팔레트",
       "category": "아이메이크업",
       "requestedGoodsNo": "A000000180532",
-      "renewalPolicy": null,
+      "lineageId": "L021",
+      "renewalPolicy": {
+        "policy": "unobserved",
+        "fromMonth": null,
+        "toMonth": null,
+        "evidence": null
+      },
       "notes": [],
       "goodsNos": [
         {
@@ -399,7 +528,13 @@
       "displayName": "코스노리 아이래쉬 세럼 비건 속눈썹영양제",
       "category": "아이메이크업",
       "requestedGoodsNo": "A000000140618",
-      "renewalPolicy": null,
+      "lineageId": "L022",
+      "renewalPolicy": {
+        "policy": "unobserved",
+        "fromMonth": null,
+        "toMonth": null,
+        "evidence": null
+      },
       "notes": [],
       "goodsNos": [
         {
@@ -421,7 +556,13 @@
       "displayName": "투크 워터프루프 슬림 아이라이너",
       "category": "아이메이크업",
       "requestedGoodsNo": "A000000185046",
-      "renewalPolicy": null,
+      "lineageId": "L023",
+      "renewalPolicy": {
+        "policy": "unobserved",
+        "fromMonth": null,
+        "toMonth": null,
+        "evidence": null
+      },
       "notes": [],
       "goodsNos": [
         {
@@ -435,7 +576,13 @@
       "displayName": "페리페라 스피디 스키니 브로우",
       "category": "아이메이크업",
       "requestedGoodsNo": "A000000138671",
-      "renewalPolicy": null,
+      "lineageId": "L024",
+      "renewalPolicy": {
+        "policy": "unobserved",
+        "fromMonth": null,
+        "toMonth": null,
+        "evidence": null
+      },
       "notes": [],
       "goodsNos": [
         {
@@ -449,7 +596,13 @@
       "displayName": "홀리카홀리카 마이페이브 피스 아이섀도우",
       "category": "아이메이크업",
       "requestedGoodsNo": "A000000174309",
-      "renewalPolicy": null,
+      "lineageId": "L025",
+      "renewalPolicy": {
+        "policy": "unobserved",
+        "fromMonth": null,
+        "toMonth": null,
+        "evidence": null
+      },
       "notes": [],
       "goodsNos": [
         {
@@ -475,7 +628,13 @@
       "displayName": "구달 청귤 비타C 잡티케어 세럼",
       "category": "에센스/세럼",
       "requestedGoodsNo": "A000000247774",
-      "renewalPolicy": null,
+      "lineageId": "L026",
+      "renewalPolicy": {
+        "policy": "unobserved",
+        "fromMonth": null,
+        "toMonth": null,
+        "evidence": null
+      },
       "notes": [],
       "goodsNos": [
         {
@@ -505,7 +664,13 @@
       "displayName": "넘버즈인 판토텐산 액티브업 수딩세럼",
       "category": "에센스/세럼",
       "requestedGoodsNo": "A000000207225",
-      "renewalPolicy": null,
+      "lineageId": "L027",
+      "renewalPolicy": {
+        "policy": "unobserved",
+        "fromMonth": null,
+        "toMonth": null,
+        "evidence": null
+      },
       "notes": [],
       "goodsNos": [
         {
@@ -527,7 +692,13 @@
       "displayName": "달바 퍼스트 스프레이 세럼",
       "category": "에센스/세럼",
       "requestedGoodsNo": "A000000232724",
-      "renewalPolicy": null,
+      "lineageId": "L028",
+      "renewalPolicy": {
+        "policy": "unobserved",
+        "fromMonth": null,
+        "toMonth": null,
+        "evidence": null
+      },
       "notes": [],
       "goodsNos": [
         {
@@ -553,7 +724,13 @@
       "displayName": "메디큐브 PDRN 핑크 앰플",
       "category": "에센스/세럼",
       "requestedGoodsNo": "A000000226498",
-      "renewalPolicy": null,
+      "lineageId": "L029",
+      "renewalPolicy": {
+        "policy": "unobserved",
+        "fromMonth": null,
+        "toMonth": null,
+        "evidence": null
+      },
       "notes": [],
       "goodsNos": [
         {
@@ -575,7 +752,13 @@
       "displayName": "메디힐 PDRN 모공 탄력 세럼",
       "category": "에센스/세럼",
       "requestedGoodsNo": "A000000232179",
-      "renewalPolicy": null,
+      "lineageId": "L030",
+      "renewalPolicy": {
+        "policy": "unobserved",
+        "fromMonth": null,
+        "toMonth": null,
+        "evidence": null
+      },
       "notes": [],
       "goodsNos": [
         {
@@ -593,7 +776,13 @@
       "displayName": "메디힐 마데카소사이드 흔적 리페어 세럼",
       "category": "에센스/세럼",
       "requestedGoodsNo": "A000000211119",
-      "renewalPolicy": null,
+      "lineageId": "L031",
+      "renewalPolicy": {
+        "policy": "unobserved",
+        "fromMonth": null,
+        "toMonth": null,
+        "evidence": null
+      },
       "notes": [],
       "goodsNos": [
         {
@@ -619,7 +808,13 @@
       "displayName": "성분에디터 그린토마토 NMN 포어 리프팅 앰플",
       "category": "에센스/세럼",
       "requestedGoodsNo": "A000000235178",
-      "renewalPolicy": null,
+      "lineageId": "L032",
+      "renewalPolicy": {
+        "policy": "unobserved",
+        "fromMonth": null,
+        "toMonth": null,
+        "evidence": null
+      },
       "notes": [],
       "goodsNos": [
         {
@@ -637,7 +832,13 @@
       "displayName": "셀라딕스 트러블 세범 리밸런싱 앰플",
       "category": "에센스/세럼",
       "requestedGoodsNo": "A000000224494",
-      "renewalPolicy": null,
+      "lineageId": "L033",
+      "renewalPolicy": {
+        "policy": "unobserved",
+        "fromMonth": null,
+        "toMonth": null,
+        "evidence": null
+      },
       "notes": [],
       "goodsNos": [
         {
@@ -655,7 +856,13 @@
       "displayName": "아누아 TXA 나이아신 흔적 세럼",
       "category": "에센스/세럼",
       "requestedGoodsNo": "A000000226201",
-      "renewalPolicy": null,
+      "lineageId": "L034",
+      "renewalPolicy": {
+        "policy": "unobserved",
+        "fromMonth": null,
+        "toMonth": null,
+        "evidence": null
+      },
       "notes": [],
       "goodsNos": [
         {
@@ -673,7 +880,13 @@
       "displayName": "아누아 피디알엔 히알루론산 캡슐 100 세럼",
       "category": "에센스/세럼",
       "requestedGoodsNo": "A000000231894",
-      "renewalPolicy": null,
+      "lineageId": "L035",
+      "renewalPolicy": {
+        "policy": "unobserved",
+        "fromMonth": null,
+        "toMonth": null,
+        "evidence": null
+      },
       "notes": [],
       "goodsNos": [
         {
@@ -711,7 +924,13 @@
       "displayName": "아이오페 레티놀 슈퍼 바운스 세럼",
       "category": "에센스/세럼",
       "requestedGoodsNo": "A000000184060",
-      "renewalPolicy": null,
+      "lineageId": "L036",
+      "renewalPolicy": {
+        "policy": "unobserved",
+        "fromMonth": null,
+        "toMonth": null,
+        "evidence": null
+      },
       "notes": [],
       "goodsNos": [
         {
@@ -745,7 +964,13 @@
       "displayName": "웰라쥬 리얼 히알루로닉 블루 100 앰플",
       "category": "에센스/세럼",
       "requestedGoodsNo": "A000000235247",
-      "renewalPolicy": null,
+      "lineageId": "L037",
+      "renewalPolicy": {
+        "policy": "unobserved",
+        "fromMonth": null,
+        "toMonth": null,
+        "evidence": null
+      },
       "notes": [],
       "goodsNos": [
         {
@@ -767,7 +992,13 @@
       "displayName": "이니스프리 레티놀 시카 흔적 앰플",
       "category": "에센스/세럼",
       "requestedGoodsNo": "A000000230208",
-      "renewalPolicy": null,
+      "lineageId": "L038",
+      "renewalPolicy": {
+        "policy": "unobserved",
+        "fromMonth": null,
+        "toMonth": null,
+        "evidence": null
+      },
       "notes": [],
       "goodsNos": [
         {
@@ -805,7 +1036,13 @@
       "displayName": "토리든 다이브인 저분자 히알루론산 세럼",
       "category": "에센스/세럼",
       "requestedGoodsNo": "A000000247193",
-      "renewalPolicy": null,
+      "lineageId": "L039",
+      "renewalPolicy": {
+        "policy": "unobserved",
+        "fromMonth": null,
+        "toMonth": null,
+        "evidence": null
+      },
       "notes": [],
       "goodsNos": [
         {
@@ -859,7 +1096,13 @@
       "displayName": "파티온 노스카나인 트러블 세럼",
       "category": "에센스/세럼",
       "requestedGoodsNo": "A000000219609",
-      "renewalPolicy": null,
+      "lineageId": "L040",
+      "renewalPolicy": {
+        "policy": "unobserved",
+        "fromMonth": null,
+        "toMonth": null,
+        "evidence": null
+      },
       "notes": [],
       "goodsNos": [
         {
@@ -885,7 +1128,13 @@
       "displayName": "닥터지 레드 블레미쉬 클리어 수딩크림",
       "category": "크림",
       "requestedGoodsNo": "A000000164615",
-      "renewalPolicy": null,
+      "lineageId": "L041",
+      "renewalPolicy": {
+        "policy": "unobserved",
+        "fromMonth": null,
+        "toMonth": null,
+        "evidence": null
+      },
       "notes": [
         "v4 맵 표시명 '닥터자르트 레드 블레미쉬 클리어 수딩 크림' 정정: A000000166641 의 리뷰 productName 은 '레드 블레미쉬 클리어 수딩 크림'이고 이 제품은 닥터지(Dr.G) 상품이다. v4 맵의 '닥터자르트' 표기가 오기다"
       ],
@@ -909,7 +1158,13 @@
       "displayName": "라로슈포제 시카플라스트 밤 B5+",
       "category": "크림",
       "requestedGoodsNo": "A000000206904",
-      "renewalPolicy": null,
+      "lineageId": "L042",
+      "renewalPolicy": {
+        "policy": "unobserved",
+        "fromMonth": null,
+        "toMonth": null,
+        "evidence": null
+      },
       "notes": [],
       "goodsNos": [
         {
@@ -955,7 +1210,13 @@
       "displayName": "메디큐브 PDRN 핑크 콜라겐 캡슐크림",
       "category": "크림",
       "requestedGoodsNo": "A000000248826",
-      "renewalPolicy": null,
+      "lineageId": "L043",
+      "renewalPolicy": {
+        "policy": "unobserved",
+        "fromMonth": null,
+        "toMonth": null,
+        "evidence": null
+      },
       "notes": [],
       "goodsNos": [
         {
@@ -973,7 +1234,13 @@
       "displayName": "아누아 피디알엔 히알루론산 100 수분크림",
       "category": "크림",
       "requestedGoodsNo": "A000000231892",
-      "renewalPolicy": null,
+      "lineageId": "L044",
+      "renewalPolicy": {
+        "policy": "unobserved",
+        "fromMonth": null,
+        "toMonth": null,
+        "evidence": null
+      },
       "notes": [],
       "goodsNos": [
         {
@@ -999,7 +1266,13 @@
       "displayName": "에스네이처 아쿠아 스쿠알란 수분크림",
       "category": "크림",
       "requestedGoodsNo": "A000000192782",
-      "renewalPolicy": null,
+      "lineageId": "L045",
+      "renewalPolicy": {
+        "policy": "unobserved",
+        "fromMonth": null,
+        "toMonth": null,
+        "evidence": null
+      },
       "notes": [],
       "goodsNos": [
         {
@@ -1021,7 +1294,13 @@
       "displayName": "에스트라 아토베리어365 크림",
       "category": "크림",
       "requestedGoodsNo": "A000000238634",
-      "renewalPolicy": null,
+      "lineageId": "L046",
+      "renewalPolicy": {
+        "policy": "unobserved",
+        "fromMonth": null,
+        "toMonth": null,
+        "evidence": null
+      },
       "notes": [],
       "goodsNos": [
         {
@@ -1055,7 +1334,13 @@
       "displayName": "유세린 하이알루론 3X 아이크림",
       "category": "크림",
       "requestedGoodsNo": "A000000200454",
-      "renewalPolicy": null,
+      "lineageId": "L047",
+      "renewalPolicy": {
+        "policy": "unobserved",
+        "fromMonth": null,
+        "toMonth": null,
+        "evidence": null
+      },
       "notes": [],
       "goodsNos": [
         {
@@ -1077,7 +1362,13 @@
       "displayName": "제로이드 인텐시브 크림",
       "category": "크림",
       "requestedGoodsNo": "A000000231590",
-      "renewalPolicy": null,
+      "lineageId": "L048",
+      "renewalPolicy": {
+        "policy": "unobserved",
+        "fromMonth": null,
+        "toMonth": null,
+        "evidence": null
+      },
       "notes": [],
       "goodsNos": [
         {
@@ -1115,7 +1406,13 @@
       "displayName": "토리든 다이브인 히알루론산 수딩 크림",
       "category": "크림",
       "requestedGoodsNo": "A000000165598",
-      "renewalPolicy": null,
+      "lineageId": "L049",
+      "renewalPolicy": {
+        "policy": "unobserved",
+        "fromMonth": null,
+        "toMonth": null,
+        "evidence": null
+      },
       "notes": [],
       "goodsNos": [
         {
@@ -1137,7 +1434,13 @@
       "displayName": "피지오겔 DMT 페이셜크림",
       "category": "크림",
       "requestedGoodsNo": "A000000180233",
-      "renewalPolicy": null,
+      "lineageId": "L050",
+      "renewalPolicy": {
+        "policy": "unobserved",
+        "fromMonth": null,
+        "toMonth": null,
+        "evidence": null
+      },
       "notes": [],
       "goodsNos": [
         {

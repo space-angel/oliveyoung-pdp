@@ -95,7 +95,7 @@ catalog → ingest → tag → gates → claims → judge
 
 | 게이트 | 판정 | 실측된 필요성 |
 |---|---|---|
-| 1 동일성 | 정규화 제품 ID 일치, 옵션 질문이면 같은 옵션만, 리뉴얼 컷 | `goodsNo` 153개 → `productId` 50개. 안 묶으면 제품이 쪼개진다 |
+| 1 동일성 | 정규화 제품 ID 일치, 옵션 질문이면 같은 옵션만, 리뉴얼 컷 + 리센시 컷 | `goodsNo` 153개 → `productId` 50개. 안 묶으면 제품이 쪼개진다. 리센시 24개월 컷의 비용은 셀 294→284 |
 | 2 중복 | 본문 해시 + **동일 작성자 1표** + 의미 유사 클러스터 | 안 걸면 카운트가 **22.4% 부풀고**, 본문 해시는 그중 12.1%만 잡는다 |
 | 3 방향성 | polarity를 `(리뷰 × 주제)` 단위로. 별점과 교차 검증, 불일치는 플래그 | 한 리뷰가 "발색은 좋은데 지속력은 별로"라고 말한다 |
 | 4 충분성 | 절대하한 **AND** 비율 **AND** 세그먼트 최소 — 낮은 쪽이 아니라 높은 쪽 | N_min=8 기준으로 `productId×skinType` 셀 393개 중 294개만 통과 |
@@ -125,6 +125,8 @@ catalog → ingest → tag → gates → claims → judge
 | **조건축** | `skinType`(단일) · `skinTrouble`(다중) · `option`. `usagePeriod`는 데이터에 없어 제외 | 같음 |
 | **미기재 취급** | "조건 없음"이 아니라 **별도 세그먼트**. `segment`는 절대 null이 아니다 | 같음 (§7-1 '조건 누락' 실패 방지) |
 | **스킨 코드북** | A01~A07 · B01~B06 · C01~C13 **26종 DOM 실측**. 라벨은 입수가 아니라 표기 단계에서 붙인다 | `data/input/skin_codebook.json` · `crawler/verify_skin_codebook.py` |
+| **리뉴얼** | **별개 제품**(PRD 권장안 채택). 세대 경계 키는 `goodsNo`가 아니라 `(goodsNo, reviewDate)`. `renewalPolicy`는 `null` 대신 **`unobserved` 명시** — 현 스냅샷 전 제품 | [`docs/DECISION_PER172_RENEWAL_AND_RECENCY.md`](docs/DECISION_PER172_RENEWAL_AND_RECENCY.md) · `eval/reports/renewal_recency_per172.json` |
+| **리센시 컷** | 스냅샷 최신 월(2026-08) 기준 **24개월 = `2024-09`~**. `today` 롤링은 재현성과 충돌해 쓰지 않는다 | 같음 |
 
 ### 조건부 진실 — 이 도메인의 핵심 설계
 
@@ -153,7 +155,8 @@ UI 정리가 아니라 정확도 문제다. 조건을 붙이면 상충하는 리
 | 동일 본문 | 587그룹 | 템플릿·복붙. 본문 해시로 잡히는 건 초과 표의 12.1%뿐 |
 | `productId×skinType` 셀 | 393개 중 N≥8이 310 → **작성자 dedup 후 294** | 16개 셀은 침묵해야 한다 |
 | 평점 분포 | 5점 85%, 1~2점 **407건(1.6%)** | 부정 신호가 희소 클래스 → 층화 표본 필수 |
-| 수집 기간 | 2018.12 ~ 2026.08 | 리센시 컷 기준 필요 (PER-172) |
+| 수집 기간 | 2018.12 ~ 2026.08 (2026년이 74.6%) | 24개월 컷 확정 — 잔존 88.8%, N≥8 셀 294→284 (PER-172) |
+| 리뉴얼 신호 | 멀티 `goodsNo` 제품 36개 중 교체형 **1개** / 본문 언급 303건(1.21%) | `goodsNo`는 리뉴얼 경계가 아니다. 세대는 날짜로 가른다 |
 
 ---
 
@@ -180,11 +183,12 @@ crawler/.venv/bin/python crawler/oliveyoung_crawler.py --products crawler/produc
 ```
 pipeline/    v5 — 작업 대상
   contracts.py             입력 계약 3층
-  catalog.py               goodsNo → productId. 미등록은 에러
+  catalog.py               goodsNo → productId. 미등록은 에러. 세대는 (goodsNo, 날짜)로 가른다
+  policy.py                리뉴얼 취급 · 리센시 컷 (PER-172). 게이트1이 소비한다
   build_product_catalog.py 카탈로그 생성기 (--check 로 재현 확인)
   ingest.py                25K → v5 레코드 (LLM 없음, 재실행 일치)
   run_v5.py                단계 레지스트리
-  test_*.py                계약 테스트 34케이스
+  test_*.py                계약 테스트 68케이스 (catalog·policy·ingest)
 legacy/v4/   v4 동결 — 비교 기준선. 고치지 않는다
 crawler/     올리브영 cursor API 크롤러 (상품당 최대 500건)
 eval/        평가 스크립트 + 리포트 (커밋됨 — 수치의 1차 근거)
@@ -260,10 +264,10 @@ v5가 넘어야 하는 선: **인용 정확도 100%** (생성 시점에 원문 �
 
 | 미결 | 내용 | 이슈 |
 |---|---|---|
-| 리뉴얼 취급 | 별개 제품 vs 시점 컷오프. 카탈로그에 `renewalPolicy` 슬롯만 있다 | PER-172 |
 | 신뢰도 사전 점수 | §3-4 6개 신호 확정. `reviewerRank`·`isTopReviewer` 드롭 여부가 여기 걸려 있다 | PER-174 |
 | 부정 신호 표본 | 1~2점 407건(1.6%)으로 "위험 신호 재현율"을 어떻게 측정할지. 아직 이슈 미할당 — FP 임계값 튜닝(PER-199)과 함께 정한다 | `docs/V5_INPUTS_AND_LEGACY_AUDIT.md` §5-3 |
 | 입력 계약 문서 | 위 결정들을 하나의 계약으로 고정 | PER-176 |
+| 리뉴얼 세대 확정 | 스키마·게이트는 준비됐고 데이터가 비었다. 후보 5개(p017·p032·p011·p004·p026)의 `cutoverDate`를 확정하지 않으면 **리뉴얼 컷의 효과는 0**이다 | PER-172 → PER-182 |
 
 ---
 
@@ -275,6 +279,7 @@ v5가 넘어야 하는 선: **인용 정확도 100%** (생성 시점에 원문 �
 | [`docs/V5_SPRINT_PLAN.md`](docs/V5_SPRINT_PLAN.md) | 마일스톤 9개 / 이슈 42개, 비용·커버리지 실측, 스코프 가드 |
 | [`docs/PRODUCT_CATALOG.md`](docs/PRODUCT_CATALOG.md) | 제품 동일성 레이어 규칙·운영 절차 |
 | [`docs/DECISION_PER170_AUTHOR_IDENTIFIER.md`](docs/DECISION_PER170_AUTHOR_IDENTIFIER.md) | 작성자 식별자 결정과 근거 |
+| [`docs/DECISION_PER172_RENEWAL_AND_RECENCY.md`](docs/DECISION_PER172_RENEWAL_AND_RECENCY.md) | 리뉴얼 취급 · 리센시 컷 결정과 근거 |
 | [`docs/V5_INPUTS_AND_LEGACY_AUDIT.md`](docs/V5_INPUTS_AND_LEGACY_AUDIT.md) | 입력 인벤토리 · 25K 프로파일 · 레거시 감사 |
 | [`docs/SCRAPLING_MIGRATION_POC.md`](docs/SCRAPLING_MIGRATION_POC.md) | 크롤러 설계 근거 (엔드포인트·size 상한·레이트리밋 실측) |
 | [`docs/PDP_EXPERIMENT_CONTEXT.md`](docs/PDP_EXPERIMENT_CONTEXT.md) | PDP 화면 명세 + 스킨 코드북 |

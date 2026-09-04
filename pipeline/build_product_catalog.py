@@ -1,5 +1,5 @@
 """
-제품 카탈로그 생성기 (PER-171).
+제품 카탈로그 생성기 (PER-171 / PER-172).
 
 `data/input/product_catalog.json` 을 만든다. 매핑을 손으로 타이핑하지 않고
 세 소스에서 유도하되, **추측이 필요한 지점에서는 에러를 내고 멈춘다.**
@@ -11,7 +11,8 @@
 
 productId 는 한 번 붙으면 고정한다(append-only). 표시명 오타를 고쳐도 집계 키가
 바뀌지 않게 하려는 것이다 — v4 맵은 이름을 키로 써서 파일 간 이름 드리프트가
-20건, 브랜드 오기가 1건 발생했다.
+20건, 브랜드 오기가 1건 발생했다. `lineageId` 와 `renewalPolicy`(PER-172) 도 같은
+이유로 커밋본 값을 승계한다 — **리뉴얼 취급은 생성기가 추론하지 않는다.**
 
 사용:
   .venv/bin/python pipeline/build_product_catalog.py            # 생성/갱신
@@ -154,11 +155,19 @@ def build() -> tuple[dict, dict]:
             f"v4 입력의 goodsNo {unresolved_legacy} 를 어느 제품에도 붙일 수 없다"
         )
 
-    # --- 4. productId 부여 (append-only) ---
+    # --- 4. productId / lineageId 부여 (append-only) ---
+    # lineageId 는 리뉴얼 계보 키다 (PER-172). 세대를 나누면 새 productId 가 생기지만
+    # lineageId 는 조상 것을 물려받으므로, 여기서도 커밋본 값을 그대로 승계한다.
     existing: dict[str, str] = {}
+    existing_lineage: dict[str, str] = {}
+    existing_renewal: dict[str, dict] = {}
     if CATALOG_PATH.exists():
         for e in json.loads(CATALOG_PATH.read_text()).get("products", []):
             existing[e["displayName"]] = e["productId"]
+            if e.get("lineageId"):
+                existing_lineage[e["displayName"]] = e["lineageId"]
+            if isinstance(e.get("renewalPolicy"), dict):
+                existing_renewal[e["displayName"]] = e["renewalPolicy"]
     ordered = sorted(products.values(), key=lambda p: (p["category"], p["displayName"]))
     next_num = max((int(pid[1:]) for pid in existing.values()), default=0) + 1
     for entry in ordered:
@@ -167,11 +176,18 @@ def build() -> tuple[dict, dict]:
             pid = f"p{next_num:03d}"
             next_num += 1
         entry["productId"] = pid
+        # 계보를 새로 시작하는 제품은 자기 productId 번호를 계보 번호로 쓴다.
+        entry["lineageId"] = existing_lineage.get(entry["displayName"], f"L{pid[1:]}")
+        # 리뉴얼 취급은 생성기가 추론하지 않는다 — 사람이 근거와 함께 카탈로그에 적고,
+        # 재생성 시 그 값을 승계한다. 아직 정하지 않았으면 'unobserved' 로 명시한다.
+        entry["renewalPolicy"] = existing_renewal.get(
+            entry["displayName"], {"policy": "unobserved", "fromMonth": None, "toMonth": None, "evidence": None}
+        )
 
     catalog = {
         "_meta": {
             "schemaVersion": SCHEMA_VERSION,
-            "issue": "PER-171",
+            "issue": "PER-171 / PER-172",
             "description": (
                 "제품 동일성(goodsNo → productId)의 단일 정본. 파이프라인은 리뷰 행의 "
                 "productKey 문자열을 신뢰하지 않고 goodsNo 를 이 파일에 물어 제품을 식별한다."
@@ -180,7 +196,10 @@ def build() -> tuple[dict, dict]:
                 "집계 단위는 productId 다. goodsNo 는 변형 SKU 단위이므로 그룹핑 키로 쓰지 않는다.",
                 "미등록 goodsNo 는 조용히 폴백하지 않고 에러다 (pipeline/catalog.py).",
                 "productId 는 한 번 부여하면 고정한다. 표시명이 바뀌어도 집계 키는 유지된다.",
-                "리뉴얼 취급(renewalPolicy)은 PER-172 에서 정한다. 지금은 전 제품 null.",
+                "리뉴얼은 별개 제품이다 (PER-172). 세대는 별개 productId 를 갖고 lineageId 로 묶인다.",
+                "세대 경계는 goodsNo 가 아니라 날짜다 — 한 goodsNo 가 여러 세대에 걸치면 review_date 로 가른다.",
+                "renewalPolicy 는 null 을 허용하지 않는다. 정하지 않았으면 'unobserved' 로 명시한다.",
+                "renewalPolicy 는 생성기가 추론하지 않는다. 사람이 근거와 함께 적고 재생성 시 승계된다.",
             ],
             "generatedBy": "pipeline/build_product_catalog.py",
             "supersedes": "data/input/product_canonical_map.json (v4, 표시명 키 기반)",
@@ -200,7 +219,8 @@ def build() -> tuple[dict, dict]:
                 "displayName": e["displayName"],
                 "category": e["category"],
                 "requestedGoodsNo": e["requestedGoodsNo"],
-                "renewalPolicy": None,
+                "lineageId": e["lineageId"],
+                "renewalPolicy": e["renewalPolicy"],
                 "notes": e["notes"],
                 "goodsNos": [
                     {"goodsNo": g, "source": src}
@@ -218,8 +238,13 @@ def build() -> tuple[dict, dict]:
     )
     unresolved_25k = sorted({r["goodsNo"] for r in reviews} - set(owner))
     unresolved_v4 = sorted(set(legacy_input_goods) - set(owner))
+    renewal_counts = collections.Counter(
+        p["renewalPolicy"]["policy"] for p in catalog["products"]
+    )
     coverage = {
-        "issue": "PER-171",
+        "issue": "PER-171 / PER-172",
+        "lineages": len({p["lineageId"] for p in catalog["products"]}),
+        "renewalPolicyCounts": dict(sorted(renewal_counts.items())),
         "sources": catalog["_meta"]["sources"],
         "products": len(catalog["products"]),
         "goodsNosTotal": len(owner),
