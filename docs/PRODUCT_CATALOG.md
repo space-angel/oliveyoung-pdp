@@ -74,7 +74,7 @@ product = catalog.product_of_goods_no(row["goodsNo"])   # 미등록이면 Unknow
 1. **리뷰 행의 `productKey` 문자열을 읽지 않는다.** 제품은 `goodsNo` → 카탈로그로만 확정한다. `pipeline/ingest.py`가 그 경계이고, v5 레코드의 최상위 키가 `productId`다.
 2. **미등록 `goodsNo`는 조용히 폴백하지 않고 에러다.** 폴백은 같은 제품을 두 개로 쪼개고, 충분성 게이트에서 근거 수가 조용히 줄어든다.
 3. **매핑을 코드 상수로 들지 않는다.** 유일한 정본은 카탈로그 파일이다.
-4. **집계 단위는 `productId`.** `goodsNo`로 그룹핑하면 리뷰 1~7건 상품이 139개 생겨 충분성 게이트가 대량 실패한다(`docs/V5_INPUTS_AND_LEGACY_AUDIT.md` §3-1).
+4. **집계 단위는 `productId`.** `goodsNo`로 그룹핑하면 한 제품의 근거가 최대 17갈래로 파편화되고(제품 53개 중 35개가 복수 `goodsNo`), 리뷰 8건 미만인 SKU 26개에 갇힌 93건은 어떤 주장도 뒷받침하지 못한다. 계약과 실측은 [`docs/INPUT_CONTRACT.md`](INPUT_CONTRACT.md) §1.
 5. 카탈로그가 계약을 위반한 상태면 **로드 시점에** 에러다 — 한 `goodsNo`가 **서로 다른 계보**에 걸침, 표시명 중복, `schemaVersion` 불일치, ID·`lineageId`·`goodsNo` 형식 위반, 미지의 `source`, `renewalPolicy`가 `null`이거나 반쯤 적힌 `separate`, 세대 구간이 겹치거나 현행 세대가 둘.
 6. **리뉴얼 세대는 날짜로 가른다 (PER-172).** 한 `goodsNo`가 여러 세대에 걸치는 것은 **같은 계보 안에서만** 허용되고, 그때 `resolve_goods_no()`는 `review_date`를 요구한다 — 날짜 없이 부르면 `AmbiguousGenerationError`다. 근거는 `docs/DECISION_PER172_RENEWAL_AND_RECENCY.md`.
 7. **`renewalPolicy`는 생성기가 추론하지 않는다.** 사람이 `RENEWAL_GENERATIONS` / `RENEWAL_SINGLE_CONFIRMED`에 외부 근거와 함께 적는다 — `goodsNo` 교체는 리뉴얼 신호가 아니기 때문이다(멀티-SKU 계보 36개 중 교체형 1개). 선언한 `goodsNo`가 실제와 어긋나거나 어느 세대에도 배정되지 않으면 **생성이 멈춘다.**

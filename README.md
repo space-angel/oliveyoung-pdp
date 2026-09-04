@@ -115,15 +115,16 @@ catalog → ingest → tag → gates → claims → judge
 
 ## 5. 확정된 입력 계약
 
-지금까지의 결정과 근거. 전부 실측 리포트가 딸려 있다.
+지금까지의 결정과 근거. 전부 실측 리포트가 딸려 있다. **정본은 [`docs/INPUT_CONTRACT.md`](docs/INPUT_CONTRACT.md)** (PER-176) — 아래 표는 그 요약이다.
 
 | 결정 | 내용 | 근거 |
 |---|---|---|
 | **집계 단위** | `productId`(50). `goodsNo`(153)는 변형 SKU 혼재라 그룹핑 키로 쓰지 않는다. **미등록 ID는 조용히 폴백하지 않고 에러** | [`docs/PRODUCT_CATALOG.md`](docs/PRODUCT_CATALOG.md) · `eval/reports/product_catalog_coverage.json` |
 | **작성자 키** | `NFC(userName)` 원문. 중복 판정 단위는 `(작성자 키, productId)`이고 카운트는 **고유 작성자 수** | [`docs/DECISION_PER170_AUTHOR_IDENTIFIER.md`](docs/DECISION_PER170_AUTHOR_IDENTIFIER.md) · `eval/reports/author_identity_per170.json` |
 | **입력 3층** | 원문(무가공) / 조건(세그먼트 축) / 파생(재계산 가능) | [`pipeline/contracts.py`](pipeline/contracts.py) · `eval/reports/v5_ingest_profile.json` |
-| **조건축** | `skinType`(단일) · `skinTrouble`(다중) · `option`. `usagePeriod`는 데이터에 없어 제외 | 같음 |
+| **조건축** | `skinType`(단일) · `skinTrouble`(다중) · `option`. `usagePeriod`는 데이터에 없어 제외. **조건 코드는 코드북 도메인 밖이면 에러** — 라벨·축 혼용 포함 | 같음 · `pipeline/codebook.py` |
 | **미기재 취급** | "조건 없음"이 아니라 **별도 세그먼트**. `segment`는 절대 null이 아니다 | 같음 (§7-1 '조건 누락' 실패 방지) |
+| **계약 강제** | 위반 입력은 조용한 폴백 없이 **에러**. 위반 클래스 12종 전부 확인 | [`docs/INPUT_CONTRACT.md`](docs/INPUT_CONTRACT.md) · `eval/reports/input_contract_per176.json` |
 | **스킨 코드북** | A01~A07 · B01~B06 · C01~C13 **26종 DOM 실측**. 라벨은 입수가 아니라 표기 단계에서 붙인다 | `data/input/skin_codebook.json` · `crawler/verify_skin_codebook.py` |
 | **리뉴얼** | **별개 제품**(PRD 권장안 채택). 세대 경계 키는 `goodsNo`가 아니라 `(goodsNo, reviewDate)`. 외부 근거로 **5개 계보 확정**(세대 분할 3 + `single` 2), 나머지 45개는 `unobserved` **명시** — `null`은 허용하지 않는다 | [`docs/DECISION_PER172_RENEWAL_AND_RECENCY.md`](docs/DECISION_PER172_RENEWAL_AND_RECENCY.md) · `eval/reports/renewal_recency_per172.json` |
 | **리센시 컷** | 스냅샷 최신 월(2026-08) 기준 **24개월 = `2024-09`~**. `today` 롤링은 재현성과 충돌해 쓰지 않는다 | 같음 |
@@ -273,7 +274,6 @@ v5가 넘어야 하는 선: **인용 정확도 100%** (생성 시점에 원문 �
 | 미결 | 내용 | 이슈 |
 |---|---|---|
 | 부정 신호 표본 | 1~2점 407건(1.6%)으로 "위험 신호 재현율"을 어떻게 측정할지. 아직 이슈 미할당 — FP 임계값 튜닝(PER-199)과 함께 정한다 | `docs/V5_INPUTS_AND_LEGACY_AUDIT.md` §5-3 |
-| 입력 계약 문서 | 위 결정들을 하나의 계약으로 고정 | PER-176 |
 | 리뉴얼 세대 (나머지 45계보) | 5개는 외부 근거로 확정했다. 나머지는 `unobserved`이고, 현행 24개월 컷에서 순증분이 작아 우선순위는 낮다 — **리센시 컷을 완화하려면 먼저 확정해야 한다**(36개월에서 순증분 7→47) | PER-172 → PER-182 |
 
 ---
@@ -282,6 +282,7 @@ v5가 넘어야 하는 선: **인용 정확도 100%** (생성 시점에 원문 �
 
 | 문서 | 내용 |
 |---|---|
+| [`docs/INPUT_CONTRACT.md`](docs/INPUT_CONTRACT.md) | **입력 계약 정본** — 집계 단위 · 유효성 · 조건축 · 컷 · PII 와 그 강제 지점 |
 | [`docs/GIT_WORKFLOW.md`](docs/GIT_WORKFLOW.md) | 브랜치 전략 · 커밋 규약 · 병합 게이트 |
 | [`docs/V5_SPRINT_PLAN.md`](docs/V5_SPRINT_PLAN.md) | 마일스톤 9개 / 이슈 42개, 비용·커버리지 실측, 스코프 가드 |
 | [`docs/PRODUCT_CATALOG.md`](docs/PRODUCT_CATALOG.md) | 제품 동일성 레이어 규칙·운영 절차 |
