@@ -2,7 +2,9 @@
   "issue": "PER-171 / PER-172",
   "lineages": 50,
   "renewalPolicyCounts": {
-    "unobserved": 50
+    "separate": 6,
+    "single": 2,
+    "unobserved": 45
   },
   "sources": [
     {
@@ -31,10 +33,10 @@
       "role": "v4 입력"
     }
   ],
-  "products": 50,
+  "products": 53,
   "goodsNosTotal": 167,
   "goodsNosBySource": {
-    "crawl_request": 50,
+    "crawl_request": 51,
     "observed_variant": 103,
     "legacy_v4": 14
   },
@@ -151,8 +153,8 @@
       "productId": "p004",
       "displayName": "컬러그램 누디 블러 틴트",
       "category": "립메이크업",
-      "goodsNos": 2,
-      "reviews25k": 500
+      "goodsNos": 1,
+      "reviews25k": 493
     },
     {
       "productId": "p005",
@@ -242,8 +244,8 @@
       "productId": "p017",
       "displayName": "헤라 블랙 쿠션 파운데이션",
       "category": "베이스메이크업",
-      "goodsNos": 3,
-      "reviews25k": 500
+      "goodsNos": 2,
+      "reviews25k": 341
     },
     {
       "productId": "p018",
@@ -475,6 +477,27 @@
       "category": "크림",
       "goodsNos": 17,
       "reviews25k": 500
+    },
+    {
+      "productId": "p051",
+      "displayName": "컬러그램 누디 블러 틴트 (기존 용기)",
+      "category": "립메이크업",
+      "goodsNos": 1,
+      "reviews25k": 7
+    },
+    {
+      "productId": "p052",
+      "displayName": "에스쁘아 비벨벳 커버쿠션 (2025 리뉴얼 이전)",
+      "category": "베이스메이크업",
+      "goodsNos": 1,
+      "reviews25k": 500
+    },
+    {
+      "productId": "p053",
+      "displayName": "헤라 블랙 쿠션 (2024 리뉴얼 이전)",
+      "category": "베이스메이크업",
+      "goodsNos": 1,
+      "reviews25k": 159
     }
   ]
 }

@@ -55,10 +55,10 @@ v4는 `data/input/product_canonical_map.json`에서 **한글 제품명을 키**�
 | `requestedGoodsNo` | 이 제품을 대표하는 SKU(크롤 요청에 쓴 값) |
 | `goodsNos[].source` | `crawl_request`(요청 목록) / `observed_variant`(스냅샷에서 관측) / `legacy_v4`(v4 시절 SKU, 레거시 재현용) |
 | `lineageId` | 리뉴얼 계보 키 (`L001`~). 세대를 나누면 `productId`는 새로 생기지만 `lineageId`는 조상 것을 물려받는다. 현재는 제품당 1개 |
-| `renewalPolicy` | **리뉴얼 취급 (PER-172 확정).** `separate`(세대 분할, `fromMonth`·`toMonth`·`evidence` 필수) / `single`(리뉴얼 없음 확인) / `unobserved`(미확정 — 현 스냅샷 전 제품). **`null`은 허용하지 않는다** |
+| `renewalPolicy` | **리뉴얼 취급 (PER-172 확정).** `separate`(세대 분할) / `single`(리뉴얼 없음 또는 코퍼스 전체가 리뉴얼 후임을 확인) / `unobserved`(미확정). `separate`·`single`은 **`evidence` 필수**, `unobserved`는 **`evidence` 금지** — 근거의 유무가 세 상태를 가른다. **`null`은 허용하지 않는다** |
 | `notes` | 정정 이력. 위 브랜드 오기처럼 사람이 판단한 근거를 남긴다 |
 
-현재 상태: **제품 50개 / `goodsNo` 167개** (`crawl_request` 50 + `observed_variant` 103 + `legacy_v4` 14).
+현재 상태: **제품 53개 / 계보 50개 / 고유 `goodsNo` 167개.** 53 = 크롤 대상 50 + 리뉴얼 이전 세대 3(p051·p052·p053). 세대 선언은 `pipeline/build_product_catalog.py`의 `RENEWAL_GENERATIONS` / `RENEWAL_SINGLE_CONFIRMED`에 근거와 함께 있다.
 
 ---
 
@@ -77,7 +77,8 @@ product = catalog.product_of_goods_no(row["goodsNo"])   # 미등록이면 Unknow
 4. **집계 단위는 `productId`.** `goodsNo`로 그룹핑하면 리뷰 1~7건 상품이 139개 생겨 충분성 게이트가 대량 실패한다(`docs/V5_INPUTS_AND_LEGACY_AUDIT.md` §3-1).
 5. 카탈로그가 계약을 위반한 상태면 **로드 시점에** 에러다 — 한 `goodsNo`가 **서로 다른 계보**에 걸침, 표시명 중복, `schemaVersion` 불일치, ID·`lineageId`·`goodsNo` 형식 위반, 미지의 `source`, `renewalPolicy`가 `null`이거나 반쯤 적힌 `separate`, 세대 구간이 겹치거나 현행 세대가 둘.
 6. **리뉴얼 세대는 날짜로 가른다 (PER-172).** 한 `goodsNo`가 여러 세대에 걸치는 것은 **같은 계보 안에서만** 허용되고, 그때 `resolve_goods_no()`는 `review_date`를 요구한다 — 날짜 없이 부르면 `AmbiguousGenerationError`다. 근거는 `docs/DECISION_PER172_RENEWAL_AND_RECENCY.md`.
-7. **`renewalPolicy`는 생성기가 추론하지 않는다.** 사람이 근거와 함께 적고 재생성 시 승계된다 — `goodsNo` 교체는 리뉴얼 신호가 아니기 때문이다(멀티-SKU 제품 36개 중 교체형 1개).
+7. **`renewalPolicy`는 생성기가 추론하지 않는다.** 사람이 `RENEWAL_GENERATIONS` / `RENEWAL_SINGLE_CONFIRMED`에 외부 근거와 함께 적는다 — `goodsNo` 교체는 리뉴얼 신호가 아니기 때문이다(멀티-SKU 계보 36개 중 교체형 1개). 선언한 `goodsNo`가 실제와 어긋나거나 어느 세대에도 배정되지 않으면 **생성이 멈춘다.**
+8. **현행 세대는 `requestedGoodsNo` 보유 여부로 가른다** (`ProductCatalog.current_generation()`). 이전 세대 엔트리는 크롤 요청 대상이 아니라 그 값이 `null`이다 — `toMonth`로 판정하지 않는 이유는 `goodsNo`가 세대를 가르는 제품은 양쪽 구간이 모두 열려 있을 수 있기 때문이다.
 
 ---
 
@@ -109,9 +110,9 @@ python3 -m unittest discover -s pipeline -p 'test_*.py'     # 계약 테스트
 | v4 입력 2파일(각 500건) | `goodsNo` 12개 전부 해석 → **미해결 0** (레거시 재현 경로 유지) |
 | v4 맵 엔트리 50개 | 이름 드리프트 10건 재조정, **고아 0건** |
 | 계약 테스트 | 15 케이스 통과 (미등록 폴백 금지 · 로드 검증 7종 · 레거시 표시명 조회) |
-| v5 입수 연동 | `pipeline/ingest.py` 가 25,000건을 50 `productId` 로 해석 — 프로파일 `eval/reports/v5_ingest_profile.json` |
+| v5 입수 연동 | `pipeline/ingest.py` 가 25,000건을 53 `productId`(계보 50) 로 해석 — 프로파일 `eval/reports/v5_ingest_profile.json` |
 
-v4 베이스라인은 `legacy/v4/`에서 그대로 재현된다 — step0 재실행이 리뷰 499건 / 5제품이다. v5는 같은 카탈로그를 `pipeline/ingest.py`에서 쓴다 (25K 25,000건 → 50 `productId`, 미해결 0).
+v4 베이스라인은 `legacy/v4/`에서 그대로 재현된다 — step0 재실행이 리뷰 499건 / 5제품이다. v5는 같은 카탈로그를 `pipeline/ingest.py`에서 쓴다 (25K 25,000건 → 53 `productId` / 50 계보, 미해결 0).
 
 ---
 
@@ -123,5 +124,5 @@ v4는 `legacy/v4/`로 동결했다(`legacy/v4/README.md`). v4의 `step0_preproce
 
 ## 6. 남은 것
 
-- **리뉴얼 세대 데이터** — 스키마와 게이트는 준비됐고 값이 비었다(전 제품 `unobserved`). 후보 큐 5개(p017·p032·p011·p004·p026)의 `cutoverDate`를 확정하기 전까지 **리뉴얼 컷의 실효는 0**이고, 그 사실은 주장의 `limitation: renewal_unobserved`로 노출된다.
+- **리뉴얼 세대 (나머지 45계보)** — 5개는 외부 근거로 확정했다(L004·L011·L017 분할, L026·L032 `single`). 나머지는 `unobserved`이고 그 사실이 주장의 `limitation: renewal_unobserved`로 노출된다. 현행 24개월 리센시 컷에서 추가 확정의 순증분이 작아(7건) 우선순위는 낮지만, **리센시 컷을 완화하려면 먼저 확정해야 한다.**
 - **입력 계약 문서화** — PER-176이 이 문서를 참조해 계약으로 고정한다.

@@ -78,25 +78,52 @@ class RealCatalog(unittest.TestCase):
         cls.catalog = load_catalog()
 
     def test_shape(self):
-        self.assertEqual(len(self.catalog), 50)
-        self.assertEqual(sum(len(p.goods_nos) for p in self.catalog.products), 167)
-
-    def test_every_product_declares_a_renewal_policy(self):
-        # PER-172: null 은 허용하지 않는다. 현 스냅샷은 리뉴얼 시점을 확정할 근거가 없어
-        # 전 제품이 'unobserved' 이고, 계보는 제품당 하나다.
-        for p in self.catalog.products:
-            with self.subTest(product=p.product_id):
-                self.assertEqual(p.renewal_policy, RENEWAL_UNOBSERVED)
-                self.assertIsNone(p.renewal_from_month)
-                self.assertIsNone(p.renewal_to_month)
-                self.assertEqual(self.catalog.lineage_of(p.product_id), (p,))
+        # 제품 53 = 크롤 대상 50 + 리뉴얼 이전 세대 3 (PER-172). 계보는 50개 그대로다.
+        self.assertEqual(len(self.catalog), 53)
+        self.assertEqual(len({g for p in self.catalog.products for g in p.goods_nos}), 167)
         self.assertEqual(len(self.catalog.lineages), 50)
 
+    def test_every_product_declares_a_renewal_policy(self):
+        # PER-172: null 은 허용하지 않는다. 확정한 것만 separate/single 이고 나머지는
+        # 'unobserved' 로 **명시**된다 — 근거의 유무가 세 상태를 가른다.
+        for p in self.catalog.products:
+            with self.subTest(product=p.product_id):
+                self.assertIn(p.renewal_policy, (RENEWAL_SEPARATE, "single", RENEWAL_UNOBSERVED))
+                if p.renewal_policy == RENEWAL_UNOBSERVED:
+                    self.assertIsNone(p.renewal_evidence)
+                    self.assertIsNone(p.renewal_from_month)
+                    self.assertIsNone(p.renewal_to_month)
+                else:
+                    self.assertTrue(p.renewal_evidence)
+
+    def test_split_lineages_are_the_ones_we_confirmed(self):
+        # 웹 근거로 확정한 3개 계보만 세대가 둘이다 (PER-172 §1).
+        multi = {lid for lid in self.catalog.lineages if len(self.catalog.lineage(lid)) > 1}
+        self.assertEqual(multi, {"L004", "L011", "L017"})
+        for lid in multi:
+            gens = self.catalog.lineage(lid)
+            with self.subTest(lineage=lid):
+                self.assertEqual(len(gens), 2)
+                for g in gens:
+                    self.assertEqual(g.renewal_policy, RENEWAL_SEPARATE)
+                    self.assertTrue(g.renewal_evidence)
+
+    def test_shared_sku_lineage_needs_the_date(self):
+        # 에스쁘아 비벨벳 커버쿠션(L011)은 goodsNo 가 하나라 날짜로만 갈린다.
+        goods = "A000000184222"
+        with self.assertRaises(AmbiguousGenerationError):
+            self.catalog.resolve_goods_no(goods)
+        self.assertEqual(self.catalog.resolve_goods_no(goods, "2023.05.01"), "p052")
+        self.assertEqual(self.catalog.resolve_goods_no(goods, "2026.08.01"), "p011")
+
     def test_resolves_every_goods_no_in_snapshots(self):
+        # 날짜를 함께 넘긴다 — 세대가 갈린 제품은 (goodsNo, reviewDate) 로만 확정된다.
         for name in ("reviews_50products", "reviews_200_normalized", "v4_reviews_500"):
             rows = json.loads((ROOT / f"data/input/{name}.json").read_text())
             for r in rows:
-                self.assertRegex(self.catalog.resolve_goods_no(r["goodsNo"]), r"^p\d{3}$")
+                self.assertRegex(
+                    self.catalog.resolve_goods_no(r["goodsNo"], r["reviewDate"]), r"^p\d{3}$"
+                )
 
     def test_display_name_lookup_for_legacy_outputs(self):
         # v4 산출물·골든셋은 한글 제품명을 키로 쓴다. 그 조회가 살아 있어야 비교가 된다.
@@ -200,10 +227,19 @@ class RenewalPolicyContract(unittest.TestCase):
             ProductCatalog.load(write_catalog([entry]))
         self.assertIn("evidence", str(ctx.exception))
 
-    def test_separate_without_any_boundary_raises(self):
-        # 양쪽이 다 열려 있으면 자를 지점을 정하지 않은 것이다.
+    def test_single_requires_evidence(self):
+        # 'single'(리뉴얼 없음 확인)도 결정이다 — 근거가 없으면 'unobserved' 와 같다.
+        entry = product(renewal={"policy": "single", "fromMonth": None,
+                                 "toMonth": None, "evidence": None})
+        with self.assertRaises(CatalogError) as ctx:
+            ProductCatalog.load(write_catalog([entry]))
+        self.assertIn("unobserved", str(ctx.exception))
+
+    def test_unobserved_cannot_carry_evidence(self):
+        entry = product(renewal={"policy": "unobserved", "fromMonth": None,
+                                 "toMonth": None, "evidence": "리뉴얼 공지 확인"})
         with self.assertRaises(CatalogError):
-            ProductCatalog.load(write_catalog([product(renewal=generation(None, None))]))
+            ProductCatalog.load(write_catalog([entry]))
 
     def test_separate_with_reversed_range_raises(self):
         with self.assertRaises(CatalogError):
@@ -282,22 +318,47 @@ class LineageValidation(unittest.TestCase):
             ProductCatalog.load(path)
         self.assertIn("separate", str(ctx.exception))
 
-    def test_two_current_generations_raise(self):
+    def test_two_open_ended_generations_sharing_a_sku_raise(self):
+        # 같은 goodsNo 를 공유하는데 양쪽 구간이 위로 열려 있으면 날짜로 못 가른다.
         path = write_catalog([
             product("p001", "A", ("A000000000001",), lineage="L001",
                     renewal=generation("2024-01", None)),
-            product("p002", "B", ("A000000000002",), lineage="L001",
+            product("p002", "B", ("A000000000001",), lineage="L001",
                     renewal=generation("2025-07", None)),
         ])
         with self.assertRaises(CatalogError) as ctx:
             ProductCatalog.load(path)
-        self.assertIn("현행 세대", str(ctx.exception))
+        self.assertIn("겹친다", str(ctx.exception))
 
-    def test_overlapping_generations_raise(self):
+    def test_sku_separated_generations_need_no_dates(self):
+        # 올리브영이 구세대를 '[기존용기]' 로 따로 표기하는 경우처럼 goodsNo 가 세대를
+        # 이미 가르면 날짜는 판별자가 아니다 — 구간 없이도 유효하다 (PER-172, p004).
+        c = ProductCatalog.load(write_catalog([
+            product("p001", "구용기", ("A000000000001",), lineage="L001",
+                    renewal=generation(None, None)),
+            product("p002", "신용기", ("A000000000002",), lineage="L001",
+                    renewal=generation(None, None)),
+        ]))
+        self.assertEqual(c.resolve_goods_no("A000000000001"), "p001")
+        self.assertEqual(c.resolve_goods_no("A000000000002"), "p002")
+        self.assertEqual(len(c.lineage("L001")), 2)
+
+    def test_shared_sku_generation_without_any_bound_raises(self):
+        path = write_catalog([
+            product("p001", "A", ("A000000000001",), lineage="L001",
+                    renewal=generation(None, None)),
+            product("p002", "B", ("A000000000001",), lineage="L001",
+                    renewal=generation("2025-07", None)),
+        ])
+        with self.assertRaises(CatalogError) as ctx:
+            ProductCatalog.load(path)
+        self.assertIn("날짜로만 갈린다", str(ctx.exception))
+
+    def test_overlapping_generations_sharing_a_sku_raise(self):
         path = write_catalog([
             product("p001", "A", ("A000000000001",), lineage="L001",
                     renewal=generation("2024-01", "2025-08")),
-            product("p002", "B", ("A000000000002",), lineage="L001",
+            product("p002", "B", ("A000000000001",), lineage="L001",
                     renewal=generation("2025-07", None)),
         ])
         with self.assertRaises(CatalogError) as ctx:

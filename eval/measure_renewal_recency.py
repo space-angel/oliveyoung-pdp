@@ -36,6 +36,8 @@ from catalog import load_catalog  # noqa: E402
 from contracts import MISSING_SEGMENT, author_key  # noqa: E402
 from policy import (  # noqa: E402
     RECENCY_CUTOFF_MONTH,
+    RENEWAL_SEPARATE,
+    RENEWAL_SINGLE,
     RECENCY_WINDOW_MONTHS,
     SNAPSHOT_LATEST_MONTH,
     SUFFICIENCY_N_MIN,
@@ -78,13 +80,21 @@ def cells_passing(rows, resolve, n_min: int = SUFFICIENCY_N_MIN) -> tuple[int, i
     cells = collections.defaultdict(set)
     for r in rows:
         segment = (r.get("skinType") or "").strip() or MISSING_SEGMENT
-        cells[(resolve(r["goodsNo"]), segment)].add(author_key(r["userName"]))
+        cells[(resolve(r), segment)].add(author_key(r["userName"]))
     return len(cells), sum(1 for authors in cells.values() if len(authors) >= n_min)
 
 
 def measure(reviews: list[dict]) -> dict:
     catalog = load_catalog()
-    resolve = catalog.resolve_goods_no
+
+    def resolve(row: dict) -> str:
+        """행 → productId. 세대가 갈린 제품은 날짜가 있어야 확정된다 (PER-172)."""
+        return catalog.resolve_goods_no(row["goodsNo"], row["reviewDate"])
+
+    def lineage(row: dict) -> str:
+        """세대 분할 **이전**의 제품 단위. 신호 진단은 이 단위로 재야 비교가 유지된다."""
+        return catalog.product(resolve(row)).lineage_id
+
     mention = re.compile(MENTION_PATTERN, re.I)
     n = len(reviews)
 
@@ -101,7 +111,7 @@ def measure(reviews: list[dict]) -> dict:
     # 겹치면 "병존형"(기획세트·용량·컬러 변형)이다.
     spans: dict[tuple[str, str], list[str]] = collections.defaultdict(list)
     for r in reviews:
-        spans[(resolve(r["goodsNo"]), r["goodsNo"])].append(r["reviewDate"])
+        spans[(lineage(r), r["goodsNo"])].append(r["reviewDate"])
     by_product: dict[str, list[dict]] = collections.defaultdict(list)
     for (pid, goods_no), ds in spans.items():
         by_product[pid].append({"goodsNo": goods_no, "first": min(ds), "last": max(ds), "reviews": len(ds)})
@@ -124,7 +134,7 @@ def measure(reviews: list[dict]) -> dict:
 
     # --- 후보 3: 본문 언급 ---
     mentions = [r for r in reviews if mention.search(r["content"])]
-    mentions_by_product = collections.Counter(resolve(r["goodsNo"]) for r in mentions)
+    mentions_by_product = collections.Counter(lineage(r) for r in mentions)
 
     # SKU 분할 불가의 직접 증거: goodsNo 가 하나뿐인데 본문 리뉴얼 언급이 있는 제품.
     # 이런 제품은 (goodsNo → productId) 매핑을 아무리 쪼개도 세대를 가를 수 없다.
@@ -133,11 +143,11 @@ def measure(reviews: list[dict]) -> dict:
         (
             {
                 "productId": pid,
-                "displayName": catalog.product(pid).display_name,
+                "displayName": catalog.current_generation(pid).display_name,
                 "goodsNos": 1,
                 "mentions": count,
                 "firstMention": min(
-                    r["reviewDate"] for r in mentions if resolve(r["goodsNo"]) == pid
+                    r["reviewDate"] for r in mentions if lineage(r) == pid
                 ),
                 "goodsNoFirstReview": by_product[pid][0]["first"],
             }
@@ -155,7 +165,7 @@ def measure(reviews: list[dict]) -> dict:
             r for r in reviews if month_of(r["reviewDate"]) >= cutoff
         ]
         cells, passing = cells_passing(kept, resolve)
-        per_product = collections.Counter(resolve(r["goodsNo"]) for r in kept)
+        per_product = collections.Counter(lineage(r) for r in kept)
         simulations.append(
             {
                 "cutoffMonth": cutoff,
@@ -179,20 +189,72 @@ def measure(reviews: list[dict]) -> dict:
     candidates = [
         {
             "productId": pid,
-            "displayName": catalog.product(pid).display_name,
+            "displayName": catalog.current_generation(pid).display_name,
             "mentions": count,
             "mentionPctOfProduct": pct(
                 count, sum(e["reviews"] for e in by_product[pid])
             ),
             "goodsNos": len(by_product[pid]),
             "mentionRange": [
-                min(r["reviewDate"] for r in mentions if resolve(r["goodsNo"]) == pid),
-                max(r["reviewDate"] for r in mentions if resolve(r["goodsNo"]) == pid),
+                min(r["reviewDate"] for r in mentions if lineage(r) == pid),
+                max(r["reviewDate"] for r in mentions if lineage(r) == pid),
             ],
         }
         for pid, count in mentions_by_product.most_common()
         if count >= 10
     ]
+
+
+    # --- 확정된 리뉴얼 세대와 그 컷의 순증분 ---
+    # 리센시 컷이 이미 걷은 것을 빼고, 리뉴얼 컷이 **추가로** 제외하는 근거가 몇 건인가.
+    # 이 수치가 "세대를 확정할 가치가 있는가"의 답이다.
+    previous_gen = {
+        p.product_id for p in catalog.products if catalog.is_previous_generation(p.product_id)
+    }
+    confirmed = []
+    for lineage_id in catalog.lineages:
+        gens = catalog.lineage(lineage_id)
+        current = catalog.current_generation(lineage_id)
+        if len(gens) == 1 and current.renewal_policy != RENEWAL_SEPARATE:
+            if current.renewal_policy == RENEWAL_SINGLE:
+                confirmed.append({
+                    "lineageId": lineage_id,
+                    "displayName": current.display_name,
+                    "policy": RENEWAL_SINGLE,
+                    "generations": 1,
+                    "evidence": current.renewal_evidence,
+                })
+            continue
+        confirmed.append({
+            "lineageId": lineage_id,
+            "displayName": current.display_name,
+            "policy": RENEWAL_SEPARATE,
+            "generations": [
+                {
+                    "productId": g.product_id,
+                    "displayName": g.display_name,
+                    "current": g.product_id == current.product_id,
+                    "goodsNos": list(g.goods_nos),
+                    "fromMonth": g.renewal_from_month,
+                    "toMonth": g.renewal_to_month,
+                    "reviews": sum(1 for r in reviews if resolve(r) == g.product_id),
+                    "evidence": g.renewal_evidence,
+                }
+                for g in gens
+            ],
+        })
+
+    marginal = []
+    for cutoff in SIMULATED_CUTOFFS:
+        kept = reviews if cutoff is None else [
+            r for r in reviews if month_of(r["reviewDate"]) >= cutoff
+        ]
+        extra = [r for r in kept if resolve(r) in previous_gen]
+        marginal.append({
+            "cutoffMonth": cutoff,
+            "previousGenerationReviewsSurvivingRecency": len(extra),
+            "adopted": cutoff == RECENCY_CUTOFF_MONTH,
+        })
 
     return {
         "issue": "PER-172",
@@ -245,6 +307,28 @@ def measure(reviews: list[dict]) -> dict:
             "baselineCellsPassingNMin": base_pass,
             "simulations": simulations,
         },
+        "confirmedRenewals": {
+            "confirmedAt": "2026-09-04",
+            "source": "pipeline/build_product_catalog.py 의 RENEWAL_GENERATIONS / RENEWAL_SINGLE_CONFIRMED",
+            "previousGenerationProductIds": sorted(previous_gen),
+            "previousGenerationReviews": sum(1 for r in reviews if resolve(r) in previous_gen),
+            "lineages": confirmed,
+            "note": (
+                "외부 근거(브랜드 뉴스룸·공식몰·올리브영 상품명)로 확정한 것만 담는다. "
+                "본문 언급은 후보 큐로만 쓰고 cutoverDate 로 승격하지 않는다"
+            ),
+        },
+        "renewalCutMarginalEffect": {
+            "definition": (
+                "리센시 컷을 통과했는데 리뉴얼 컷(이전 세대 귀속)으로 현행 제품의 근거에서 "
+                "빠지는 리뷰 수. 두 컷이 겹치는 만큼 리뉴얼 컷의 실효는 리센시 컷 값에 달려 있다"
+            ),
+            "byRecencyCutoff": marginal,
+            "note": (
+                "현행 24개월 컷에서는 순증분이 작다. 리센시 컷을 완화할수록 커지므로 "
+                "리뉴얼 세대 확정은 지금의 필터라기보다 **리센시 컷 값에 대한 보험**이다"
+            ),
+        },
         "renewalCandidateQueue": {
             "minMentions": 10,
             "products": candidates,
@@ -289,6 +373,14 @@ def main() -> None:
         print(f"  {str(s['cutoffMonth'] or '컷 없음'):>8} 잔존 {s['reviewsKept']:6d}"
               f" ({s['reviewsKeptPct']:5.1f}%)  N>={SUFFICIENCY_N_MIN} 셀 {s['cellsPassingNMin']:3d}"
               f" (-{s['cellsLostVsNoCut']:2d}){mark}")
+    cr = result["confirmedRenewals"]
+    print(f"\n[확정된 리뉴얼] 이전 세대 productId {cr['previousGenerationProductIds']} "
+          f"/ 리뷰 {cr['previousGenerationReviews']}건")
+    print("[리뉴얼 컷 순증분] 리센시 컷을 통과했는데 이전 세대라서 빠지는 리뷰")
+    for m in result["renewalCutMarginalEffect"]["byRecencyCutoff"]:
+        mark = " ←채택" if m["adopted"] else ""
+        print(f"  리센시 {str(m['cutoffMonth'] or '컷 없음'):>8} → "
+              f"{m['previousGenerationReviewsSurvivingRecency']:4d}건{mark}")
     print(f"\n→ {args.out.relative_to(ROOT)}")
 
 

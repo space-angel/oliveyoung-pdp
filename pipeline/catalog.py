@@ -39,6 +39,8 @@ from policy import (  # noqa: E402
     MONTH_PATTERN,
     RENEWAL_POLICIES,
     RENEWAL_SEPARATE,
+    RENEWAL_SINGLE,
+    RENEWAL_UNOBSERVED,
     month_of,
 )
 
@@ -111,23 +113,29 @@ def _parse_renewal(pid: str, raw) -> dict:
                 f"{pid}: policy={policy!r} 인데 세대 구간(fromMonth/toMonth)이 있다. "
                 "구간은 separate 에서만 의미가 있다"
             )
-        if evidence is not None:
+        # 'single'(리뉴얼 없음)도 결정이다 — 무엇으로 확인했는지 없으면 'unobserved' 와
+        # 구분되지 않는다. 반대로 'unobserved' 는 아직 아무것도 확인하지 않은 상태다.
+        if policy == RENEWAL_SINGLE and evidence is None:
             raise CatalogError(
-                f"{pid}: policy={policy!r} 인데 evidence 가 있다. "
-                "근거는 세대를 나눴을 때만 붙인다"
+                f"{pid}: policy='single' 인데 evidence 가 비었다. "
+                "리뉴얼이 없음을 무엇으로 확인했는지 남겨야 한다 "
+                "(확인하지 않았으면 'unobserved' 다)"
             )
-        return {"policy": policy, "fromMonth": None, "toMonth": None, "evidence": None}
+        if policy == RENEWAL_UNOBSERVED and evidence is not None:
+            raise CatalogError(
+                f"{pid}: policy='unobserved' 인데 evidence 가 있다. "
+                "근거가 있으면 'separate' 이거나 'single' 이다"
+            )
+        return {"policy": policy, "fromMonth": None, "toMonth": None, "evidence": evidence}
 
-    # separate — 어디서 자르는지와 왜 잘랐는지가 없으면 결정이 아니다
+    # separate — 왜 나눴는지가 없으면 결정이 아니다.
+    # 세대 구간은 여기서 강제하지 않는다: goodsNo 가 세대를 이미 가르는 제품이 있고
+    # (예: 올리브영이 구세대를 '[기존용기]'로 따로 표기), 그때 날짜는 판별자가 아니다.
+    # 구간이 정말 필요한 경우(형제 세대와 goodsNo 를 공유)는 계보 검증에서 요구한다.
     if evidence is None:
         raise CatalogError(
             f"{pid}: policy='separate' 인데 evidence 가 비었다. "
             "리뉴얼 시점을 무엇으로 확인했는지 남겨야 한다"
-        )
-    if from_month is None and to_month is None:
-        raise CatalogError(
-            f"{pid}: policy='separate' 인데 세대 구간이 양쪽 다 열려 있다. "
-            "어디서 자를지 정하지 않은 것이므로 분할이 성립하지 않는다"
         )
     for label, value in (("fromMonth", from_month), ("toMonth", to_month)):
         if value is not None and not MONTH_PATTERN.match(value):
@@ -135,6 +143,17 @@ def _parse_renewal(pid: str, raw) -> dict:
     if from_month is not None and to_month is not None and from_month > to_month:
         raise CatalogError(f"{pid}: 세대 구간이 뒤집혔다 ({from_month} > {to_month})")
     return {"policy": policy, "fromMonth": from_month, "toMonth": to_month, "evidence": evidence}
+
+
+def _ranges_overlap(a: Product, b: Product) -> bool:
+    """두 세대의 [fromMonth, toMonth] 가 겹치는가. None 은 열린 끝이다."""
+    if a.renewal_to_month is not None and b.renewal_from_month is not None:
+        if a.renewal_to_month < b.renewal_from_month:
+            return False
+    if b.renewal_to_month is not None and a.renewal_from_month is not None:
+        if b.renewal_to_month < a.renewal_from_month:
+            return False
+    return True
 
 
 class ProductCatalog:
@@ -259,24 +278,32 @@ class ProductCatalog:
                     f"{non_separate} 의 policy 가 'separate' 가 아니다. "
                     "계보를 나눴다면 세대는 별개 제품이어야 한다"
                 )
-            open_ended = [p.product_id for p in members if p.renewal_to_month is None]
-            if len(open_ended) != 1:
-                raise CatalogError(
-                    f"계보 {lineage}: 현행 세대(toMonth=null)가 {len(open_ended)}개다 "
-                    f"({open_ended}). 정확히 하나여야 한다"
-                )
-            ordered = sorted(members, key=lambda p: (p.renewal_from_month or ""))
-            for earlier, later in zip(ordered, ordered[1:]):
-                if earlier.renewal_to_month is None or (
-                    later.renewal_from_month is not None
-                    and earlier.renewal_to_month >= later.renewal_from_month
-                ):
-                    raise CatalogError(
-                        f"계보 {lineage}: 세대 구간이 겹친다 "
-                        f"({earlier.product_id} …{earlier.renewal_to_month} / "
-                        f"{later.product_id} {later.renewal_from_month}…). "
-                        "겹치면 리뷰를 날짜로 가를 수 없다"
-                    )
+            # 구간이 겹쳐도 되는 경우가 있다. 날짜는 **goodsNo 가 세대를 못 가를 때만**
+            # 쓰는 판별자이므로, goodsNo 가 겹치지 않는 세대끼리는 기간이 겹쳐도
+            # 해석이 모호해지지 않는다. 실제로 리뉴얼 전 재고 리뷰 때문에 구세대 SKU 가
+            # 신세대 출시 뒤까지 리뷰를 받는다 (헤라 블랙 쿠션: 3개월 중첩).
+            ordered = sorted(members, key=lambda p: (p.renewal_from_month or "", p.product_id))
+            for i, earlier in enumerate(ordered):
+                for later in ordered[i + 1:]:
+                    shared = set(earlier.goods_nos) & set(later.goods_nos)
+                    if not shared:
+                        continue
+                    # 공유 SKU 는 날짜 말고 가를 방법이 없다 — 구간이 비면 해석 불가다
+                    for gen in (earlier, later):
+                        if gen.renewal_from_month is None and gen.renewal_to_month is None:
+                            raise CatalogError(
+                                f"계보 {lineage}: {gen.product_id} 가 "
+                                f"goodsNo {sorted(shared)} 를 형제 세대와 공유하는데 "
+                                "세대 구간이 양쪽 다 열려 있다. 공유 SKU 는 날짜로만 갈린다"
+                            )
+                    if _ranges_overlap(earlier, later):
+                        raise CatalogError(
+                            f"계보 {lineage}: {earlier.product_id} 와 {later.product_id} 가 "
+                            f"goodsNo {sorted(shared)} 를 공유하는데 세대 구간이 겹친다 "
+                            f"({earlier.renewal_from_month}~{earlier.renewal_to_month} / "
+                            f"{later.renewal_from_month}~{later.renewal_to_month}). "
+                            "공유 SKU 는 날짜로만 갈리므로 구간이 겹치면 해석이 모호하다"
+                        )
 
     # --- 조회 ---
 
@@ -339,6 +366,26 @@ class ProductCatalog:
 
     def lineage_of(self, product_id: str) -> tuple[Product, ...]:
         return self.lineage(self.product(product_id).lineage_id)
+
+    def current_generation(self, lineage_id: str) -> Product:
+        """계보의 현행 세대. `requestedGoodsNo` 를 가진 세대가 지금 팔리는 제품이다.
+
+        이전 세대 엔트리는 크롤 요청 대상이 아니라 `requestedGoodsNo` 가 없다.
+        구간(`toMonth`)으로 판정하지 않는 이유는, goodsNo 가 세대를 가르는 제품은
+        양쪽 구간이 모두 열려 있을 수 있기 때문이다 (예: '[기존용기]' 표기).
+        """
+        current = [p for p in self.lineage(lineage_id) if p.requested_goods_no]
+        if len(current) != 1:
+            raise CatalogError(
+                f"계보 {lineage_id}: 현행 세대(requestedGoodsNo 보유)가 {len(current)}개다 "
+                f"({[p.product_id for p in current]}). 정확히 하나여야 한다"
+            )
+        return current[0]
+
+    def is_previous_generation(self, product_id: str) -> bool:
+        """이 제품이 리뉴얼로 물러난 이전 세대인가."""
+        p = self.product(product_id)
+        return self.current_generation(p.lineage_id).product_id != p.product_id
 
     @property
     def products(self) -> list[Product]:
