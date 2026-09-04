@@ -66,6 +66,7 @@ PRD 표는 좋아요 신호로 `usefulPoint` / `recommendCount` 를 함께 적�
 """
 from __future__ import annotations
 
+import bisect
 import collections
 import hashlib
 import json
@@ -221,24 +222,13 @@ class ScoringContext:
                 continue
             # 자기보다 **낮은** 값의 비율. 0 이 71.5% 라 동점이 많고, 동점끼리는 같은 값을
             # 받아야 한다 (동점을 순서로 가르면 파일 순서가 점수에 새 든다).
-            below = _bisect_left(values, likes)
+            below = bisect.bisect_left(values, likes)
             percentile[r["reviewId"]] = round(below / (n - 1), 6)
         return cls(
             content_group_size=dict(group),
             like_percentile=percentile,
             aspect_counts=dict(aspect_counts) if aspect_counts is not None else None,
         )
-
-
-def _bisect_left(values: list[int], target: int) -> int:
-    lo, hi = 0, len(values)
-    while lo < hi:
-        mid = (lo + hi) // 2
-        if values[mid] < target:
-            lo = mid + 1
-        else:
-            hi = mid
-    return lo
 
 
 def signal_values(record: dict, context: ScoringContext, weights: TrustWeights) -> dict[str, float]:
