@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>골든셋 라벨 도구 (PER-178)</title>
+<style>
+  :root { --bg:#fafaf9; --fg:#1c1917; --mute:#78716c; --line:#e7e5e4; --card:#fff; --accent:#0f766e; --warn:#b45309; --bad:#b91c1c; --sel:#fef3c7; }
+  * { box-sizing:border-box; }
+  body { margin:0; font:14px/1.5 -apple-system, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif; color:var(--fg); background:var(--bg); }
+  header { display:flex; gap:16px; align-items:center; padding:8px 16px; border-bottom:1px solid var(--line); background:var(--card); position:sticky; top:0; z-index:2; }
+  header b { font-size:15px; }
+  header .mute { color:var(--mute); }
+  main { display:grid; grid-template-columns: 240px minmax(360px,1fr) 380px; height: calc(100vh - 45px); }
+  @media (max-width: 1100px) { main { grid-template-columns: 200px minmax(300px,1fr) 340px; } }
+  @media (max-width: 900px) { main { grid-template-columns: 1fr; height:auto; } aside { max-height:220px; border-right:0; border-bottom:1px solid var(--line); } form { border-left:0; border-top:1px solid var(--line); } }
+  aside, section { overflow:auto; }
+  aside { border-right:1px solid var(--line); padding:8px; }
+  .bundle { display:block; width:100%; text-align:left; padding:6px 8px; margin:2px 0; border:1px solid transparent; border-radius:6px; background:none; cursor:pointer; font:inherit; color:inherit; }
+  .bundle:hover { background:#f5f5f4; }
+  .bundle.active { border-color:var(--accent); background:#f0fdfa; }
+  .bundle small { color:var(--mute); display:block; }
+  .kind { font-size:11px; padding:0 5px; border-radius:4px; background:#e7e5e4; margin-right:4px; }
+  .kind.cell { background:#dbeafe; }
+  .kind.missing { background:#fde68a; }
+  .badge { float:right; font-size:11px; color:var(--accent); }
+  section.reviews { padding:12px 16px; }
+  .head { padding:8px 12px; margin-bottom:8px; border:1px solid var(--line); border-radius:8px; background:var(--card); }
+  .head .rule { color:var(--warn); font-size:13px; }
+  .review { border:1px solid var(--line); border-radius:8px; padding:8px 12px; margin:8px 0; background:var(--card); }
+  .review.used { border-color:var(--accent); }
+  .review .meta { color:var(--mute); font-size:12px; display:flex; gap:10px; flex-wrap:wrap; }
+  .review .meta code { background:#f5f5f4; padding:0 4px; border-radius:3px; }
+  .review .content { white-space:pre-wrap; margin:6px 0 0; user-select:text; }
+  .review .content ::selection { background:var(--sel); }
+  .ev-actions { display:none; gap:6px; margin-top:6px; }
+  .review.selected .ev-actions { display:flex; }
+  form { padding:12px 16px; border-left:1px solid var(--line); background:var(--card); display:flex; flex-direction:column; gap:8px; }
+  label.f { display:flex; flex-direction:column; gap:2px; font-size:12px; color:var(--mute); }
+  label.f input, label.f select, label.f textarea { font:inherit; padding:5px 7px; border:1px solid var(--line); border-radius:6px; color:var(--fg); background:#fff; }
+  textarea { min-height:52px; resize:vertical; }
+  .row { display:flex; gap:8px; }
+  .row > * { flex:1; }
+  button.primary { background:var(--accent); color:#fff; border:0; border-radius:6px; padding:8px; font:inherit; font-weight:600; cursor:pointer; }
+  button.small { font:inherit; font-size:12px; padding:2px 8px; border:1px solid var(--line); border-radius:5px; background:#fff; cursor:pointer; }
+  button.small.support { border-color:var(--accent); color:var(--accent); }
+  button.small.oppose { border-color:var(--bad); color:var(--bad); }
+  .evidence { border:1px dashed var(--line); border-radius:6px; padding:6px; font-size:13px; }
+  .evidence .item { display:flex; gap:6px; align-items:flex-start; padding:3px 0; border-bottom:1px solid #f5f5f4; }
+  .evidence .item:last-child { border:0; }
+  .evidence .stance { font-size:11px; padding:0 5px; border-radius:4px; }
+  .stance.support { background:#ccfbf1; color:#115e59; } .stance.oppose { background:#fee2e2; color:#991b1b; }
+  .evidence q { flex:1; quotes:none; }
+  .msg { padding:8px 10px; border-radius:6px; font-size:13px; white-space:pre-wrap; }
+  .msg.err { background:#fef2f2; color:var(--bad); border:1px solid #fecaca; }
+  .msg.ok { background:#f0fdfa; color:#115e59; border:1px solid #99f6e4; }
+  .labels { font-size:13px; }
+  .labels .l { padding:6px 8px; border:1px solid var(--line); border-radius:6px; margin:4px 0; background:#fff; }
+  .labels .l b { display:block; }
+  .labels .l .mute { color:var(--mute); font-size:12px; }
+  details summary { cursor:pointer; color:var(--mute); font-size:12px; }
+  .chips { display:flex; flex-wrap:wrap; gap:4px; }
+  .chips label { font-size:12px; border:1px solid var(--line); border-radius:12px; padding:1px 8px; cursor:pointer; }
+  .chips input { vertical-align:middle; margin:0 3px 0 0; }
+  .chips .critical { border-color:#fca5a5; } .chips .high { border-color:#fcd34d; }
+  .timer { font-variant-numeric: tabular-nums; }
+</style>
+</head>
+<body>
+<header>
+  <b>골든셋 라벨 도구</b>
+  <span class="mute" id="progress">…</span>
+  <span class="mute">파이프라인 결과·v4 산출물은 없다. 번들 밖 리뷰를 보지 않는다. 방향은 별점이 아니라 문장으로.</span>
+  <span class="mute" style="margin-left:auto">경과 <span class="timer" id="timer">0:00</span></span>
+</header>
+<main>
+  <aside id="bundles"></aside>
+  <section class="reviews" id="reviews"><p class="mute">왼쪽에서 번들을 고르세요.</p></section>
+  <form id="form" onsubmit="return false">
+    <p class="mute" style="margin:0">번들을 고르면 폼이 열립니다.</p>
+  </form>
+</main>
+<script>
+const $ = (s, r=document) => r.querySelector(s);
+const state = { bundleId:null, data:null, evidence:[], startedAt:Date.now(), selectedReview:null };
+
+async function api(path, opt) {
+  const r = await fetch(path, opt);
+  const j = await r.json().catch(() => ({error:'응답 파싱 실패'}));
+  if (!r.ok) throw new Error(j.error || r.statusText);
+  return j;
+}
+
+function esc(s) { return String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+async function loadBundles() {
+  const list = await api('/api/bundles');
+  const total = list.reduce((a,b)=>a+b.labels,0);
+  const pilot = list.filter(b=>b.phase==='pilot').reduce((a,b)=>a+b.labels,0);
+  $('#progress').textContent = `라벨 ${total}건 (파일럿 ${pilot}/40 · 목표 100) · 번들 ${list.filter(b=>b.labels>0).length}/${list.length}`;
+  const kindCls = k => k==='product' ? '' : (k==='missing' ? 'missing' : 'cell');
+  $('#bundles').innerHTML = list.map(b => `
+    <button class="bundle ${b.bundleId===state.bundleId?'active':''}" data-id="${b.bundleId}">
+      <span class="badge">${b.labels ? b.labels+'건' : ''}</span>
+      <b>${b.bundleId}</b> <span class="kind ${kindCls(b.scope.kind)}">${b.scope.kind}${b.scope.segment ? ' '+esc(b.scope.segment) : ''}</span>
+      <small>${esc(b.displayName)} · ${esc(b.category)} · ${b.reviews}리뷰 · ${b.phase}</small>
+    </button>`).join('');
+  $('#bundles').querySelectorAll('.bundle').forEach(el => el.onclick = () => openBundle(el.dataset.id));
+}
+
+async function openBundle(id) {
+  state.bundleId = id; state.evidence = []; state.startedAt = Date.now(); state.selectedReview = null;
+  state.data = await api('/api/bundle/' + id);
+  await loadBundles();
+  renderReviews(); renderForm();
+}
+
+function stars(n) { return '★'.repeat(n) + '☆'.repeat(5-n); }
+
+function renderReviews() {
+  const d = state.data, b = d.bundle, s = b.scope;
+  const scopeLine = s.axis
+    ? `<b>셀 번들</b> — <code>${s.axis}</code> = ${esc(d.scopeLabel)}. 이 번들의 주장은 condition.${s.axis} 에 이 값을 가져야 한다`
+    : `<b>제품 번들</b> — 제품 전체 주장. 리뷰별 조건을 보고 조건부 주장을 만들 수도 있다 (근거는 그 세그먼트 리뷰만)`;
+  const strata = b.strata.map(x=>`${x.name} ${x.sampled}/${x.population}`).join(' · ');
+  const usedIds = new Set(state.evidence.map(e=>e.reviewId));
+  $('#reviews').innerHTML = `
+    <div class="head">
+      <div><b>${b.bundleId} — ${esc(b.displayName)}</b> <span class="mute">· ${esc(b.category)} · ${b.productId} · 리뉴얼 ${b.renewalPolicy} · ${b.phase}</span></div>
+      <div>${scopeLine}</div>
+      <div class="mute">리뷰 ${d.reviews.length} / 모집단 ${b.population} (리센시 통과 · 작성자 1건). 층: ${strata}</div>
+      <div class="rule">원문을 드래그해서 선택한 뒤 support / oppose 를 누르면 근거로 들어갑니다. 인용은 원문 그대로여야 합니다.</div>
+    </div>
+    ${d.reviews.map((r,i)=>`
+      <article class="review ${usedIds.has(r.reviewId)?'used':''}" data-id="${r.reviewId}">
+        <div class="meta"><span>#${String(i+1).padStart(2,'0')}</span><code>${r.reviewId}</code><span>${stars(r.rating)}</span><span>${r.month}</span><span>${esc(r.conditionLine)}</span><span>작성자 <code>${esc(r.author)}</code></span></div>
+        <p class="content">${esc(r.content)}</p>
+        <div class="ev-actions">
+          <button type="button" class="small support" data-stance="support">support 로 추가</button>
+          <button type="button" class="small oppose" data-stance="oppose">oppose 로 추가</button>
+          <span class="mute" style="font-size:12px">선택: <q class="sel"></q></span>
+        </div>
+      </article>`).join('')}`;
+  const sec = $('#reviews');
+  document.addEventListener('selectionchange', onSelection);
+  sec.querySelectorAll('.ev-actions button').forEach(btn => btn.onclick = () => {
+    const art = btn.closest('.review'); const q = art.querySelector('q.sel').textContent;
+    if (!q) return;
+    const rid = Number(art.dataset.id);
+    state.evidence = state.evidence.filter(e=>e.reviewId!==rid);
+    state.evidence.push({reviewId: rid, stance: btn.dataset.stance, quote: q});
+    window.getSelection().removeAllRanges();
+    renderEvidence(); art.classList.add('used'); art.classList.remove('selected');
+  });
+}
+
+function onSelection() {
+  const sel = window.getSelection();
+  if (!sel || sel.isCollapsed) return;
+  const node = sel.anchorNode && sel.anchorNode.parentElement;
+  const art = node && node.closest('.review');
+  document.querySelectorAll('.review.selected').forEach(a=>a.classList.remove('selected'));
+  if (!art || !node.closest('.content')) return;
+  const text = sel.toString();
+  if (!text.trim()) return;
+  art.classList.add('selected');
+  art.querySelector('q.sel').textContent = text;
+}
+
+function renderForm() {
+  const d = state.data, v = d.vocab, s = d.bundle.scope;
+  const n = d.labels.length + 1;
+  const opt = (arr, sel) => arr.map(x=>`<option ${x===sel?'selected':''}>${esc(x)}</option>`).join('');
+  const condSelect = (axis) => {
+    let choices = [['', 'null (무관)'], [v.missing, v.missing]];
+    if (axis==='skinType') choices = choices.concat(Object.entries(v.skinType).map(([c,l])=>[c,`${c} ${l}`]));
+    if (axis==='option') choices = choices.concat(v.optionSegments.map(o=>[o,o]));
+    const def = s.axis===axis ? s.segment : '';
+    return `<select name="cond_${axis}">${choices.map(([val,lab])=>`<option value="${esc(val)}" ${val===def?'selected':''}>${esc(lab)}</option>`).join('')}</select>`;
+  };
+  const troubleChips = `<div class="chips">
+      <label><input type="checkbox" name="trouble_missing" value="${v.missing}" ${s.axis==='skinTrouble'&&s.segment===v.missing?'checked':''}>${v.missing}</label>
+      ${Object.entries(v.skinTrouble).map(([c,l])=>`<label><input type="checkbox" name="trouble" value="${c}" ${s.axis==='skinTrouble'&&s.segment===c?'checked':''}>${c} ${l}</label>`).join('')}
+    </div><small class="mute">아무것도 안 고르면 null(무관)</small>`;
+  const failChips = `<div class="chips">${v.taxonomy.types.map(t=>`<label class="${t.severity}"><input type="checkbox" name="fail" value="${t.key}">${t.key} <span class="mute">${t.label}</span></label>`).join('')}</div>`;
+  $('#form').innerHTML = `
+    <div class="row">
+      <label class="f">labelId<input name="labelId" value="${d.bundle.bundleId}-${n}"></label>
+      <label class="f">aspect<select name="aspect"><option value="">(없음 → notes 에)</option>${opt(v.aspects)}</select></label>
+    </div>
+    <label class="f">question (구매자의 질문)<textarea name="question" placeholder="…나요?"></textarea></label>
+    <label class="f">answer (리뷰가 주는 답)<textarea name="answer"></textarea></label>
+    <div class="row">
+      <label class="f">condition.skinType${condSelect('skinType')}</label>
+      <label class="f">condition.option${condSelect('option')}</label>
+    </div>
+    <label class="f">condition.skinTrouble (다중)${troubleChips}</label>
+    <div class="row">
+      <label class="f">direction<select name="direction">${opt(v.directions,'positive')}</select></label>
+      <label class="f">evaluation<select name="evaluation">${opt(v.evaluations,'complete')}</select></label>
+    </div>
+    <label class="f">evidence (리뷰에서 드래그 → 버튼)<div class="evidence" id="evidence"><span class="mute">아직 없음</span></div></label>
+    <label class="f">failureReasons (${v.taxonomy.version}) — 이 claim 이 실패 사례일 때만${failChips}</label>
+    <label class="f">notes<textarea name="notes" placeholder="애매한 판정·규격 결함은 여기에 (PER-178 로 되먹임)"></textarea></label>
+    <label class="f">minutesSpent<input name="minutesSpent" type="number" min="0.5" step="0.5" placeholder="비우면 경과 시간으로"></label>
+    <button class="primary" id="save">저장 (계약 검증)</button>
+    <div id="msg"></div>
+    <details><summary>이 번들의 라벨 ${d.labels.length}건</summary><div class="labels">${d.labels.map(l=>`
+      <div class="l"><b>${esc(l.labelId)} · ${esc(l.direction)} · ${esc(l.aspect||'—')} ${l.failureReasons.length?'· <span style="color:var(--bad)">'+l.failureReasons.join(', ')+'</span>':''}</b>
+        ${esc(l.question)}<div class="mute">${esc(l.answer)} · 근거 ${l.evidence.length} · ${l.minutesSpent}분</div>
+        <button type="button" class="small" data-del="${esc(l.labelId)}">삭제</button></div>`).join('')}</div></details>`;
+  renderEvidence();
+  $('#save').onclick = save;
+  $('#form').querySelectorAll('[data-del]').forEach(b => b.onclick = async () => {
+    if (!confirm(`${b.dataset.del} 를 삭제할까요? (파일에서 지워집니다)`)) return;
+    try { await api('/api/labels/' + encodeURIComponent(b.dataset.del), {method:'DELETE'}); await openBundle(state.bundleId); }
+    catch (e) { showMsg(e.message, 'err'); }
+  });
+}
+
+function renderEvidence() {
+  const box = $('#evidence'); if (!box) return;
+  const authors = new Map(state.data.reviews.map(r=>[r.reviewId, r.author]));
+  const uniq = st => new Set(state.evidence.filter(e=>e.stance===st).map(e=>authors.get(e.reviewId))).size;
+  box.innerHTML = state.evidence.length ? state.evidence.map((e,i)=>`
+    <div class="item"><span class="stance ${e.stance}">${e.stance}</span><code>${e.reviewId}</code><q>${esc(e.quote)}</q>
+      <button type="button" class="small" data-i="${i}">✕</button></div>`).join('') +
+    `<div class="mute" style="font-size:12px;margin-top:4px">고유 작성자 support ${uniq('support')} / oppose ${uniq('oppose')} · N_min ${state.data.vocab.nMin} 은 참고값</div>`
+    : '<span class="mute">아직 없음</span>';
+  box.querySelectorAll('[data-i]').forEach(b => b.onclick = () => { state.evidence.splice(Number(b.dataset.i),1); renderEvidence(); renderReviews(); });
+}
+
+function showMsg(text, cls) { const m = $('#msg'); m.className = 'msg ' + cls; m.textContent = text; }
+
+async function save() {
+  const f = $('#form'), fd = new FormData(f), v = state.data.vocab;
+  const cond = axis => { const x = fd.get('cond_'+axis); return x === '' ? null : x; };
+  const troubles = fd.getAll('trouble');
+  const troubleMissing = fd.get('trouble_missing');
+  let skinTrouble = null;
+  if (troubleMissing) skinTrouble = [v.missing].concat(troubles);   // 섞이면 서버가 에러를 낸다 — 조용히 고치지 않는다
+  else if (troubles.length) skinTrouble = troubles;
+  const minutesRaw = fd.get('minutesSpent');
+  const elapsed = Math.max(0.5, Math.round((Date.now()-state.startedAt)/60000*2)/2);
+  const payload = {
+    labelId: fd.get('labelId').trim(), bundleId: state.bundleId, productId: state.data.bundle.productId,
+    aspect: fd.get('aspect') || null, question: fd.get('question'), answer: fd.get('answer'),
+    condition: { skinType: cond('skinType'), skinTrouble, option: cond('option') },
+    direction: fd.get('direction'), evidence: state.evidence, failureReasons: fd.getAll('fail'),
+    evaluation: fd.get('evaluation'), notes: fd.get('notes') || null,
+    minutesSpent: minutesRaw ? Number(minutesRaw) : elapsed,
+  };
+  try {
+    const r = await api('/api/labels', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload)});
+    showMsg(`저장됨 ${r.label.labelId} — support 작성자 ${r.counts.supportAuthors} / oppose ${r.counts.opposeAuthors}, failureReasons=${r.label.failureReasons.join(', ')||'none'}`, 'ok');
+    state.evidence = []; state.startedAt = Date.now();
+    const keep = $('#msg').textContent;
+    await openBundle(state.bundleId);
+    showMsg(keep, 'ok');
+  } catch (e) { showMsg('저장하지 않았다 — ' + e.message, 'err'); }
+}
+
+setInterval(() => { const s = Math.floor((Date.now()-state.startedAt)/1000); $('#timer').textContent = `${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`; }, 1000);
+loadBundles().catch(e => { $('#bundles').innerHTML = `<div class="msg err">${esc(e.message)}</div>`; });
+</script>
+</body>
+</html>

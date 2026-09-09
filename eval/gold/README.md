@@ -31,6 +31,7 @@
 python3 pipeline/sample_concern_golden.py --check     # 번들이 고정물과 같은지
 python3 eval/label_concern_golden.py show B01         # 워크시트 (블라인드 — 파이프라인 결과 없음)
 python3 eval/label_concern_golden.py add B01          # 라벨 입력 → 계약 검증 → 저장
+python3 eval/label_concern_golden_web.py              # 같은 일을 웹 UI 로 (http://127.0.0.1:8178)
 python3 eval/label_concern_golden.py validate         # 게이트
 ```
 

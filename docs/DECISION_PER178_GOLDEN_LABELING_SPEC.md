@@ -193,6 +193,17 @@ python3 eval/label_concern_golden.py validate           # 라벨 전체 계약 �
 python3 eval/label_concern_golden.py stats              # 진척 · 층 · 실패유형 · 건당 소요 시간
 ```
 
+**웹 UI** (`eval/label_concern_golden_web.py`, 표준 라이브러리만, 127.0.0.1 만 듣는다):
+
+```bash
+python3 eval/label_concern_golden_web.py          # → http://127.0.0.1:8178
+```
+
+왼쪽 번들 목록(진척) · 가운데 리뷰(원문을 드래그 → support/oppose 버튼으로 근거 추가) · 오른쪽 claim 폼.
+저장은 CLI 와 같은 `validate_label` 을 거치고 같은 라벨 파일에 쓴다 — 위반이면 저장되지 않고 이유가 뜬다.
+소요 시간은 번들을 열거나 직전 저장 이후의 경과로 자동 채우되 손으로 고칠 수 있다. 라벨 삭제도 여기서 한다.
+테스트 `pipeline/test_label_web.py` (7).
+
 `add` 는 `failureReasons` 정렬을 대신 해주고, 셀 번들에서는 그 셀을 조건 기본값으로 채운다. 나머지는
 사람이 정한다. 저장 후 `support 작성자 N / oppose M` 을 바로 보여줘 과소 근거를 라벨 시점에 알 수 있다.
 
