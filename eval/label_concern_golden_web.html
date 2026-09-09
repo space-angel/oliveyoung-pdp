@@ -72,6 +72,7 @@
   .quote .bar { border-radius:2px; } .quote.support .bar { background:var(--accent); } .quote.oppose .bar { background:var(--bad); }
   .quote .qm { color:var(--mute); font-size:11px; display:flex; gap:8px; }
   .quote .qt { margin-top:2px; }
+  .quote.missed { cursor:default; } .quote.missed .qm { cursor:pointer; }
   .actions { display:flex; gap:6px; margin-top:8px; }
   form { padding:12px; display:flex; flex-direction:column; gap:8px; }
   label.f { display:flex; flex-direction:column; gap:2px; font-size:12px; color:var(--mute); }
@@ -262,6 +263,8 @@ function addEvidence(rid, stance, quote) {
   state.evidence = state.evidence.filter(e => e.reviewId !== rid);
   state.evidence.push({reviewId: rid, stance, quote});
   renderEvidence(); applyFilter();
+  const c = (state.data.candidates||[]).find(x => x.candidateId === state.reviewing);
+  if (c && $('#missed')) renderMissed(c);
 }
 function focusReview(rid) {
   const el = document.getElementById('rv-'+rid); if (!el) return;
@@ -335,15 +338,58 @@ function renderPanel() {
       <div class="quote ${e.stance}" data-rid="${e.reviewId}"><span class="bar"></span>
         <div><div class="qm"><span>${e.stance}</span><code>${e.reviewId}</code><span>${r.rating?stars(r.rating):''}</span><span>${esc(r.conditionLine||'')}</span></div>
         <div class="qt">“${esc(e.quote)}”</div></div></div>`; }).join('')}</div>
+    <div id="missed"></div>
     ${c.decision ? '' : `<div class="actions">
       <button type="button" class="primary" id="btnAccept">채택 → 아래 폼 확인 후 저장</button>
       <button type="button" class="primary reject" id="btnReject">기각 → 실패유형 체크 후 저장</button></div>
       <div class="mute" style="font-size:12px;margin-top:4px">채택 후 근거를 보태거나 문장을 고치면 저장 시 자동으로 candidate_edited 가 됩니다.</div>`}`;
   box.querySelectorAll('.quote').forEach(q => q.onclick = () => focusReview(Number(q.dataset.rid)));
+  renderMissed(c);
   const a = $('#btnAccept'), r = $('#btnReject');
   if (a) a.onclick = () => { state.source = 'candidate_accepted'; setSrcLine(); $('#save').scrollIntoView({block:'center', behavior:'smooth'}); };
   if (r) r.onclick = () => { state.source = 'candidate_rejected'; setSrcLine(); const f = document.querySelector('[name=fail]'); if (f) f.scrollIntoView({block:'center', behavior:'smooth'}); };
 }
+const STOP = new Set(['리뷰','리뷰가','있다','있고','있어요','없다','없어요','같아요','너무','진짜','정말','그냥','조금','좀','이거','이게','사용','제품','느낌','느껴','생겼다는','생기지','않았다는','않았어요','있나요','나요','인가요','하나요','되나요','건가요','사람이']);
+function stems(text) {
+  // 인용·질문에서 어간 후보를 뽑는다 — 모델 없음. 2~6자 토큰과 그 앞 2자.
+  const toks = (text||'').replace(/[^가-힣a-zA-Z0-9\s]/g,' ').split(/\s+/).filter(t => t.length >= 2 && t.length <= 8 && !STOP.has(t));
+  const out = new Set();
+  toks.forEach(t => { out.add(t.slice(0, Math.min(t.length, 3))); if (t.length >= 4) out.add(t.slice(0, 2)); });
+  // 너무 흔한 2자 어간은 뺀다
+  ['바르','발라','입술','색이','색은','생각','정도','다른','때문','제가','저는','이번','처음'].forEach(w => out.delete(w));
+  return [...out];
+}
+function renderMissed(c) {
+  const box = $('#missed'); if (!box) return;
+  const k = c.candidate;
+  const aspectWords = (k.aspect && state.data.aspectHits[k.aspect]) ? state.data.aspectHits[k.aspect].keywords : [];
+  const qstems = stems([k.question, k.answer, ...(k.evidence||[]).map(e=>e.quote)].join(' '));
+  const terms = [...new Set([...aspectWords, ...qstems])].filter(Boolean);
+  const evIds = new Set(state.evidence.map(e=>e.reviewId));
+  const scored = state.data.reviews.filter(r => !evIds.has(r.reviewId)).map(r => {
+    const hitsA = aspectWords.filter(w => r.content.includes(w));
+    const hitsQ = qstems.filter(w => r.content.includes(w));
+    const sents = splitSentences(r.content).filter(sn => hitsA.some(w=>sn.includes(w)) || hitsQ.some(w=>sn.includes(w)));
+    return { r, score: hitsA.length * 2 + hitsQ.length, hits: [...new Set([...hitsA, ...hitsQ])], sents: sents.slice(0, 3) };
+  }).filter(x => x.score > 0 && x.sents.length).sort((a,b)=>b.score-a.score).slice(0, 8);
+  if (!scored.length) { box.innerHTML = `<div class="mute" style="font-size:12px;margin-top:8px">같은 얘기를 하는 다른 리뷰가 문자열 매칭으로는 안 보인다 — aspect 칩·단어 필터로 직접 확인</div>`; return; }
+  box.innerHTML = `
+    <div class="mute" style="font-size:12px;margin-top:10px">후보가 놓쳤을 수 있는 근거 ${scored.length}개 리뷰 <span title="${esc(terms.join(', '))}">(같은 단어를 말하는 리뷰, 문자열 매칭)</span> — 문장 옆 S/O 로 근거에 추가</div>
+    <div class="quotes">${scored.map(x => `
+      <div class="quote missed" data-rid="${x.r.reviewId}"><span class="bar" style="background:#fde68a"></span>
+        <div><div class="qm"><code>${x.r.reviewId}</code><span>${stars(x.r.rating)}</span><span>${esc(x.r.conditionLine)}</span><span>매칭 ${x.hits.slice(0,4).map(esc).join('·')}</span></div>
+          ${x.sents.map(sn => `<div class="cand" style="margin-top:3px"><span class="txt">${esc(sn)}</span>
+            <button type="button" class="small support" data-rid="${x.r.reviewId}" data-stance="support">S</button>
+            <button type="button" class="small oppose" data-rid="${x.r.reviewId}" data-stance="oppose">O</button></div>`).join('')}
+        </div></div>`).join('')}</div>`;
+  box.querySelectorAll('.cand button').forEach(b => b.onclick = ev => {
+    ev.stopPropagation();
+    addEvidence(Number(b.dataset.rid), b.dataset.stance, b.closest('.cand').querySelector('.txt').textContent);
+    renderMissed(c);
+  });
+  box.querySelectorAll('.quote.missed .qm').forEach(m => m.onclick = () => focusReview(Number(m.closest('.quote').dataset.rid)));
+}
+
 function setSrcLine() {
   const el = $('#srcline'); if (!el) return;
   const s = state.source;
