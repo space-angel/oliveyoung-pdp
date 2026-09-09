@@ -1,0 +1,293 @@
+{
+  "issue": "PER-178",
+  "question": "v4 골든셋 15문항을 v5 라벨 규격(concern-golden-v1)으로 마이그레이션할 수 있는가",
+  "source": {
+    "v4Golden": {
+      "path": "legacy/v4/eval/golden_set.json",
+      "sha256": "00adff09365dbf783d77c731f53641dc8810fa730214f0f6edf7f5e9ffa563b6"
+    },
+    "reviews": {
+      "path": "data/intermediate/v5_reviews.jsonl",
+      "sha256": "bc3033cb5b0225f58c95ac2a5896545d9e97303de9dfff01fe2198dfeb69537c"
+    },
+    "catalog": {
+      "path": "data/input/product_catalog.json",
+      "sha256": "897cbc2c9765ca08b8d9514f307a678cff82596e0493c3d9ea0ee9a156d94fb6"
+    }
+  },
+  "recencyCutoffMonth": "2024-09",
+  "nMin": 8,
+  "structure": {
+    "items": 15,
+    "productResolved": 15,
+    "supportingReviewIds": 155,
+    "inV5Corpus": 30,
+    "recencyPassed": 24,
+    "usableEvidence": 24,
+    "itemsWithZeroUsable": 5,
+    "itemsMeetingNmin": 0
+  },
+  "content": {
+    "fieldMap": {
+      "goldenId": "labelId",
+      "productKey": "productId (카탈로그 displayName 으로 해석)",
+      "category": null,
+      "question": "question",
+      "supportingReviewIds": "evidence[].reviewId (quote · stance 는 없음)",
+      "rationale": "notes"
+    },
+    "v5FieldsAbsentInV4": [
+      "answer",
+      "aspect",
+      "condition",
+      "direction",
+      "evaluation",
+      "failureReasons",
+      "minutesSpent"
+    ],
+    "note": "answer · condition · direction · evidence.quote · evidence.stance · failureReasons 는 v4 에 없다. 원문을 다시 읽어야 채워지므로 '변환'이 아니라 '재라벨'이다"
+  },
+  "perItem": [
+    {
+      "goldenId": "G01",
+      "productKey": "달바 퍼스트 스프레이 세럼",
+      "productId": "p028",
+      "lineage": [
+        "p028"
+      ],
+      "category_v4": "리스크",
+      "supportingReviewIds": 9,
+      "inV5Corpus": 2,
+      "recencyPassed": 2,
+      "sameLineage": 2,
+      "usableEvidence": 2,
+      "usableUniqueAuthors": 2,
+      "meetsNmin": false
+    },
+    {
+      "goldenId": "G02",
+      "productKey": "달바 퍼스트 스프레이 세럼",
+      "productId": "p028",
+      "lineage": [
+        "p028"
+      ],
+      "category_v4": "실사용",
+      "supportingReviewIds": 14,
+      "inV5Corpus": 5,
+      "recencyPassed": 3,
+      "sameLineage": 5,
+      "usableEvidence": 3,
+      "usableUniqueAuthors": 3,
+      "meetsNmin": false
+    },
+    {
+      "goldenId": "G03",
+      "productKey": "달바 퍼스트 스프레이 세럼",
+      "productId": "p028",
+      "lineage": [
+        "p028"
+      ],
+      "category_v4": "실사용",
+      "supportingReviewIds": 14,
+      "inV5Corpus": 4,
+      "recencyPassed": 2,
+      "sameLineage": 4,
+      "usableEvidence": 2,
+      "usableUniqueAuthors": 2,
+      "meetsNmin": false
+    },
+    {
+      "goldenId": "G04",
+      "productKey": "파티온 노스카나인 트러블 세럼",
+      "productId": "p040",
+      "lineage": [
+        "p040"
+      ],
+      "category_v4": "실사용",
+      "supportingReviewIds": 9,
+      "inV5Corpus": 0,
+      "recencyPassed": 0,
+      "sameLineage": 0,
+      "usableEvidence": 0,
+      "usableUniqueAuthors": 0,
+      "meetsNmin": false
+    },
+    {
+      "goldenId": "G05",
+      "productKey": "파티온 노스카나인 트러블 세럼",
+      "productId": "p040",
+      "lineage": [
+        "p040"
+      ],
+      "category_v4": "리스크",
+      "supportingReviewIds": 8,
+      "inV5Corpus": 0,
+      "recencyPassed": 0,
+      "sameLineage": 0,
+      "usableEvidence": 0,
+      "usableUniqueAuthors": 0,
+      "meetsNmin": false
+    },
+    {
+      "goldenId": "G06",
+      "productKey": "파티온 노스카나인 트러블 세럼",
+      "productId": "p040",
+      "lineage": [
+        "p040"
+      ],
+      "category_v4": "실사용",
+      "supportingReviewIds": 12,
+      "inV5Corpus": 0,
+      "recencyPassed": 0,
+      "sameLineage": 0,
+      "usableEvidence": 0,
+      "usableUniqueAuthors": 0,
+      "meetsNmin": false
+    },
+    {
+      "goldenId": "G07",
+      "productKey": "메디큐브 PDRN 핑크 콜라겐 캡슐크림",
+      "productId": "p043",
+      "lineage": [
+        "p043"
+      ],
+      "category_v4": "실사용",
+      "supportingReviewIds": 11,
+      "inV5Corpus": 2,
+      "recencyPassed": 2,
+      "sameLineage": 2,
+      "usableEvidence": 2,
+      "usableUniqueAuthors": 2,
+      "meetsNmin": false
+    },
+    {
+      "goldenId": "G08",
+      "productKey": "메디큐브 PDRN 핑크 콜라겐 캡슐크림",
+      "productId": "p043",
+      "lineage": [
+        "p043"
+      ],
+      "category_v4": "적합성",
+      "supportingReviewIds": 8,
+      "inV5Corpus": 3,
+      "recencyPassed": 3,
+      "sameLineage": 3,
+      "usableEvidence": 3,
+      "usableUniqueAuthors": 3,
+      "meetsNmin": false
+    },
+    {
+      "goldenId": "G09",
+      "productKey": "메디큐브 PDRN 핑크 콜라겐 캡슐크림",
+      "productId": "p043",
+      "lineage": [
+        "p043"
+      ],
+      "category_v4": "실사용",
+      "supportingReviewIds": 10,
+      "inV5Corpus": 2,
+      "recencyPassed": 2,
+      "sameLineage": 2,
+      "usableEvidence": 2,
+      "usableUniqueAuthors": 2,
+      "meetsNmin": false
+    },
+    {
+      "goldenId": "G10",
+      "productKey": "클리오 킬 커버 파운웨어 쿠션",
+      "productId": "p015",
+      "lineage": [
+        "p015"
+      ],
+      "category_v4": "실사용",
+      "supportingReviewIds": 10,
+      "inV5Corpus": 0,
+      "recencyPassed": 0,
+      "sameLineage": 0,
+      "usableEvidence": 0,
+      "usableUniqueAuthors": 0,
+      "meetsNmin": false
+    },
+    {
+      "goldenId": "G11",
+      "productKey": "클리오 킬 커버 파운웨어 쿠션",
+      "productId": "p015",
+      "lineage": [
+        "p015"
+      ],
+      "category_v4": "적합성",
+      "supportingReviewIds": 7,
+      "inV5Corpus": 0,
+      "recencyPassed": 0,
+      "sameLineage": 0,
+      "usableEvidence": 0,
+      "usableUniqueAuthors": 0,
+      "meetsNmin": false
+    },
+    {
+      "goldenId": "G12",
+      "productKey": "클리오 킬 커버 파운웨어 쿠션",
+      "productId": "p015",
+      "lineage": [
+        "p015"
+      ],
+      "category_v4": "실사용",
+      "supportingReviewIds": 11,
+      "inV5Corpus": 3,
+      "recencyPassed": 3,
+      "sameLineage": 3,
+      "usableEvidence": 3,
+      "usableUniqueAuthors": 2,
+      "meetsNmin": false
+    },
+    {
+      "goldenId": "G13",
+      "productKey": "힌스 로 글로우 젤 틴트",
+      "productId": "p007",
+      "lineage": [
+        "p007"
+      ],
+      "category_v4": "실사용",
+      "supportingReviewIds": 11,
+      "inV5Corpus": 3,
+      "recencyPassed": 2,
+      "sameLineage": 3,
+      "usableEvidence": 2,
+      "usableUniqueAuthors": 2,
+      "meetsNmin": false
+    },
+    {
+      "goldenId": "G14",
+      "productKey": "힌스 로 글로우 젤 틴트",
+      "productId": "p007",
+      "lineage": [
+        "p007"
+      ],
+      "category_v4": "실사용",
+      "supportingReviewIds": 11,
+      "inV5Corpus": 3,
+      "recencyPassed": 3,
+      "sameLineage": 3,
+      "usableEvidence": 3,
+      "usableUniqueAuthors": 2,
+      "meetsNmin": false
+    },
+    {
+      "goldenId": "G15",
+      "productKey": "힌스 로 글로우 젤 틴트",
+      "productId": "p007",
+      "lineage": [
+        "p007"
+      ],
+      "category_v4": "실사용",
+      "supportingReviewIds": 10,
+      "inV5Corpus": 3,
+      "recencyPassed": 2,
+      "sameLineage": 3,
+      "usableEvidence": 2,
+      "usableUniqueAuthors": 2,
+      "meetsNmin": false
+    }
+  ],
+  "verdict": "구조 마이그레이션은 가능하지만(제품 15/15 해석) 근거는 살아남지 않는다 — 근거 ID 155개 중 v5 코퍼스에 30개, 리센시 통과 24개, N_min 충족 문항 0/15. 내용 필드(answer·condition·direction·quote)는 v4 에 없어 변환할 것이 없다. → v4 15문항은 v5 골든셋으로 옮기지 않고 v4 대비 비교(PER-201)의 v4 쪽 기준으로만 남긴다. v4 5제품은 블라인드가 깨져 v5 표본에서도 뺐다 (sample_concern_golden.py)"
+}
