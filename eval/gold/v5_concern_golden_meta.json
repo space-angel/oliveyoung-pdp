@@ -1,0 +1,67 @@
+{
+  "issue": "PER-178",
+  "purpose": "주장 골든셋(PER-179 파일럿 40건 → PER-180 100건) 라벨링 번들. 라벨러는 번들만 보고 claim 을 만든다",
+  "schemaVersion": "concern-golden-v1",
+  "seed": 20260909,
+  "bundles": 40,
+  "pilotBundles": 16,
+  "labelTarget": {
+    "pilot": 40,
+    "total": 100
+  },
+  "bundleSize": 40,
+  "strataQuota": {
+    "rating_1_2": 12,
+    "rating_3": 8,
+    "rating_4": 8,
+    "rating_5": 12
+  },
+  "scopeQuota": {
+    "product": 16,
+    "skinType": 10,
+    "option": 6,
+    "skinTrouble": 4,
+    "missing": 4
+  },
+  "cellMinAuthors": 8,
+  "population": {
+    "corpus": 25000,
+    "recencyPassed": 22194,
+    "recencyCutoffMonth": "2024-09",
+    "afterAuthorDedup": 17681
+  },
+  "excludedProducts": {
+    "v4GoldenLineages": [
+      "p007",
+      "p015",
+      "p028",
+      "p040",
+      "p043"
+    ],
+    "reason": "v4 골든셋·concern 을 이미 본 제품 — 블라인드가 성립하지 않는다 (legacy/v4/eval/golden_set.json)",
+    "belowCellMinAuthors": [
+      "p051"
+    ],
+    "belowCellMinAuthorsReason": "리센시·작성자 1건 후 고유 작성자 8명 미만 — 파이프라인이 침묵해야 하는 제품"
+  },
+  "eligibleProducts": 45,
+  "categoryAllocation": {
+    "립메이크업": 5,
+    "베이스메이크업": 8,
+    "아이메이크업": 7,
+    "에센스/세럼": 12,
+    "크림": 8
+  },
+  "source": {
+    "reviews": {
+      "path": "data/intermediate/v5_reviews.jsonl",
+      "sha256": "bc3033cb5b0225f58c95ac2a5896545d9e97303de9dfff01fe2198dfeb69537c"
+    },
+    "catalog": {
+      "path": "data/input/product_catalog.json",
+      "sha256": "897cbc2c9765ca08b8d9514f307a678cff82596e0493c3d9ea0ee9a156d94fb6"
+    }
+  },
+  "reviewsInBundles": 1267,
+  "note": "번들 안 평점 비율은 코퍼스와 다르다 (1~2점 과표집). 층별 weight 로 되돌린다. 번들 밖 리뷰로 라벨을 만들지 않는다"
+}

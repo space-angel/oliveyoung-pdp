@@ -11,12 +11,34 @@
 | 접두어 | 무엇을 채점하나 | 이슈 |
 |---|---|---|
 | `v5_tag_pilot_*` · `v5_tags_pilot_gold` | **입수 태깅** — (리뷰 × aspect) 단위 aspect/polarity | PER-175 |
-| (예정) `v5_concern_golden_*` | **주장·질문 생성** 결과. 별개 파일이다 | PER-179~181 |
+| `v5_concern_golden_*` | **주장(claim)** 단위. 규격은 PER-178, 라벨은 PER-179~180 | PER-178~180 |
 
 두 골든셋은 단위가 다르다 — 태깅은 (리뷰 × aspect) 행이고, 생성 골든셋은 주장 단위다.
 같은 디렉터리에 있어도 섞어 쓰지 않는다.
 
-## 현재 파일 (PER-175)
+## 주장 골든셋 파일 (PER-178)
+
+| 파일 | 무엇 |
+|---|---|
+| `v5_concern_golden_sample.jsonl` | 라벨링 번들 40개 (제품 또는 제품 × 조건 셀, 리뷰 ≤40건 전문). 시드 20260909 의 **고정물** |
+| `v5_concern_golden_meta.json` | 시드 · 종류/카테고리 할당 · 모집단 컷 · 입력 sha256 |
+| `v5_concern_golden_labels.jsonl` | 사람이 검수·확정한 claim 라벨. **채점 기준.** 출처 `source` 4종 기록. PER-179 부터 쌓인다 |
+| `v5_concern_golden_candidates.jsonl` | 다른 모델이 만든 **후보** (하네스 `eval/concern_candidates.py`). 정답이 아니다 — 라벨의 `candidateId` 가 가리키므로 고정물로 커밋 |
+
+**후보를 만드는 모델(에이전트)용 지침은 [`CANDIDATE_HARNESS_INSTRUCTIONS.md`](CANDIDATE_HARNESS_INSTRUCTIONS.md)** — 작업 위치·읽지 말 것·입력/출력 경로·들여오기.
+**라벨러 가이드는 [`LABELING_GUIDE.md`](LABELING_GUIDE.md)** — 읽는 순서·좋은 claim 의 모양·조건 규칙·거부 메시지 대처.
+규격·표본 근거·도구는 [`docs/DECISION_PER178_GOLDEN_LABELING_SPEC.md`](../../docs/DECISION_PER178_GOLDEN_LABELING_SPEC.md),
+계약은 `pipeline/golden_contract.py`. 라벨은 `(bundleId, reviewId)` 로 번들과 대조한다 — 번들 밖 리뷰는 에러다.
+
+```bash
+python3 pipeline/sample_concern_golden.py --check     # 번들이 고정물과 같은지
+python3 eval/label_concern_golden.py show B01         # 워크시트 (블라인드 — 파이프라인 결과 없음)
+python3 eval/label_concern_golden.py add B01          # 라벨 입력 → 계약 검증 → 저장
+python3 eval/label_concern_golden_web.py              # 같은 일을 웹 UI 로 (http://127.0.0.1:8178)
+python3 eval/label_concern_golden.py validate         # 게이트
+```
+
+## 태깅 골든셋 파일 (PER-175)
 
 | 파일 | 무엇 |
 |---|---|
