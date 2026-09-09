@@ -22,7 +22,8 @@
 |---|---|
 | `v5_concern_golden_sample.jsonl` | 라벨링 번들 40개 (제품 또는 제품 × 조건 셀, 리뷰 ≤40건 전문). 시드 20260909 의 **고정물** |
 | `v5_concern_golden_meta.json` | 시드 · 종류/카테고리 할당 · 모집단 컷 · 입력 sha256 |
-| `v5_concern_golden_labels.jsonl` | 손으로 만든 claim 라벨. **채점 기준.** PER-179 부터 쌓인다 |
+| `v5_concern_golden_labels.jsonl` | 사람이 검수·확정한 claim 라벨. **채점 기준.** 출처 `source` 4종 기록. PER-179 부터 쌓인다 |
+| `v5_concern_golden_candidates.jsonl` | 다른 모델이 만든 **후보** (하네스 `eval/concern_candidates.py`). 정답이 아니다 — 라벨의 `candidateId` 가 가리키므로 고정물로 커밋 |
 
 **라벨러 가이드는 [`LABELING_GUIDE.md`](LABELING_GUIDE.md)** — 읽는 순서·좋은 claim 의 모양·조건 규칙·거부 메시지 대처.
 규격·표본 근거·도구는 [`docs/DECISION_PER178_GOLDEN_LABELING_SPEC.md`](../../docs/DECISION_PER178_GOLDEN_LABELING_SPEC.md),

@@ -21,6 +21,8 @@
     evaluation       complete | not_evaluable
     notes            판단 메모. not_evaluable 이면 필수
     minutesSpent     건당 소요 시간 (PER-179 가 일정 추정 근거로 요구)
+    source           human | candidate_accepted | candidate_edited | candidate_rejected (출처, B안)
+    candidateId      모델 후보에서 왔으면 그 후보 ID, 사람이 만들었으면 null
 
 ## 왜 이런 규칙인가
 
@@ -65,7 +67,16 @@ CODED_AXES = ("skinType", "skinTrouble")
 LABEL_FIELDS = (
     "labelId", "bundleId", "productId", "aspect", "question", "answer", "condition",
     "direction", "evidence", "failureReasons", "evaluation", "notes", "minutesSpent",
+    "source", "candidateId",
 )
+
+# 라벨의 출처 (B안, PER-178). judge 일치율(PER-197)·v4 비교(PER-201)는 출처별로 갈라 본다.
+#   human               사람이 번들을 읽고 직접 만들었다 — 후보에 없던 claim (재현율의 근거)
+#   candidate_accepted  모델 후보를 그대로 채택
+#   candidate_edited    모델 후보를 고쳐 채택
+#   candidate_rejected  모델 후보를 기각 — failureReasons 가 있어야 한다 (음성 정답)
+SOURCES = ("human", "candidate_accepted", "candidate_edited", "candidate_rejected")
+CANDIDATE_SOURCES = ("candidate_accepted", "candidate_edited", "candidate_rejected")
 
 
 class GoldenContractError(ValueError):
@@ -320,6 +331,18 @@ def validate_label(
     if isinstance(minutes, bool) or not isinstance(minutes, (int, float)) or minutes <= 0:
         _fail(label, f"minutesSpent 는 양수여야 한다 (받은 값 {minutes!r}) — PER-179 가 건당 소요 시간을 요구한다")
 
+    source = label.get("source")
+    if source not in SOURCES:
+        _fail(label, f"source 는 {list(SOURCES)} 중 하나여야 한다 (받은 값 {source!r}). 출처 없는 라벨은 judge 일치율을 출처별로 갈라 볼 수 없다")
+    candidate_id = label.get("candidateId")
+    if source in CANDIDATE_SOURCES:
+        if not isinstance(candidate_id, str) or not candidate_id.strip():
+            _fail(label, f"source={source} 인데 candidateId 가 없다 — 어느 후보였는지 남겨야 한다")
+        if source == "candidate_rejected" and not reasons:
+            _fail(label, "source=candidate_rejected 인데 failureReasons 가 비었다 — 기각 사유가 없는 기각은 음성 정답이 아니다")
+    elif candidate_id is not None:
+        _fail(label, f"source=human 인데 candidateId={candidate_id!r} 가 있다. 후보에서 왔으면 candidate_* 로 적는다")
+
     return {
         "labelId": label_id,
         "bundleId": bundle_id,
@@ -334,6 +357,8 @@ def validate_label(
         "evaluation": evaluation,
         "notes": (notes or "").strip() or None,
         "minutesSpent": minutes,
+        "source": source,
+        "candidateId": candidate_id.strip() if isinstance(candidate_id, str) else None,
     }
 
 

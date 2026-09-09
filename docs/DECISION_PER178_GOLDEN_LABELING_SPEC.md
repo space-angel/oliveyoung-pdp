@@ -223,6 +223,30 @@ PER-177 이 8키·심각도·순번을 확정했고(`docs/DECISION_PER177_FAILUR
 
 ---
 
+## 8. B안 — 모델 후보 + 사람 검수 (2026-09-09 추가 결정)
+
+첫 라벨 실측이 **건당 30분**이었고, 그중 80%가 "질문 짜내기"였다(라벨러 진술). 40건 = 20시간이라 PER-179 마감을 못 지킨다.
+A안(모델 없는 선택지: aspect 칩·문장 후보·질문 틀)을 먼저 넣었지만 라벨러가 여전히 느리다고 판단해 B안으로 간다.
+
+| 골든셋이 필요한 이유 | B안에서 지키는 방법 | 강제 |
+|---|---|---|
+| judge 신뢰도 검증 | 후보를 사람이 채점한 기록이 judge 과제와 같은 모양이다 — 오히려 잘 맞는다 | — |
+| 실패 사례(음성 정답) | 기각한 후보 = `candidate_rejected` + `failureReasons` 필수 | `golden_contract` |
+| 생성기가 놓친 것(재현율) | 번들마다 `source=human` 1개 이상. `stats.bundlesWithoutHumanLabel` 이 경고 | `label_concern_golden.summarize` |
+| 생성기와의 독립성 | 후보 모델 이름을 후보 파일에 기록. **생성기(PER-189)·judge(PER-196)는 그 모델·프롬프트를 쓰지 않는다** | `import --model` 필수 |
+| 출처 추적 | 라벨 `source` 4종 + `candidateId`. PER-197·201 은 출처별로 갈라 본다 | `LABEL_FIELDS` 15 |
+
+API 를 부르지 않는다 — 인증 정보를 저장소에 두지 않기로 했고, 라벨러가 구독제 모델에 하네스를 붙여 넣는 편이 빠르다.
+하네스(`eval/concern_candidates.py export`)는 지시문(`eval/prompts/concern_candidates_v1.md`, sha256 기록) + 번들 리뷰 + 출력
+JSON 규격 한 파일이다. 모델 출력은 `import` 가 계약에 비춰 **버리지 않고 위반을 기록**한다(`contractErrors`) —
+인용이 원문에 없는 후보는 그 자체가 `unsupported_claim` 의 자연 표본이다.
+
+후보 파일 `eval/gold/v5_concern_golden_candidates.jsonl` 은 커밋한다. 사람의 결정이 `candidateId` 로 가리키는 고정물이기
+때문이다. **후보는 정답이 아니다.** 정답은 검수된 라벨이다.
+
+기각한 대안: 세션 안의 Claude 가 후보를 쓰는 것 — 모델 ID·프롬프트가 파일로 남지 않아 재현이 안 되고, 저장소 규칙
+"Claude 가 라벨을 대신 쓰지 않는다"와 충돌한다. API 스크립트 — 키가 저장소에 없고, 지금 단계에서 1인 라벨러에게는 하네스가 더 빠르다.
+
 ## 7. PER-179 로 넘기는 것
 
 - 파일럿 번들 B01~B16, 라벨 목표 40건. `stats` 의 `minutesPerLabel` 이 남은 60건의 추정 근거.

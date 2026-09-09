@@ -83,6 +83,8 @@ def label(**over) -> dict:
         "evaluation": "complete",
         "notes": None,
         "minutesSpent": 5,
+        "source": "human",
+        "candidateId": None,
     }
     base.update(over)
     return base
@@ -287,7 +289,32 @@ class TestViolations(unittest.TestCase):
 
     def test_label_fields_are_the_contract(self):
         """필드 목록이 바뀌면 문서도 바뀌어야 한다 — 실수로 늘어나지 않게 개수를 고정."""
-        self.assertEqual(len(LABEL_FIELDS), 13)
+        self.assertEqual(len(LABEL_FIELDS), 15)
+
+
+class TestSource(unittest.TestCase):
+    """출처 규칙 (B안). 후보에서 온 라벨과 사람이 만든 라벨을 나중에 갈라 볼 수 있어야 한다."""
+
+    def assert_fails(self, lab, fragment):
+        with self.assertRaises(GoldenContractError) as ctx:
+            validate_label(lab, bundle())
+        self.assertIn(fragment, str(ctx.exception))
+
+    def test_source_required(self):
+        self.assert_fails(label(source=None), "source")
+        self.assert_fails(label(source="llm"), "source")
+
+    def test_candidate_sources_need_candidate_id(self):
+        self.assert_fails(label(source="candidate_accepted", candidateId=None), "candidateId")
+        out = validate_label(label(source="candidate_accepted", candidateId="B01-c1"), bundle())
+        self.assertEqual(out["candidateId"], "B01-c1")
+
+    def test_rejected_candidate_needs_failure_reasons(self):
+        self.assert_fails(label(source="candidate_rejected", candidateId="B01-c1", failureReasons=[]), "기각 사유")
+        validate_label(label(source="candidate_rejected", candidateId="B01-c1", failureReasons=["overbroad_question"]), bundle())
+
+    def test_human_label_has_no_candidate_id(self):
+        self.assert_fails(label(source="human", candidateId="B01-c1"), "source=human")
 
 
 class TestValidateLabels(unittest.TestCase):

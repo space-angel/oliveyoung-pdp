@@ -21,6 +21,31 @@ python3 eval/label_concern_golden_web.py                         # → http://12
 2. **방향은 별점이 아니라 문장으로 정한다.** 5점 리뷰 안에 불만이, 1점 리뷰 안에 칭찬이 있다 (실측 12.9%).
 3. **인용은 원문 그대로 드래그한다.** 요약·재구성·띄어쓰기 손질은 저장이 거부된다.
 
+### 작업 방식 — 모델 후보를 사람이 검수한다 (B안, 2026-09-09 결정)
+
+제로베이스 작성은 건당 30분이 걸렸다. 그래서 **1차 후보는 다른 모델이 만들고, 사람은 채택·수정·기각**한다.
+골든셋의 존재 이유를 지키는 규칙 셋:
+
+1. **출처가 남는다.** 라벨마다 `source` (human / candidate_accepted / candidate_edited / candidate_rejected) 와 `candidateId`.
+   judge 일치율(PER-197)은 출처별로 갈라 본다.
+2. **후보 모델은 파이프라인 생성기(PER-189)·judge(PER-196)와 다른 모델**이어야 한다. 모델 이름은 `import --model` 로 후보 파일에 남는다.
+3. **번들마다 후보에 없는 claim 을 1개 이상 직접 만든다** (`source=human`). 후보만 채택하면 "모델이 생각 못 한 질문"이
+   골든셋에서도 사라진다(재현율). `stats` 가 사람 claim 0인 번들을 경고한다.
+
+```bash
+python3 eval/concern_candidates.py export --phase pilot        # 하네스 → data/intermediate/v5_concern_golden_harness/B01.md …
+#   B01.md 를 통째로 다른 모델(구독제)에 붙여 넣고, 출력 JSON 을 B01.json 으로 저장
+python3 eval/concern_candidates.py import B01 B01.json --model "GPT-5 (ChatGPT, 2026-09-09)"
+python3 eval/concern_candidates.py status                      # 번들별 후보·계약 통과·결정·사람 claim 수
+```
+
+웹 UI 를 열면 폼 위에 후보 카드가 뜬다.
+- **채택**: 폼에 올라온다. 원문과 대조해서 그대로 저장하면 `candidate_accepted`, 한 글자라도 고치면 자동으로 `candidate_edited`.
+- **기각**: 폼에 올라오고 `failureReasons` 를 하나 이상 체크해야 저장된다. 기각 라벨이 **음성 정답**이다.
+- 후보에 **계약 위반**(인용이 원문에 없음 등)이 있으면 카드에 빨갛게 뜨고 그대로는 저장되지 않는다. 인용을 실제 원문 문장으로
+  바꿔 넣거나(근거 클릭), 근거를 지우고 기각한다. 위반 사실은 후보 파일(`contractErrors`)에 이미 기록돼 있다.
+- 후보를 다 처리했으면 **직접 1개**: 후보가 놓친 주제를 칩·필터로 찾아 `human` 으로 저장.
+
 ### 목표와 순서
 
 파일럿(PER-179) = **B01~B16 에서 라벨 40건.** 번들 순서대로 간다. 번들 하나에서 보통 2~4건이 나오고,

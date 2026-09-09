@@ -71,6 +71,7 @@ class TestWebApi(unittest.TestCase):
             ],
             "failureReasons": ["duplicate_claim", "unsupported_claim"],  # 미정렬 — 서버가 정렬한다
             "evaluation": "complete", "notes": None, "minutesSpent": 4,
+            "source": "human", "candidateId": None,
         }
         base.update(over)
         return base

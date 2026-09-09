@@ -37,6 +37,7 @@ from golden_contract import (  # noqa: E402
     support_counts,
     validate_label,
 )
+from concern_candidates import load_candidates  # noqa: E402
 from label_concern_golden import _condition_line, append_label, load_labels, summarize  # noqa: E402
 from policy import SUFFICIENCY_N_MIN  # noqa: E402
 from sample_concern_golden import LABELS_PATH, load_bundles  # noqa: E402
@@ -82,6 +83,9 @@ def api_bundles() -> list[dict]:
     counts: dict[str, int] = {}
     for l in load_labels():
         counts[l["bundleId"]] = counts.get(l["bundleId"], 0) + 1
+    cand_counts: dict[str, int] = {}
+    for c in load_candidates():
+        cand_counts[c["bundleId"]] = cand_counts.get(c["bundleId"], 0) + 1
     return [
         {
             "bundleId": b["bundleId"],
@@ -92,6 +96,7 @@ def api_bundles() -> list[dict]:
             "scope": b["scope"],
             "reviews": len(b["reviews"]),
             "labels": counts.get(b["bundleId"], 0),
+            "candidates": cand_counts.get(b["bundleId"], 0),
         }
         for b in bundles.values()
     ]
@@ -128,6 +133,7 @@ def api_bundle(bundle_id: str) -> dict:
             for r in b["reviews"]
         ],
         "labels": [l for l in load_labels() if l["bundleId"] == bundle_id],
+        "candidates": bundle_candidates(bundle_id),
         "aspectHits": aspect_hits(b["reviews"], load_aspect_keywords()),
         "questionTemplates": load_question_templates(),
         "vocab": {
@@ -144,6 +150,18 @@ def api_bundle(bundle_id: str) -> dict:
             "nMin": SUFFICIENCY_N_MIN,
         },
     }
+
+
+def bundle_candidates(bundle_id: str) -> list[dict]:
+    """모델 후보 + 사람 결정 상태. 후보는 정답이 아니다 — 사람이 채택·수정·기각한 라벨이 정답이다."""
+    decisions = {l["candidateId"]: l for l in load_labels() if l.get("candidateId")}
+    out = []
+    for c in load_candidates():
+        if c["bundleId"] != bundle_id:
+            continue
+        d = decisions.get(c["candidateId"])
+        out.append({**c, "decision": (d["source"] if d else None), "labelId": (d["labelId"] if d else None)})
+    return out
 
 
 def api_add_label(payload: dict) -> tuple[int, dict]:

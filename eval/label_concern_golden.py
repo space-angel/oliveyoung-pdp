@@ -228,6 +228,8 @@ def interactive_label(bundle: dict, existing: list[dict]) -> dict:
         "evaluation": evaluation,
         "notes": notes,
         "minutesSpent": minutes,
+        "source": "human",  # CLI 입력은 사람이 직접 만든 것. 후보 검수는 웹 UI 에서 한다
+        "candidateId": None,
     }
 
 
@@ -242,6 +244,8 @@ def cmd_add(args) -> None:
         raw = json.loads(Path(args.from_file).read_text())
         raw.setdefault("bundleId", bundle["bundleId"])
         raw.setdefault("productId", bundle["productId"])
+        raw.setdefault("source", "human")
+        raw.setdefault("candidateId", None)
     else:
         try:
             raw = interactive_label(bundle, existing)
@@ -312,6 +316,12 @@ def summarize(labels: list[dict], bundles: dict[str, dict]) -> dict:
         "withFailure": sum(1 for l in normalized if l["failureReasons"]),
         "byFailureReason": dict(collections.Counter(k for l in normalized for k in l["failureReasons"])),
         "notEvaluable": sum(1 for l in normalized if l["evaluation"] == "not_evaluable"),
+        "bySource": dict(collections.Counter(l["source"] for l in normalized)),
+        # 재현율 보존 장치 (B안): 후보 결정만 있고 사람이 만든 claim 이 0인 번들
+        "bundlesWithoutHumanLabel": sorted(
+            b for b in touched
+            if not any(l["source"] == "human" for l in normalized if l["bundleId"] == b)
+        ),
         "supportAuthors": {
             "min": min(supports) if supports else None,
             "median": sorted(supports)[len(supports) // 2] if supports else None,
@@ -339,6 +349,7 @@ def cmd_stats(args) -> None:
     print(f"라벨 {s['labels']}건  (파일럿 {s['byPhase'].get('pilot', 0)}/{s['target']['pilot']} · 전체 목표 {s['target']['total']})")
     print(f"번들 {s['bundlesTouched']}/{s['bundlesTotal']} 착수 (파일럿 번들 {s['pilotBundlesTouched']}/{s['pilotBundles']})")
     print(f"방향 {s['byDirection']} · 조건부 {s['conditional']} · 실패 라벨 {s['withFailure']} {s['byFailureReason']} · 평가불가 {s['notEvaluable']}")
+    print(f"출처 {s['bySource']} · 사람 claim 없는 번들 {len(s['bundlesWithoutHumanLabel'])} {s['bundlesWithoutHumanLabel'] or ''}")
     print(f"종류 {s['byScopeKind']} · 카테고리 {s['byCategory']}")
     print(f"aspect {s['byAspect']}")
     sa = s["supportAuthors"]

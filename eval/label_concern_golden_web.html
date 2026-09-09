@@ -77,6 +77,14 @@
   .cand .txt { flex:1; }
   .cand.picked { border-left-color:var(--accent); background:#f0fdfa; }
   .chips .tpl { border-style:dashed; color:var(--fg); }
+  .cands summary { font-weight:600; color:var(--fg); }
+  .cand-card { border:1px solid var(--line); border-radius:6px; padding:6px 8px; margin:4px 0; font-size:13px; background:#fff; }
+  .cand-card.done { opacity:.6; }
+  .cand-card .q { margin-top:2px; }
+  .cerr { color:var(--bad); font-size:12px; margin-top:2px; }
+  .dec { font-size:11px; padding:0 5px; border-radius:4px; background:#e7e5e4; }
+  .dec.candidate_rejected { background:#fee2e2; color:#991b1b; } .dec.candidate_accepted, .dec.candidate_edited { background:#ccfbf1; color:#115e59; }
+  .srcline { font-size:12px; }
   .chips .tpl:hover { background:#f0fdfa; border-color:var(--accent); }
 </style>
 </head>
@@ -96,7 +104,7 @@
 </main>
 <script>
 const $ = (s, r=document) => r.querySelector(s);
-const state = { bundleId:null, data:null, evidence:[], startedAt:Date.now(), selectedReview:null, filter:'', aspect:null };
+const state = { bundleId:null, data:null, evidence:[], startedAt:Date.now(), selectedReview:null, filter:'', aspect:null, source:'human', candidateId:null, snapshot:null };
 
 async function api(path, opt) {
   const r = await fetch(path, opt);
@@ -115,7 +123,7 @@ async function loadBundles() {
   const kindCls = k => k==='product' ? '' : (k==='missing' ? 'missing' : 'cell');
   $('#bundles').innerHTML = list.map(b => `
     <button class="bundle ${b.bundleId===state.bundleId?'active':''}" data-id="${b.bundleId}">
-      <span class="badge">${b.labels ? b.labels+'건' : ''}</span>
+      <span class="badge">${b.candidates ? '후보 '+b.candidates+' · ' : ''}${b.labels ? '라벨 '+b.labels : ''}</span>
       <b>${b.bundleId}</b> <span class="kind ${kindCls(b.scope.kind)}">${b.scope.kind}${b.scope.segment ? ' '+esc(b.scope.segment) : ''}</span>
       <small>${esc(b.displayName)} · ${esc(b.category)} · ${b.reviews}리뷰 · ${b.phase}</small>
     </button>`).join('');
@@ -123,7 +131,7 @@ async function loadBundles() {
 }
 
 async function openBundle(id) {
-  state.bundleId = id; state.evidence = []; state.startedAt = Date.now(); state.selectedReview = null; state.aspect = null; state.filter = '';
+  state.bundleId = id; state.evidence = []; state.startedAt = Date.now(); state.selectedReview = null; state.aspect = null; state.filter = ''; state.source = 'human'; state.candidateId = null; state.snapshot = null;
   state.data = await api('/api/bundle/' + id);
   await loadBundles();
   renderReviews(); renderForm();
@@ -188,6 +196,39 @@ function pickAspect(aspect) {
   const sel = document.querySelector('[name=aspect]'); if (sel && state.aspect) sel.value = state.aspect;
   renderQuestionTemplates();
   applyFilter();
+}
+
+function loadCandidate(cid, mode) {
+  const c = (state.data.candidates||[]).find(x => x.candidateId === cid); if (!c) return;
+  const k = c.candidate, f = $('#form'), v = state.data.vocab;
+  f.querySelector('[name=aspect]').value = k.aspect || '';
+  f.querySelector('[name=question]').value = k.question || '';
+  f.querySelector('[name=answer]').value = k.answer || '';
+  f.querySelector('[name=direction]').value = k.direction || 'positive';
+  const cond = k.condition || {};
+  f.querySelector('[name=cond_skinType]').value = cond.skinType || '';
+  f.querySelector('[name=cond_option]').value = cond.option || '';
+  f.querySelectorAll('[name=trouble],[name=trouble_missing]').forEach(cb => cb.checked = Array.isArray(cond.skinTrouble) && cond.skinTrouble.includes(cb.value));
+  state.evidence = (k.evidence||[]).map(e => ({reviewId: e.reviewId, stance: e.stance, quote: e.quote}));
+  state.candidateId = cid;
+  state.source = mode === 'reject' ? 'candidate_rejected' : 'candidate_accepted';
+  state.snapshot = JSON.stringify(normalizedForm());
+  $('#srcline').innerHTML = mode === 'reject'
+    ? `출처: <b style="color:var(--bad)">candidate_rejected</b> · ${esc(cid)} — 기각 사유(failureReasons)를 하나 이상 체크하고 저장`
+    : `출처: <b style="color:var(--accent)">candidate_accepted</b> · ${esc(cid)} — 원문과 대조해 확인. 고치면 자동으로 candidate_edited`;
+  renderEvidence(); renderQuestionTemplates(); renderReviews();
+  if (c.contractErrors.length) showMsg('이 후보는 계약 위반이 있다 — 그대로는 저장되지 않는다. 근거·조건을 고치거나 기각하라:\n' + c.contractErrors.join('\n'), 'err');
+  else showMsg('', '');
+  if (mode === 'reject') document.querySelector('[name=fail]').scrollIntoView({block:'center'});
+}
+
+function normalizedForm() {
+  const fd = new FormData($('#form'));
+  const cond = axis => { const x = fd.get('cond_'+axis); return x === '' ? null : x; };
+  const troubles = fd.getAll('trouble'); const tm = fd.get('trouble_missing');
+  return { aspect: fd.get('aspect') || null, question: (fd.get('question')||'').trim(), answer: (fd.get('answer')||'').trim(),
+    condition: { skinType: cond('skinType'), skinTrouble: tm ? [tm].concat(troubles) : (troubles.length ? troubles : null), option: cond('option') },
+    direction: fd.get('direction'), evidence: state.evidence };
 }
 
 function renderQuestionTemplates() {
@@ -268,7 +309,22 @@ function renderForm() {
       ${Object.entries(v.skinTrouble).map(([c,l])=>`<label><input type="checkbox" name="trouble" value="${c}" ${s.axis==='skinTrouble'&&s.segment===c?'checked':''}>${c} ${l}</label>`).join('')}
     </div><small class="mute">아무것도 안 고르면 null(무관)</small>`;
   const failChips = `<div class="chips">${v.taxonomy.types.map(t=>`<label class="${t.severity}"><input type="checkbox" name="fail" value="${t.key}">${t.key} <span class="mute">${t.label}</span></label>`).join('')}</div>`;
+  const cands = d.candidates || [];
+  const candHtml = cands.length ? `<details open class="cands"><summary>모델 후보 ${cands.length}개 — 채택·수정·기각 (${[...new Set(cands.map(c=>c.model))].join(', ')})</summary>
+    ${cands.map(c => {
+      const k = c.candidate, dec = c.decision;
+      const badge = dec ? `<span class="dec ${dec}">${dec.replace('candidate_','')} · ${esc(c.labelId)}</span>` : '';
+      const errs = c.contractErrors.length ? `<div class="cerr">계약 위반 ${c.contractErrors.length}: ${esc(c.contractErrors[0].slice(0,140))}</div>` : '';
+      return `<div class="cand-card ${dec?'done':''}">
+        <div><b>${esc(c.candidateId)}</b> · ${esc(k.aspect||'—')} · ${esc(k.direction||'—')} ${badge}</div>
+        <div class="q">${esc(k.question||'')}</div><div class="a mute">${esc(k.answer||'')}</div>
+        <div class="mute" style="font-size:12px">근거 ${(k.evidence||[]).length} · 조건 ${esc(JSON.stringify(k.condition))}${c.note?' · '+esc(c.note):''}</div>
+        ${errs}
+        ${dec ? '' : `<div class="row" style="margin-top:4px"><button type="button" class="small" data-load="${esc(c.candidateId)}" data-mode="accept">채택 (폼에 올려 확인)</button><button type="button" class="small oppose" data-load="${esc(c.candidateId)}" data-mode="reject">기각 (실패유형 붙이기)</button></div>`}
+      </div>`; }).join('')}</details>` : `<div class="mute" style="font-size:12px">모델 후보 없음 — <code>python3 eval/concern_candidates.py export</code> 로 하네스를 만들어 다른 모델에 돌리고 <code>import</code> 로 들여온다. 없어도 직접 만들 수 있다.</div>`;
   $('#form').innerHTML = `
+    ${candHtml}
+    <div class="srcline mute" id="srcline">출처: <b>human</b> (직접 작성)</div>
     <div class="row">
       <label class="f">aspect (이 claim 이 다루는 주제)<select name="aspect"><option value="">(없음 → notes 에)</option>${opt(v.aspects)}</select></label>
       <label class="f">labelId (자동)<input name="labelId" value="${d.bundle.bundleId}-${n}" readonly style="background:#f5f5f4;color:var(--mute)"></label>
@@ -300,6 +356,7 @@ function renderForm() {
   renderQuestionTemplates();
   document.querySelector('[name=aspect]').onchange = renderQuestionTemplates;
   $('#save').onclick = save;
+  $('#form').querySelectorAll('[data-load]').forEach(b => b.onclick = () => loadCandidate(b.dataset.load, b.dataset.mode));
   $('#form').querySelectorAll('[data-del]').forEach(b => b.onclick = async () => {
     if (!confirm(`${b.dataset.del} 를 삭제할까요? (파일에서 지워집니다)`)) return;
     try { await api('/api/labels/' + encodeURIComponent(b.dataset.del), {method:'DELETE'}); await openBundle(state.bundleId); }
@@ -331,7 +388,10 @@ async function save() {
   else if (troubles.length) skinTrouble = troubles;
   const minutesRaw = fd.get('minutesSpent');
   const elapsed = Math.max(0.5, Math.round((Date.now()-state.startedAt)/60000*2)/2);
+  let source = state.source;
+  if (source === 'candidate_accepted' && state.snapshot && JSON.stringify(normalizedForm()) !== state.snapshot) source = 'candidate_edited';
   const payload = {
+    source, candidateId: source === 'human' ? null : state.candidateId,
     labelId: fd.get('labelId').trim(), bundleId: state.bundleId, productId: state.data.bundle.productId,
     aspect: fd.get('aspect') || null, question: fd.get('question'), answer: fd.get('answer'),
     condition: { skinType: cond('skinType'), skinTrouble, option: cond('option') },
@@ -341,7 +401,7 @@ async function save() {
   };
   try {
     const r = await api('/api/labels', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload)});
-    showMsg(`저장됨 ${r.label.labelId} — support 작성자 ${r.counts.supportAuthors} / oppose ${r.counts.opposeAuthors}, failureReasons=${r.label.failureReasons.join(', ')||'none'}`, 'ok');
+    showMsg(`저장됨 ${r.label.labelId} [${r.label.source}] — support 작성자 ${r.counts.supportAuthors} / oppose ${r.counts.opposeAuthors}, failureReasons=${r.label.failureReasons.join(', ')||'none'}`, 'ok');
     state.evidence = []; state.startedAt = Date.now();
     const keep = $('#msg').textContent;
     await openBundle(state.bundleId);
