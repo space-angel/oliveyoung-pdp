@@ -64,6 +64,9 @@
   .chips input { vertical-align:middle; margin:0 3px 0 0; }
   .chips .critical { border-color:#fca5a5; } .chips .high { border-color:#fcd34d; }
   .timer { font-variant-numeric: tabular-nums; }
+  .filter { display:flex; gap:8px; align-items:center; margin-top:6px; }
+  .filter input { flex:1; font:inherit; padding:5px 8px; border:1px solid var(--line); border-radius:6px; }
+  mark { background:#fde68a; padding:0 1px; }
 </style>
 </head>
 <body>
@@ -82,7 +85,7 @@
 </main>
 <script>
 const $ = (s, r=document) => r.querySelector(s);
-const state = { bundleId:null, data:null, evidence:[], startedAt:Date.now(), selectedReview:null };
+const state = { bundleId:null, data:null, evidence:[], startedAt:Date.now(), selectedReview:null, filter:'' };
 
 async function api(path, opt) {
   const r = await fetch(path, opt);
@@ -130,6 +133,7 @@ function renderReviews() {
       <div>${scopeLine}</div>
       <div class="mute">리뷰 ${d.reviews.length} / 모집단 ${b.population} (리센시 통과 · 작성자 1건). 층: ${strata}</div>
       <div class="rule">원문을 드래그해서 선택한 뒤 support / oppose 를 누르면 근거로 들어갑니다. 인용은 원문 그대로여야 합니다.</div>
+      <div class="filter"><input id="filter" placeholder="단어로 리뷰 걸러 보기 — 예: 구순염, 발색, 지속  (쉼표로 여러 개, 빈 칸이면 전체)" value="${esc(state.filter||'')}"><span id="filterCount" class="mute"></span></div>
     </div>
     ${d.reviews.map((r,i)=>`
       <article class="review ${usedIds.has(r.reviewId)?'used':''}" data-id="${r.reviewId}">
@@ -142,6 +146,9 @@ function renderReviews() {
         </div>
       </article>`).join('')}`;
   const sec = $('#reviews');
+  const fi = $('#filter');
+  fi.oninput = () => { state.filter = fi.value; applyFilter(); };
+  applyFilter();
   document.addEventListener('selectionchange', onSelection);
   sec.querySelectorAll('.ev-actions button').forEach(btn => btn.onclick = () => {
     const art = btn.closest('.review'); const q = art.querySelector('q.sel').textContent;
@@ -152,6 +159,23 @@ function renderReviews() {
     window.getSelection().removeAllRanges();
     renderEvidence(); art.classList.add('used'); art.classList.remove('selected');
   });
+}
+
+function applyFilter() {
+  const terms = (state.filter||'').split(',').map(t=>t.trim()).filter(Boolean);
+  let shown = 0;
+  document.querySelectorAll('.review').forEach(art => {
+    const text = art.querySelector('.content').textContent;
+    const hit = !terms.length || terms.some(t => text.includes(t));
+    art.hidden = !hit; if (hit) shown++;
+    // 하이라이트: 텍스트 노드만 다시 그린다 (선택 → 인용에 영향 없음)
+    const p = art.querySelector('.content');
+    let h = esc(text);
+    terms.forEach(t => { if (t) h = h.split(esc(t)).join(`<mark>${esc(t)}</mark>`); });
+    p.innerHTML = h;
+  });
+  const total = document.querySelectorAll('.review').length;
+  $('#filterCount').textContent = terms.length ? `${shown} / ${total} 리뷰` : `${total} 리뷰`;
 }
 
 function onSelection() {
@@ -185,8 +209,8 @@ function renderForm() {
   const failChips = `<div class="chips">${v.taxonomy.types.map(t=>`<label class="${t.severity}"><input type="checkbox" name="fail" value="${t.key}">${t.key} <span class="mute">${t.label}</span></label>`).join('')}</div>`;
   $('#form').innerHTML = `
     <div class="row">
-      <label class="f">labelId<input name="labelId" value="${d.bundle.bundleId}-${n}"></label>
-      <label class="f">aspect<select name="aspect"><option value="">(없음 → notes 에)</option>${opt(v.aspects)}</select></label>
+      <label class="f">aspect (이 claim 이 다루는 주제)<select name="aspect"><option value="">(없음 → notes 에)</option>${opt(v.aspects)}</select></label>
+      <label class="f">labelId (자동)<input name="labelId" value="${d.bundle.bundleId}-${n}" readonly style="background:#f5f5f4;color:var(--mute)"></label>
     </div>
     <label class="f">question (구매자의 질문)<textarea name="question" placeholder="…나요?"></textarea></label>
     <label class="f">answer (리뷰가 주는 답)<textarea name="answer"></textarea></label>
