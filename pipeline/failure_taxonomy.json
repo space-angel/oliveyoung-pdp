@@ -1,0 +1,20 @@
+{
+  "_meta": {
+    "description": "실패 유형 택소노미 — claim 1건의 failureReason 어휘. 코드 상수가 아니라 이 파일이 정본이다 (PRD §9, PER-181).",
+    "decision": "docs/DECISION_PER177_FAILURE_TAXONOMY.md §2",
+    "metaField": "failureTaxonomyVersion",
+    "rule": "복수 실패는 failureReasons[] 에 전부 남기고 severity 순(critical > high > medium > low), 같은 severity 는 order 순으로 정렬한다. failureReason 은 첫 원소다. null 은 '평가 완료 후 실패 없음' 이지 아홉 번째 유형이 아니다."
+  },
+  "version": "failure-taxonomy-v1",
+  "severityOrder": ["critical", "high", "medium", "low"],
+  "types": [
+    {"key": "unsupported_claim",     "label": "근거 없는 주장", "severity": "critical", "order": 1},
+    {"key": "misattribution",        "label": "잘못된 귀속",   "severity": "critical", "order": 2},
+    {"key": "polarity_mismatch",     "label": "방향 불일치",   "severity": "high",     "order": 3},
+    {"key": "insufficient_evidence", "label": "과소 근거",     "severity": "high",     "order": 4},
+    {"key": "missing_condition",     "label": "조건 누락",     "severity": "high",     "order": 5},
+    {"key": "overfit_question",      "label": "과적합 질문",   "severity": "medium",   "order": 6},
+    {"key": "overbroad_question",    "label": "과포괄 질문",   "severity": "medium",   "order": 7},
+    {"key": "duplicate_claim",       "label": "중복 주장",     "severity": "low",      "order": 8}
+  ]
+}
