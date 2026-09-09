@@ -11,12 +11,30 @@
 | 접두어 | 무엇을 채점하나 | 이슈 |
 |---|---|---|
 | `v5_tag_pilot_*` · `v5_tags_pilot_gold` | **입수 태깅** — (리뷰 × aspect) 단위 aspect/polarity | PER-175 |
-| (예정) `v5_concern_golden_*` | **주장·질문 생성** 결과. 별개 파일이다 | PER-179~181 |
+| `v5_concern_golden_*` | **주장(claim)** 단위. 규격은 PER-178, 라벨은 PER-179~180 | PER-178~180 |
 
 두 골든셋은 단위가 다르다 — 태깅은 (리뷰 × aspect) 행이고, 생성 골든셋은 주장 단위다.
 같은 디렉터리에 있어도 섞어 쓰지 않는다.
 
-## 현재 파일 (PER-175)
+## 주장 골든셋 파일 (PER-178)
+
+| 파일 | 무엇 |
+|---|---|
+| `v5_concern_golden_sample.jsonl` | 라벨링 번들 40개 (제품 또는 제품 × 조건 셀, 리뷰 ≤40건 전문). 시드 20260909 의 **고정물** |
+| `v5_concern_golden_meta.json` | 시드 · 종류/카테고리 할당 · 모집단 컷 · 입력 sha256 |
+| `v5_concern_golden_labels.jsonl` | 손으로 만든 claim 라벨. **채점 기준.** PER-179 부터 쌓인다 |
+
+규격·표본 근거·도구는 [`docs/DECISION_PER178_GOLDEN_LABELING_SPEC.md`](../../docs/DECISION_PER178_GOLDEN_LABELING_SPEC.md),
+계약은 `pipeline/golden_contract.py`. 라벨은 `(bundleId, reviewId)` 로 번들과 대조한다 — 번들 밖 리뷰는 에러다.
+
+```bash
+python3 pipeline/sample_concern_golden.py --check     # 번들이 고정물과 같은지
+python3 eval/label_concern_golden.py show B01         # 워크시트 (블라인드 — 파이프라인 결과 없음)
+python3 eval/label_concern_golden.py add B01          # 라벨 입력 → 계약 검증 → 저장
+python3 eval/label_concern_golden.py validate         # 게이트
+```
+
+## 태깅 골든셋 파일 (PER-175)
 
 | 파일 | 무엇 |
 |---|---|
