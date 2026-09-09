@@ -225,6 +225,10 @@ PER-177 이 8키·심각도·순번을 확정했고(`docs/DECISION_PER177_FAILUR
 
 ---
 
+## 10. 침묵은 근거가 아니다 (2026-09-09 추가 결정)
+
+별도 문서 [`DECISION_PER178_SILENCE_IS_NOT_EVIDENCE.md`](DECISION_PER178_SILENCE_IS_NOT_EVIDENCE.md) — U+/U−/D/S 보존, 파이프라인 단계별 유지 규칙, 외부 사례.
+
 ## 9. v2 — 입장 절대값, 방향 계산 (2026-09-09 추가 결정)
 
 라벨러가 "mixed 기준과 support/oppose 가 애매하다"고 했다. 원인은 v1 의 stance 가 **답 문장에 상대적**이어서

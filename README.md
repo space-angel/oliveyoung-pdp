@@ -291,6 +291,7 @@ v5가 넘어야 하는 선: **인용 정확도 100%** (생성 시점에 원문 �
 | [`docs/DECISION_PER175_TAGGING_CONTRACT.md`](docs/DECISION_PER175_TAGGING_CONTRACT.md) | 태깅 계약 — 태그 단위 · 힌트 · 인용 정규화 · 택소노미 동결 |
 | [`docs/DECISION_PER174_TRUST_PRIOR.md`](docs/DECISION_PER174_TRUST_PRIOR.md) | 신뢰도 사전 점수 — 6개 신호 실측 · 가중치 근거 · `usefulPoint` 기각 |
 | [`docs/DECISION_PER178_GOLDEN_LABELING_SPEC.md`](docs/DECISION_PER178_GOLDEN_LABELING_SPEC.md) | 주장 골든셋 규격 — 라벨 1건의 모양 · 층화 번들 40개 · 블라인드 절차 · v4 15문항 미이관 근거 |
+| [`docs/DECISION_PER178_SILENCE_IS_NOT_EVIDENCE.md`](docs/DECISION_PER178_SILENCE_IS_NOT_EVIDENCE.md) | 침묵은 근거가 아니다 — U+/U−/D/S 보존, 단계별 유지 규칙, 아마존·NN/G·자기선택 편향 사례 |
 | [`eval/gold/README.md`](eval/gold/README.md) | 평가 고정물(표본·정답셋) 규칙과 재현 절차 |
 | [`docs/V5_INPUTS_AND_LEGACY_AUDIT.md`](docs/V5_INPUTS_AND_LEGACY_AUDIT.md) | 입력 인벤토리 · 25K 프로파일 · 레거시 감사 |
 | [`docs/SCRAPLING_MIGRATION_POC.md`](docs/SCRAPLING_MIGRATION_POC.md) | 크롤러 설계 근거 (엔드포인트·size 상한·레이트리밋 실측) |
