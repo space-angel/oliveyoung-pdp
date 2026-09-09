@@ -67,6 +67,15 @@
   .filter { display:flex; gap:8px; align-items:center; margin-top:6px; }
   .filter input { flex:1; font:inherit; padding:5px 8px; border:1px solid var(--line); border-radius:6px; }
   mark { background:#fde68a; padding:0 1px; }
+  .aspects { display:flex; flex-wrap:wrap; gap:4px; margin-top:6px; align-items:center; }
+  .chip { font:inherit; font-size:12px; padding:2px 8px; border:1px solid var(--line); border-radius:12px; background:#fff; cursor:pointer; }
+  .chip b { color:var(--accent); }
+  .chip.on { background:#f0fdfa; border-color:var(--accent); }
+  .chip.zero { opacity:.45; }
+  .sentences { margin-top:6px; }
+  .cand { display:flex; gap:6px; align-items:center; padding:3px 6px; margin:2px 0; border-left:3px solid #fde68a; background:#fffbeb; font-size:13px; }
+  .cand .txt { flex:1; }
+  .cand.picked { border-left-color:var(--accent); background:#f0fdfa; }
 </style>
 </head>
 <body>
@@ -85,7 +94,7 @@
 </main>
 <script>
 const $ = (s, r=document) => r.querySelector(s);
-const state = { bundleId:null, data:null, evidence:[], startedAt:Date.now(), selectedReview:null, filter:'' };
+const state = { bundleId:null, data:null, evidence:[], startedAt:Date.now(), selectedReview:null, filter:'', aspect:null };
 
 async function api(path, opt) {
   const r = await fetch(path, opt);
@@ -112,7 +121,7 @@ async function loadBundles() {
 }
 
 async function openBundle(id) {
-  state.bundleId = id; state.evidence = []; state.startedAt = Date.now(); state.selectedReview = null;
+  state.bundleId = id; state.evidence = []; state.startedAt = Date.now(); state.selectedReview = null; state.aspect = null; state.filter = '';
   state.data = await api('/api/bundle/' + id);
   await loadBundles();
   renderReviews(); renderForm();
@@ -134,11 +143,16 @@ function renderReviews() {
       <div class="mute">리뷰 ${d.reviews.length} / 모집단 ${b.population} (리센시 통과 · 작성자 1건). 층: ${strata}</div>
       <div class="rule">원문을 드래그해서 선택한 뒤 support / oppose 를 누르면 근거로 들어갑니다. 인용은 원문 그대로여야 합니다.</div>
       <div class="filter"><input id="filter" placeholder="단어로 리뷰 걸러 보기 — 예: 구순염, 발색, 지속  (쉼표로 여러 개, 빈 칸이면 전체)" value="${esc(state.filter||'')}"><span id="filterCount" class="mute"></span></div>
+      <div class="aspects" id="aspects">${Object.entries(d.aspectHits).sort((a,b)=>b[1].reviews-a[1].reviews).map(([a,h])=>`
+        <button type="button" class="chip ${state.aspect===a?'on':''} ${h.reviews===0?'zero':''}" data-aspect="${esc(a)}" title="${esc(h.keywords.join(', '))}">${esc(a)} <b>${h.reviews}</b></button>`).join('')}
+        <span class="mute" style="font-size:12px">← aspect 를 누르면 그 단어가 든 리뷰만 남고, 문장 후보가 아래에 뜹니다. 숫자는 단어가 든 리뷰 수(태그 아님)</span>
+      </div>
     </div>
     ${d.reviews.map((r,i)=>`
       <article class="review ${usedIds.has(r.reviewId)?'used':''}" data-id="${r.reviewId}">
         <div class="meta"><span>#${String(i+1).padStart(2,'0')}</span><code>${r.reviewId}</code><span>${stars(r.rating)}</span><span>${r.month}</span><span>${esc(r.conditionLine)}</span><span>작성자 <code>${esc(r.author)}</code></span></div>
         <p class="content">${esc(r.content)}</p>
+        <div class="sentences" data-id="${r.reviewId}"></div>
         <div class="ev-actions">
           <button type="button" class="small support" data-stance="support">support 로 추가</button>
           <button type="button" class="small oppose" data-stance="oppose">oppose 로 추가</button>
@@ -147,7 +161,8 @@ function renderReviews() {
       </article>`).join('')}`;
   const sec = $('#reviews');
   const fi = $('#filter');
-  fi.oninput = () => { state.filter = fi.value; applyFilter(); };
+  fi.oninput = () => { state.filter = fi.value; state.aspect = null; applyFilter(); };
+  $('#aspects').querySelectorAll('.chip').forEach(c => c.onclick = () => pickAspect(c.dataset.aspect));
   applyFilter();
   document.addEventListener('selectionchange', onSelection);
   sec.querySelectorAll('.ev-actions button').forEach(btn => btn.onclick = () => {
@@ -159,6 +174,25 @@ function renderReviews() {
     window.getSelection().removeAllRanges();
     renderEvidence(); art.classList.add('used'); art.classList.remove('selected');
   });
+}
+
+function pickAspect(aspect) {
+  const hit = state.data.aspectHits[aspect];
+  state.aspect = state.aspect === aspect ? null : aspect;
+  state.filter = state.aspect ? hit.keywords.join(', ') : '';
+  const fi = $('#filter'); if (fi) fi.value = state.filter;
+  document.querySelectorAll('#aspects .chip').forEach(c => c.classList.toggle('on', c.dataset.aspect === state.aspect));
+  // 폼: aspect 선택 + 질문 틀 (비어 있을 때만 — 쓰던 문장을 덮지 않는다)
+  const sel = document.querySelector('[name=aspect]'); if (sel && state.aspect) sel.value = state.aspect;
+  const q = document.querySelector('[name=question]');
+  if (q && state.aspect && !q.value.trim()) q.value = `${state.aspect.split('/')[0]}은/는 어떤가요? `;
+  applyFilter();
+}
+
+function splitSentences(text) {
+  // 문장 후보: 문장부호·개행으로 자르고, 길면 쉼표에서 한 번 더. 원문 부분문자열만 만든다 (trim 만).
+  const parts = text.split(/(?<=[.!?…~])\s+|\n+/).flatMap(p => p.length > 90 ? p.split(/(?<=,)\s+/) : [p]);
+  return parts.map(p => p.trim()).filter(p => p.length >= 4);
 }
 
 function applyFilter() {
@@ -173,6 +207,24 @@ function applyFilter() {
     let h = esc(text);
     terms.forEach(t => { if (t) h = h.split(esc(t)).join(`<mark>${esc(t)}</mark>`); });
     p.innerHTML = h;
+    // 문장 후보 — 검색어가 든 문장만, 클릭으로 근거 추가
+    const box = art.querySelector('.sentences');
+    if (!hit || !terms.length) { box.innerHTML = ''; return; }
+    const rid = Number(art.dataset.id);
+    const used = state.evidence.find(e => e.reviewId === rid);
+    const cands = splitSentences(text).filter(sn => terms.some(t => sn.includes(t)));
+    box.innerHTML = cands.map(sn => `
+      <div class="cand ${used && used.quote === sn ? 'picked' : ''}">
+        <span class="txt">${esc(sn)}</span>
+        <button type="button" class="small support" data-stance="support">S</button>
+        <button type="button" class="small oppose" data-stance="oppose">O</button>
+      </div>`).join('');
+    box.querySelectorAll('.cand button').forEach(btn => btn.onclick = () => {
+      const quote = btn.closest('.cand').querySelector('.txt').textContent;
+      state.evidence = state.evidence.filter(e => e.reviewId !== rid);
+      state.evidence.push({reviewId: rid, stance: btn.dataset.stance, quote});
+      renderEvidence(); art.classList.add('used'); applyFilter();
+    });
   });
   const total = document.querySelectorAll('.review').length;
   $('#filterCount').textContent = terms.length ? `${shown} / ${total} 리뷰` : `${total} 리뷰`;

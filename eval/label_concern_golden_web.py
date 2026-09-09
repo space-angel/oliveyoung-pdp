@@ -44,6 +44,28 @@ from tag_contract import ASPECTS, fold_invisible  # noqa: E402
 
 DEFAULT_PORT = 8178
 HTML_PATH = Path(__file__).with_name("label_concern_golden_web.html")
+ASPECT_KEYWORDS_PATH = Path(__file__).with_name("aspect_keywords.json")
+
+
+def load_aspect_keywords(path: Path = ASPECT_KEYWORDS_PATH) -> dict[str, list[str]]:
+    """읽기 보조 사전 (A안). 키는 ASPECTS 14종과 같아야 한다 — 아니면 라벨러가 없는 칸을 고른다."""
+    data = json.loads(path.read_text())
+    words = {k: v for k, v in data.items() if not k.startswith("_")}
+    if set(words) != set(ASPECTS):
+        raise ValueError(
+            f"aspect_keywords.json 의 키가 ASPECTS 와 다르다: 빠짐 {sorted(set(ASPECTS) - set(words))}, "
+            f"초과 {sorted(set(words) - set(ASPECTS))}"
+        )
+    return words
+
+
+def aspect_hits(reviews: list[dict], keywords: dict[str, list[str]]) -> dict[str, dict]:
+    """aspect → 언급 리뷰 수·리뷰 ID. 문자열 포함 검색이지 태깅이 아니다."""
+    out = {}
+    for aspect, words in keywords.items():
+        ids = [r["reviewId"] for r in reviews if any(w in fold_invisible(r["raw"]["content"]) for w in words)]
+        out[aspect] = {"reviews": len(ids), "reviewIds": ids, "keywords": words}
+    return out
 
 
 # --- API 로직 (핸들러와 분리 — 테스트가 이걸 부른다) ---
@@ -100,6 +122,7 @@ def api_bundle(bundle_id: str) -> dict:
             for r in b["reviews"]
         ],
         "labels": [l for l in load_labels() if l["bundleId"] == bundle_id],
+        "aspectHits": aspect_hits(b["reviews"], load_aspect_keywords()),
         "vocab": {
             "aspects": list(ASPECTS),
             "directions": list(DIRECTIONS),

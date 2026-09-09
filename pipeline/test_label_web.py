@@ -114,6 +114,16 @@ class TestWebApi(unittest.TestCase):
         self.assertEqual([l["labelId"] for l in cli.load_labels()], ["B01-2"])
         self.assertEqual(web.api_delete_label("B01-1")[0], 404)
 
+    def test_aspect_keywords_cover_exactly_the_14_aspects(self):
+        from tag_contract import ASPECTS
+        self.assertEqual(set(web.load_aspect_keywords()), set(ASPECTS))
+
+    def test_aspect_hits_are_string_matches_not_tags(self):
+        hits = web.api_bundle("B01")["aspectHits"]
+        self.assertEqual(hits["보습감"]["reviews"], 3)   # 속보습·촉촉(2)·촉촉함
+        self.assertEqual(hits["유분/번들거림"]["reviewIds"], [4])
+        self.assertEqual(hits["분사력"]["reviews"], 0)
+
     def test_stats_after_add(self):
         web.api_add_label(self.payload())
         status, body = web.api_stats()
