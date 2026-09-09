@@ -66,8 +66,8 @@ class TestWebApi(unittest.TestCase):
             "condition": {"skinType": None, "skinTrouble": None, "option": None},
             "direction": "mixed",
             "evidence": [
-                {"reviewId": 2, "stance": "support", "quote": "촉촉하고 순해요"},
-                {"reviewId": 1, "stance": "oppose", "quote": "속보습은 못 느꼈어요"},
+                {"reviewId": 2, "stance": "positive", "quote": "촉촉하고 순해요"},
+                {"reviewId": 1, "stance": "negative", "quote": "속보습은 못 느꼈어요"},
             ],
             "failureReasons": ["duplicate_claim", "unsupported_claim"],  # 미정렬 — 서버가 정렬한다
             "evaluation": "complete", "notes": None, "minutesSpent": 4,
@@ -87,12 +87,12 @@ class TestWebApi(unittest.TestCase):
         status, body = web.api_add_label(self.payload())
         self.assertEqual(status, 200, body)
         self.assertEqual(body["label"]["failureReasons"], ["unsupported_claim", "duplicate_claim"])
-        self.assertEqual(body["counts"]["supportAuthors"], 1)
+        self.assertEqual(body["counts"]["positiveAuthors"], 1)
         self.assertEqual(len(cli.load_labels()), 1)
         self.assertEqual(web.api_bundles()[0]["labels"], 1)
 
     def test_invalid_quote_is_400_and_not_written(self):
-        status, body = web.api_add_label(self.payload(evidence=[{"reviewId": 2, "stance": "support", "quote": "없는 문장"}]))
+        status, body = web.api_add_label(self.payload(evidence=[{"reviewId": 2, "stance": "positive", "quote": "없는 문장"}]))
         self.assertEqual(status, 400)
         self.assertIn("원문 부분문자열", body["error"])
         self.assertFalse(self.labels.exists())

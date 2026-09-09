@@ -76,8 +76,8 @@ def label(**over) -> dict:
         "condition": {"skinType": "A02", "skinTrouble": None, "option": None},
         "direction": "mixed",
         "evidence": [
-            {"reviewId": 2, "stance": "support", "quote": "촉촉하고 순해요"},
-            {"reviewId": 1, "stance": "oppose", "quote": "속보습은 못 느꼈어요.\n금새"},
+            {"reviewId": 2, "stance": "positive", "quote": "촉촉하고 순해요"},
+            {"reviewId": 1, "stance": "negative", "quote": "속보습은 못 느꼈어요.\n금새"},
         ],
         "failureReasons": [],
         "evaluation": "complete",
@@ -132,7 +132,7 @@ class TestValidLabel(unittest.TestCase):
         lab = label(
             condition={"skinType": MISSING_SEGMENT, "skinTrouble": None, "option": None},
             direction="positive",
-            evidence=[{"reviewId": 3, "stance": "support", "quote": "촉촉함이 오래가요"}],
+            evidence=[{"reviewId": 3, "stance": "positive", "quote": "촉촉함이 오래가요"}],
         )
         out = validate_label(lab, bundle())
         self.assertEqual(out["condition"]["skinType"], MISSING_SEGMENT)
@@ -142,15 +142,24 @@ class TestValidLabel(unittest.TestCase):
             condition={"skinType": None, "skinTrouble": None, "option": None},
             direction="mixed",
             evidence=[
-                {"reviewId": 2, "stance": "support", "quote": "촉촉하고"},
-                {"reviewId": 1, "stance": "oppose", "quote": "속보습은"},
-                {"reviewId": 4, "stance": "oppose", "quote": "번들거려서"},  # 작성자 a 두 번째
+                {"reviewId": 2, "stance": "positive", "quote": "촉촉하고"},
+                {"reviewId": 1, "stance": "negative", "quote": "속보습은"},
+                {"reviewId": 4, "stance": "negative", "quote": "번들거려서"},  # 작성자 a 두 번째
             ],
         )
         counts = support_counts(validate_label(lab, bundle()), bundle())
         self.assertEqual(counts["evidenceReviews"], 3)
-        self.assertEqual(counts["opposeAuthors"], 1)  # a 의 리뷰 2건 = 1표
-        self.assertEqual(counts["supportAuthors"], 1)
+        self.assertEqual(counts["negativeAuthors"], 1)  # a 의 리뷰 2건 = 1표
+        self.assertEqual(counts["positiveAuthors"], 1)
+
+    def test_direction_is_derived_from_evidence(self):
+        pos_only = label(direction="positive", evidence=[{"reviewId": 2, "stance": "positive", "quote": "촉촉하고"}])
+        self.assertEqual(validate_label(pos_only, bundle())["direction"], "positive")
+        one_dissent = label(direction="mixed", evidence=[
+            {"reviewId": 2, "stance": "positive", "quote": "촉촉하고"},
+            {"reviewId": 1, "stance": "negative", "quote": "속보습은"},
+        ])
+        self.assertEqual(validate_label(one_dissent, bundle())["direction"], "mixed")  # 반대 1명도 mixed
 
 
 class TestViolations(unittest.TestCase):
@@ -174,16 +183,16 @@ class TestViolations(unittest.TestCase):
         self.assert_fails(label(aspect="피부결"), "14종 택소노미 밖")
 
     def test_quote_must_be_verbatim(self):
-        lab = label(evidence=[{"reviewId": 2, "stance": "support", "quote": "촉촉하고 순하다"}])
+        lab = label(direction="positive", evidence=[{"reviewId": 2, "stance": "positive", "quote": "촉촉하고 순하다"}])
         self.assert_fails(lab, "원문 부분문자열이 아니다")
 
     def test_squeezed_whitespace_is_not_verbatim(self):
         """띄어쓰기를 지운 편집은 인용이 아니다 — squeeze 금지 (CLAUDE.md)."""
-        lab = label(evidence=[{"reviewId": 2, "stance": "support", "quote": "촉촉하고순해요"}])
+        lab = label(direction="positive", evidence=[{"reviewId": 2, "stance": "positive", "quote": "촉촉하고순해요"}])
         self.assert_fails(lab, "원문 부분문자열이 아니다")
 
     def test_evidence_outside_bundle(self):
-        lab = label(evidence=[{"reviewId": 99, "stance": "support", "quote": "x"}])
+        lab = label(evidence=[{"reviewId": 99, "stance": "positive", "quote": "x"}])
         self.assert_fails(lab, "이 번들에 없다")
 
     def test_empty_evidence(self):
@@ -191,22 +200,21 @@ class TestViolations(unittest.TestCase):
 
     def test_duplicate_review_in_evidence(self):
         lab = label(evidence=[
-            {"reviewId": 2, "stance": "support", "quote": "촉촉"},
-            {"reviewId": 2, "stance": "oppose", "quote": "순해요"},
+            {"reviewId": 2, "stance": "positive", "quote": "촉촉"},
+            {"reviewId": 2, "stance": "negative", "quote": "순해요"},
         ])
         self.assert_fails(lab, "두 번")
 
     def test_bad_stance(self):
-        lab = label(evidence=[{"reviewId": 2, "stance": "positive", "quote": "촉촉"}])
+        lab = label(evidence=[{"reviewId": 2, "stance": "support", "quote": "촉촉"}])
         self.assert_fails(lab, "stance")
 
-    def test_mixed_requires_oppose(self):
-        lab = label(evidence=[{"reviewId": 2, "stance": "support", "quote": "촉촉"}])
-        self.assert_fails(lab, "oppose 근거가 없다")
-
-    def test_no_support_evidence(self):
-        lab = label(direction="negative", evidence=[{"reviewId": 1, "stance": "oppose", "quote": "속보습은"}])
-        self.assert_fails(lab, "support 근거가 하나도 없다")
+    def test_direction_mismatch_is_rejected(self):
+        """사람이 고른 direction 이 근거와 다르면 에러 — direction 은 계산값이다."""
+        lab = label(direction="positive")  # 근거는 긍정+부정
+        self.assert_fails(lab, "근거에서 계산한 방향은 'mixed'")
+        lab = label(direction="mixed", evidence=[{"reviewId": 2, "stance": "positive", "quote": "촉촉하고"}])
+        self.assert_fails(lab, "근거에서 계산한 방향은 'positive'")
 
     def test_direction_enum(self):
         self.assert_fails(label(direction="neutral"), "direction")
@@ -235,16 +243,16 @@ class TestViolations(unittest.TestCase):
         lab = label(
             direction="positive",
             evidence=[
-                {"reviewId": 2, "stance": "support", "quote": "촉촉하고"},
-                {"reviewId": 3, "stance": "support", "quote": "촉촉함이 오래가요"},
+                {"reviewId": 2, "stance": "positive", "quote": "촉촉하고"},
+                {"reviewId": 3, "stance": "positive", "quote": "촉촉함이 오래가요"},
             ],
         )
         self.assert_fails(lab, "미기재 리뷰를 특정 조건의 지지로 세지 않는다")
 
     def test_conditional_claim_rejects_other_segment_evidence(self):
         lab = label(direction="mixed", evidence=[
-            {"reviewId": 2, "stance": "support", "quote": "촉촉하고"},
-            {"reviewId": 4, "stance": "oppose", "quote": "번들거려서"},  # A01
+            {"reviewId": 2, "stance": "positive", "quote": "촉촉하고"},
+            {"reviewId": 4, "stance": "negative", "quote": "번들거려서"},  # A01
         ])
         self.assert_fails(lab, "주장의 조건은 ['A02']")
 
@@ -252,7 +260,7 @@ class TestViolations(unittest.TestCase):
         lab = label(
             condition={"skinType": MISSING_SEGMENT, "skinTrouble": None, "option": None},
             direction="positive",
-            evidence=[{"reviewId": 2, "stance": "support", "quote": "촉촉하고"}],  # A02 기재
+            evidence=[{"reviewId": 2, "stance": "positive", "quote": "촉촉하고"}],  # A02 기재
         )
         self.assert_fails(lab, "주장의 조건은 ['미기재']")
 

@@ -15,8 +15,9 @@
     question         구매자가 물을 법한 질문
     answer           리뷰가 주는 답 (질문만 있으면 사용자가 답을 직접 찾아야 한다, PRD §6)
     condition        {skinType, skinTrouble, option} — 축마다 null(무관) / "미기재" / 코드
-    direction        positive | negative | mixed   (별점이 아니라 근거의 방향)
-    evidence[]       {reviewId, quote, stance}. quote 는 원문 부분문자열, stance 는 support|oppose
+    direction        positive | negative | mixed — **사람이 고르지 않고 근거에서 계산한다** (derive_direction)
+    evidence[]       {reviewId, quote, stance}. quote 는 원문 부분문자열, stance 는 그 문장이 주제에 대해
+                     positive | negative 인지 (답 문장과 무관한 절대값)
     failureReasons[] 이 claim 이 실패 사례라면 PER-177 8유형 키. 정상 claim 은 []
     evaluation       complete | not_evaluable
     notes            판단 메모. not_evaluable 이면 필수
@@ -37,6 +38,10 @@
 - **failureReasons 는 정렬된 상태로 저장한다** — 첫 원소가 대표 `failureReason` 이므로
   순서가 곧 판정이다. 어휘는 코드 상수가 아니라 `pipeline/failure_taxonomy.json` 이다.
 - **방향을 별점에서 가져오지 않는다.** 별점은 라벨 필드에 없다. 화면에는 보이지만 근거는 원문이다.
+- **입장(stance)은 답 문장에 상대적이지 않다.** v1 의 support/oppose 는 답을 어떻게 쓰느냐에 따라 뒤집혀 라벨러가
+  헷갈렸다(2026-09-09 B01 실측). v2 는 문장 자체의 긍/부정이고, direction 은 고유 작성자 기준으로
+  긍정만 → positive, 부정만 → negative, 둘 다 → mixed 로 **계산**한다. 반대 1명도 mixed 다 — 골든셋은 방향별
+  수를 보존하고, 소수 반대를 무시할지는 PER-186 게이트 정책이 정한다.
 
 위반은 전부 `GoldenContractError` 다 — 조용히 고치거나 건너뛰지 않는다. 라벨 도구는 위반 라벨을
 파일에 쓰지 않고, 게이트는 위반이 하나라도 있으면 종료 코드 1 이다.
@@ -56,11 +61,11 @@ from contracts import CONDITION_AXES, MISSING_SEGMENT  # noqa: E402
 from tag_contract import ASPECTS, is_verbatim  # noqa: E402
 
 ROOT = Path(__file__).parents[1]
-GOLDEN_SCHEMA_VERSION = "concern-golden-v1"
+GOLDEN_SCHEMA_VERSION = "concern-golden-v2"  # v2: stance 절대값 + direction 계산
 TAXONOMY_PATH = Path(__file__).parent / "failure_taxonomy.json"
 
 DIRECTIONS = ("positive", "negative", "mixed")
-STANCES = ("support", "oppose")
+STANCES = ("positive", "negative")
 EVALUATIONS = ("complete", "not_evaluable")
 CODED_AXES = ("skinType", "skinTrouble")
 
@@ -301,11 +306,12 @@ def validate_label(
     evidence = _validate_evidence(label, bundle_reviews)
     condition = _validate_condition(label, bundle, bundle_reviews)
 
-    stances = collections.Counter(ev["stance"] for ev in evidence)
-    if stances["support"] == 0:
-        _fail(label, "support 근거가 하나도 없다 — 답을 지지하는 리뷰가 없으면 claim 이 아니다")
-    if direction == "mixed" and stances["oppose"] == 0:
-        _fail(label, "direction=mixed 인데 oppose 근거가 없다. 한쪽만 있으면 positive/negative 다")
+    derived = derive_direction(evidence, bundle)
+    if direction != derived:
+        _fail(label, (
+            f"direction={direction!r} 인데 근거에서 계산한 방향은 {derived!r} 다. direction 은 사람이 고르지 않는다 — "
+            "근거의 고유 작성자 기준으로 긍정만 → positive, 부정만 → negative, 둘 다 → mixed"
+        ))
 
     reasons = label.get("failureReasons")
     if not isinstance(reasons, list):
@@ -362,17 +368,31 @@ def validate_label(
     }
 
 
+def _authors_by_stance(evidence: list[dict], bundle: dict) -> dict[str, set[str]]:
+    authors = {r["reviewId"]: r["derived"]["authorKey"] for r in bundle["reviews"]}
+    out: dict[str, set[str]] = {"positive": set(), "negative": set()}
+    for ev in evidence:
+        if ev.get("stance") in out and ev.get("reviewId") in authors:
+            out[ev["stance"]].add(authors[ev["reviewId"]])
+    return out
+
+
+def derive_direction(evidence: list[dict], bundle: dict) -> str:
+    """근거의 고유 작성자 기준 방향. 사람이 고르는 값이 아니다."""
+    by = _authors_by_stance(evidence, bundle)
+    if by["positive"] and by["negative"]:
+        return "mixed"
+    return "positive" if by["positive"] else "negative"
+
+
 def support_counts(label: dict, bundle: dict) -> dict:
     """근거 카운트 — 리뷰 수가 아니라 **고유 작성자 수** (PER-170)."""
-    authors = {r["reviewId"]: r["derived"]["authorKey"] for r in bundle["reviews"]}
-    by_stance: dict[str, set[str]] = {"support": set(), "oppose": set()}
-    for ev in label["evidence"]:
-        by_stance[ev["stance"]].add(authors[ev["reviewId"]])
+    by = _authors_by_stance(label["evidence"], bundle)
     return {
-        "supportAuthors": len(by_stance["support"]),
-        "opposeAuthors": len(by_stance["oppose"]),
+        "positiveAuthors": len(by["positive"]),
+        "negativeAuthors": len(by["negative"]),
         "evidenceReviews": len(label["evidence"]),
-        "bundleAuthors": len(set(authors.values())),
+        "bundleAuthors": len({r["derived"]["authorKey"] for r in bundle["reviews"]}),
     }
 
 

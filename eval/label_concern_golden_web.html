@@ -92,8 +92,8 @@
   button.primary.reject { background:#fff; color:var(--red-ink); border:1px solid var(--g200); }
   button.primary.reject:hover { background:var(--red-bg); }
   button.small { font-size:12px; font-weight:700; padding:4px 10px; border:1px solid var(--g200); border-radius:8px; background:#fff; cursor:pointer; color:var(--g700); }
-  button.small.support { color:var(--blue-ink); border-color:var(--blue-bg); background:var(--blue-bg); }
-  button.small.oppose { color:var(--red-ink); border-color:var(--red-bg); background:var(--red-bg); }
+  button.small.positive { color:var(--blue-ink); border-color:var(--blue-bg); background:var(--blue-bg); }
+  button.small.negative { color:var(--red-ink); border-color:var(--red-bg); background:var(--red-bg); }
 
   /* 오른쪽 */
   .right { background:transparent; display:flex; flex-direction:column; gap:12px; }
@@ -119,7 +119,7 @@
   .quotes { display:flex; flex-direction:column; gap:8px; margin-top:8px; }
   .quote { display:grid; grid-template-columns: 4px 1fr; gap:10px; padding:10px 12px; border-radius:var(--r-s); cursor:pointer; background:var(--g50); font-size:14px; }
   .quote:hover { background:var(--g100); }
-  .quote .bar { border-radius:2px; background:var(--g300); } .quote.support .bar { background:var(--blue); } .quote.oppose .bar { background:var(--red); }
+  .quote .bar { border-radius:2px; background:var(--g300); } .quote.positive .bar { background:var(--blue); } .quote.negative .bar { background:var(--red); }
   .quote .qm { color:var(--g500); font-size:12px; display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
   .quote .qm .stance { font-weight:700; }
   .quote .qt { margin-top:4px; color:var(--g800); line-height:1.55; }
@@ -139,7 +139,7 @@
   .evidence .item { display:flex; gap:8px; align-items:flex-start; padding:7px 0; border-bottom:1px solid var(--g200); }
   .evidence .item:last-child { border:0; }
   .stance { font-size:11px; font-weight:700; padding:2px 7px; border-radius:999px; white-space:nowrap; }
-  .stance.support { background:var(--blue-bg); color:var(--blue-ink); } .stance.oppose { background:var(--red-bg); color:var(--red-ink); }
+  .stance.positive { background:var(--blue-bg); color:var(--blue-ink); } .stance.negative { background:var(--red-bg); color:var(--red-ink); }
   .evidence q { flex:1; quotes:none; cursor:pointer; color:var(--g800); }
   .msg { padding:12px 14px; border-radius:var(--r-s); font-size:14px; white-space:pre-wrap; font-weight:600; }
   .msg.err { background:var(--red-bg); color:var(--red-ink); } .msg.ok { background:var(--green-bg); color:var(--green-ink); }
@@ -229,7 +229,7 @@ function renderReviews() {
       <div class="aspects" id="aspects">${Object.entries(d.aspectHits).sort((a,b)=>b[1].reviews-a[1].reviews).map(([a,h])=>`
         <button type="button" class="chip ${state.aspect===a?'on':''} ${h.reviews===0?'zero':''}" data-aspect="${esc(a)}" title="${esc(h.keywords.join(', '))}">${esc(a)}<b>${h.reviews}</b></button>`).join('')}
       </div>
-      <div class="hint">근거 추가: 원문을 드래그해서 support/oppose, 또는 aspect 칩을 눌러 나온 문장 옆 S/O. 인용은 원문 그대로여야 합니다.</div>
+      <div class="hint">근거 추가: 원문을 드래그해서 긍정/부정, 또는 aspect 칩을 눌러 나온 문장 옆 긍정/부정. 입장은 그 문장이 주제에 대해 좋다/나쁘다이고, 방향은 자동으로 계산됩니다.</div>
     </div>
     ${d.reviews.map((r,i)=>`
       <article class="review" data-id="${r.reviewId}" id="rv-${r.reviewId}">
@@ -237,8 +237,8 @@ function renderReviews() {
         <p class="content">${esc(r.content)}</p>
         <div class="sentences"></div>
         <div class="ev-actions">
-          <button type="button" class="small support" data-stance="support">support 로 추가</button>
-          <button type="button" class="small oppose" data-stance="oppose">oppose 로 추가</button>
+          <button type="button" class="small positive" data-stance="positive">긍정 근거로 추가</button>
+          <button type="button" class="small negative" data-stance="negative">부정 근거로 추가</button>
           <span class="mute" style="font-size:13px">선택: <q class="sel" style="quotes:none;color:var(--g800)"></q></span>
         </div>
       </article>`).join('')}`;
@@ -279,7 +279,7 @@ function markQuotes(html, text, quotes) {
   // 인용 형광펜 — 원문(escaped) 안에서 인용(escaped)을 찾아 감싼다. 입장별 색.
   for (const e of quotes) {
     const q = esc(e.quote); if (!q || !html.includes(q)) continue;
-    html = html.split(q).join(`<mark class="${e.stance==='oppose'?'qo':'qs'}">${q}</mark>`);
+    html = html.split(q).join(`<mark class="${e.stance==='negative'?'qo':'qs'}">${q}</mark>`);
   }
   return html;
 }
@@ -307,8 +307,8 @@ function applyFilter() {
     const cands = splitSentences(text).filter(sn => terms.some(t => sn.includes(t)));
     box.innerHTML = cands.map(sn => `
       <div class="cand ${used && used.quote === sn ? 'picked' : ''}"><span class="txt">${esc(sn)}</span>
-        <button type="button" class="small support" data-stance="support">S</button>
-        <button type="button" class="small oppose" data-stance="oppose">O</button></div>`).join('');
+        <button type="button" class="small positive" data-stance="positive">긍정</button>
+        <button type="button" class="small negative" data-stance="negative">부정</button></div>`).join('');
     box.querySelectorAll('.cand button').forEach(btn => btn.onclick = () => addEvidence(rid, btn.dataset.stance, btn.closest('.cand').querySelector('.txt').textContent));
   });
   $('#filterCount').textContent = `${shown} / ${total} 리뷰`;
@@ -430,13 +430,13 @@ function renderMissed(c) {
   }).filter(x => x.score > 0 && x.sents.length).sort((a,b)=>b.score-a.score).slice(0, 8);
   if (!scored.length) { box.innerHTML = `<div class="hint">같은 얘기를 하는 다른 리뷰가 문자열 매칭으로는 보이지 않습니다 — aspect 칩·단어 필터로 확인하세요</div>`; return; }
   box.innerHTML = `
-    <h2 class="s" style="margin-top:14px">놓쳤을 수 있는 근거 ${scored.length}개 리뷰 <span style="font-weight:500" title="${esc(terms.join(', '))}">· 같은 단어를 말하는 리뷰. 문장 옆 S/O 로 추가</span></h2>
+    <h2 class="s" style="margin-top:14px">놓쳤을 수 있는 근거 ${scored.length}개 리뷰 <span style="font-weight:500" title="${esc(terms.join(', '))}">· 같은 단어를 말하는 리뷰. 문장 옆 긍정/부정으로 추가</span></h2>
     <div class="quotes">${scored.map(x => `
       <div class="quote missed" data-rid="${x.r.reviewId}"><span class="bar" style="background:#fde68a"></span>
         <div><div class="qm"><code>${x.r.reviewId}</code><span>${stars(x.r.rating)}</span><span>${esc(x.r.conditionLine)}</span><span>매칭 ${x.hits.slice(0,4).map(esc).join('·')}</span></div>
           ${x.sents.map(sn => `<div class="cand"><span class="txt">${esc(sn)}</span>
-            <button type="button" class="small support" data-rid="${x.r.reviewId}" data-stance="support">S</button>
-            <button type="button" class="small oppose" data-rid="${x.r.reviewId}" data-stance="oppose">O</button></div>`).join('')}
+            <button type="button" class="small positive" data-rid="${x.r.reviewId}" data-stance="positive">긍정</button>
+            <button type="button" class="small negative" data-rid="${x.r.reviewId}" data-stance="negative">부정</button></div>`).join('')}
         </div></div>`).join('')}</div>`;
   box.querySelectorAll('.cand button').forEach(b => b.onclick = ev => {
     ev.stopPropagation();
@@ -478,7 +478,7 @@ function renderForm() {
     <label class="f">질문 — 답을 묻는 말로<textarea name="question"></textarea><div class="chips" id="qtpl"></div></label>
     <div class="row">
       <label class="f">aspect<select name="aspect"><option value="">(없음 → notes 에)</option>${opt(v.aspects)}</select></label>
-      <label class="f">방향<select name="direction">${opt(v.directions,'positive')}</select></label>
+      <label class="f">방향 (근거에서 자동 계산)<input name="direction" readonly style="background:var(--g50);color:var(--g700);font-weight:700"></label>
     </div>
     <label class="f">근거 — 저장될 인용<div class="evidence" id="evidence"></div></label>
     <label class="f">실패유형 — 기각 라벨·실패 사례일 때만<div class="chips">${v.taxonomy.types.map(t=>`<label class="${t.severity}"><input type="checkbox" name="fail" value="${t.key}">${t.label} <span class="mute">${t.key}</span></label>`).join('')}</div></label>
@@ -516,7 +516,7 @@ function fillForm(k) {
   f.querySelector('[name=aspect]').value = (k && k.aspect) || '';
   f.querySelector('[name=question]').value = (k && k.question) || '';
   f.querySelector('[name=answer]').value = (k && k.answer) || '';
-  f.querySelector('[name=direction]').value = (k && k.direction) || 'positive';
+  f.querySelector('[name=direction]').value = state.evidence.length ? derived() : '';
   const s = state.data.bundle.scope;
   f.querySelector('[name=cond_skinType]').value = cond.skinType || (s.axis==='skinType' ? s.segment : '');
   f.querySelector('[name=cond_option]').value = cond.option || (s.axis==='option' ? s.segment : '');
@@ -525,6 +525,12 @@ function fillForm(k) {
   f.querySelector('[name=notes]').value = ''; f.querySelector('[name=minutesSpent]').value = '';
   renderEvidence(); renderQuestionTemplates(); setSrcLine(); showMsg('', '');
 }
+function derived() {
+  const authors = new Map(state.data.reviews.map(r=>[r.reviewId, r.author]));
+  const u = st => new Set(state.evidence.filter(e=>e.stance===st).map(e=>authors.get(e.reviewId))).size;
+  const p = u('positive'), n = u('negative');
+  return p && n ? 'mixed' : (p ? 'positive' : 'negative');
+}
 function renderEvidence() {
   const box = $('#evidence'); if (!box) return;
   const authors = new Map(state.data.reviews.map(r=>[r.reviewId, r.author]));
@@ -532,10 +538,11 @@ function renderEvidence() {
   box.innerHTML = state.evidence.length ? state.evidence.map((e,i)=>`
     <div class="item"><span class="stance ${e.stance}">${e.stance}</span><code>${e.reviewId}</code><q data-rid="${e.reviewId}">${esc(e.quote)}</q>
       <button type="button" class="small" data-flip="${i}" title="입장 바꾸기">⇄</button><button type="button" class="small" data-i="${i}">✕</button></div>`).join('') +
-    `<div class="mute" style="font-size:12px;margin-top:4px">고유 작성자 support ${uniq('support')} / oppose ${uniq('oppose')} · N_min ${state.data.vocab.nMin} 은 참고값</div>`
+    `<div class="mute" style="font-size:12px;margin-top:4px">고유 작성자 긍정 ${uniq('positive')} · 부정 ${uniq('negative')} → 방향 <b>${derived()}</b> (자동) · N_min ${state.data.vocab.nMin} 은 참고값</div>`
     : '<span class="mute">아직 없음 — 가운데에서 드래그하거나 문장 옆 S/O</span>';
+  const dir = document.querySelector('[name=direction]'); if (dir) dir.value = state.evidence.length ? derived() : '';
   box.querySelectorAll('[data-i]').forEach(b => b.onclick = () => { state.evidence.splice(Number(b.dataset.i),1); renderEvidence(); applyFilter(); });
-  box.querySelectorAll('[data-flip]').forEach(b => b.onclick = () => { const e = state.evidence[Number(b.dataset.flip)]; e.stance = e.stance==='support'?'oppose':'support'; renderEvidence(); applyFilter(); });
+  box.querySelectorAll('[data-flip]').forEach(b => b.onclick = () => { const e = state.evidence[Number(b.dataset.flip)]; e.stance = e.stance==='positive'?'negative':'positive'; renderEvidence(); applyFilter(); });
   box.querySelectorAll('q[data-rid]').forEach(q => q.onclick = () => focusReview(Number(q.dataset.rid)));
 }
 function renderQuestionTemplates() {
@@ -551,7 +558,7 @@ function normalizedForm() {
   const troubles = fd.getAll('trouble'); const tm = fd.get('trouble_missing');
   return { aspect: fd.get('aspect') || null, question: (fd.get('question')||'').trim(), answer: (fd.get('answer')||'').trim(),
     condition: { skinType: cond('skinType'), skinTrouble: tm ? [tm].concat(troubles) : (troubles.length ? troubles : null), option: cond('option') },
-    direction: fd.get('direction'), evidence: state.evidence };
+    direction: state.evidence.length ? derived() : 'positive', evidence: state.evidence };
 }
 function showMsg(text, cls) { const m = $('#msg'); if (!m) return; m.className = text ? 'msg ' + cls : ''; m.textContent = text; }
 
@@ -568,7 +575,7 @@ async function save() {
     minutesSpent: minutesRaw ? Number(minutesRaw) : elapsed };
   try {
     const r = await api('/api/labels', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload)});
-    const keep = `저장됨 ${r.label.labelId} [${r.label.source}] — support 작성자 ${r.counts.supportAuthors} / oppose ${r.counts.opposeAuthors}${r.label.failureReasons.length?' · '+r.label.failureReasons.join(', '):''}`;
+    const keep = `저장됨 ${r.label.labelId} [${r.label.source}] · ${r.label.direction} — 긍정 ${r.counts.positiveAuthors} / 부정 ${r.counts.negativeAuthors}${r.label.failureReasons.length?' · '+r.label.failureReasons.join(', '):''}`;
     await openBundle(state.bundleId);
     showMsg(keep, 'ok');
   } catch (e) { showMsg('저장하지 않았다 — ' + e.message, 'err'); }

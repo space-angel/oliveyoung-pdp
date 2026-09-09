@@ -171,10 +171,10 @@ def _parse_condition_value(axis: str, raw: str):
 
 
 def parse_evidence_line(line: str) -> dict:
-    """`reviewId | support|oppose | 인용문` 한 줄."""
+    """`reviewId | positive|negative | 인용문` 한 줄."""
     parts = [p.strip() for p in line.split("|", 2)]
     if len(parts) != 3:
-        raise GoldenContractError(f"근거 줄은 'reviewId | support|oppose | 인용문' 꼴이어야 한다: {line!r}")
+        raise GoldenContractError(f"근거 줄은 'reviewId | positive|negative | 인용문' 꼴이어야 한다: {line!r}")
     rid, stance, quote = parts
     if not rid.isdigit():
         raise GoldenContractError(f"reviewId 가 정수가 아니다: {rid!r}")
@@ -200,8 +200,8 @@ def interactive_label(bundle: dict, existing: list[dict]) -> dict:
             default = scope["segment"]
         hint = f"null=무관 / {MISSING_SEGMENT} / 코드" + (" (쉼표 구분)" if axis == "skinTrouble" else "")
         condition[axis] = _parse_condition_value(axis, _prompt(f"condition.{axis} ({hint})", default))
-    direction = _prompt(f"direction ({'/'.join(DIRECTIONS)})", "positive")
-    print("evidence: 한 줄에 하나, 'reviewId | support|oppose | 원문 인용'. 빈 줄로 끝.")
+    direction = None  # 근거에서 계산한다 (아래)
+    print("evidence: 한 줄에 하나, 'reviewId | positive|negative | 원문 인용' (문장 자체의 긍/부정). 빈 줄로 끝.")
     evidence = []
     while True:
         line = input(f"  evidence[{len(evidence)}]: ").strip()
@@ -214,6 +214,9 @@ def interactive_label(bundle: dict, existing: list[dict]) -> dict:
     notes = _prompt("notes", "") or None
     minutes_raw = _prompt("minutesSpent (이 claim 에 쓴 분)")
     minutes = float(minutes_raw) if "." in minutes_raw else int(minutes_raw)
+    from golden_contract import derive_direction
+    direction = derive_direction(evidence, bundle)
+    print(f"  direction = {direction} (근거에서 계산)")
     return {
         "labelId": label_id,
         "bundleId": bundle["bundleId"],
@@ -246,6 +249,9 @@ def cmd_add(args) -> None:
         raw.setdefault("productId", bundle["productId"])
         raw.setdefault("source", "human")
         raw.setdefault("candidateId", None)
+        if "direction" not in raw:
+            from golden_contract import derive_direction
+            raw["direction"] = derive_direction(raw.get("evidence") or [], bundle)
     else:
         try:
             raw = interactive_label(bundle, existing)
@@ -264,7 +270,7 @@ def cmd_add(args) -> None:
     append_label(label)
     print(
         f"저장 → {rel(LABELS_PATH)}  ({label['labelId']}, {label['direction']}, "
-        f"support 작성자 {counts['supportAuthors']} / oppose {counts['opposeAuthors']}, "
+        f"긍정 작성자 {counts['positiveAuthors']} / 부정 {counts['negativeAuthors']}, "
         f"failureReasons={label['failureReasons'] or 'none'})"
     )
 
@@ -299,7 +305,7 @@ def summarize(labels: list[dict], bundles: dict[str, dict]) -> dict:
     by_phase = collections.Counter(bundles[l["bundleId"]]["phase"] for l in normalized)
     touched = {l["bundleId"] for l in normalized}
     minutes = [l["minutesSpent"] for l in normalized]
-    supports = [support_counts(l, bundles[l["bundleId"]])["supportAuthors"] for l in normalized]
+    supports = [sum((lambda k: (k["positiveAuthors"], k["negativeAuthors"]))(support_counts(l, bundles[l["bundleId"]]))) for l in normalized]
     return {
         "labels": len(normalized),
         "byPhase": dict(by_phase),
@@ -322,7 +328,7 @@ def summarize(labels: list[dict], bundles: dict[str, dict]) -> dict:
             b for b in touched
             if not any(l["source"] == "human" for l in normalized if l["bundleId"] == b)
         ),
-        "supportAuthors": {
+        "evidenceAuthors": {
             "min": min(supports) if supports else None,
             "median": sorted(supports)[len(supports) // 2] if supports else None,
             "belowNmin": sum(1 for s in supports if s < SUFFICIENCY_N_MIN),
@@ -352,8 +358,8 @@ def cmd_stats(args) -> None:
     print(f"출처 {s['bySource']} · 사람 claim 없는 번들 {len(s['bundlesWithoutHumanLabel'])} {s['bundlesWithoutHumanLabel'] or ''}")
     print(f"종류 {s['byScopeKind']} · 카테고리 {s['byCategory']}")
     print(f"aspect {s['byAspect']}")
-    sa = s["supportAuthors"]
-    print(f"support 고유 작성자 min {sa['min']} / 중앙 {sa['median']} · N_min({sa['nMin']}) 미만 {sa['belowNmin']}건")
+    sa = s["evidenceAuthors"]
+    print(f"근거 고유 작성자 min {sa['min']} / 중앙 {sa['median']} · N_min({sa['nMin']}) 미만 {sa['belowNmin']}건")
     m = s["minutesPerLabel"]
     if m["mean"] is not None:
         remaining = max(0, s["target"]["total"] - s["labels"])

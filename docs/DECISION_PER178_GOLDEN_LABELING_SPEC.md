@@ -18,7 +18,8 @@ PRD §7-2: 골든셋은 "가장 느리고 가장 믿을 만한" 층이다. 규�
 
 | 항목 | 결정 | 강제 |
 |---|---|---|
-| 라벨 단위 | **claim 1개** = 질문–답 · 조건 · 방향 · 근거(reviewId+인용+입장) · 실패유형 · 평가상태 | `golden_contract.validate_label` |
+| 라벨 단위 | **claim 1개** = 질문–답 · 조건 · 방향(계산) · 근거(reviewId+인용+입장) · 실패유형 · 평가상태 · 출처 | `golden_contract.validate_label` |
+| 입장·방향 | **v2:** stance 는 문장의 절대 긍/부정, direction 은 고유 작성자로 계산(둘 다 있으면 mixed, 반대 1명도) | `derive_direction` |
 | 읽는 단위 | **번들** = 제품(또는 제품 × 조건 셀) 하나의 리뷰 ≤40건. 라벨은 번들 안에서만 만든다 | `evidence.reviewId ∈ bundle` |
 | 표본 | 번들 40개 (파일럿 16) · 제품 40개 / 5카테고리 비례 · 종류 5 (제품 16 · skinType 10 · option 6 · skinTrouble 4 · 미기재 4) | `sample_concern_golden.py --check` |
 | 층화 | 번들 안 평점 층 12/8/8/12 (1~2★ / 3★ / 4★ / 5★), 층별 weight 기록 | 같음 |
@@ -51,10 +52,10 @@ PRD §7-2: 골든셋은 "가장 느리고 가장 믿을 만한" 층이다. 규�
   "condition": {                     // 축마다 null(무관) / "미기재" / 코드
     "skinType": "A02", "skinTrouble": null, "option": null
   },
-  "direction": "mixed",              // positive | negative | mixed — 별점이 아니라 문장의 방향
-  "evidence": [                      // 근거. 번들 안 리뷰만
-    {"reviewId": 61368405, "stance": "support", "quote": "원문 부분문자열"},
-    {"reviewId": 61380240, "stance": "oppose",  "quote": "원문 부분문자열"}
+  "direction": "mixed",              // 근거에서 계산: 긍정만 positive · 부정만 negative · 둘 다 mixed (사람이 고르지 않음)
+  "evidence": [                      // 근거. 번들 안 리뷰만. stance 는 문장 자체의 긍/부정 (답과 무관)
+    {"reviewId": 61368405, "stance": "negative", "quote": "원문 부분문자열"},
+    {"reviewId": 61380240, "stance": "positive", "quote": "원문 부분문자열"}
   ],
   "failureReasons": [],              // 정상 claim 은 []. 실패 사례면 PER-177 8키 (정렬됨)
   "evaluation": "complete",          // complete | not_evaluable (후자는 notes 필수)
@@ -67,7 +68,8 @@ PRD §7-2: 골든셋은 "가장 느리고 가장 믿을 만한" 층이다. 규�
 |---|---|---|
 | `answer` | question–answer 쌍이 가치 단위 (PRD §6, 이슈 5-3). judge 는 답의 지지 여부를 본다 | 빈 값 → 에러 |
 | `evidence[].quote` | 잘못된 귀속(`misattribution`)은 인용 없이는 판정할 수 없다 (PER-177 §2) | 원문 부분문자열이 아니면 에러 |
-| `evidence[].stance` | `mixed` 를 표현하려면 근거마다 입장이 필요하다. U(지지 작성자)와 반대 수를 따로 센다 | `support`/`oppose` 밖 → 에러 |
+| `evidence[].stance` | 문장 자체의 긍/부정 (v2). v1 의 답-상대적 support/oppose 는 답 문장에 따라 뒤집혀 라벨러가 헷갈려 폐기 | `positive`/`negative` 밖 → 에러 |
+| `direction` | 사람이 고르지 않고 근거의 고유 작성자로 계산. 반대 1명도 mixed — 소수 처리는 PER-186 | 계산값과 다르면 에러 |
 | `failureReasons[]` (배열) | 복수 실패를 대표 하나로 뭉개면 동시 발생한 치명 실패가 집계에서 사라진다 (PER-177 §4-3) | 택소노미 밖·미정렬 → 에러 |
 | `evaluation` | "자료 부족"은 아홉 번째 실패가 아니라 평가 상태다 (PER-177 §4-3 ①) | `not_evaluable` 에 notes 없음 → 에러 |
 | `minutesSpent` | PER-179 "건당 소요 시간을 기록한다 → 나머지 60건의 일정 추정 근거" | 양수 아님 → 에러 |
@@ -222,6 +224,18 @@ PER-177 이 8키·심각도·순번을 확정했고(`docs/DECISION_PER177_FAILUR
 표와 1:1 이다. PER-181 은 이 파일에 검사 목록·버전 거부 규칙을 더하면 된다 — 코드 상수는 어디에도 없다.
 
 ---
+
+## 9. v2 — 입장 절대값, 방향 계산 (2026-09-09 추가 결정)
+
+라벨러가 "mixed 기준과 support/oppose 가 애매하다"고 했다. 원인은 v1 의 stance 가 **답 문장에 상대적**이어서
+답을 어떻게 쓰느냐에 따라 같은 문장의 입장이 뒤집히는 것이었고, 그래서 "mixed 면 부정 관측을 주어로" 같은
+우회 규칙이 필요했다. v2 는 stance 를 문장 자체의 긍/부정으로 바꾸고 direction 을 계산값으로 만들었다.
+사람이 정하는 것은 "이 문장이 주제에 대해 좋다/나쁘다" 하나다.
+
+기존 라벨·후보 187개는 v1 답 방향을 알고 있으므로 기계 변환했다(`stanceMigrated` 필드). direction 재계산으로
+바뀐 후보 0개, 계약 위반 0개. 프롬프트는 `concern_candidates_v2.md` 로 새 파일.
+
+기각: 반대 1명이면 mixed 가 아니라 다수 방향으로 — 골든셋에서 소수 의견을 지우면 게이트 정책을 나중에 평가할 수 없다.
 
 ## 8. B안 — 모델 후보 + 사람 검수 (2026-09-09 추가 결정)
 

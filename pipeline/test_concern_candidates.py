@@ -25,11 +25,11 @@ GOOD = {
     "aspect": "보습감", "question": "촉촉한가요?", "answer": "속보습은 못 느꼈다는 리뷰가 있다",
     "condition": {"skinType": None, "skinTrouble": None, "option": None}, "direction": "mixed",
     "evidence": [
-        {"reviewId": 1, "stance": "support", "quote": "속보습은 못 느꼈어요"},
-        {"reviewId": 2, "stance": "oppose", "quote": "촉촉하고 순해요"},
+        {"reviewId": 1, "stance": "positive", "quote": "속보습은 못 느꼈어요"},
+        {"reviewId": 2, "stance": "negative", "quote": "촉촉하고 순해요"},
     ],
 }
-BAD_QUOTE = dict(GOOD, evidence=[{"reviewId": 2, "stance": "support", "quote": "촉촉하고 순하다"}], direction="positive")
+BAD_QUOTE = dict(GOOD, evidence=[{"reviewId": 2, "stance": "positive", "quote": "촉촉하고 순하다"}], direction="positive")
 
 
 class TestParse(unittest.TestCase):
@@ -114,18 +114,15 @@ class TestAutoChecks(unittest.TestCase):
         return {"candidateId": cid, "bundleId": "B01", "candidate": cand}
 
     def test_clean_candidate_has_no_warnings(self):
-        good = dict(GOOD, question="속보습까지 촉촉하게 유지되나요?", evidence=GOOD["evidence"] + [{"reviewId": 3, "stance": "support", "quote": "촉촉함이 오래가요"}])
+        good = dict(GOOD, question="속보습까지 촉촉하게 유지되나요?", evidence=GOOD["evidence"] + [{"reviewId": 3, "stance": "positive", "quote": "촉촉함이 오래가요"}])
         checks = cc.auto_checks(good, bundle_record(), [self.wrap(good)])
         self.assertEqual([c for c in checks if c["level"] == "warn"], [])
 
     def test_thin_support_and_generic_question(self):
-        keys = {c["key"] for c in cc.auto_checks(dict(GOOD, question="좋은가요?"), bundle_record(), [self.wrap(GOOD)])}
-        self.assertIn("thin_support", keys)
+        thin = dict(GOOD, question="좋은가요?", direction="positive", evidence=[GOOD["evidence"][0]])
+        keys = {c["key"] for c in cc.auto_checks(thin, bundle_record(), [self.wrap(thin)])}
+        self.assertIn("thin_evidence", keys)
         self.assertIn("question_broad", keys)
-
-    def test_mixed_without_oppose(self):
-        cand = dict(GOOD, evidence=[GOOD["evidence"][0]])
-        self.assertIn("mixed_without_both", {c["key"] for c in cc.auto_checks(cand, bundle_record(), [self.wrap(cand)])})
 
     def test_number_not_in_quotes(self):
         cand = dict(GOOD, answer="6시간은 촉촉하다")

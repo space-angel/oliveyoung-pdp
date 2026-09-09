@@ -43,7 +43,7 @@ from label_concern_golden import _condition_line, load_labels  # noqa: E402
 from sample_concern_golden import load_bundles  # noqa: E402
 from tag_contract import fold_invisible  # noqa: E402
 
-PROMPT_PATH = Path(__file__).parent / "prompts/concern_candidates_v1.md"
+PROMPT_PATH = Path(__file__).parent / "prompts/concern_candidates_v2.md"  # v2: stance 절대값
 HARNESS_DIR = ROOT / "data/intermediate/v5_concern_golden_harness"
 RAW_DIR = ROOT / "data/intermediate/v5_concern_golden_candidates_raw"  # 다른 모델이 B01.json 을 여기에 쓴다
 CANDIDATES_PATH = ROOT / "eval/gold/v5_concern_golden_candidates.jsonl"
@@ -187,15 +187,13 @@ def auto_checks(candidate: dict, bundle: dict, siblings: list[dict]) -> list[dic
     authors = {r["reviewId"]: r["derived"]["authorKey"] for r in bundle["reviews"]}
     contents = {r["reviewId"]: fold_invisible(r["raw"]["content"]) for r in bundle["reviews"]}
     ev = candidate.get("evidence") or []
-    support = {authors.get(e.get("reviewId")) for e in ev if e.get("stance") == "support"} - {None}
-    oppose = {authors.get(e.get("reviewId")) for e in ev if e.get("stance") == "oppose"} - {None}
-    if len(support) < MIN_SUPPORT_AUTHORS:
-        out.append({"key": "thin_support", "level": "warn", "text": f"지지 작성자 {len(support)}명 — 근거를 보태거나 과소 근거로 볼지 판단"})
+    pos = {authors.get(e.get("reviewId")) for e in ev if e.get("stance") == "positive"} - {None}
+    neg = {authors.get(e.get("reviewId")) for e in ev if e.get("stance") == "negative"} - {None}
+    if len(pos | neg) < MIN_SUPPORT_AUTHORS:
+        out.append({"key": "thin_evidence", "level": "warn", "text": f"근거 고유 작성자 {len(pos | neg)}명 — 놓친 근거를 보태거나 과소 근거로 볼지 판단"})
     direction = candidate.get("direction")
-    if direction == "mixed" and (not oppose or not support):
-        out.append({"key": "mixed_without_both", "level": "warn", "text": "mixed 인데 한쪽 입장만 있다 — positive/negative 로 고칠지 확인"})
-    if direction == "mixed" and len(oppose) == 1 and len(support) >= 3:
-        out.append({"key": "mixed_single_oppose", "level": "info", "text": "반대 1명 — mixed 보다 support 다수 + oppose 1건이 맞을 수 있다"})
+    if pos and neg and min(len(pos), len(neg)) == 1 and max(len(pos), len(neg)) >= 3:
+        out.append({"key": "mixed_single_dissent", "level": "info", "text": "한쪽 1명 — mixed 로 저장되되 소수 의견의 처리는 게이트(PER-186)가 정한다"})
     q = (candidate.get("question") or "").strip()
     if len(q) < 14 or any(w in q for w in GENERIC_QUESTION_WORDS):
         out.append({"key": "question_broad", "level": "warn", "text": "질문이 짧거나 일반적 — 무엇을 재는지 없으면 overbroad_question"})
