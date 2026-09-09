@@ -45,6 +45,7 @@ from tag_contract import fold_invisible  # noqa: E402
 
 PROMPT_PATH = Path(__file__).parent / "prompts/concern_candidates_v1.md"
 HARNESS_DIR = ROOT / "data/intermediate/v5_concern_golden_harness"
+RAW_DIR = ROOT / "data/intermediate/v5_concern_golden_candidates_raw"  # 다른 모델이 B01.json 을 여기에 쓴다
 CANDIDATES_PATH = ROOT / "eval/gold/v5_concern_golden_candidates.jsonl"
 CANDIDATE_FIELDS = ("aspect", "question", "answer", "condition", "direction", "evidence")
 
@@ -98,6 +99,7 @@ def cmd_export(args) -> None:
     bundles = load_bundles()
     prompt = PROMPT_PATH.read_text()
     HARNESS_DIR.mkdir(parents=True, exist_ok=True)
+    RAW_DIR.mkdir(parents=True, exist_ok=True)
     chosen = [b for b in bundles.values() if args.phase == "all" or b["phase"] == args.phase]
     if args.bundle:
         chosen = [bundles[args.bundle]]
@@ -110,6 +112,8 @@ def cmd_export(args) -> None:
         "2. 모델이 낸 JSON 을 `B01.json` 으로 저장한다 (코드 블록 표시가 섞여도 임포터가 벗겨낸다).\n"
         f"3. `python3 eval/concern_candidates.py import B01 B01.json --model \"<모델 이름과 날짜>\"`\n"
         "4. 라벨 도구(웹)에서 후보를 채택·수정·기각한다. 번들마다 후보에 없는 claim 도 1개 이상 직접 만든다.\n\n"
+        "모델(에이전트)이 파일 시스템에서 직접 작업하는 경우의 지침: `eval/gold/CANDIDATE_HARNESS_INSTRUCTIONS.md`. "
+        f"출력은 `{rel(RAW_DIR)}/Bxx.json`, 들여오기는 `import-dir`.\n\n"
         f"프롬프트 정본: `{rel(PROMPT_PATH)}` (sha256 {sha256_text(prompt)[:12]}…). 프롬프트를 고치면 v2 로 파일을 새로 만든다.\n"
         "모델은 파이프라인 생성기(PER-189)·judge(PER-196)와 **다른 것**을 쓴다.\n"
     )
@@ -248,6 +252,30 @@ def status(bundles: dict[str, dict] | None = None) -> list[dict]:
     return out
 
 
+def cmd_import_dir(args) -> None:
+    """RAW_DIR(또는 지정 폴더)의 B??.json 을 전부 들여온다. 이미 있는 번들은 건너뛴다(--replace 없이)."""
+    folder = Path(args.dir) if args.dir else RAW_DIR
+    files = sorted(folder.glob("B[0-9][0-9].json"))
+    if not files:
+        raise SystemExit(f"{rel(folder)} 에 B??.json 이 없다")
+    have = {c["bundleId"] for c in load_candidates()}
+    done = skipped = 0
+    for f in files:
+        bid = f.stem
+        if bid in have and not args.replace:
+            skipped += 1
+            continue
+        try:
+            rows = import_candidates(bid, f.read_text(), args.model, replace=args.replace)
+        except (SystemExit, ValueError, json.JSONDecodeError) as e:
+            print(f"  !! {bid}: {e}")
+            continue
+        ok = sum(1 for r in rows if not r["contractErrors"])
+        print(f"  {bid}: {len(rows)}개 (계약 통과 {ok})")
+        done += 1
+    print(f"[후보] 들여옴 {done} · 건너뜀(이미 있음) {skipped} → {rel(CANDIDATES_PATH)}")
+
+
 def cmd_status(args) -> None:
     rows = status()
     with_c = [r for r in rows if r["candidates"]]
@@ -271,6 +299,11 @@ def main(argv=None) -> None:
     p.add_argument("--model", required=True, help="후보를 만든 모델 이름과 날짜 — 생성기·judge 와 달라야 한다")
     p.add_argument("--replace", action="store_true")
     p.set_defaults(fn=cmd_import)
+    p = sub.add_parser("import-dir", help="폴더의 B??.json 을 전부 들여온다")
+    p.add_argument("--dir", help=f"기본 {RAW_DIR.relative_to(ROOT)}")
+    p.add_argument("--model", required=True)
+    p.add_argument("--replace", action="store_true")
+    p.set_defaults(fn=cmd_import_dir)
     p = sub.add_parser("status")
     p.set_defaults(fn=cmd_status)
     args = ap.parse_args(argv)

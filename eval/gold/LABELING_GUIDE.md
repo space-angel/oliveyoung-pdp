@@ -35,7 +35,8 @@ python3 eval/label_concern_golden_web.py                         # → http://12
 ```bash
 python3 eval/concern_candidates.py export --phase pilot        # 하네스 → data/intermediate/v5_concern_golden_harness/B01.md …
 #   B01.md 를 통째로 다른 모델(구독제)에 붙여 넣고, 출력 JSON 을 B01.json 으로 저장
-python3 eval/concern_candidates.py import B01 B01.json --model "GPT-5 (ChatGPT, 2026-09-09)"
+python3 eval/concern_candidates.py import-dir --model "<모델 이름, 날짜>"   # data/intermediate/v5_concern_golden_candidates_raw/B??.json 전부
+#   (모델이 파일 시스템에서 직접 작업하면 CANDIDATE_HARNESS_INSTRUCTIONS.md 를 주면 된다 — 저장 위치·규칙이 거기 있다)
 python3 eval/concern_candidates.py status                      # 번들별 후보·계약 통과·결정·사람 claim 수
 ```
 

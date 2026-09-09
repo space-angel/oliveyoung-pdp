@@ -25,6 +25,7 @@
 | `v5_concern_golden_labels.jsonl` | 사람이 검수·확정한 claim 라벨. **채점 기준.** 출처 `source` 4종 기록. PER-179 부터 쌓인다 |
 | `v5_concern_golden_candidates.jsonl` | 다른 모델이 만든 **후보** (하네스 `eval/concern_candidates.py`). 정답이 아니다 — 라벨의 `candidateId` 가 가리키므로 고정물로 커밋 |
 
+**후보를 만드는 모델(에이전트)용 지침은 [`CANDIDATE_HARNESS_INSTRUCTIONS.md`](CANDIDATE_HARNESS_INSTRUCTIONS.md)** — 작업 위치·읽지 말 것·입력/출력 경로·들여오기.
 **라벨러 가이드는 [`LABELING_GUIDE.md`](LABELING_GUIDE.md)** — 읽는 순서·좋은 claim 의 모양·조건 규칙·거부 메시지 대처.
 규격·표본 근거·도구는 [`docs/DECISION_PER178_GOLDEN_LABELING_SPEC.md`](../../docs/DECISION_PER178_GOLDEN_LABELING_SPEC.md),
 계약은 `pipeline/golden_contract.py`. 라벨은 `(bundleId, reviewId)` 로 번들과 대조한다 — 번들 밖 리뷰는 에러다.
