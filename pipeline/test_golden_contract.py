@@ -151,6 +151,8 @@ class TestValidLabel(unittest.TestCase):
         self.assertEqual(counts["evidenceReviews"], 3)
         self.assertEqual(counts["negativeAuthors"], 1)  # a 의 리뷰 2건 = 1표
         self.assertEqual(counts["positiveAuthors"], 1)
+        self.assertEqual(counts["spokeAuthors"], 2)
+        self.assertEqual(counts["silentAuthors"], 1)   # c 는 말하지 않았다 — 어느 쪽도 아니다
 
     def test_direction_is_derived_from_evidence(self):
         pos_only = label(direction="positive", evidence=[{"reviewId": 2, "stance": "positive", "quote": "촉촉하고"}])

@@ -194,6 +194,11 @@ def auto_checks(candidate: dict, bundle: dict, siblings: list[dict]) -> list[dic
     direction = candidate.get("direction")
     if pos and neg and min(len(pos), len(neg)) == 1 and max(len(pos), len(neg)) >= 3:
         out.append({"key": "mixed_single_dissent", "level": "info", "text": "한쪽 1명 — mixed 로 저장되되 소수 의견의 처리는 게이트(PER-186)가 정한다"})
+    generalizers = ("대부분", "대체로", "거의", "보통", "다들", "모두", "누구나", "없다는 편", "문제 없", "문제없", "안 생긴다", "생기지 않는다")
+    ans = candidate.get("answer") or ""
+    if any(w in ans for w in generalizers) and len(pos | neg) < 5:
+        out.append({"key": "generalizes_from_silence", "level": "warn",
+                    "text": f"답에 일반화 표현이 있는데 언급한 작성자는 {len(pos | neg)}명 — 언급 없음(침묵)을 근거로 세면 unsupported_claim"})
     q = (candidate.get("question") or "").strip()
     if len(q) < 14 or any(w in q for w in GENERIC_QUESTION_WORDS):
         out.append({"key": "question_broad", "level": "warn", "text": "질문이 짧거나 일반적 — 무엇을 재는지 없으면 overbroad_question"})

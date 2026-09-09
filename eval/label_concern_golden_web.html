@@ -531,6 +531,11 @@ function derived() {
   const p = u('positive'), n = u('negative');
   return p && n ? 'mixed' : (p ? 'positive' : 'negative');
 }
+function silentCount() {
+  const authors = new Map(state.data.reviews.map(r=>[r.reviewId, r.author]));
+  const spoke = new Set(state.evidence.map(e=>authors.get(e.reviewId)));
+  return new Set(state.data.reviews.map(r=>r.author)).size - spoke.size;
+}
 function renderEvidence() {
   const box = $('#evidence'); if (!box) return;
   const authors = new Map(state.data.reviews.map(r=>[r.reviewId, r.author]));
@@ -538,7 +543,7 @@ function renderEvidence() {
   box.innerHTML = state.evidence.length ? state.evidence.map((e,i)=>`
     <div class="item"><span class="stance ${e.stance}">${e.stance}</span><code>${e.reviewId}</code><q data-rid="${e.reviewId}">${esc(e.quote)}</q>
       <button type="button" class="small" data-flip="${i}" title="입장 바꾸기">⇄</button><button type="button" class="small" data-i="${i}">✕</button></div>`).join('') +
-    `<div class="mute" style="font-size:12px;margin-top:4px">고유 작성자 긍정 ${uniq('positive')} · 부정 ${uniq('negative')} → 방향 <b>${derived()}</b> (자동) · N_min ${state.data.vocab.nMin} 은 참고값</div>`
+    `<div class="mute" style="font-size:12px;margin-top:4px">고유 작성자 긍정 ${uniq('positive')} · 부정 ${uniq('negative')} → 방향 <b>${derived()}</b> (자동) · <span title="주제를 언급하지 않은 작성자. 긍정도 부정도 아니다 — 답에서 '대부분 없다'로 세지 않는다">언급 없음 ${silentCount()}</span> · N_min ${state.data.vocab.nMin} 은 참고값</div>`
     : '<span class="mute">아직 없음 — 가운데에서 드래그하거나 문장 옆 S/O</span>';
   const dir = document.querySelector('[name=direction]'); if (dir) dir.value = state.evidence.length ? derived() : '';
   box.querySelectorAll('[data-i]').forEach(b => b.onclick = () => { state.evidence.splice(Number(b.dataset.i),1); renderEvidence(); applyFilter(); });
@@ -575,7 +580,7 @@ async function save() {
     minutesSpent: minutesRaw ? Number(minutesRaw) : elapsed };
   try {
     const r = await api('/api/labels', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload)});
-    const keep = `저장됨 ${r.label.labelId} [${r.label.source}] · ${r.label.direction} — 긍정 ${r.counts.positiveAuthors} / 부정 ${r.counts.negativeAuthors}${r.label.failureReasons.length?' · '+r.label.failureReasons.join(', '):''}`;
+    const keep = `저장됨 ${r.label.labelId} [${r.label.source}] · ${r.label.direction} — 긍정 ${r.counts.positiveAuthors} / 부정 ${r.counts.negativeAuthors} / 언급 없음 ${r.counts.silentAuthors}${r.label.failureReasons.length?' · '+r.label.failureReasons.join(', '):''}`;
     await openBundle(state.bundleId);
     showMsg(keep, 'ok');
   } catch (e) { showMsg('저장하지 않았다 — ' + e.message, 'err'); }

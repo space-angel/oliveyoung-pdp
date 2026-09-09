@@ -124,6 +124,10 @@ class TestAutoChecks(unittest.TestCase):
         self.assertIn("thin_evidence", keys)
         self.assertIn("question_broad", keys)
 
+    def test_generalizing_from_silence_is_flagged(self):
+        cand = dict(GOOD, answer="대부분 트러블이 없다")
+        self.assertIn("generalizes_from_silence", {c["key"] for c in cc.auto_checks(cand, bundle_record(), [self.wrap(cand)])})
+
     def test_number_not_in_quotes(self):
         cand = dict(GOOD, answer="6시간은 촉촉하다")
         self.assertIn("number_not_in_quotes", {c["key"] for c in cc.auto_checks(cand, bundle_record(), [self.wrap(cand)])})

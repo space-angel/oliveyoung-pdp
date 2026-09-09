@@ -35,6 +35,8 @@
 - **인용은 원문 부분문자열이어야 한다** (`tag_contract.is_verbatim`, 보이지 않는 문자만
   접는다). v4 88.8% 의 재발 경로를 라벨 단계에서부터 막는다.
 - **근거 카운트는 리뷰 수가 아니라 고유 작성자 수다** (PER-170). `support_counts()` 가 센다.
+- **침묵은 근거가 아니다.** 주제를 언급하지 않은 리뷰는 긍정도 부정도 아니다 (`silentAuthors` 로 따로 센다).
+  "대부분 트러블이 없다"처럼 언급 없음을 부정 증거로 일반화하면 `unsupported_claim` 이다 — 안 생겼다는 **명시 문장**만 긍정 근거다.
 - **failureReasons 는 정렬된 상태로 저장한다** — 첫 원소가 대표 `failureReason` 이므로
   순서가 곧 판정이다. 어휘는 코드 상수가 아니라 `pipeline/failure_taxonomy.json` 이다.
 - **방향을 별점에서 가져오지 않는다.** 별점은 라벨 필드에 없다. 화면에는 보이지만 근거는 원문이다.
@@ -388,11 +390,15 @@ def derive_direction(evidence: list[dict], bundle: dict) -> str:
 def support_counts(label: dict, bundle: dict) -> dict:
     """근거 카운트 — 리뷰 수가 아니라 **고유 작성자 수** (PER-170)."""
     by = _authors_by_stance(label["evidence"], bundle)
+    bundle_authors = {r["derived"]["authorKey"] for r in bundle["reviews"]}
+    spoke = by["positive"] | by["negative"]
     return {
-        "positiveAuthors": len(by["positive"]),
-        "negativeAuthors": len(by["negative"]),
+        "positiveAuthors": len(by["positive"]),   # U+
+        "negativeAuthors": len(by["negative"]),   # U-
+        "spokeAuthors": len(spoke),               # D — 이 주제를 말한 작성자
+        "silentAuthors": len(bundle_authors - spoke),  # S - D — 말하지 않은 작성자. 어느 쪽 근거도 아니다
         "evidenceReviews": len(label["evidence"]),
-        "bundleAuthors": len({r["derived"]["authorKey"] for r in bundle["reviews"]}),
+        "bundleAuthors": len(bundle_authors),     # S
     }
 
 
