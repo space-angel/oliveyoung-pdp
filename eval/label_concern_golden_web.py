@@ -50,13 +50,19 @@ ASPECT_KEYWORDS_PATH = Path(__file__).with_name("aspect_keywords.json")
 def load_aspect_keywords(path: Path = ASPECT_KEYWORDS_PATH) -> dict[str, list[str]]:
     """읽기 보조 사전 (A안). 키는 ASPECTS 14종과 같아야 한다 — 아니면 라벨러가 없는 칸을 고른다."""
     data = json.loads(path.read_text())
-    words = {k: v for k, v in data.items() if not k.startswith("_")}
+    words = {k: v["keywords"] for k, v in data.items() if not k.startswith("_")}
     if set(words) != set(ASPECTS):
         raise ValueError(
             f"aspect_keywords.json 의 키가 ASPECTS 와 다르다: 빠짐 {sorted(set(ASPECTS) - set(words))}, "
             f"초과 {sorted(set(words) - set(ASPECTS))}"
         )
     return words
+
+
+def load_question_templates(path: Path = ASPECT_KEYWORDS_PATH) -> dict[str, list[str]]:
+    """aspect 별 질문 틀. 라벨러가 골라 고친다 — 질문 짜내기가 건당 시간의 대부분이었다 (B01 실측)."""
+    data = json.loads(path.read_text())
+    return {k: list(v.get("questions") or []) for k, v in data.items() if not k.startswith("_")}
 
 
 def aspect_hits(reviews: list[dict], keywords: dict[str, list[str]]) -> dict[str, dict]:
@@ -123,6 +129,7 @@ def api_bundle(bundle_id: str) -> dict:
         ],
         "labels": [l for l in load_labels() if l["bundleId"] == bundle_id],
         "aspectHits": aspect_hits(b["reviews"], load_aspect_keywords()),
+        "questionTemplates": load_question_templates(),
         "vocab": {
             "aspects": list(ASPECTS),
             "directions": list(DIRECTIONS),

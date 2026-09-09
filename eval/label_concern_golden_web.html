@@ -76,6 +76,8 @@
   .cand { display:flex; gap:6px; align-items:center; padding:3px 6px; margin:2px 0; border-left:3px solid #fde68a; background:#fffbeb; font-size:13px; }
   .cand .txt { flex:1; }
   .cand.picked { border-left-color:var(--accent); background:#f0fdfa; }
+  .chips .tpl { border-style:dashed; color:var(--fg); }
+  .chips .tpl:hover { background:#f0fdfa; border-color:var(--accent); }
 </style>
 </head>
 <body>
@@ -184,9 +186,16 @@ function pickAspect(aspect) {
   document.querySelectorAll('#aspects .chip').forEach(c => c.classList.toggle('on', c.dataset.aspect === state.aspect));
   // 폼: aspect 선택 + 질문 틀 (비어 있을 때만 — 쓰던 문장을 덮지 않는다)
   const sel = document.querySelector('[name=aspect]'); if (sel && state.aspect) sel.value = state.aspect;
-  const q = document.querySelector('[name=question]');
-  if (q && state.aspect && !q.value.trim()) q.value = `${state.aspect.split('/')[0]}은/는 어떤가요? `;
+  renderQuestionTemplates();
   applyFilter();
+}
+
+function renderQuestionTemplates() {
+  const box = $('#qtpl'); if (!box) return;
+  const aspect = state.aspect || document.querySelector('[name=aspect]')?.value;
+  const tpls = (state.data.questionTemplates || {})[aspect] || [];
+  box.innerHTML = tpls.length ? tpls.map(t => `<label class="tpl">${esc(t)}</label>`).join('') : '<span class="mute" style="font-size:12px">aspect 를 고르면 질문 틀이 뜹니다</span>';
+  box.querySelectorAll('.tpl').forEach(el => el.onclick = () => { const q = document.querySelector('[name=question]'); q.value = el.textContent; q.focus(); });
 }
 
 function splitSentences(text) {
@@ -264,8 +273,10 @@ function renderForm() {
       <label class="f">aspect (이 claim 이 다루는 주제)<select name="aspect"><option value="">(없음 → notes 에)</option>${opt(v.aspects)}</select></label>
       <label class="f">labelId (자동)<input name="labelId" value="${d.bundle.bundleId}-${n}" readonly style="background:#f5f5f4;color:var(--mute)"></label>
     </div>
-    <label class="f">question (구매자의 질문)<textarea name="question" placeholder="…나요?"></textarea></label>
-    <label class="f">answer (리뷰가 주는 답)<textarea name="answer"></textarea></label>
+    <label class="f">① evidence 를 먼저 모으고 → ② answer 를 쓰고 → ③ question 은 답을 묻는 말로 뒤집는다</label>
+    <label class="f">answer (리뷰가 주는 답 — 먼저 쓴다)<textarea name="answer" placeholder="예: 구순염이 생겼다는 리뷰가 있고, 걱정했지만 안 생겼다는 리뷰도 있다"></textarea></label>
+    <label class="f">question (답을 묻는 말로)<textarea name="question" placeholder="…나요?"></textarea>
+      <div class="chips" id="qtpl"></div></label>
     <div class="row">
       <label class="f">condition.skinType${condSelect('skinType')}</label>
       <label class="f">condition.option${condSelect('option')}</label>
@@ -286,6 +297,8 @@ function renderForm() {
         ${esc(l.question)}<div class="mute">${esc(l.answer)} · 근거 ${l.evidence.length} · ${l.minutesSpent}분</div>
         <button type="button" class="small" data-del="${esc(l.labelId)}">삭제</button></div>`).join('')}</div></details>`;
   renderEvidence();
+  renderQuestionTemplates();
+  document.querySelector('[name=aspect]').onchange = renderQuestionTemplates;
   $('#save').onclick = save;
   $('#form').querySelectorAll('[data-del]').forEach(b => b.onclick = async () => {
     if (!confirm(`${b.dataset.del} 를 삭제할까요? (파일에서 지워집니다)`)) return;
