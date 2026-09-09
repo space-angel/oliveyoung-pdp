@@ -24,6 +24,7 @@
 | `v5_concern_golden_meta.json` | 시드 · 종류/카테고리 할당 · 모집단 컷 · 입력 sha256 |
 | `v5_concern_golden_labels.jsonl` | 손으로 만든 claim 라벨. **채점 기준.** PER-179 부터 쌓인다 |
 
+**라벨러 가이드는 [`LABELING_GUIDE.md`](LABELING_GUIDE.md)** — 읽는 순서·좋은 claim 의 모양·조건 규칙·거부 메시지 대처.
 규격·표본 근거·도구는 [`docs/DECISION_PER178_GOLDEN_LABELING_SPEC.md`](../../docs/DECISION_PER178_GOLDEN_LABELING_SPEC.md),
 계약은 `pipeline/golden_contract.py`. 라벨은 `(bundleId, reviewId)` 로 번들과 대조한다 — 번들 밖 리뷰는 에러다.
 
