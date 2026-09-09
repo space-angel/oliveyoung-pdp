@@ -39,11 +39,13 @@
     "v5FieldsAbsentInV4": [
       "answer",
       "aspect",
+      "candidateId",
       "condition",
       "direction",
       "evaluation",
       "failureReasons",
-      "minutesSpent"
+      "minutesSpent",
+      "source"
     ],
     "note": "answer · condition · direction · evidence.quote · evidence.stance · failureReasons 는 v4 에 없다. 원문을 다시 읽어야 채워지므로 '변환'이 아니라 '재라벨'이다"
   },
