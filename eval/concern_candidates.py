@@ -172,6 +172,56 @@ def check_candidate(candidate: dict, bundle: dict, candidate_id: str, taxonomy) 
         return [str(e)]
 
 
+# --- 사람 앞에 두는 규칙 점검 (토션 "규칙 기반 필터" 의 사상) ---
+
+GENERIC_QUESTION_WORDS = ("좋은가요", "좋나요", "추천", "괜찮나요", "어떤가요", "만족")
+MIN_SUPPORT_AUTHORS = 2
+
+
+def auto_checks(candidate: dict, bundle: dict, siblings: list[dict]) -> list[dict]:
+    """후보 하나에 대한 결정적 점검. **판정이 아니라 주의 표시**다 — 사람의 명시적 결정이 항상 우선한다.
+
+    각 항목: {"key", "level": warn|info, "text"}. 계약 위반(contractErrors)은 따로 있다.
+    """
+    out: list[dict] = []
+    authors = {r["reviewId"]: r["derived"]["authorKey"] for r in bundle["reviews"]}
+    contents = {r["reviewId"]: fold_invisible(r["raw"]["content"]) for r in bundle["reviews"]}
+    ev = candidate.get("evidence") or []
+    support = {authors.get(e.get("reviewId")) for e in ev if e.get("stance") == "support"} - {None}
+    oppose = {authors.get(e.get("reviewId")) for e in ev if e.get("stance") == "oppose"} - {None}
+    if len(support) < MIN_SUPPORT_AUTHORS:
+        out.append({"key": "thin_support", "level": "warn", "text": f"지지 작성자 {len(support)}명 — 근거를 보태거나 과소 근거로 볼지 판단"})
+    direction = candidate.get("direction")
+    if direction == "mixed" and (not oppose or not support):
+        out.append({"key": "mixed_without_both", "level": "warn", "text": "mixed 인데 한쪽 입장만 있다 — positive/negative 로 고칠지 확인"})
+    if direction == "mixed" and len(oppose) == 1 and len(support) >= 3:
+        out.append({"key": "mixed_single_oppose", "level": "info", "text": "반대 1명 — mixed 보다 support 다수 + oppose 1건이 맞을 수 있다"})
+    q = (candidate.get("question") or "").strip()
+    if len(q) < 14 or any(w in q for w in GENERIC_QUESTION_WORDS):
+        out.append({"key": "question_broad", "level": "warn", "text": "질문이 짧거나 일반적 — 무엇을 재는지 없으면 overbroad_question"})
+    # 답의 숫자가 인용 어디에도 없으면 창작 의심
+    import re as _re
+    nums = set(_re.findall(r"\d+", candidate.get("answer") or ""))
+    if nums:
+        quoted = " ".join(e.get("quote") or "" for e in ev)
+        missing = sorted(n for n in nums if n not in quoted)
+        if missing:
+            out.append({"key": "number_not_in_quotes", "level": "warn", "text": f"답의 숫자 {missing} 가 인용에 없다 — unsupported_claim 의심"})
+    # 번들 안 같은 aspect+direction 후보
+    twins = [c["candidateId"] for c in siblings if c["candidate"].get("aspect") == candidate.get("aspect") and c["candidate"].get("direction") == direction]
+    if len(twins) > 1:
+        out.append({"key": "sibling_same_topic", "level": "info", "text": f"같은 aspect·방향 후보 {len(twins)}개 ({', '.join(twins)}) — 답이 같으면 duplicate_claim"})
+    # 인용이 리뷰 전체의 절반 이상이면 근거가 아니라 통째 복사
+    for e in ev:
+        c = contents.get(e.get("reviewId"))
+        if c and e.get("quote") and len(e["quote"]) > max(80, len(c) * 0.6):
+            out.append({"key": "quote_too_long", "level": "info", "text": f"reviewId {e['reviewId']} 인용이 본문의 대부분 — 핵심 문장으로 줄일지"})
+            break
+    if candidate.get("aspect") is None:
+        out.append({"key": "aspect_null", "level": "info", "text": "aspect 없음 — 14종 밖 주제면 그대로 두고 notes 에 주제를 남긴다"})
+    return out
+
+
 def import_candidates(bundle_id: str, text: str, model: str, replace: bool = False) -> list[dict]:
     bundles = load_bundles()
     if bundle_id not in bundles:

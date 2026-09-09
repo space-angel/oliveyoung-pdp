@@ -5,87 +5,102 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>골든셋 라벨 도구 (PER-178)</title>
 <style>
-  :root { --bg:#fafaf9; --fg:#1c1917; --mute:#78716c; --line:#e7e5e4; --card:#fff; --accent:#0f766e; --warn:#b45309; --bad:#b91c1c; --sel:#fef3c7; }
+  :root { --bg:#fafaf9; --fg:#1c1917; --mute:#78716c; --line:#e7e5e4; --card:#fff; --accent:#0f766e; --warn:#b45309; --bad:#b91c1c; --sel:#fef3c7; --sup:#ccfbf1; --opp:#fee2e2; }
   * { box-sizing:border-box; }
   body { margin:0; font:14px/1.5 -apple-system, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif; color:var(--fg); background:var(--bg); }
   header { display:flex; gap:16px; align-items:center; padding:8px 16px; border-bottom:1px solid var(--line); background:var(--card); position:sticky; top:0; z-index:2; }
   header b { font-size:15px; }
-  header .mute { color:var(--mute); }
-  main { display:grid; grid-template-columns: 240px minmax(360px,1fr) 380px; height: calc(100vh - 45px); }
-  @media (max-width: 1100px) { main { grid-template-columns: 200px minmax(300px,1fr) 340px; } }
-  @media (max-width: 900px) { main { grid-template-columns: 1fr; height:auto; } aside { max-height:220px; border-right:0; border-bottom:1px solid var(--line); } form { border-left:0; border-top:1px solid var(--line); } }
-  aside, section { overflow:auto; }
+  .mute { color:var(--mute); }
+  main { display:grid; grid-template-columns: 220px minmax(380px,1fr) 440px; height: calc(100vh - 45px); }
+  @media (max-width: 1100px) { main { grid-template-columns: 190px minmax(300px,1fr) 380px; } }
+  @media (max-width: 900px) { main { grid-template-columns: 1fr; height:auto; } aside { max-height:220px; border-right:0; border-bottom:1px solid var(--line); } .right { border-left:0; border-top:1px solid var(--line); } }
+  aside, section, .right { overflow:auto; }
   aside { border-right:1px solid var(--line); padding:8px; }
   .bundle { display:block; width:100%; text-align:left; padding:6px 8px; margin:2px 0; border:1px solid transparent; border-radius:6px; background:none; cursor:pointer; font:inherit; color:inherit; }
   .bundle:hover { background:#f5f5f4; }
   .bundle.active { border-color:var(--accent); background:#f0fdfa; }
   .bundle small { color:var(--mute); display:block; }
   .kind { font-size:11px; padding:0 5px; border-radius:4px; background:#e7e5e4; margin-right:4px; }
-  .kind.cell { background:#dbeafe; }
-  .kind.missing { background:#fde68a; }
+  .kind.cell { background:#dbeafe; } .kind.missing { background:#fde68a; }
   .badge { float:right; font-size:11px; color:var(--accent); }
+  .prog { height:4px; background:#e7e5e4; border-radius:2px; margin-top:4px; overflow:hidden; }
+  .prog i { display:block; height:100%; background:var(--accent); }
   section.reviews { padding:12px 16px; }
   .head { padding:8px 12px; margin-bottom:8px; border:1px solid var(--line); border-radius:8px; background:var(--card); }
   .head .rule { color:var(--warn); font-size:13px; }
   .review { border:1px solid var(--line); border-radius:8px; padding:8px 12px; margin:8px 0; background:var(--card); }
   .review.used { border-color:var(--accent); }
+  .review.focus { outline:2px solid var(--warn); }
   .review .meta { color:var(--mute); font-size:12px; display:flex; gap:10px; flex-wrap:wrap; }
   .review .meta code { background:#f5f5f4; padding:0 4px; border-radius:3px; }
   .review .content { white-space:pre-wrap; margin:6px 0 0; user-select:text; }
   .review .content ::selection { background:var(--sel); }
+  mark { background:#fde68a; padding:0 1px; }
+  mark.qs { background:var(--sup); border-bottom:2px solid var(--accent); }
+  mark.qo { background:var(--opp); border-bottom:2px solid var(--bad); }
   .ev-actions { display:none; gap:6px; margin-top:6px; }
   .review.selected .ev-actions { display:flex; }
-  form { padding:12px 16px; border-left:1px solid var(--line); background:var(--card); display:flex; flex-direction:column; gap:8px; }
+  .sentences { margin-top:6px; }
+  .cand { display:flex; gap:6px; align-items:center; padding:3px 6px; margin:2px 0; border-left:3px solid #fde68a; background:#fffbeb; font-size:13px; }
+  .cand .txt { flex:1; } .cand.picked { border-left-color:var(--accent); background:#f0fdfa; }
+  .filter { display:flex; gap:8px; align-items:center; margin-top:6px; }
+  .filter input { flex:1; font:inherit; padding:5px 8px; border:1px solid var(--line); border-radius:6px; }
+  .aspects { display:flex; flex-wrap:wrap; gap:4px; margin-top:6px; align-items:center; }
+  .chip { font:inherit; font-size:12px; padding:2px 8px; border:1px solid var(--line); border-radius:12px; background:#fff; cursor:pointer; }
+  .chip b { color:var(--accent); } .chip.on { background:#f0fdfa; border-color:var(--accent); } .chip.zero { opacity:.45; }
+  .toggle { font-size:12px; margin-left:auto; }
+  .right { border-left:1px solid var(--line); background:var(--card); display:flex; flex-direction:column; }
+  .queue { padding:10px 12px; border-bottom:1px solid var(--line); }
+  .queue h3 { margin:0 0 6px; font-size:13px; }
+  .qrow { display:grid; grid-template-columns: 18px 1fr auto; gap:6px; align-items:center; padding:4px 6px; border-radius:6px; cursor:pointer; font-size:13px; border:1px solid transparent; }
+  .qrow:hover { background:#f5f5f4; } .qrow.on { border-color:var(--accent); background:#f0fdfa; } .qrow.done { opacity:.55; }
+  .qrow .st { font-size:12px; text-align:center; }
+  .qrow .q { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .qrow .q small { color:var(--mute); }
+  .qrow .w { font-size:11px; color:var(--warn); }
+  .qrow.human { color:var(--accent); }
+  .review-panel { padding:10px 12px; border-bottom:1px solid var(--line); background:#fffdf7; }
+  .review-panel h3 { margin:0 0 4px; font-size:13px; display:flex; gap:8px; align-items:center; }
+  .review-panel .qa { margin:4px 0; }
+  .review-panel .qa b { display:block; }
+  .checks { margin:6px 0; display:flex; flex-direction:column; gap:3px; font-size:12px; }
+  .chk { padding:2px 6px; border-radius:4px; background:#f5f5f4; }
+  .chk.warn { background:#fef3c7; color:#92400e; } .chk.err { background:#fee2e2; color:#991b1b; }
+  .quotes { display:flex; flex-direction:column; gap:4px; margin-top:6px; }
+  .quote { display:grid; grid-template-columns: 4px 1fr; gap:8px; padding:5px 8px; border:1px solid var(--line); border-radius:6px; cursor:pointer; background:#fff; font-size:13px; }
+  .quote:hover { border-color:var(--accent); }
+  .quote .bar { border-radius:2px; } .quote.support .bar { background:var(--accent); } .quote.oppose .bar { background:var(--bad); }
+  .quote .qm { color:var(--mute); font-size:11px; display:flex; gap:8px; }
+  .quote .qt { margin-top:2px; }
+  .actions { display:flex; gap:6px; margin-top:8px; }
+  form { padding:12px; display:flex; flex-direction:column; gap:8px; }
   label.f { display:flex; flex-direction:column; gap:2px; font-size:12px; color:var(--mute); }
   label.f input, label.f select, label.f textarea { font:inherit; padding:5px 7px; border:1px solid var(--line); border-radius:6px; color:var(--fg); background:#fff; }
-  textarea { min-height:52px; resize:vertical; }
-  .row { display:flex; gap:8px; }
-  .row > * { flex:1; }
+  textarea { min-height:48px; resize:vertical; }
+  .row { display:flex; gap:8px; } .row > * { flex:1; }
   button.primary { background:var(--accent); color:#fff; border:0; border-radius:6px; padding:8px; font:inherit; font-weight:600; cursor:pointer; }
+  button.primary.reject { background:var(--bad); }
   button.small { font:inherit; font-size:12px; padding:2px 8px; border:1px solid var(--line); border-radius:5px; background:#fff; cursor:pointer; }
-  button.small.support { border-color:var(--accent); color:var(--accent); }
-  button.small.oppose { border-color:var(--bad); color:var(--bad); }
+  button.small.support { border-color:var(--accent); color:var(--accent); } button.small.oppose { border-color:var(--bad); color:var(--bad); }
   .evidence { border:1px dashed var(--line); border-radius:6px; padding:6px; font-size:13px; }
   .evidence .item { display:flex; gap:6px; align-items:flex-start; padding:3px 0; border-bottom:1px solid #f5f5f4; }
   .evidence .item:last-child { border:0; }
-  .evidence .stance { font-size:11px; padding:0 5px; border-radius:4px; }
-  .stance.support { background:#ccfbf1; color:#115e59; } .stance.oppose { background:#fee2e2; color:#991b1b; }
-  .evidence q { flex:1; quotes:none; }
+  .stance { font-size:11px; padding:0 5px; border-radius:4px; }
+  .stance.support { background:var(--sup); color:#115e59; } .stance.oppose { background:var(--opp); color:#991b1b; }
+  .evidence q { flex:1; quotes:none; cursor:pointer; }
   .msg { padding:8px 10px; border-radius:6px; font-size:13px; white-space:pre-wrap; }
   .msg.err { background:#fef2f2; color:var(--bad); border:1px solid #fecaca; }
   .msg.ok { background:#f0fdfa; color:#115e59; border:1px solid #99f6e4; }
-  .labels { font-size:13px; }
-  .labels .l { padding:6px 8px; border:1px solid var(--line); border-radius:6px; margin:4px 0; background:#fff; }
-  .labels .l b { display:block; }
-  .labels .l .mute { color:var(--mute); font-size:12px; }
+  .labels { font-size:13px; } .labels .l { padding:6px 8px; border:1px solid var(--line); border-radius:6px; margin:4px 0; background:#fff; }
+  .labels .l b { display:block; } .labels .l .mute { font-size:12px; }
   details summary { cursor:pointer; color:var(--mute); font-size:12px; }
   .chips { display:flex; flex-wrap:wrap; gap:4px; }
   .chips label { font-size:12px; border:1px solid var(--line); border-radius:12px; padding:1px 8px; cursor:pointer; }
   .chips input { vertical-align:middle; margin:0 3px 0 0; }
   .chips .critical { border-color:#fca5a5; } .chips .high { border-color:#fcd34d; }
-  .timer { font-variant-numeric: tabular-nums; }
-  .filter { display:flex; gap:8px; align-items:center; margin-top:6px; }
-  .filter input { flex:1; font:inherit; padding:5px 8px; border:1px solid var(--line); border-radius:6px; }
-  mark { background:#fde68a; padding:0 1px; }
-  .aspects { display:flex; flex-wrap:wrap; gap:4px; margin-top:6px; align-items:center; }
-  .chip { font:inherit; font-size:12px; padding:2px 8px; border:1px solid var(--line); border-radius:12px; background:#fff; cursor:pointer; }
-  .chip b { color:var(--accent); }
-  .chip.on { background:#f0fdfa; border-color:var(--accent); }
-  .chip.zero { opacity:.45; }
-  .sentences { margin-top:6px; }
-  .cand { display:flex; gap:6px; align-items:center; padding:3px 6px; margin:2px 0; border-left:3px solid #fde68a; background:#fffbeb; font-size:13px; }
-  .cand .txt { flex:1; }
-  .cand.picked { border-left-color:var(--accent); background:#f0fdfa; }
-  .chips .tpl { border-style:dashed; color:var(--fg); }
-  .cands summary { font-weight:600; color:var(--fg); }
-  .cand-card { border:1px solid var(--line); border-radius:6px; padding:6px 8px; margin:4px 0; font-size:13px; background:#fff; }
-  .cand-card.done { opacity:.6; }
-  .cand-card .q { margin-top:2px; }
-  .cerr { color:var(--bad); font-size:12px; margin-top:2px; }
-  .dec { font-size:11px; padding:0 5px; border-radius:4px; background:#e7e5e4; }
-  .dec.candidate_rejected { background:#fee2e2; color:#991b1b; } .dec.candidate_accepted, .dec.candidate_edited { background:#ccfbf1; color:#115e59; }
+  .chips .tpl { border-style:dashed; color:var(--fg); } .chips .tpl:hover { background:#f0fdfa; border-color:var(--accent); }
   .srcline { font-size:12px; }
-  .chips .tpl:hover { background:#f0fdfa; border-color:var(--accent); }
+  .timer { font-variant-numeric: tabular-nums; }
 </style>
 </head>
 <body>
@@ -98,13 +113,12 @@
 <main>
   <aside id="bundles"></aside>
   <section class="reviews" id="reviews"><p class="mute">왼쪽에서 번들을 고르세요.</p></section>
-  <form id="form" onsubmit="return false">
-    <p class="mute" style="margin:0">번들을 고르면 폼이 열립니다.</p>
-  </form>
+  <div class="right" id="right"><p class="mute" style="padding:12px">번들을 고르면 후보 대기열과 폼이 열립니다.</p></div>
 </main>
 <script>
 const $ = (s, r=document) => r.querySelector(s);
-const state = { bundleId:null, data:null, evidence:[], startedAt:Date.now(), selectedReview:null, filter:'', aspect:null, source:'human', candidateId:null, snapshot:null };
+const state = { bundleId:null, data:null, evidence:[], startedAt:Date.now(), filter:'', aspect:null,
+  source:'human', candidateId:null, snapshot:null, reviewing:null, onlyEvidence:false, highlight:[] };
 
 async function api(path, opt) {
   const r = await fetch(path, opt);
@@ -112,9 +126,10 @@ async function api(path, opt) {
   if (!r.ok) throw new Error(j.error || r.statusText);
   return j;
 }
-
 function esc(s) { return String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+function stars(n) { return '★'.repeat(n) + '☆'.repeat(5-n); }
 
+// ---------- 번들 목록 ----------
 async function loadBundles() {
   const list = await api('/api/bundles');
   const total = list.reduce((a,b)=>a+b.labels,0);
@@ -123,68 +138,74 @@ async function loadBundles() {
   const kindCls = k => k==='product' ? '' : (k==='missing' ? 'missing' : 'cell');
   $('#bundles').innerHTML = list.map(b => `
     <button class="bundle ${b.bundleId===state.bundleId?'active':''}" data-id="${b.bundleId}">
-      <span class="badge">${b.candidates ? '후보 '+b.candidates+' · ' : ''}${b.labels ? '라벨 '+b.labels : ''}</span>
+      <span class="badge">${b.labels ? '라벨 '+b.labels : ''}</span>
       <b>${b.bundleId}</b> <span class="kind ${kindCls(b.scope.kind)}">${b.scope.kind}${b.scope.segment ? ' '+esc(b.scope.segment) : ''}</span>
-      <small>${esc(b.displayName)} · ${esc(b.category)} · ${b.reviews}리뷰 · ${b.phase}</small>
+      <small>${esc(b.displayName)} · ${b.reviews}리뷰 · ${b.phase}${b.candidates ? ' · 후보 '+b.candidates : ''}</small>
+      ${b.candidates ? `<div class="prog"><i style="width:${Math.min(100, Math.round(100*b.labels/Math.max(1,b.candidates+1)))}%"></i></div>` : ''}
     </button>`).join('');
   $('#bundles').querySelectorAll('.bundle').forEach(el => el.onclick = () => openBundle(el.dataset.id));
 }
 
 async function openBundle(id) {
-  state.bundleId = id; state.evidence = []; state.startedAt = Date.now(); state.selectedReview = null; state.aspect = null; state.filter = ''; state.source = 'human'; state.candidateId = null; state.snapshot = null;
+  Object.assign(state, { bundleId:id, evidence:[], startedAt:Date.now(), aspect:null, filter:'', source:'human',
+    candidateId:null, snapshot:null, reviewing:null, onlyEvidence:false, highlight:[] });
   state.data = await api('/api/bundle/' + id);
   await loadBundles();
-  renderReviews(); renderForm();
+  renderReviews(); renderRight();
+  // 첫 미결 후보를 자동으로 검수 대상으로
+  const next = (state.data.candidates||[]).find(c => !c.decision);
+  if (next) reviewCandidate(next.candidateId);
 }
 
-function stars(n) { return '★'.repeat(n) + '☆'.repeat(5-n); }
-
+// ---------- 가운데: 리뷰 ----------
 function renderReviews() {
   const d = state.data, b = d.bundle, s = b.scope;
   const scopeLine = s.axis
     ? `<b>셀 번들</b> — <code>${s.axis}</code> = ${esc(d.scopeLabel)}. 이 번들의 주장은 condition.${s.axis} 에 이 값을 가져야 한다`
     : `<b>제품 번들</b> — 제품 전체 주장. 리뷰별 조건을 보고 조건부 주장을 만들 수도 있다 (근거는 그 세그먼트 리뷰만)`;
   const strata = b.strata.map(x=>`${x.name} ${x.sampled}/${x.population}`).join(' · ');
-  const usedIds = new Set(state.evidence.map(e=>e.reviewId));
   $('#reviews').innerHTML = `
     <div class="head">
       <div><b>${b.bundleId} — ${esc(b.displayName)}</b> <span class="mute">· ${esc(b.category)} · ${b.productId} · 리뉴얼 ${b.renewalPolicy} · ${b.phase}</span></div>
       <div>${scopeLine}</div>
       <div class="mute">리뷰 ${d.reviews.length} / 모집단 ${b.population} (리센시 통과 · 작성자 1건). 층: ${strata}</div>
-      <div class="rule">원문을 드래그해서 선택한 뒤 support / oppose 를 누르면 근거로 들어갑니다. 인용은 원문 그대로여야 합니다.</div>
-      <div class="filter"><input id="filter" placeholder="단어로 리뷰 걸러 보기 — 예: 구순염, 발색, 지속  (쉼표로 여러 개, 빈 칸이면 전체)" value="${esc(state.filter||'')}"><span id="filterCount" class="mute"></span></div>
+      <div class="rule">근거 추가: 원문을 드래그 → support/oppose, 또는 aspect 칩을 눌러 나온 문장 옆 S/O. 인용은 원문 그대로여야 합니다.</div>
+      <div class="filter"><input id="filter" placeholder="단어로 리뷰 걸러 보기 (쉼표로 여러 개)" value="${esc(state.filter||'')}"><span id="filterCount" class="mute"></span>
+        <label class="toggle"><input type="checkbox" id="onlyEv" ${state.onlyEvidence?'checked':''}> 근거 리뷰만</label></div>
       <div class="aspects" id="aspects">${Object.entries(d.aspectHits).sort((a,b)=>b[1].reviews-a[1].reviews).map(([a,h])=>`
         <button type="button" class="chip ${state.aspect===a?'on':''} ${h.reviews===0?'zero':''}" data-aspect="${esc(a)}" title="${esc(h.keywords.join(', '))}">${esc(a)} <b>${h.reviews}</b></button>`).join('')}
-        <span class="mute" style="font-size:12px">← aspect 를 누르면 그 단어가 든 리뷰만 남고, 문장 후보가 아래에 뜹니다. 숫자는 단어가 든 리뷰 수(태그 아님)</span>
       </div>
     </div>
     ${d.reviews.map((r,i)=>`
-      <article class="review ${usedIds.has(r.reviewId)?'used':''}" data-id="${r.reviewId}">
+      <article class="review" data-id="${r.reviewId}" id="rv-${r.reviewId}">
         <div class="meta"><span>#${String(i+1).padStart(2,'0')}</span><code>${r.reviewId}</code><span>${stars(r.rating)}</span><span>${r.month}</span><span>${esc(r.conditionLine)}</span><span>작성자 <code>${esc(r.author)}</code></span></div>
         <p class="content">${esc(r.content)}</p>
-        <div class="sentences" data-id="${r.reviewId}"></div>
+        <div class="sentences"></div>
         <div class="ev-actions">
           <button type="button" class="small support" data-stance="support">support 로 추가</button>
           <button type="button" class="small oppose" data-stance="oppose">oppose 로 추가</button>
           <span class="mute" style="font-size:12px">선택: <q class="sel"></q></span>
         </div>
       </article>`).join('')}`;
-  const sec = $('#reviews');
   const fi = $('#filter');
   fi.oninput = () => { state.filter = fi.value; state.aspect = null; applyFilter(); };
+  $('#onlyEv').onchange = e => { state.onlyEvidence = e.target.checked; applyFilter(); };
   $('#aspects').querySelectorAll('.chip').forEach(c => c.onclick = () => pickAspect(c.dataset.aspect));
-  applyFilter();
-  document.addEventListener('selectionchange', onSelection);
-  sec.querySelectorAll('.ev-actions button').forEach(btn => btn.onclick = () => {
-    const art = btn.closest('.review'); const q = art.querySelector('q.sel').textContent;
-    if (!q) return;
-    const rid = Number(art.dataset.id);
-    state.evidence = state.evidence.filter(e=>e.reviewId!==rid);
-    state.evidence.push({reviewId: rid, stance: btn.dataset.stance, quote: q});
-    window.getSelection().removeAllRanges();
-    renderEvidence(); art.classList.add('used'); art.classList.remove('selected');
+  $('#reviews').querySelectorAll('.ev-actions button').forEach(btn => btn.onclick = () => {
+    const art = btn.closest('.review'); const q = art.querySelector('q.sel').textContent; if (!q) return;
+    addEvidence(Number(art.dataset.id), btn.dataset.stance, q);
+    window.getSelection().removeAllRanges(); art.classList.remove('selected');
   });
+  applyFilter();
 }
+document.addEventListener('selectionchange', () => {
+  const sel = window.getSelection(); if (!sel || sel.isCollapsed) return;
+  const node = sel.anchorNode && sel.anchorNode.parentElement; const art = node && node.closest('.review');
+  document.querySelectorAll('.review.selected').forEach(a=>a.classList.remove('selected'));
+  if (!art || !node.closest('.content')) return;
+  const text = sel.toString(); if (!text.trim()) return;
+  art.classList.add('selected'); art.querySelector('q.sel').textContent = text;
+});
 
 function pickAspect(aspect) {
   const hit = state.data.aspectHits[aspect];
@@ -192,110 +213,149 @@ function pickAspect(aspect) {
   state.filter = state.aspect ? hit.keywords.join(', ') : '';
   const fi = $('#filter'); if (fi) fi.value = state.filter;
   document.querySelectorAll('#aspects .chip').forEach(c => c.classList.toggle('on', c.dataset.aspect === state.aspect));
-  // 폼: aspect 선택 + 질문 틀 (비어 있을 때만 — 쓰던 문장을 덮지 않는다)
-  const sel = document.querySelector('[name=aspect]'); if (sel && state.aspect) sel.value = state.aspect;
-  renderQuestionTemplates();
-  applyFilter();
+  const sel = document.querySelector('[name=aspect]'); if (sel && state.aspect && !sel.value) sel.value = state.aspect;
+  renderQuestionTemplates(); applyFilter();
 }
-
-function loadCandidate(cid, mode) {
-  const c = (state.data.candidates||[]).find(x => x.candidateId === cid); if (!c) return;
-  const k = c.candidate, f = $('#form'), v = state.data.vocab;
-  f.querySelector('[name=aspect]').value = k.aspect || '';
-  f.querySelector('[name=question]').value = k.question || '';
-  f.querySelector('[name=answer]').value = k.answer || '';
-  f.querySelector('[name=direction]').value = k.direction || 'positive';
-  const cond = k.condition || {};
-  f.querySelector('[name=cond_skinType]').value = cond.skinType || '';
-  f.querySelector('[name=cond_option]').value = cond.option || '';
-  f.querySelectorAll('[name=trouble],[name=trouble_missing]').forEach(cb => cb.checked = Array.isArray(cond.skinTrouble) && cond.skinTrouble.includes(cb.value));
-  state.evidence = (k.evidence||[]).map(e => ({reviewId: e.reviewId, stance: e.stance, quote: e.quote}));
-  state.candidateId = cid;
-  state.source = mode === 'reject' ? 'candidate_rejected' : 'candidate_accepted';
-  state.snapshot = JSON.stringify(normalizedForm());
-  $('#srcline').innerHTML = mode === 'reject'
-    ? `출처: <b style="color:var(--bad)">candidate_rejected</b> · ${esc(cid)} — 기각 사유(failureReasons)를 하나 이상 체크하고 저장`
-    : `출처: <b style="color:var(--accent)">candidate_accepted</b> · ${esc(cid)} — 원문과 대조해 확인. 고치면 자동으로 candidate_edited`;
-  renderEvidence(); renderQuestionTemplates(); renderReviews();
-  if (c.contractErrors.length) showMsg('이 후보는 계약 위반이 있다 — 그대로는 저장되지 않는다. 근거·조건을 고치거나 기각하라:\n' + c.contractErrors.join('\n'), 'err');
-  else showMsg('', '');
-  if (mode === 'reject') document.querySelector('[name=fail]').scrollIntoView({block:'center'});
-}
-
-function normalizedForm() {
-  const fd = new FormData($('#form'));
-  const cond = axis => { const x = fd.get('cond_'+axis); return x === '' ? null : x; };
-  const troubles = fd.getAll('trouble'); const tm = fd.get('trouble_missing');
-  return { aspect: fd.get('aspect') || null, question: (fd.get('question')||'').trim(), answer: (fd.get('answer')||'').trim(),
-    condition: { skinType: cond('skinType'), skinTrouble: tm ? [tm].concat(troubles) : (troubles.length ? troubles : null), option: cond('option') },
-    direction: fd.get('direction'), evidence: state.evidence };
-}
-
-function renderQuestionTemplates() {
-  const box = $('#qtpl'); if (!box) return;
-  const aspect = state.aspect || document.querySelector('[name=aspect]')?.value;
-  const tpls = (state.data.questionTemplates || {})[aspect] || [];
-  box.innerHTML = tpls.length ? tpls.map(t => `<label class="tpl">${esc(t)}</label>`).join('') : '<span class="mute" style="font-size:12px">aspect 를 고르면 질문 틀이 뜹니다</span>';
-  box.querySelectorAll('.tpl').forEach(el => el.onclick = () => { const q = document.querySelector('[name=question]'); q.value = el.textContent; q.focus(); });
-}
-
 function splitSentences(text) {
-  // 문장 후보: 문장부호·개행으로 자르고, 길면 쉼표에서 한 번 더. 원문 부분문자열만 만든다 (trim 만).
   const parts = text.split(/(?<=[.!?…~])\s+|\n+/).flatMap(p => p.length > 90 ? p.split(/(?<=,)\s+/) : [p]);
   return parts.map(p => p.trim()).filter(p => p.length >= 4);
 }
-
+function markQuotes(html, text, quotes) {
+  // 인용 형광펜 — 원문(escaped) 안에서 인용(escaped)을 찾아 감싼다. 입장별 색.
+  for (const e of quotes) {
+    const q = esc(e.quote); if (!q || !html.includes(q)) continue;
+    html = html.split(q).join(`<mark class="${e.stance==='oppose'?'qo':'qs'}">${q}</mark>`);
+  }
+  return html;
+}
 function applyFilter() {
   const terms = (state.filter||'').split(',').map(t=>t.trim()).filter(Boolean);
-  let shown = 0;
+  const evIds = new Set(state.evidence.map(e=>e.reviewId));
+  const hl = state.evidence;  // 폼에 올라온 근거를 원문에 표시
+  let shown = 0; const total = document.querySelectorAll('.review').length;
   document.querySelectorAll('.review').forEach(art => {
-    const text = art.querySelector('.content').textContent;
-    const hit = !terms.length || terms.some(t => text.includes(t));
+    const rid = Number(art.dataset.id);
+    const text = state.data.reviews.find(r=>r.reviewId===rid).content;
+    let hit = !terms.length || terms.some(t => text.includes(t));
+    if (state.onlyEvidence) hit = evIds.has(rid);
     art.hidden = !hit; if (hit) shown++;
-    // 하이라이트: 텍스트 노드만 다시 그린다 (선택 → 인용에 영향 없음)
+    art.classList.toggle('used', evIds.has(rid));
     const p = art.querySelector('.content');
     let h = esc(text);
-    terms.forEach(t => { if (t) h = h.split(esc(t)).join(`<mark>${esc(t)}</mark>`); });
+    const mine = hl.filter(e=>e.reviewId===rid);
+    if (mine.length) h = markQuotes(h, text, mine);
+    else terms.forEach(t => { if (t) h = h.split(esc(t)).join(`<mark>${esc(t)}</mark>`); });
     p.innerHTML = h;
-    // 문장 후보 — 검색어가 든 문장만, 클릭으로 근거 추가
     const box = art.querySelector('.sentences');
-    if (!hit || !terms.length) { box.innerHTML = ''; return; }
-    const rid = Number(art.dataset.id);
+    if (!hit || !terms.length || state.onlyEvidence) { box.innerHTML = ''; return; }
     const used = state.evidence.find(e => e.reviewId === rid);
     const cands = splitSentences(text).filter(sn => terms.some(t => sn.includes(t)));
     box.innerHTML = cands.map(sn => `
-      <div class="cand ${used && used.quote === sn ? 'picked' : ''}">
-        <span class="txt">${esc(sn)}</span>
+      <div class="cand ${used && used.quote === sn ? 'picked' : ''}"><span class="txt">${esc(sn)}</span>
         <button type="button" class="small support" data-stance="support">S</button>
-        <button type="button" class="small oppose" data-stance="oppose">O</button>
-      </div>`).join('');
-    box.querySelectorAll('.cand button').forEach(btn => btn.onclick = () => {
-      const quote = btn.closest('.cand').querySelector('.txt').textContent;
-      state.evidence = state.evidence.filter(e => e.reviewId !== rid);
-      state.evidence.push({reviewId: rid, stance: btn.dataset.stance, quote});
-      renderEvidence(); art.classList.add('used'); applyFilter();
-    });
+        <button type="button" class="small oppose" data-stance="oppose">O</button></div>`).join('');
+    box.querySelectorAll('.cand button').forEach(btn => btn.onclick = () => addEvidence(rid, btn.dataset.stance, btn.closest('.cand').querySelector('.txt').textContent));
   });
-  const total = document.querySelectorAll('.review').length;
-  $('#filterCount').textContent = terms.length ? `${shown} / ${total} 리뷰` : `${total} 리뷰`;
+  $('#filterCount').textContent = `${shown} / ${total} 리뷰`;
+}
+function addEvidence(rid, stance, quote) {
+  state.evidence = state.evidence.filter(e => e.reviewId !== rid);
+  state.evidence.push({reviewId: rid, stance, quote});
+  renderEvidence(); applyFilter();
+}
+function focusReview(rid) {
+  const el = document.getElementById('rv-'+rid); if (!el) return;
+  if (el.hidden) { state.onlyEvidence = false; const t = $('#onlyEv'); if (t) t.checked = false; state.filter=''; const fi=$('#filter'); if (fi) fi.value=''; applyFilter(); }
+  document.querySelectorAll('.review.focus').forEach(a=>a.classList.remove('focus'));
+  el.classList.add('focus'); el.scrollIntoView({block:'center', behavior:'smooth'});
 }
 
-function onSelection() {
-  const sel = window.getSelection();
-  if (!sel || sel.isCollapsed) return;
-  const node = sel.anchorNode && sel.anchorNode.parentElement;
-  const art = node && node.closest('.review');
-  document.querySelectorAll('.review.selected').forEach(a=>a.classList.remove('selected'));
-  if (!art || !node.closest('.content')) return;
-  const text = sel.toString();
-  if (!text.trim()) return;
-  art.classList.add('selected');
-  art.querySelector('q.sel').textContent = text;
+// ---------- 오른쪽: 대기열 · 검수 패널 · 폼 ----------
+function renderRight() {
+  const d = state.data, cands = d.candidates || [];
+  const humans = d.labels.filter(l=>l.source==='human').length;
+  const decided = cands.filter(c=>c.decision).length;
+  const icon = c => c.decision ? (c.decision==='candidate_rejected' ? '✗' : '✓') : (c.contractErrors.length ? '!' : '○');
+  $('#right').innerHTML = `
+    <div class="queue">
+      <h3>검수 대기열 <span class="mute">후보 ${decided}/${cands.length} 결정 · 사람 claim ${humans}${humans?'':' <b style="color:var(--warn)">(번들당 1개 필요)</b>'}</span></h3>
+      ${cands.map(c => { const k=c.candidate; const warns=c.checks.filter(x=>x.level==='warn').length + c.contractErrors.length;
+        return `<div class="qrow ${state.reviewing===c.candidateId?'on':''} ${c.decision?'done':''}" data-cid="${c.candidateId}">
+          <span class="st">${icon(c)}</span>
+          <span class="q">${esc(k.question||'')} <small>· ${esc(k.aspect||'—')} · ${esc(k.direction||'')}</small></span>
+          <span class="w">${warns?'⚠ '+warns:''}</span></div>`; }).join('')}
+      <div class="qrow human ${state.reviewing==='__human__'?'on':''}" data-cid="__human__"><span class="st">＋</span><span class="q">후보에 없는 claim 직접 만들기 <small>· source=human</small></span><span></span></div>
+    </div>
+    <div class="review-panel" id="panel"></div>
+    <form id="form" onsubmit="return false"></form>`;
+  $('#right').querySelectorAll('.qrow').forEach(r => r.onclick = () => r.dataset.cid==='__human__' ? startHuman() : reviewCandidate(r.dataset.cid));
+  renderForm();
+  renderPanel();
 }
 
+function reviewCandidate(cid) {
+  const c = (state.data.candidates||[]).find(x => x.candidateId === cid); if (!c) return;
+  state.reviewing = cid;
+  const k = c.candidate;
+  state.evidence = (k.evidence||[]).map(e => ({reviewId:e.reviewId, stance:e.stance, quote:e.quote}));
+  state.candidateId = cid; state.source = c.decision ? 'human' : 'candidate_accepted';
+  state.onlyEvidence = true; state.filter=''; state.aspect=null;
+  renderRight();                       // 대기열·패널·폼을 먼저 그리고
+  fillForm(k); state.snapshot = JSON.stringify(normalizedForm());   // 그 다음 후보를 폼에 올린다
+  const t = $('#onlyEv'); if (t) t.checked = true; const fi=$('#filter'); if (fi) fi.value='';
+  applyFilter();
+  const first = state.evidence[0]; if (first) focusReview(first.reviewId);
+}
+function startHuman() {
+  state.reviewing = '__human__'; state.candidateId = null; state.source = 'human'; state.snapshot = null;
+  state.evidence = []; state.onlyEvidence = false;
+  renderRight(); fillForm(null); const t = $('#onlyEv'); if (t) t.checked = false; applyFilter();
+}
+
+function renderPanel() {
+  const box = $('#panel'); if (!box) return;
+  if (state.reviewing === '__human__') {
+    box.innerHTML = `<h3>직접 작성 <span class="mute">— 후보가 놓친 주제를 aspect 칩·단어 필터로 찾아 근거를 모으고 답 → 질문 순서로</span></h3>`;
+    return;
+  }
+  const c = (state.data.candidates||[]).find(x => x.candidateId === state.reviewing);
+  if (!c) { box.innerHTML = `<span class="mute">대기열에서 후보를 고르세요. 후보가 없으면 "직접 만들기".</span>`; return; }
+  const k = c.candidate; const rv = id => state.data.reviews.find(r=>r.reviewId===id) || {};
+  const checks = c.contractErrors.map(e=>`<div class="chk err">계약 위반: ${esc(e.replace(/^\[labelId=[^\]]*\]\s*/,''))}</div>`)
+    + c.checks.map(x=>`<div class="chk ${x.level}">${esc(x.text)}</div>`).join('');
+  box.innerHTML = `
+    <h3>${esc(c.candidateId)} <span class="mute" style="font-weight:400">${esc(k.aspect||'aspect 없음')} · ${esc(k.direction||'')} · ${esc(c.model)}</span>
+      ${c.decision ? `<span class="stance ${c.decision==='candidate_rejected'?'oppose':'support'}">${c.decision.replace('candidate_','')} → ${esc(c.labelId)}</span>` : ''}</h3>
+    <div class="qa"><b>Q</b>${esc(k.question||'')}</div>
+    <div class="qa"><b>A</b>${esc(k.answer||'')}</div>
+    <div class="mute" style="font-size:12px">조건 ${esc(JSON.stringify(k.condition))}${c.note?' · note: '+esc(c.note):''}</div>
+    <div class="checks">${checks || '<div class="chk">자동 점검 통과 — 그래도 인용을 원문에서 확인</div>'}</div>
+    <div class="mute" style="font-size:12px;margin-top:6px">이 질문을 뽑은 근거 인용 ${(k.evidence||[]).length}개 — 누르면 원문 위치로 이동 (가운데 형광펜: <mark class="qs">지지</mark> <mark class="qo">반대</mark>)</div>
+    <div class="quotes">${(k.evidence||[]).map(e => { const r = rv(e.reviewId); return `
+      <div class="quote ${e.stance}" data-rid="${e.reviewId}"><span class="bar"></span>
+        <div><div class="qm"><span>${e.stance}</span><code>${e.reviewId}</code><span>${r.rating?stars(r.rating):''}</span><span>${esc(r.conditionLine||'')}</span></div>
+        <div class="qt">“${esc(e.quote)}”</div></div></div>`; }).join('')}</div>
+    ${c.decision ? '' : `<div class="actions">
+      <button type="button" class="primary" id="btnAccept">채택 → 아래 폼 확인 후 저장</button>
+      <button type="button" class="primary reject" id="btnReject">기각 → 실패유형 체크 후 저장</button></div>
+      <div class="mute" style="font-size:12px;margin-top:4px">채택 후 근거를 보태거나 문장을 고치면 저장 시 자동으로 candidate_edited 가 됩니다.</div>`}`;
+  box.querySelectorAll('.quote').forEach(q => q.onclick = () => focusReview(Number(q.dataset.rid)));
+  const a = $('#btnAccept'), r = $('#btnReject');
+  if (a) a.onclick = () => { state.source = 'candidate_accepted'; setSrcLine(); $('#save').scrollIntoView({block:'center', behavior:'smooth'}); };
+  if (r) r.onclick = () => { state.source = 'candidate_rejected'; setSrcLine(); const f = document.querySelector('[name=fail]'); if (f) f.scrollIntoView({block:'center', behavior:'smooth'}); };
+}
+function setSrcLine() {
+  const el = $('#srcline'); if (!el) return;
+  const s = state.source;
+  el.innerHTML = s==='human' ? '출처: <b>human</b> (직접 작성)'
+    : s==='candidate_rejected' ? `출처: <b style="color:var(--bad)">candidate_rejected</b> · ${esc(state.candidateId)} — 기각 사유(failureReasons)를 하나 이상 체크`
+    : `출처: <b style="color:var(--accent)">candidate_accepted</b> · ${esc(state.candidateId)} — 고치면 자동으로 candidate_edited`;
+  const btn = $('#save'); if (btn) { btn.textContent = s==='candidate_rejected' ? '기각 라벨 저장 (계약 검증)' : '저장 (계약 검증)'; btn.classList.toggle('reject', s==='candidate_rejected'); }
+}
+
+// ---------- 폼 ----------
 function renderForm() {
-  const d = state.data, v = d.vocab, s = d.bundle.scope;
-  const n = d.labels.length + 1;
+  const d = state.data, v = d.vocab, s = d.bundle.scope, n = d.labels.length + 1;
   const opt = (arr, sel) => arr.map(x=>`<option ${x===sel?'selected':''}>${esc(x)}</option>`).join('');
   const condSelect = (axis) => {
     let choices = [['', 'null (무관)'], [v.missing, v.missing]];
@@ -307,103 +367,103 @@ function renderForm() {
   const troubleChips = `<div class="chips">
       <label><input type="checkbox" name="trouble_missing" value="${v.missing}" ${s.axis==='skinTrouble'&&s.segment===v.missing?'checked':''}>${v.missing}</label>
       ${Object.entries(v.skinTrouble).map(([c,l])=>`<label><input type="checkbox" name="trouble" value="${c}" ${s.axis==='skinTrouble'&&s.segment===c?'checked':''}>${c} ${l}</label>`).join('')}
-    </div><small class="mute">아무것도 안 고르면 null(무관)</small>`;
+    </div>`;
   const failChips = `<div class="chips">${v.taxonomy.types.map(t=>`<label class="${t.severity}"><input type="checkbox" name="fail" value="${t.key}">${t.key} <span class="mute">${t.label}</span></label>`).join('')}</div>`;
-  const cands = d.candidates || [];
-  const candHtml = cands.length ? `<details open class="cands"><summary>모델 후보 ${cands.length}개 — 채택·수정·기각 (${[...new Set(cands.map(c=>c.model))].join(', ')})</summary>
-    ${cands.map(c => {
-      const k = c.candidate, dec = c.decision;
-      const badge = dec ? `<span class="dec ${dec}">${dec.replace('candidate_','')} · ${esc(c.labelId)}</span>` : '';
-      const errs = c.contractErrors.length ? `<div class="cerr">계약 위반 ${c.contractErrors.length}: ${esc(c.contractErrors[0].slice(0,140))}</div>` : '';
-      return `<div class="cand-card ${dec?'done':''}">
-        <div><b>${esc(c.candidateId)}</b> · ${esc(k.aspect||'—')} · ${esc(k.direction||'—')} ${badge}</div>
-        <div class="q">${esc(k.question||'')}</div><div class="a mute">${esc(k.answer||'')}</div>
-        <div class="mute" style="font-size:12px">근거 ${(k.evidence||[]).length} · 조건 ${esc(JSON.stringify(k.condition))}${c.note?' · '+esc(c.note):''}</div>
-        ${errs}
-        ${dec ? '' : `<div class="row" style="margin-top:4px"><button type="button" class="small" data-load="${esc(c.candidateId)}" data-mode="accept">채택 (폼에 올려 확인)</button><button type="button" class="small oppose" data-load="${esc(c.candidateId)}" data-mode="reject">기각 (실패유형 붙이기)</button></div>`}
-      </div>`; }).join('')}</details>` : `<div class="mute" style="font-size:12px">모델 후보 없음 — <code>python3 eval/concern_candidates.py export</code> 로 하네스를 만들어 다른 모델에 돌리고 <code>import</code> 로 들여온다. 없어도 직접 만들 수 있다.</div>`;
   $('#form').innerHTML = `
-    ${candHtml}
-    <div class="srcline mute" id="srcline">출처: <b>human</b> (직접 작성)</div>
+    <div class="srcline mute" id="srcline"></div>
+    <label class="f">answer (리뷰가 주는 답)<textarea name="answer"></textarea></label>
+    <label class="f">question (답을 묻는 말로)<textarea name="question"></textarea><div class="chips" id="qtpl"></div></label>
     <div class="row">
-      <label class="f">aspect (이 claim 이 다루는 주제)<select name="aspect"><option value="">(없음 → notes 에)</option>${opt(v.aspects)}</select></label>
-      <label class="f">labelId (자동)<input name="labelId" value="${d.bundle.bundleId}-${n}" readonly style="background:#f5f5f4;color:var(--mute)"></label>
+      <label class="f">aspect<select name="aspect"><option value="">(없음 → notes 에)</option>${opt(v.aspects)}</select></label>
+      <label class="f">direction<select name="direction">${opt(v.directions,'positive')}</select></label>
     </div>
-    <label class="f">① evidence 를 먼저 모으고 → ② answer 를 쓰고 → ③ question 은 답을 묻는 말로 뒤집는다</label>
-    <label class="f">answer (리뷰가 주는 답 — 먼저 쓴다)<textarea name="answer" placeholder="예: 구순염이 생겼다는 리뷰가 있고, 걱정했지만 안 생겼다는 리뷰도 있다"></textarea></label>
-    <label class="f">question (답을 묻는 말로)<textarea name="question" placeholder="…나요?"></textarea>
-      <div class="chips" id="qtpl"></div></label>
+    <label class="f">evidence — 저장될 근거 (인용 클릭 → 원문 위치)<div class="evidence" id="evidence"></div></label>
     <div class="row">
       <label class="f">condition.skinType${condSelect('skinType')}</label>
       <label class="f">condition.option${condSelect('option')}</label>
     </div>
-    <label class="f">condition.skinTrouble (다중)${troubleChips}</label>
+    <label class="f">condition.skinTrouble (다중, 아무것도 안 고르면 null)${troubleChips}</label>
+    <label class="f">failureReasons (${v.taxonomy.version}) — 기각 라벨·실패 사례일 때만${failChips}</label>
     <div class="row">
-      <label class="f">direction<select name="direction">${opt(v.directions,'positive')}</select></label>
       <label class="f">evaluation<select name="evaluation">${opt(v.evaluations,'complete')}</select></label>
+      <label class="f">minutesSpent<input name="minutesSpent" type="number" min="0.5" step="0.5" placeholder="비우면 경과 시간"></label>
     </div>
-    <label class="f">evidence (리뷰에서 드래그 → 버튼)<div class="evidence" id="evidence"><span class="mute">아직 없음</span></div></label>
-    <label class="f">failureReasons (${v.taxonomy.version}) — 이 claim 이 실패 사례일 때만${failChips}</label>
-    <label class="f">notes<textarea name="notes" placeholder="애매한 판정·규격 결함은 여기에 (PER-178 로 되먹임)"></textarea></label>
-    <label class="f">minutesSpent<input name="minutesSpent" type="number" min="0.5" step="0.5" placeholder="비우면 경과 시간으로"></label>
+    <label class="f">notes<textarea name="notes" placeholder="애매한 판정·규격 결함·aspect 없음 사유"></textarea></label>
+    <label class="f">labelId (자동)<input name="labelId" value="${d.bundle.bundleId}-${n}" readonly style="background:#f5f5f4;color:var(--mute)"></label>
     <button class="primary" id="save">저장 (계약 검증)</button>
     <div id="msg"></div>
     <details><summary>이 번들의 라벨 ${d.labels.length}건</summary><div class="labels">${d.labels.map(l=>`
-      <div class="l"><b>${esc(l.labelId)} · ${esc(l.direction)} · ${esc(l.aspect||'—')} ${l.failureReasons.length?'· <span style="color:var(--bad)">'+l.failureReasons.join(', ')+'</span>':''}</b>
+      <div class="l"><b>${esc(l.labelId)} · ${esc(l.source)} · ${esc(l.direction)} · ${esc(l.aspect||'—')} ${l.failureReasons.length?'· <span style="color:var(--bad)">'+l.failureReasons.join(', ')+'</span>':''}</b>
         ${esc(l.question)}<div class="mute">${esc(l.answer)} · 근거 ${l.evidence.length} · ${l.minutesSpent}분</div>
         <button type="button" class="small" data-del="${esc(l.labelId)}">삭제</button></div>`).join('')}</div></details>`;
-  renderEvidence();
-  renderQuestionTemplates();
+  renderEvidence(); renderQuestionTemplates(); setSrcLine();
   document.querySelector('[name=aspect]').onchange = renderQuestionTemplates;
   $('#save').onclick = save;
-  $('#form').querySelectorAll('[data-load]').forEach(b => b.onclick = () => loadCandidate(b.dataset.load, b.dataset.mode));
   $('#form').querySelectorAll('[data-del]').forEach(b => b.onclick = async () => {
     if (!confirm(`${b.dataset.del} 를 삭제할까요? (파일에서 지워집니다)`)) return;
     try { await api('/api/labels/' + encodeURIComponent(b.dataset.del), {method:'DELETE'}); await openBundle(state.bundleId); }
     catch (e) { showMsg(e.message, 'err'); }
   });
 }
-
+function fillForm(k) {
+  const f = $('#form'); if (!f) return;
+  const cond = (k && k.condition) || {};
+  f.querySelector('[name=aspect]').value = (k && k.aspect) || '';
+  f.querySelector('[name=question]').value = (k && k.question) || '';
+  f.querySelector('[name=answer]').value = (k && k.answer) || '';
+  f.querySelector('[name=direction]').value = (k && k.direction) || 'positive';
+  const s = state.data.bundle.scope;
+  f.querySelector('[name=cond_skinType]').value = cond.skinType || (s.axis==='skinType' ? s.segment : '');
+  f.querySelector('[name=cond_option]').value = cond.option || (s.axis==='option' ? s.segment : '');
+  f.querySelectorAll('[name=trouble],[name=trouble_missing]').forEach(cb => cb.checked = Array.isArray(cond.skinTrouble) ? cond.skinTrouble.includes(cb.value) : (s.axis==='skinTrouble' && s.segment===cb.value));
+  f.querySelectorAll('[name=fail]').forEach(cb => cb.checked = false);
+  f.querySelector('[name=notes]').value = ''; f.querySelector('[name=minutesSpent]').value = '';
+  renderEvidence(); renderQuestionTemplates(); setSrcLine(); showMsg('', '');
+}
 function renderEvidence() {
   const box = $('#evidence'); if (!box) return;
   const authors = new Map(state.data.reviews.map(r=>[r.reviewId, r.author]));
   const uniq = st => new Set(state.evidence.filter(e=>e.stance===st).map(e=>authors.get(e.reviewId))).size;
   box.innerHTML = state.evidence.length ? state.evidence.map((e,i)=>`
-    <div class="item"><span class="stance ${e.stance}">${e.stance}</span><code>${e.reviewId}</code><q>${esc(e.quote)}</q>
-      <button type="button" class="small" data-i="${i}">✕</button></div>`).join('') +
+    <div class="item"><span class="stance ${e.stance}">${e.stance}</span><code>${e.reviewId}</code><q data-rid="${e.reviewId}">${esc(e.quote)}</q>
+      <button type="button" class="small" data-flip="${i}" title="입장 바꾸기">⇄</button><button type="button" class="small" data-i="${i}">✕</button></div>`).join('') +
     `<div class="mute" style="font-size:12px;margin-top:4px">고유 작성자 support ${uniq('support')} / oppose ${uniq('oppose')} · N_min ${state.data.vocab.nMin} 은 참고값</div>`
-    : '<span class="mute">아직 없음</span>';
-  box.querySelectorAll('[data-i]').forEach(b => b.onclick = () => { state.evidence.splice(Number(b.dataset.i),1); renderEvidence(); renderReviews(); });
+    : '<span class="mute">아직 없음 — 가운데에서 드래그하거나 문장 옆 S/O</span>';
+  box.querySelectorAll('[data-i]').forEach(b => b.onclick = () => { state.evidence.splice(Number(b.dataset.i),1); renderEvidence(); applyFilter(); });
+  box.querySelectorAll('[data-flip]').forEach(b => b.onclick = () => { const e = state.evidence[Number(b.dataset.flip)]; e.stance = e.stance==='support'?'oppose':'support'; renderEvidence(); applyFilter(); });
+  box.querySelectorAll('q[data-rid]').forEach(q => q.onclick = () => focusReview(Number(q.dataset.rid)));
 }
-
-function showMsg(text, cls) { const m = $('#msg'); m.className = 'msg ' + cls; m.textContent = text; }
+function renderQuestionTemplates() {
+  const box = $('#qtpl'); if (!box) return;
+  const aspect = document.querySelector('[name=aspect]')?.value || state.aspect;
+  const tpls = (state.data.questionTemplates || {})[aspect] || [];
+  box.innerHTML = tpls.map(t => `<label class="tpl">${esc(t)}</label>`).join('');
+  box.querySelectorAll('.tpl').forEach(el => el.onclick = () => { const q = document.querySelector('[name=question]'); q.value = el.textContent; q.focus(); });
+}
+function normalizedForm() {
+  const fd = new FormData($('#form'));
+  const cond = axis => { const x = fd.get('cond_'+axis); return x === '' ? null : x; };
+  const troubles = fd.getAll('trouble'); const tm = fd.get('trouble_missing');
+  return { aspect: fd.get('aspect') || null, question: (fd.get('question')||'').trim(), answer: (fd.get('answer')||'').trim(),
+    condition: { skinType: cond('skinType'), skinTrouble: tm ? [tm].concat(troubles) : (troubles.length ? troubles : null), option: cond('option') },
+    direction: fd.get('direction'), evidence: state.evidence };
+}
+function showMsg(text, cls) { const m = $('#msg'); if (!m) return; m.className = text ? 'msg ' + cls : ''; m.textContent = text; }
 
 async function save() {
-  const f = $('#form'), fd = new FormData(f), v = state.data.vocab;
-  const cond = axis => { const x = fd.get('cond_'+axis); return x === '' ? null : x; };
-  const troubles = fd.getAll('trouble');
-  const troubleMissing = fd.get('trouble_missing');
-  let skinTrouble = null;
-  if (troubleMissing) skinTrouble = [v.missing].concat(troubles);   // 섞이면 서버가 에러를 낸다 — 조용히 고치지 않는다
-  else if (troubles.length) skinTrouble = troubles;
+  const fd = new FormData($('#form'));
+  const nf = normalizedForm();
+  let source = state.source;
+  if (source === 'candidate_accepted' && state.snapshot && JSON.stringify(nf) !== state.snapshot) source = 'candidate_edited';
   const minutesRaw = fd.get('minutesSpent');
   const elapsed = Math.max(0.5, Math.round((Date.now()-state.startedAt)/60000*2)/2);
-  let source = state.source;
-  if (source === 'candidate_accepted' && state.snapshot && JSON.stringify(normalizedForm()) !== state.snapshot) source = 'candidate_edited';
-  const payload = {
-    source, candidateId: source === 'human' ? null : state.candidateId,
+  const payload = { ...nf, source, candidateId: source === 'human' ? null : state.candidateId,
     labelId: fd.get('labelId').trim(), bundleId: state.bundleId, productId: state.data.bundle.productId,
-    aspect: fd.get('aspect') || null, question: fd.get('question'), answer: fd.get('answer'),
-    condition: { skinType: cond('skinType'), skinTrouble, option: cond('option') },
-    direction: fd.get('direction'), evidence: state.evidence, failureReasons: fd.getAll('fail'),
-    evaluation: fd.get('evaluation'), notes: fd.get('notes') || null,
-    minutesSpent: minutesRaw ? Number(minutesRaw) : elapsed,
-  };
+    failureReasons: fd.getAll('fail'), evaluation: fd.get('evaluation'), notes: fd.get('notes') || null,
+    minutesSpent: minutesRaw ? Number(minutesRaw) : elapsed };
   try {
     const r = await api('/api/labels', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload)});
-    showMsg(`저장됨 ${r.label.labelId} [${r.label.source}] — support 작성자 ${r.counts.supportAuthors} / oppose ${r.counts.opposeAuthors}, failureReasons=${r.label.failureReasons.join(', ')||'none'}`, 'ok');
-    state.evidence = []; state.startedAt = Date.now();
-    const keep = $('#msg').textContent;
+    const keep = `저장됨 ${r.label.labelId} [${r.label.source}] — support 작성자 ${r.counts.supportAuthors} / oppose ${r.counts.opposeAuthors}${r.label.failureReasons.length?' · '+r.label.failureReasons.join(', '):''}`;
     await openBundle(state.bundleId);
     showMsg(keep, 'ok');
   } catch (e) { showMsg('저장하지 않았다 — ' + e.message, 'err'); }

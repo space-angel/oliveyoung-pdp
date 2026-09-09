@@ -107,6 +107,35 @@ class TestImport(unittest.TestCase):
         self.assertEqual((row["candidates"], row["decided"], row["humanLabels"]), (1, 1, 1))
 
 
+class TestAutoChecks(unittest.TestCase):
+    """규칙 점검은 주의 표시다 — 있어야 할 때 있고, 정상 후보에는 없어야 한다."""
+
+    def wrap(self, cand, cid="B01-c1"):
+        return {"candidateId": cid, "bundleId": "B01", "candidate": cand}
+
+    def test_clean_candidate_has_no_warnings(self):
+        good = dict(GOOD, question="속보습까지 촉촉하게 유지되나요?", evidence=GOOD["evidence"] + [{"reviewId": 3, "stance": "support", "quote": "촉촉함이 오래가요"}])
+        checks = cc.auto_checks(good, bundle_record(), [self.wrap(good)])
+        self.assertEqual([c for c in checks if c["level"] == "warn"], [])
+
+    def test_thin_support_and_generic_question(self):
+        keys = {c["key"] for c in cc.auto_checks(dict(GOOD, question="좋은가요?"), bundle_record(), [self.wrap(GOOD)])}
+        self.assertIn("thin_support", keys)
+        self.assertIn("question_broad", keys)
+
+    def test_mixed_without_oppose(self):
+        cand = dict(GOOD, evidence=[GOOD["evidence"][0]])
+        self.assertIn("mixed_without_both", {c["key"] for c in cc.auto_checks(cand, bundle_record(), [self.wrap(cand)])})
+
+    def test_number_not_in_quotes(self):
+        cand = dict(GOOD, answer="6시간은 촉촉하다")
+        self.assertIn("number_not_in_quotes", {c["key"] for c in cc.auto_checks(cand, bundle_record(), [self.wrap(cand)])})
+
+    def test_sibling_same_topic(self):
+        sibs = [self.wrap(GOOD, "B01-c1"), self.wrap(GOOD, "B01-c2")]
+        self.assertIn("sibling_same_topic", {c["key"] for c in cc.auto_checks(GOOD, bundle_record(), sibs)})
+
+
 class TestHarness(unittest.TestCase):
     def test_harness_is_blind_and_carries_scope(self):
         b = bundle_record()

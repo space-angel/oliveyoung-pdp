@@ -37,7 +37,7 @@ from golden_contract import (  # noqa: E402
     support_counts,
     validate_label,
 )
-from concern_candidates import load_candidates  # noqa: E402
+from concern_candidates import auto_checks, load_candidates  # noqa: E402
 from label_concern_golden import _condition_line, append_label, load_labels, summarize  # noqa: E402
 from policy import SUFFICIENCY_N_MIN  # noqa: E402
 from sample_concern_golden import LABELS_PATH, load_bundles  # noqa: E402
@@ -155,12 +155,17 @@ def api_bundle(bundle_id: str) -> dict:
 def bundle_candidates(bundle_id: str) -> list[dict]:
     """모델 후보 + 사람 결정 상태. 후보는 정답이 아니다 — 사람이 채택·수정·기각한 라벨이 정답이다."""
     decisions = {l["candidateId"]: l for l in load_labels() if l.get("candidateId")}
+    bundle = load_bundles()[bundle_id]
+    mine = [c for c in load_candidates() if c["bundleId"] == bundle_id]
     out = []
-    for c in load_candidates():
-        if c["bundleId"] != bundle_id:
-            continue
+    for c in mine:
         d = decisions.get(c["candidateId"])
-        out.append({**c, "decision": (d["source"] if d else None), "labelId": (d["labelId"] if d else None)})
+        out.append({
+            **c,
+            "decision": (d["source"] if d else None),
+            "labelId": (d["labelId"] if d else None),
+            "checks": auto_checks(c["candidate"], bundle, mine),
+        })
     return out
 
 
