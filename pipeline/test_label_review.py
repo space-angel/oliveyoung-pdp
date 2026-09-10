@@ -132,6 +132,15 @@ class TestLabelReview(unittest.TestCase):
         saved = {l["labelId"]: l for l in self.store.labels()}[r["labelId"]]
         self.assertEqual((saved["source"], saved["candidateId"], saved["direction"]), ("human", None, "neutral"))
 
+    def test_checks_are_plain_language(self):
+        # 라벨러 화면의 점검 문구에 실패유형 키(overbroad_question 등)가 새지 않는다
+        import re
+        v = self.open_bundle()
+        for c in v["candidates"]:
+            for chk in c["checks"]:
+                self.assertFalse(re.search(r"[a-z]+_[a-z_]+", chk["text"]), chk["text"])
+                self.assertEqual(chk["level"], "warn")
+
     def test_reasons_map_to_taxonomy_keys(self):
         keys = {r["failure"] for r in REASONS}
         self.assertEqual(keys, {"overfit_question", "overbroad_question", "duplicate_claim", "unsupported_claim"})
