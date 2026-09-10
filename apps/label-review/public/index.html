@@ -86,6 +86,8 @@
   .actions { display:flex; gap:14px; justify-content:center; flex-wrap:wrap; padding-top:8px; }
   .dock { position:sticky; bottom:0; z-index:2; margin:-24px -16px -160px; padding:44px 16px 28px; display:flex; flex-direction:column; gap:16px; align-items:center; background:linear-gradient(to top, rgba(12,12,14,.97) 0, rgba(12,12,14,.97) calc(100% - 40px), rgba(12,12,14,0)); }
   .dock .actions { padding-top:0; }
+  .verdict { display:inline-flex; align-items:center; gap:10px; height:44px; padding:0 20px; border-radius:100px; background:var(--card2); font-size:16px; font-weight:600; color:var(--fg); letter-spacing:-.3px; }
+  .verdict .dot { width:8px; height:8px; border-radius:50%; background:var(--fg50); } .verdict.accept .dot, .verdict.edit .dot { background:var(--mint); } .verdict.reject .dot { background:var(--coral); }
   .criteria { display:flex; gap:10px 28px; flex-wrap:wrap; justify-content:center; font-size:15px; color:var(--fg2); letter-spacing:-.3px; }
   .criteria b { display:inline-flex; width:20px; height:20px; border-radius:50%; align-items:center; justify-content:center; background:rgba(255,255,255,.08); font-size:12px; margin-right:6px; vertical-align:middle; }
   .actions .btn { min-width:220px; }
@@ -179,15 +181,24 @@ function renderStart(err) {
 }
 
 // ---------- 번들 로드 ----------
-async function load() {
+async function load(keepId) {
   S.view = await api(`/api/bundle?labeler=${encodeURIComponent(S.me.labelerId)}&name=${encodeURIComponent(S.me.name)}`);
   if (!S.view.assignment) { renderNoWork(); return; }
   const undecided = S.view.candidates.findIndex(c => !c.decision);
-  S.idx = undecided; S.editing = false; S.draft = null; S.reason = null; S.startedAt = Date.now();
-  if (undecided < 0) { S.screen = S.view.noMissed || S.view.labels.some(l=>l.source==='human') ? 'done' : 'missed'; }
-  else S.screen = 'judge';
+  const keep = keepId ? S.view.candidates.findIndex(c => c.candidateId === keepId) : -1;
+  S.editing = false; S.draft = null; S.reason = null; S.startedAt = Date.now();
+  if (keep >= 0) { S.idx = keep; S.screen = 'judge'; }           // 방금 판단한 카드에 머무른다 — 저장 결과를 보고 "다음"을 직접 누른다
+  else if (undecided < 0) { S.idx = 0; S.screen = S.view.noMissed || S.view.labels.some(l=>l.source==='human') ? 'done' : 'missed'; }
+  else { S.idx = undecided; S.screen = 'judge'; }
   render();
 }
+function afterCandidates() { S.screen = S.view.noMissed || S.view.labels.some(l=>l.source==='human') ? 'done' : 'missed'; render(); }
+function goNext() {
+  const n = S.view.candidates.length;
+  if (S.idx + 1 < n) { S.idx += 1; S.editing = false; S.draft = null; S.startedAt = Date.now(); renderJudge(); window.scrollTo(0,0); }
+  else afterCandidates();
+}
+function goPrev() { if (S.idx > 0) { S.idx -= 1; S.editing = false; S.draft = null; renderJudge(); window.scrollTo(0,0); } }
 function setHeader(v) {
   const c = v?.candidates || [];
   const done = c.filter(x=>x.decision).length;
@@ -219,14 +230,22 @@ function missedHtml(list, mode) {
   if (!list.length) return '';
   return `<details class="missed"><summary>같은 얘기를 하는 리뷰가 <b>${list.length}개</b> 더 있어요<small style="color:var(--fg50);font-weight:400;margin-left:10px">근거를 놓쳤는지만 봐요</small>${help('missed')}<span style="margin-left:auto">보기 〉</span></summary>
     <div class="body">${list.map(r => `<div class="mr"><div class="m"><span>${stars(r.rating)}</span><span>${esc(r.conditionLine.split(' · ')[0])}</span><span>· ${esc(r.hits.join(' '))}</span></div>
-      ${r.sentences.map(s => `<div class="sent"><span>${txt(s)}</span>
+      ${r.sentences.map(s => `<div class="sent"><span>${txt(s)}</span>${mode==='locked' ? '' : `
         <button type="button" class="sm" data-add='${esc(JSON.stringify({reviewId:r.reviewId, quote:s, stance:'positive'}))}'>긍정</button>
         <button type="button" class="sm" data-add='${esc(JSON.stringify({reviewId:r.reviewId, quote:s, stance:'negative'}))}'>부정</button>
-        <button type="button" class="sm" data-add='${esc(JSON.stringify({reviewId:r.reviewId, quote:s, stance:'neutral'}))}'>중립</button></div>`).join('')}</div>`).join('')}
-    <div class="note" style="padding:0 8px 8px">${mode==='judge' ? '누르면 "고칠게요"로 바뀌고 근거에 들어가요.' : '누르면 근거에 들어가요.'}</div></div></details>`;
+        <button type="button" class="sm" data-add='${esc(JSON.stringify({reviewId:r.reviewId, quote:s, stance:'neutral'}))}'>중립</button>`}</div>`).join('')}</div>`).join('')}
+    ${mode==='locked' ? '' : `<div class="note" style="padding:0 8px 8px">${mode==='judge' ? '누르면 "고칠게요"로 바뀌고 근거에 들어가요.' : '누르면 근거에 들어가요.'}</div>`}</div></details>`;
+}
+function verdictText(d) {
+  if (d.kind === 'accept') return '맞아요 — 그대로 저장했어요';
+  if (d.kind === 'edit') return '고칠게요 — 고친 대로 저장했어요';
+  const r = S.view.reasons.find(x => x.key === d.reason);
+  return `아니에요 — ${r ? r.title : '이유 선택'}${d.contractError ? ' · 기각 기록만 남김' : ''}`;
 }
 function renderJudge(msg) {
   const c = S.view.candidates[S.idx];
+  const decided = c.decision || null;
+  if (decided) S.editing = false;
   const d = S.draft || { question:c.question, answer:c.answer, aspect:c.aspect, evidence: c.quotes.map(q=>({reviewId:q.reviewId, stance:q.stance, quote:q.quote})) };
   const quotes = S.editing ? d.evidence.map(e => {
     const q = c.quotes.find(x=>x.reviewId===e.reviewId && x.quote===e.quote);
@@ -249,15 +268,20 @@ function renderJudge(msg) {
   </div>
   <div class="eyebrow">이 질문을 만든 리뷰 ${quotes.length}개 · 굵은 문장이 근거예요</div>
   <div class="grid ${S.editing?'editing':''}" id="quotes">${quotes.map(quoteHtml).join('')}</div>
-  ${missedHtml(c.missed, 'judge')}
+  ${missedHtml(c.missed, decided ? 'locked' : 'judge')}
   ${msg ? `<div class="msg ${msg.cls}">${esc(msg.text)}</div>` : ''}
-  ${S.editing
-    ? `<div class="actions"><button class="btn ghost" id="cancelEdit">그대로 두기</button><button class="btn white" id="saveEdit">고친 대로 저장하고 다음 〉</button></div>`
+  ${decided
+    ? `<div class="dock"><div class="verdict ${decided.kind}"><span class="dot"></span><span>${verdictText(decided)}</span></div>
+       <div class="actions"><button class="btn ghost" id="prev" ${S.idx>0?'':'disabled'}>〈 이전</button><button class="btn white" id="next">${S.idx+1 < S.view.candidates.length ? `다음 질문 〉 <small>${S.idx+2} / ${S.view.candidates.length}</small>` : `후보 끝 · 놓친 질문으로 〉`}</button></div></div>`
+    : S.editing
+    ? `<div class="actions"><button class="btn ghost" id="cancelEdit">그대로 두기</button><button class="btn white" id="saveEdit">고친 대로 저장 〉</button></div>`
     : `<div class="dock"><div class="criteria"><span><b>1</b> 굵은 문장이 이 답을 실제로 말하나요?</span><span><b>2</b> 한 명의 특수한 사정이 아니라, 다른 구매자도 겪을 얘기인가요?</span><span><b>3</b> 사기 전에 물어볼 만한 질문인가요?</span>${help('criteria')}</div>
-       <div class="actions"><button class="btn white" id="accept">맞아요 <small>셋 다 그래요</small></button><button class="btn" id="edit">고칠게요 <small>문장·근거 수정</small></button><button class="btn coral" id="reject">아니에요 <small>이유 하나 선택</small></button></div></div>`}`;
+       <div class="actions">${S.idx>0?'<button class="btn ghost" id="prev">〈 이전</button>':''}<button class="btn white" id="accept">맞아요 <small>셋 다 그래요</small></button><button class="btn" id="edit">고칠게요 <small>문장·근거 수정</small></button><button class="btn coral" id="reject">아니에요 <small>이유 하나 선택</small></button></div></div>`}`;
   renderCounts(quotes);
   if (S.editing) S.draft = d;
   $('#accept')?.addEventListener('click', () => decide({kind:'accept'}));
+  $('#next')?.addEventListener('click', goNext);
+  $('#prev')?.addEventListener('click', goPrev);
   $('#reject')?.addEventListener('click', () => { S.screen='reject'; S.reason=null; render(); });
   $('#edit')?.addEventListener('click', () => { S.editing = true; S.draft = d; renderJudge(); });
   $('#cancelEdit')?.addEventListener('click', () => { S.editing=false; S.draft=null; renderJudge(); });
@@ -281,7 +305,7 @@ async function decide(extra) {
   const c = S.view.candidates[S.idx];
   try {
     const r = await api('/api/decide', {labelerId:S.me.labelerId, candidateId:c.candidateId, minutesSpent:minutes(), reason:S.reason, ...extra});
-    await load();
+    await load(c.candidateId);
     if (r.note && S.screen==='judge') renderJudge({cls:'warn', text:r.note});
   } catch (e) { S.screen==='reject' ? renderReject(e.message) : renderJudge({cls:'err', text:e.message}); }
 }
@@ -295,7 +319,7 @@ function renderReject(err) {
   <div class="narrow fade" style="display:flex;flex-direction:column;gap:12px">
     ${S.view.reasons.map(r => `<button type="button" class="opt ${S.reason===r.key?'on':''}" data-r="${r.key}"><span class="dot">${S.reason===r.key?'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"></path></svg>':''}</span><span><b>${esc(r.title)}</b><small>${esc(r.desc)}</small></span></button>`).join('')}
     ${err ? `<div class="msg err">${esc(err)}</div>` : ''}
-    <div class="row" style="margin-top:8px"><button class="btn ghost" id="back" style="flex:0 0 160px">〈 돌아가기</button><button class="btn white" id="save" ${S.reason?'':'disabled'}>이 이유로 저장하고 다음 〉</button></div>
+    <div class="row" style="margin-top:8px"><button class="btn ghost" id="back" style="flex:0 0 160px">〈 돌아가기</button><button class="btn white" id="save" ${S.reason?'':'disabled'}>이 이유로 저장 〉</button></div>
   </div>`;
   document.querySelectorAll('[data-r]').forEach(b => b.onclick = () => { S.reason = b.dataset.r; renderReject(); });
   $('#back').onclick = () => { S.screen='judge'; render(); };
