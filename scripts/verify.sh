@@ -20,6 +20,8 @@ echo "== 생성물 재현 확인 =="
 "$PY" pipeline/sample_concern_golden.py --check
 "$PY" eval/label_concern_golden.py validate
 "$PY" eval/measure_v4_golden_migration.py --check
+# 모델 후보의 계약 표시가 현재 규칙과 같은지 — 규칙이 바뀌면 표시가 조용히 낡는다 (PER-178)
+"$PY" eval/concern_candidates.py recheck --check
 
 echo
 echo "== 입력 계약 강제 (PER-176) =="
