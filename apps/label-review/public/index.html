@@ -16,7 +16,7 @@
   }
   * { box-sizing:border-box; }
   html { -webkit-font-smoothing:antialiased; scroll-behavior:smooth; }
-  body { margin:0; background:var(--bg); color:var(--fg); font:18px/1.6 "Pretendard Variable", Pretendard, -apple-system, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif; letter-spacing:-0.5px; }
+  body { margin:0; background-color:var(--bg); background-image:radial-gradient(900px 520px at 18% -10%, rgba(71,139,255,.22), transparent 70%), radial-gradient(700px 500px at 100% 40%, rgba(255,255,255,.05), transparent 70%); background-repeat:no-repeat; background-attachment:fixed; color:var(--fg); font:18px/1.6 "Pretendard Variable", Pretendard, -apple-system, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif; letter-spacing:-0.5px; }
   button { font:inherit; letter-spacing:inherit; cursor:pointer; color:inherit; }
   header { position:sticky; top:16px; z-index:3; margin:16px auto 0; width:min(1100px, calc(100% - 32px)); height:64px; border-radius:var(--pill); background:rgba(0,0,0,.5); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); display:flex; align-items:center; gap:14px; padding:0 12px 0 28px; }
   header .name { font-size:20px; font-weight:700; letter-spacing:0; line-height:1.4; }
@@ -36,12 +36,12 @@
   .sub { margin:0; font-size:20px; line-height:1.5; letter-spacing:-0.5px; color:var(--blue80); font-weight:500; text-wrap:pretty; }
   .sub.white { color:var(--fg2); font-weight:400; }
   .pill { display:inline-flex; align-items:center; gap:6px; height:36px; padding:0 16px; border-radius:var(--pill); font-size:17px; font-weight:500; letter-spacing:-0.5px; background:var(--card2); color:var(--fg70); white-space:nowrap; line-height:1.6; }
-  .pill.blue { background:var(--blue-bg); color:var(--blue); font-weight:700; letter-spacing:0; } .pill.mint { background:var(--mint-bg); color:var(--mint); } .pill.coral { background:var(--coral-bg); color:var(--coral); } .pill.lime { background:var(--lime-bg); color:var(--lime); }
+  .pill.blue { background:var(--blue-bg); color:var(--blue); font-weight:700; letter-spacing:0; } .pill.mint, .pill.coral, .pill.lime { background:var(--card2); color:var(--fg); } .pill.mint::before, .pill.coral::before { content:''; width:8px; height:8px; border-radius:50%; } .pill.mint::before { background:var(--mint); } .pill.coral::before { background:var(--coral); }
   .pills { display:flex; flex-wrap:wrap; gap:8px; }
   .eyebrow { font-size:17px; color:var(--grey); padding:0 8px; letter-spacing:-1px; font-weight:600; }
   /* 세션 카드 문법: 큰 문장 · 태그 · 하단 색 라벨 + 〉 */
   .grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(320px, 1fr)); gap:20px; }
-  .card { background:var(--card); border-radius:var(--r); padding:28px; display:flex; flex-direction:column; gap:18px; min-height:240px; position:relative; }
+  .card { background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.07); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); border-radius:var(--r); padding:28px; display:flex; flex-direction:column; gap:18px; min-height:240px; position:relative; }
   .card .big { margin:0; font-size:28px; line-height:1.4; font-weight:600; letter-spacing:-1px; color:var(--fg); text-wrap:pretty; }
   .card .ctx { color:var(--fg50); font-weight:400; font-size:19px; }
   .card .ctxp { margin:-6px 0 0; font-size:15px; line-height:1.6; color:var(--fg50); letter-spacing:-0.5px; } .card .ctxp b { color:var(--fg70); font-weight:600; }
@@ -50,16 +50,16 @@
   .card .foot { margin-top:auto; display:flex; align-items:center; justify-content:space-between; font-size:18px; font-weight:600; letter-spacing:-0.5px; }
   .card .foot .who.positive { color:var(--mint); } .card .foot .who.negative { color:var(--coral); } .card .foot .who.neutral { color:var(--fg50); }
   .card .foot .chev { color:var(--fg30); font-size:20px; }
-  .card.positive { box-shadow: inset 0 0 0 1px rgba(70,236,136,.18); } .card.negative { box-shadow: inset 0 0 0 1px rgba(255,122,107,.18); }
+  .card .foot .who::before { content:''; display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:8px; background:currentColor; vertical-align:middle; }
   .card mark { background:transparent; color:inherit; }
   .card .tools { display:none; gap:8px; } .editing .card .tools { display:flex; }
   .card.wide { min-height:0; }
   /* 놓친 근거 */
-  .missed { border-radius:var(--r); background:var(--lime-bg); overflow:hidden; }
-  .missed summary { list-style:none; cursor:pointer; padding:18px 28px; display:flex; align-items:center; gap:12px; font-size:18px; color:var(--lime); font-weight:500; letter-spacing:-0.5px; }
-  .missed summary::-webkit-details-marker { display:none; } .missed summary b { font-weight:600; }
+  .missed { border-radius:var(--r); background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.07); backdrop-filter:blur(20px); overflow:hidden; }
+  .missed summary { list-style:none; cursor:pointer; padding:18px 28px; display:flex; align-items:center; gap:12px; font-size:18px; color:var(--blue); font-weight:500; letter-spacing:-0.5px; }
+  .missed summary::-webkit-details-marker { display:none; } .missed summary b { font-weight:700; }
   .missed .body { display:flex; flex-direction:column; gap:10px; padding:0 12px 12px; }
-  .mr { background:rgba(12,12,14,.6); border-radius:16px; padding:16px 18px; display:flex; flex-direction:column; gap:8px; }
+  .mr { background:rgba(255,255,255,.03); border-radius:16px; padding:16px 18px; display:flex; flex-direction:column; gap:8px; }
   .mr .m { font-size:14px; color:var(--fg50); display:flex; gap:10px; }
   .sent { display:flex; gap:8px; align-items:center; background:var(--card); border-radius:12px; padding:10px 12px; font-size:16px; color:var(--fg70); }
   .sent span { flex:1; }
@@ -74,28 +74,28 @@
   .btn:disabled { opacity:.35; cursor:default; }
   .sm { height:34px; padding:0 12px; border-radius:var(--pill); border:0; background:var(--card2); color:var(--fg70); font-size:15px; font-weight:500; letter-spacing:-0.5px; }
   .sm:hover { background:var(--card3); }
-  .sm.on-good { background:var(--mint-bg); color:var(--mint); } .sm.on-bad { background:var(--coral-bg); color:var(--coral); } .sm.on-neu { background:var(--card3); color:var(--fg); }
+  .sm.on-good { background:var(--card3); color:var(--mint); } .sm.on-bad { background:var(--card3); color:var(--coral); } .sm.on-neu { background:var(--card3); color:var(--fg); }
   .actions { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
   .actions .btn { min-width:220px; }
   .row { display:flex; gap:12px; flex-wrap:wrap; } .row > .btn { flex:1; }
   /* 입력 */
   .field { display:flex; flex-direction:column; gap:8px; }
   .field label { font-size:15px; color:var(--fg50); font-weight:500; }
-  input, textarea { width:100%; font:inherit; letter-spacing:inherit; color:var(--fg); background:var(--card2); border:1px solid transparent; border-radius:16px; padding:16px 18px; outline:none; }
+  input, textarea { width:100%; font:inherit; letter-spacing:inherit; color:var(--fg); background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.08); border-radius:16px; padding:16px 18px; outline:none; }
   input:focus, textarea:focus { border-color:var(--blue); background:var(--card3); }
   textarea { min-height:72px; resize:vertical; line-height:1.5; }
   textarea.big { font-size:24px; font-weight:600; letter-spacing:-0.03em; line-height:1.35; }
   .chips { display:flex; flex-wrap:wrap; gap:8px; }
   .chip { height:40px; padding:0 18px; border-radius:var(--pill); border:0; background:var(--card2); color:var(--fg2); font-size:17px; letter-spacing:-0.5px; }
   .chip b { color:var(--fg50); font-weight:500; margin-left:6px; } .chip.on { background:#FBFBFB; color:#0C0C0E; } .chip.on b { color:#666; }
-  .opt { display:flex; align-items:center; gap:16px; padding:22px 24px; border-radius:20px; border:0; background:var(--card); text-align:left; width:100%; }
-  .opt:hover { background:var(--card2); } .opt.on { background:var(--blue-bg); box-shadow: inset 0 0 0 1px var(--blue); }
-  .opt .dot { width:24px; height:24px; border-radius:50%; border:2px solid var(--fg30); flex:none; display:flex; align-items:center; justify-content:center; } .opt.on .dot { background:var(--blue); border-color:var(--blue); }
+  .opt { display:flex; align-items:center; gap:16px; padding:22px 24px; border-radius:20px; border:1px solid rgba(255,255,255,.07); background:rgba(255,255,255,.04); backdrop-filter:blur(20px); text-align:left; width:100%; }
+  .opt:hover { background:var(--card2); } .opt.on { border-color:var(--coral); } .opt.on .dot { background:var(--coral); border-color:var(--coral); }
+  .opt .dot { width:24px; height:24px; border-radius:50%; border:2px solid var(--fg30); flex:none; display:flex; align-items:center; justify-content:center; }
   .opt b { display:block; font-size:20px; font-weight:600; letter-spacing:-0.5px; line-height:1.4; } .opt small { color:var(--fg50); font-size:15px; line-height:1.5; }
-  .msg { padding:14px 18px; border-radius:16px; font-size:15px; font-weight:500; } .msg.err { background:var(--coral-bg); color:var(--coral); } .msg.ok { background:var(--mint-bg); color:var(--mint); } .msg.warn { background:var(--lime-bg); color:var(--lime); }
+  .msg { padding:14px 18px; border-radius:16px; font-size:15px; font-weight:500; background:rgba(255,255,255,.06); color:var(--fg2); border:1px solid rgba(255,255,255,.07); } .msg.err { color:var(--coral); } .msg.ok { color:var(--mint); } .msg.warn { color:var(--fg2); }
   .note { font-size:15px; color:var(--grey); line-height:1.6; }
   .stats { display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:12px; }
-  .stat { background:var(--card); border-radius:20px; padding:22px 12px; text-align:center; } .stat b { display:block; font-size:47px; font-weight:600; letter-spacing:-2px; font-variant-numeric:tabular-nums; line-height:1.2; } .stat span { font-size:15px; color:var(--fg50); }
+  .stat { background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.07); backdrop-filter:blur(20px); border-radius:20px; padding:22px 12px; text-align:center; } .stat b { display:block; font-size:47px; font-weight:600; letter-spacing:-2px; font-variant-numeric:tabular-nums; line-height:1.2; } .stat span { font-size:15px; color:var(--fg50); }
   .stat.hi b { color:var(--mint); }
   .center { display:flex; flex-direction:column; align-items:center; text-align:center; gap:28px; }
   .narrow { width:min(640px, 100%); margin:0 auto; }
@@ -142,7 +142,7 @@ function renderStart(err) {
     <div class="card wide">
       <p class="big">리뷰에서 뽑은 질문 후보를 보고<br>맞아요 · 고칠게요 · 아니에요<br>중 하나를 고르면 끝이에요</p>
       <div class="tags"><span class="tagc">색칠된 문장이 근거</span><span class="tagc">제품 하나씩</span><span class="tagc">언제든 이어서</span></div>
-      <div class="foot"><span class="who positive">30초면 감이 와요</span><span class="chev">〉</span></div>
+      <div class="foot"><span style="color:var(--blue)">30초면 감이 와요</span><span class="chev">〉</span></div>
     </div>
   </div>`;
   const saved = JSON.parse(localStorage.getItem('labeler') || 'null');
@@ -259,7 +259,7 @@ async function decide(extra) {
 function renderReject(err) {
   const c = S.view.candidates[S.idx];
   $('#main').innerHTML = `
-  <div class="track fade"><div class="pills"><span class="pill coral">아니에요</span><span class="pill">${esc(c.aspect||'주제 없음')}</span></div><h1 class="display white" style="color:var(--fg50);font-size:clamp(28px,3.4vw,40px)">${esc(c.question)}</h1></div>
+  <div class="track fade"><div class="pills"><span class="pill" style="color:var(--coral);font-weight:700">아니에요</span><span class="pill">${esc(c.aspect||'주제 없음')}</span></div><h1 class="display white" style="color:var(--fg50);font-size:clamp(28px,3.4vw,40px)">${esc(c.question)}</h1></div>
   <div class="track fade"><h1 class="display" style="color:var(--coral)">왜 아닌가요?</h1><p class="sub white">가장 가까운 이유 하나만 골라주세요. 이 선택도 정답의 일부로 저장돼요.</p></div>
   <div class="narrow fade" style="display:flex;flex-direction:column;gap:12px">
     ${S.view.reasons.map(r => `<button type="button" class="opt ${S.reason===r.key?'on':''}" data-r="${r.key}"><span class="dot">${S.reason===r.key?'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"></path></svg>':''}</span><span><b>${esc(r.title)}</b><small>${esc(r.desc)}</small></span></button>`).join('')}
@@ -282,7 +282,7 @@ function renderMissed(msg) {
   const evIds = new Set(H.evidence.map(e=>e.reviewId));
   const sentences = r => r.content.split(/(?<=[.!?…~])\s+|\n+/).map(s=>s.trim()).filter(s => s.length>=4 && terms.some(t=>s.includes(t))).slice(0,3);
   $('#main').innerHTML = `
-  <div class="track fade"><span class="pill lime">마지막 한 가지</span><h1 class="display" style="color:var(--lime)">후보에 없는 질문이<br>하나 떠오르나요?</h1><p class="sub white">"이건 왜 안 물어봤지?" 싶었던 게 있으면 적어주세요. 없으면 없다고 답해도 충분해요. 그것도 기록이에요.</p></div>
+  <div class="track fade"><span class="pill blue">마지막 한 가지</span><h1 class="display">후보에 없는 질문이<br>하나 떠오르나요?</h1><p class="sub white">"이건 왜 안 물어봤지?" 싶었던 게 있으면 적어주세요. 없으면 없다고 답해도 충분해요. 그것도 기록이에요.</p></div>
   <div class="fade" style="display:flex;flex-direction:column;gap:20px">
     <div class="field"><label>리뷰에서 자주 나오는 말 · 눌러서 그 리뷰만 보기</label><div class="chips">${hits.map(([a,h]) => `<button type="button" class="chip ${H.term===a?'on':''}" data-t="${esc(a)}">${esc(a)}<b>${h.reviews}</b></button>`).join('')}</div></div>
     ${H.term ? `<div class="grid">${shown.slice(0,9).map(r => `<div class="card ${evIds.has(r.reviewId)?'positive':''}"><div class="tags"><span class="tagc">${stars(r.rating)}</span><span class="tagc">${esc(r.conditionLine.split(' · ')[0])}</span>${evIds.has(r.reviewId)?'<span class="tagc" style="color:var(--mint)">근거에 있음</span>':''}</div>
@@ -315,7 +315,7 @@ function renderDone() {
   const d = S.doneInfo || { summary:{accept:0,edit:0,reject:0,human:0}, next:null, bundleId:S.view.bundle.bundleId };
   const s = d.summary; const p = S.view.progress || {doneBundles:0};
   $('#main').innerHTML = `
-  <div class="track fade"><span class="pill mint">${esc(S.view.bundle.displayName)}</span><h1 class="display mint">끝났어요</h1><p class="sub white">판단은 모두 자동으로 저장됐어요. 지금까지 제품 ${p.doneBundles + 1}개.</p></div>
+  <div class="track fade"><span class="pill" style="color:var(--mint);font-weight:700">${esc(S.view.bundle.displayName)}</span><h1 class="display mint">끝났어요</h1><p class="sub white">판단은 모두 자동으로 저장됐어요. 지금까지 제품 ${p.doneBundles + 1}개.</p></div>
   <div class="stats fade"><div class="stat"><b>${s.accept}</b><span>맞아요</span></div><div class="stat"><b>${s.edit}</b><span>고쳤어요</span></div><div class="stat"><b>${s.reject}</b><span>아니에요</span></div><div class="stat hi"><b>${s.human}</b><span>직접 추가</span></div></div>
   <div class="actions fade">
     ${d.next ? `<button class="btn white" id="next">다음 제품 시작 〉 <small>${esc(d.next.displayName)} · 리뷰 ${d.next.reviewCount}개</small></button>` : `<div class="msg ok">남은 제품이 없어요. 고마워요!</div>`}
