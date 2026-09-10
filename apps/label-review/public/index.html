@@ -112,6 +112,14 @@
   .center { display:flex; flex-direction:column; align-items:center; text-align:center; gap:28px; }
   .narrow { width:min(640px, 100%); margin:0 auto; }
   .hero { padding:24px 8px 8px; display:flex; flex-direction:column; gap:20px; }
+  /* 부가 설명 레이어: 본문에 문단으로 끼우지 않고 ⓘ 뒤로 보낸다 */
+  .help { width:22px; height:22px; border-radius:50%; border:1px solid rgba(255,255,255,.18); background:transparent; color:var(--fg50); font-size:13px; font-weight:700; line-height:1; display:inline-flex; align-items:center; justify-content:center; cursor:pointer; padding:0; flex:none; font-family:inherit; vertical-align:middle; transition:background .15s, color .15s; }
+  .help:hover, .help.on { background:rgba(255,255,255,.12); color:var(--fg); }
+  .tip { position:fixed; z-index:20; width:min(360px, calc(100vw - 32px)); padding:18px 20px; border-radius:20px; background:#1B1B1F; border:1px solid rgba(255,255,255,.1); box-shadow:0 20px 60px rgba(0,0,0,.5); color:var(--fg2); font-size:15px; line-height:1.6; letter-spacing:-.3px; }
+  .tip b { color:var(--fg); font-weight:600; } .tip .t { display:block; font-size:16px; font-weight:700; color:var(--fg); margin-bottom:8px; }
+  .tip ul { margin:8px 0 0; padding-left:18px; } .tip li { margin:4px 0; }
+  @media (max-width:640px) { .tip { left:0 !important; right:0; top:auto !important; bottom:0; width:auto; border-radius:24px 24px 0 0; padding:24px 24px 36px; } }
+  .tipbg { position:fixed; inset:0; z-index:19; }
   [hidden] { display:none !important; }
 </style>
 </head>
@@ -209,8 +217,7 @@ function quoteHtml(q, i) {
 }
 function missedHtml(list, mode) {
   if (!list.length) return '';
-  return `<details class="missed"><summary>같은 얘기를 하는 리뷰가 <b>${list.length}개</b> 더 있어요<small style="color:var(--fg50);font-weight:400;margin-left:10px">위 카드에 안 들어간 리뷰예요 · 근거를 놓쳤는지만 확인해요</small><span style="margin-left:auto">보기 〉</span></summary>
-    <div class="note" style="padding:0 28px 14px;line-height:1.6">이 질문과 같은 주제를 말하는 리뷰인데 후보에는 빠져 있어요. 문장이 <b>이 답을 뒷받침하면</b> 그 문장이 이 주제를 좋게 말하면 <b>긍정</b>, 나쁘게 말하면 <b>부정</b>, 좋다 나쁘다 없이 언급만 하면 <b>중립</b>을 눌러 근거에 넣어요. 뒷받침하지 않으면 그냥 두면 돼요.</div>
+  return `<details class="missed"><summary>같은 얘기를 하는 리뷰가 <b>${list.length}개</b> 더 있어요<small style="color:var(--fg50);font-weight:400;margin-left:10px">근거를 놓쳤는지만 봐요</small>${help('missed')}<span style="margin-left:auto">보기 〉</span></summary>
     <div class="body">${list.map(r => `<div class="mr"><div class="m"><span>${stars(r.rating)}</span><span>${esc(r.conditionLine.split(' · ')[0])}</span><span>· ${esc(r.hits.join(' '))}</span></div>
       ${r.sentences.map(s => `<div class="sent"><span>${txt(s)}</span>
         <button type="button" class="sm" data-add='${esc(JSON.stringify({reviewId:r.reviewId, quote:s, stance:'positive'}))}'>긍정</button>
@@ -239,7 +246,7 @@ function renderJudge(msg) {
   ${msg ? `<div class="msg ${msg.cls}">${esc(msg.text)}</div>` : ''}
   ${S.editing
     ? `<div class="actions"><button class="btn ghost" id="cancelEdit">그대로 두기</button><button class="btn white" id="saveEdit">고친 대로 저장하고 다음 〉</button></div>`
-    : `<div class="dock"><div class="criteria"><span><b>1</b> 굵은 문장이 이 답을 실제로 말하나요?</span><span><b>2</b> 한 명의 특수한 사정이 아니라, 다른 구매자도 겪을 얘기인가요?</span><span><b>3</b> 사기 전에 물어볼 만한 질문인가요?</span></div>
+    : `<div class="dock"><div class="criteria"><span><b>1</b> 굵은 문장이 이 답을 실제로 말하나요?</span><span><b>2</b> 한 명의 특수한 사정이 아니라, 다른 구매자도 겪을 얘기인가요?</span><span><b>3</b> 사기 전에 물어볼 만한 질문인가요?</span>${help('criteria')}</div>
        <div class="actions"><button class="btn white" id="accept">맞아요 <small>셋 다 그래요</small></button><button class="btn" id="edit">고칠게요 <small>문장·근거 수정</small></button><button class="btn coral" id="reject">아니에요 <small>이유 하나 선택</small></button></div></div>`}`;
   renderCounts(quotes);
   if (S.editing) S.draft = d;
@@ -261,7 +268,7 @@ function renderCounts(quotes) {
   const authors = new Map(S.view.reviews.map(r=>[r.reviewId, r.author]));
   const u = st => new Set(quotes.filter(q=>q.stance===st).map(q=>authors.get(q.reviewId))).size;
   const spoke = new Set(quotes.map(q=>authors.get(q.reviewId))).size;
-  $('#counts').innerHTML = `<span class="pill coral">부정 ${u('negative')}명</span><span class="pill mint">긍정 ${u('positive')}명</span>${u('neutral')?`<span class="pill">중립 ${u('neutral')}명</span>`:''}<span class="pill" title="이 주제를 말하지 않은 사람. 좋다 나쁘다 어느 쪽도 아니에요">이 얘기 안 한 사람 ${S.view.bundle.authors - spoke}명</span>`;
+  $('#counts').innerHTML = `<span class="pill coral">부정 ${u('negative')}명</span><span class="pill mint">긍정 ${u('positive')}명</span>${u('neutral')?`<span class="pill">중립 ${u('neutral')}명</span>`:''}<span class="pill">이 얘기 안 한 사람 ${S.view.bundle.authors - spoke}명 ${help('silent')}</span>`;
 }
 async function decide(extra) {
   const c = S.view.candidates[S.idx];
@@ -341,6 +348,30 @@ function renderDone() {
   $('#next')?.addEventListener('click', () => { S.human=null; load(); });
   $('#stop').onclick = () => { localStorage.setItem('labeler', JSON.stringify(S.me)); $('#main').innerHTML = `<div class="track fade"><h1 class="display white">수고했어요</h1><p class="sub white">다음에 같은 이름으로 들어오면 이어서 할 수 있어요.</p><button class="btn ghost" style="align-self:flex-start" onclick="location.reload()">다시 시작</button></div>`; setHeader(null); };
 }
+
+// ---------- 부가 설명 (ⓘ) ----------
+const HELP = {
+  missed: `<span class="t">같은 얘기를 하는 리뷰</span>이 질문과 같은 주제를 말하는데 후보에는 빠진 리뷰예요.<ul><li>문장이 <b>이 답을 뒷받침하면</b> 그 문장의 입장을 골라 근거에 넣어요.</li><li><b>긍정</b> 좋게 말함 · <b>부정</b> 나쁘게 말함 · <b>중립</b> 좋다 나쁘다 없이 언급만</li><li>뒷받침하지 않으면 그냥 두면 돼요.</li></ul>`,
+  silent: `<span class="t">이 얘기 안 한 사람</span>리뷰에 이 주제를 아예 언급하지 않은 사람 수예요. 좋다는 것도, 나쁘다는 것도 아니에요.<ul><li>이 사람들을 "문제 없다"로 세면 안 돼요.</li><li>답이 "대부분 괜찮다"처럼 말하는데 실제 언급한 사람이 적으면 <b>아니에요</b>가 맞아요.</li></ul>`,
+  criteria: `<span class="t">이렇게 판단해요</span><ul><li><b>1</b> 답이 굵은 문장에 실제로 있는 말인지. 요약·추측이면 아니에요.</li><li><b>2</b> 한 명의 유별난 경험이면 다른 구매자의 질문이 못 돼요. 여러 사람이 겪을 법한 얘기여야 해요.</li><li><b>3</b> 사기 전에 정말 물어볼 질문인지. "좋은가요?"처럼 뭉뚱그린 건 아니에요.</li></ul>셋 다 그러면 <b>맞아요</b>, 문장이나 근거만 다르면 <b>고칠게요</b>, 하나라도 아니면 <b>아니에요</b>.`,
+};
+const help = key => `<button type="button" class="help" data-help="${key}" aria-label="설명">?</button>`;
+function closeTip() { document.querySelectorAll('.tip, .tipbg').forEach(e => e.remove()); document.querySelectorAll('.help.on').forEach(e => e.classList.remove('on')); }
+document.addEventListener('click', ev => {
+  const b = ev.target.closest('[data-help]');
+  if (!b) { if (!ev.target.closest('.tip')) closeTip(); return; }
+  ev.preventDefault(); ev.stopPropagation();
+  if (b.classList.contains('on')) return closeTip();
+  closeTip(); b.classList.add('on');
+  const bg = document.createElement('div'); bg.className = 'tipbg';
+  const tip = document.createElement('div'); tip.className = 'tip'; tip.innerHTML = HELP[b.dataset.help] || '';
+  document.body.append(bg, tip);
+  const r = b.getBoundingClientRect(), w = tip.offsetWidth, h = tip.offsetHeight;
+  let left = Math.min(Math.max(16, r.left + r.width / 2 - w / 2), window.innerWidth - w - 16);
+  let top = r.bottom + 10; if (top + h > window.innerHeight - 16) top = r.top - h - 10;
+  tip.style.left = left + 'px'; tip.style.top = top + 'px';
+}, true);
+document.addEventListener('keydown', ev => { if (ev.key === 'Escape') closeTip(); });
 
 // ---------- 부팅 ----------
 (async () => {
