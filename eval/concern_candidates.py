@@ -43,7 +43,7 @@ from label_concern_golden import _condition_line, load_labels  # noqa: E402
 from sample_concern_golden import load_bundles  # noqa: E402
 from tag_contract import fold_invisible  # noqa: E402
 
-PROMPT_PATH = Path(__file__).parent / "prompts/concern_candidates_v2.md"  # v2: stance 절대값
+PROMPT_PATH = Path(__file__).parent / "prompts/concern_candidates_v3.md"  # v2: stance 절대값 · v3: neutral 추가
 HARNESS_DIR = ROOT / "data/intermediate/v5_concern_golden_harness"
 RAW_DIR = ROOT / "data/intermediate/v5_concern_golden_candidates_raw"  # 다른 모델이 B01.json 을 여기에 쓴다
 CANDIDATES_PATH = ROOT / "eval/gold/v5_concern_golden_candidates.jsonl"
@@ -189,16 +189,20 @@ def auto_checks(candidate: dict, bundle: dict, siblings: list[dict]) -> list[dic
     ev = candidate.get("evidence") or []
     pos = {authors.get(e.get("reviewId")) for e in ev if e.get("stance") == "positive"} - {None}
     neg = {authors.get(e.get("reviewId")) for e in ev if e.get("stance") == "negative"} - {None}
-    if len(pos | neg) < MIN_SUPPORT_AUTHORS:
-        out.append({"key": "thin_evidence", "level": "warn", "text": f"근거 고유 작성자 {len(pos | neg)}명 — 놓친 근거를 보태거나 과소 근거로 볼지 판단"})
+    neu = {authors.get(e.get("reviewId")) for e in ev if e.get("stance") == "neutral"} - {None}
+    spoke = pos | neg | neu
+    if len(spoke) < MIN_SUPPORT_AUTHORS:
+        out.append({"key": "thin_evidence", "level": "warn", "text": f"근거 고유 작성자 {len(spoke)}명 — 놓친 근거를 보태거나 과소 근거로 볼지 판단"})
+    if neu and not (pos or neg):
+        out.append({"key": "neutral_only", "level": "info", "text": "중립 언급만 있다 — direction 은 neutral 로 계산된다. 답이 방향을 단정하면 unsupported_claim"})
     direction = candidate.get("direction")
     if pos and neg and min(len(pos), len(neg)) == 1 and max(len(pos), len(neg)) >= 3:
         out.append({"key": "mixed_single_dissent", "level": "info", "text": "한쪽 1명 — mixed 로 저장되되 소수 의견의 처리는 게이트(PER-186)가 정한다"})
     generalizers = ("대부분", "대체로", "거의", "보통", "다들", "모두", "누구나", "없다는 편", "문제 없", "문제없", "안 생긴다", "생기지 않는다")
     ans = candidate.get("answer") or ""
-    if any(w in ans for w in generalizers) and len(pos | neg) < 5:
+    if any(w in ans for w in generalizers) and len(spoke) < 5:
         out.append({"key": "generalizes_from_silence", "level": "warn",
-                    "text": f"답에 일반화 표현이 있는데 언급한 작성자는 {len(pos | neg)}명 — 언급 없음(침묵)을 근거로 세면 unsupported_claim"})
+                    "text": f"답에 일반화 표현이 있는데 언급한 작성자는 {len(spoke)}명 — 언급 없음(침묵)을 근거로 세면 unsupported_claim"})
     q = (candidate.get("question") or "").strip()
     if len(q) < 14 or any(w in q for w in GENERIC_QUESTION_WORDS):
         out.append({"key": "question_broad", "level": "warn", "text": "질문이 짧거나 일반적 — 무엇을 재는지 없으면 overbroad_question"})

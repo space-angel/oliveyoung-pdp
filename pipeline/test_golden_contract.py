@@ -163,6 +163,38 @@ class TestValidLabel(unittest.TestCase):
         ])
         self.assertEqual(validate_label(one_dissent, bundle())["direction"], "mixed")  # 반대 1명도 mixed
 
+    def test_neutral_mention_counts_as_spoke_not_direction(self):
+        """중립 언급은 D 에 들어가고 U+/U- 에는 안 들어간다. 침묵으로 세지 않는다."""
+        lab = label(
+            condition={"skinType": None, "skinTrouble": None, "option": None},
+            direction="positive",
+            evidence=[
+                {"reviewId": 2, "stance": "positive", "quote": "촉촉하고"},
+                {"reviewId": 3, "stance": "neutral", "quote": "건성인데"},
+            ],
+        )
+        out = validate_label(lab, bundle())
+        counts = support_counts(out, bundle())
+        self.assertEqual(out["direction"], "positive")           # 중립은 방향에 영향 없음
+        self.assertEqual(counts["neutralAuthors"], 1)
+        self.assertEqual(counts["spokeAuthors"], 2)              # 중립도 말한 사람
+        self.assertEqual(counts["silentAuthors"], 1)             # a 만 말하지 않았다
+
+    def test_neutral_only_direction_is_neutral(self):
+        lab = label(
+            condition={"skinType": None, "skinTrouble": None, "option": None},
+            direction="neutral",
+            evidence=[{"reviewId": 3, "stance": "neutral", "quote": "건성인데"}],
+        )
+        self.assertEqual(validate_label(lab, bundle())["direction"], "neutral")
+        self.assert_fails_dir(lab)
+
+    def assert_fails_dir(self, lab):
+        lab = dict(lab, direction="negative")
+        with self.assertRaises(GoldenContractError) as ctx:
+            validate_label(lab, bundle())
+        self.assertIn("'neutral'", str(ctx.exception))
+
 
 class TestViolations(unittest.TestCase):
     def assert_fails(self, lab: dict, fragment: str, b: dict | None = None):

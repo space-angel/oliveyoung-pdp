@@ -15,9 +15,10 @@
     question         구매자가 물을 법한 질문
     answer           리뷰가 주는 답 (질문만 있으면 사용자가 답을 직접 찾아야 한다, PRD §6)
     condition        {skinType, skinTrouble, option} — 축마다 null(무관) / "미기재" / 코드
-    direction        positive | negative | mixed — **사람이 고르지 않고 근거에서 계산한다** (derive_direction)
+    direction        positive | negative | mixed | neutral — **사람이 고르지 않고 근거에서 계산한다** (derive_direction)
     evidence[]       {reviewId, quote, stance}. quote 는 원문 부분문자열, stance 는 그 문장이 주제에 대해
-                     positive | negative 인지 (답 문장과 무관한 절대값)
+                     positive | negative | neutral 인지 (답 문장과 무관한 절대값). neutral = 주제를 말하지만
+                     방향이 없는 문장("지속력은 보통") — 태깅 계약(PER-175)의 polarity 3종과 같은 어휘
     failureReasons[] 이 claim 이 실패 사례라면 PER-177 8유형 키. 정상 claim 은 []
     evaluation       complete | not_evaluable
     notes            판단 메모. not_evaluable 이면 필수
@@ -36,6 +37,8 @@
   접는다). v4 88.8% 의 재발 경로를 라벨 단계에서부터 막는다.
 - **근거 카운트는 리뷰 수가 아니라 고유 작성자 수다** (PER-170). `support_counts()` 가 센다.
 - **침묵은 근거가 아니다.** 주제를 언급하지 않은 리뷰는 긍정도 부정도 아니다 (`silentAuthors` 로 따로 센다).
+  **중립 언급은 침묵이 아니다** (v3) — "보통이에요"는 주제를 말한 것이라 D(언급 작성자)에 들어가고 U+/U− 에는 안 들어간다.
+  중립을 근거에서 빼면 그 작성자가 침묵으로 잘못 세어진다.
   "대부분 트러블이 없다"처럼 언급 없음을 부정 증거로 일반화하면 `unsupported_claim` 이다 — 안 생겼다는 **명시 문장**만 긍정 근거다.
 - **failureReasons 는 정렬된 상태로 저장한다** — 첫 원소가 대표 `failureReason` 이므로
   순서가 곧 판정이다. 어휘는 코드 상수가 아니라 `pipeline/failure_taxonomy.json` 이다.
@@ -63,11 +66,11 @@ from contracts import CONDITION_AXES, MISSING_SEGMENT  # noqa: E402
 from tag_contract import ASPECTS, is_verbatim  # noqa: E402
 
 ROOT = Path(__file__).parents[1]
-GOLDEN_SCHEMA_VERSION = "concern-golden-v2"  # v2: stance 절대값 + direction 계산
+GOLDEN_SCHEMA_VERSION = "concern-golden-v3"  # v2: stance 절대값 + direction 계산 · v3: neutral 입장 추가
 TAXONOMY_PATH = Path(__file__).parent / "failure_taxonomy.json"
 
-DIRECTIONS = ("positive", "negative", "mixed")
-STANCES = ("positive", "negative")
+DIRECTIONS = ("positive", "negative", "mixed", "neutral")
+STANCES = ("positive", "negative", "neutral")
 EVALUATIONS = ("complete", "not_evaluable")
 CODED_AXES = ("skinType", "skinTrouble")
 
@@ -312,7 +315,7 @@ def validate_label(
     if direction != derived:
         _fail(label, (
             f"direction={direction!r} 인데 근거에서 계산한 방향은 {derived!r} 다. direction 은 사람이 고르지 않는다 — "
-            "근거의 고유 작성자 기준으로 긍정만 → positive, 부정만 → negative, 둘 다 → mixed"
+            "근거의 고유 작성자 기준으로 긍정만 → positive, 부정만 → negative, 둘 다 → mixed, 중립만 → neutral"
         ))
 
     reasons = label.get("failureReasons")
@@ -372,7 +375,7 @@ def validate_label(
 
 def _authors_by_stance(evidence: list[dict], bundle: dict) -> dict[str, set[str]]:
     authors = {r["reviewId"]: r["derived"]["authorKey"] for r in bundle["reviews"]}
-    out: dict[str, set[str]] = {"positive": set(), "negative": set()}
+    out: dict[str, set[str]] = {"positive": set(), "negative": set(), "neutral": set()}
     for ev in evidence:
         if ev.get("stance") in out and ev.get("reviewId") in authors:
             out[ev["stance"]].add(authors[ev["reviewId"]])
@@ -384,17 +387,22 @@ def derive_direction(evidence: list[dict], bundle: dict) -> str:
     by = _authors_by_stance(evidence, bundle)
     if by["positive"] and by["negative"]:
         return "mixed"
-    return "positive" if by["positive"] else "negative"
+    if by["positive"]:
+        return "positive"
+    if by["negative"]:
+        return "negative"
+    return "neutral"  # 중립 언급만 있다 — 부정으로 바꾸지 않는다 (PER-177 §2 경계 규칙)
 
 
 def support_counts(label: dict, bundle: dict) -> dict:
     """근거 카운트 — 리뷰 수가 아니라 **고유 작성자 수** (PER-170)."""
     by = _authors_by_stance(label["evidence"], bundle)
     bundle_authors = {r["derived"]["authorKey"] for r in bundle["reviews"]}
-    spoke = by["positive"] | by["negative"]
+    spoke = by["positive"] | by["negative"] | by["neutral"]
     return {
         "positiveAuthors": len(by["positive"]),   # U+
         "negativeAuthors": len(by["negative"]),   # U-
+        "neutralAuthors": len(by["neutral"]),     # 주제를 말했지만 방향 없음 — D 에는 들어가고 U 에는 안 들어간다
         "spokeAuthors": len(spoke),               # D — 이 주제를 말한 작성자
         "silentAuthors": len(bundle_authors - spoke),  # S - D — 말하지 않은 작성자. 어느 쪽 근거도 아니다
         "evidenceReviews": len(label["evidence"]),

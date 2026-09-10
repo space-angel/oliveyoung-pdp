@@ -19,7 +19,7 @@ PRD §7-2: 골든셋은 "가장 느리고 가장 믿을 만한" 층이다. 규�
 | 항목 | 결정 | 강제 |
 |---|---|---|
 | 라벨 단위 | **claim 1개** = 질문–답 · 조건 · 방향(계산) · 근거(reviewId+인용+입장) · 실패유형 · 평가상태 · 출처 | `golden_contract.validate_label` |
-| 입장·방향 | **v2:** stance 는 문장의 절대 긍/부정, direction 은 고유 작성자로 계산(둘 다 있으면 mixed, 반대 1명도) | `derive_direction` |
+| 입장·방향 | **v2:** stance 는 문장의 절대 긍/부정, direction 은 고유 작성자로 계산(둘 다 있으면 mixed, 반대 1명도). **v3:** `neutral` 추가 — 주제를 말하되 방향 없음. D 에 들어가고 U 에는 안 들어감, 중립만이면 direction=neutral | `derive_direction` |
 | 읽는 단위 | **번들** = 제품(또는 제품 × 조건 셀) 하나의 리뷰 ≤40건. 라벨은 번들 안에서만 만든다 | `evidence.reviewId ∈ bundle` |
 | 표본 | 번들 40개 (파일럿 16) · 제품 40개 / 5카테고리 비례 · 종류 5 (제품 16 · skinType 10 · option 6 · skinTrouble 4 · 미기재 4) | `sample_concern_golden.py --check` |
 | 층화 | 번들 안 평점 층 12/8/8/12 (1~2★ / 3★ / 4★ / 5★), 층별 weight 기록 | 같음 |
@@ -52,8 +52,8 @@ PRD §7-2: 골든셋은 "가장 느리고 가장 믿을 만한" 층이다. 규�
   "condition": {                     // 축마다 null(무관) / "미기재" / 코드
     "skinType": "A02", "skinTrouble": null, "option": null
   },
-  "direction": "mixed",              // 근거에서 계산: 긍정만 positive · 부정만 negative · 둘 다 mixed (사람이 고르지 않음)
-  "evidence": [                      // 근거. 번들 안 리뷰만. stance 는 문장 자체의 긍/부정 (답과 무관)
+  "direction": "mixed",              // 근거에서 계산: 긍정만 positive · 부정만 negative · 둘 다 mixed · 중립만 neutral (사람이 고르지 않음)
+  "evidence": [                      // 근거. 번들 안 리뷰만. stance 는 문장 자체의 positive|negative|neutral (답과 무관)
     {"reviewId": 61368405, "stance": "negative", "quote": "원문 부분문자열"},
     {"reviewId": 61380240, "stance": "positive", "quote": "원문 부분문자열"}
   ],
@@ -224,6 +224,14 @@ PER-177 이 8키·심각도·순번을 확정했고(`docs/DECISION_PER177_FAILUR
 표와 1:1 이다. PER-181 은 이 파일에 검사 목록·버전 거부 규칙을 더하면 된다 — 코드 상수는 어디에도 없다.
 
 ---
+
+## 11. v3 — 중립 입장 (2026-09-10 추가 결정)
+
+라벨러가 첫 중립 리뷰를 만났다("보통이에요" 류). v2 는 stance 가 positive/negative 둘이라 중립을 근거에서 빼야 했고,
+그러면 그 작성자가 **언급 없음(침묵)으로 잘못 세어진다** — §10 의 규칙과 정면 충돌한다. 태깅 계약(PER-175)의 polarity 는
+이미 3종이므로 골든셋도 `neutral` 을 갖는다. 중립은 D(언급 작성자)에 들어가고 U+/U− 에는 안 들어가며, 중립만이면
+direction=neutral 이다 (PER-177 §2 "중립·혼재는 부정으로 바꾸지 않는다"). 주제와 무관한 문장은 여전히 근거가 아니다 —
+무관과 중립을 구분하는 것이 라벨러의 판단이다. 후보 187개는 v2 로 만들어져 neutral 이 없다 — 검수 시 사람이 붙인다.
 
 ## 10. 침묵은 근거가 아니다 (2026-09-09 추가 결정)
 
