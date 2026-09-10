@@ -122,18 +122,6 @@
   .tip ul { margin:8px 0 0; padding-left:18px; } .tip li { margin:4px 0; }
   @media (max-width:640px) { .tip { left:0 !important; right:0; top:auto !important; bottom:0; width:auto; border-radius:24px 24px 0 0; padding:24px 24px 36px; } }
   .tipbg { position:fixed; inset:0; z-index:19; }
-  /* 마지막 한 가지: 왼쪽 리뷰 전체(자체 스크롤) · 오른쪽 작성 폼(고정) */
-  .split { display:grid; grid-template-columns:minmax(0,1fr) 400px; gap:24px; align-items:start; }
-  .pane-l { display:flex; flex-direction:column; gap:16px; max-height:calc(100vh - 128px); overflow:auto; padding-right:6px; scrollbar-width:thin; }
-  .pane-r { position:sticky; top:96px; } .pane-r .row.col { flex-direction:column; gap:10px; } .pane-r .row.col .btn { width:100%; }
-  .rlist { display:flex; flex-direction:column; gap:10px; }
-  .rv { background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.07); border-radius:20px; padding:14px 16px 10px; display:flex; flex-direction:column; gap:4px; }
-  .rv.used { border-color:rgba(84,237,145,.35); }
-  .rv .m { display:flex; gap:12px; font-size:13px; color:var(--grey); padding:0 6px 6px; } .rv .m .mint { color:var(--mint); }
-  .rv .sent { background:transparent; display:flex; align-items:flex-start; justify-content:space-between; gap:12px; padding:8px 10px; border-radius:12px; font-size:15px; line-height:1.55; color:var(--fg2); letter-spacing:-.3px; }
-  .rv .sent:hover { background:rgba(255,255,255,.04); } .rv .sent.hit { color:var(--fg); font-weight:600; }
-  .rv .sent .pills { flex:none; gap:6px; opacity:.55; transition:opacity .15s; } .rv .sent:hover .pills, .rv .sent .pills:has(.sm[class*="on-"]) { opacity:1; }
-  @media (max-width:960px) { .split { grid-template-columns:1fr; } .pane-l { max-height:none; overflow:visible; } .pane-r { position:static; } }
   [hidden] { display:none !important; }
 </style>
 </head>
@@ -345,33 +333,30 @@ function renderMissed(msg) {
   const H = S.human;
   const hits = Object.entries(v.aspectHits).filter(([,h])=>h.reviews>0).sort((a,b)=>b[1].reviews-a[1].reviews);
   const terms = H.term ? v.aspectHits[H.term].keywords : [];
-  // 기본은 전체 리뷰. 키워드 칩을 누르면 그 말이 나온 리뷰만 남기고 해당 문장을 굵게
-  const shown = H.term ? v.reviews.filter(r => terms.some(t=>r.content.includes(t))) : v.reviews;
+  const shown = H.term ? v.reviews.filter(r => terms.some(t=>r.content.includes(t))) : [];
   const evIds = new Set(H.evidence.map(e=>e.reviewId));
-  const split = r => r.content.split(/(?<=[.!?…~])\s+|\n+/).map(x=>x.trim()).filter(x => x.length>=4);
-  const hit = x => terms.some(t=>x.includes(t));
-  const sentRow = (r, x) => `<div class="sent ${hit(x)?'hit':''}"><span>${txt(x)}</span><span class="pills">${['positive','negative','neutral'].map(st => `<button type="button" class="sm ${H.evidence.some(e=>e.reviewId===r.reviewId&&e.quote===x&&e.stance===st)?('on-'+(st==='positive'?'good':st==='negative'?'bad':'neu')):''}" data-add='${esc(JSON.stringify({reviewId:r.reviewId, quote:x, stance:st}))}'>${STANCE[st]}</button>`).join('')}</span></div>`;
+  const sentences = r => r.content.split(/(?<=[.!?…~])\s+|\n+/).map(s=>s.trim()).filter(s => s.length>=4 && terms.some(t=>s.includes(t))).slice(0,3);
   $('#main').innerHTML = `
-  <div class="track fade"><span class="pill blue">마지막 한 가지</span><h1 class="display">후보에 없는 질문이<br>하나 떠오르나요?</h1><p class="sub white">리뷰를 쭉 읽다가 "이건 왜 안 물어봤지?" 싶은 게 있으면 그 문장을 눌러 근거로 모으고 오른쪽에 적어주세요. 없으면 없다고 답해도 충분해요. 그것도 기록이에요.</p></div>
-  <div class="split fade">
-    <section class="pane-l">
-      <div class="field" style="padding:0 4px"><label>리뷰에서 자주 나오는 말 · 눌러서 그 리뷰만 보기</label><div class="chips"><button type="button" class="chip ${H.term?'':'on'}" data-t="">전체<b>${v.reviews.length}</b></button>${hits.map(([a,h]) => `<button type="button" class="chip ${H.term===a?'on':''}" data-t="${esc(a)}">${esc(a)}<b>${h.reviews}</b></button>`).join('')}</div></div>
-      <div class="rlist">${shown.map(r => `<article class="rv ${evIds.has(r.reviewId)?'used':''}"><div class="m"><span>${stars(r.rating)}</span><span>${esc(r.conditionLine.split(' · ')[0])}</span>${evIds.has(r.reviewId)?'<span class="mint">근거에 있음</span>':''}</div>${split(r).map(x => sentRow(r, x)).join('')}</article>`).join('')}
-      ${shown.length ? '' : '<div class="note" style="padding:12px">이 말이 나온 리뷰가 없어요</div>'}</div>
-    </section>
-    <aside class="pane-r card wide" style="gap:16px">
-      <div class="field"><label>고른 근거 ${H.evidence.length}개</label>${H.evidence.length ? `<div class="pills">${H.evidence.map((e,i)=>`<span class="pill ${e.stance==='positive'?'mint':e.stance==='negative'?'coral':''}">${txt(e.quote.slice(0,24))}${e.quote.length>24?'…':''} <button type="button" class="sm" data-rm="${i}" style="height:24px;padding:0 8px">✕</button></span>`).join('')}</div>` : `<span class="note">왼쪽에서 문장 옆 긍정·부정·중립을 눌러 근거를 모으세요</span>`}</div>
-      <div class="field"><label>리뷰가 말하는 것 (답)</label><textarea id="ha" placeholder="예: 냄새가 불쾌하다는 리뷰가 여러 개 있어요">${esc(H.answer)}</textarea></div>
-      <div class="field"><label>그 답을 묻는 질문</label><textarea class="big" id="hq" placeholder="예: 향이나 냄새가 불쾌하다는 사람이 있나요?">${esc(H.question)}</textarea></div>
-      ${msg ? `<div class="msg ${msg.cls}">${esc(msg.text)}</div>` : ''}
-      <div class="row col"><button class="btn white" id="add">추가하고 제품 마치기 〉</button><button class="btn ghost" id="none">떠오르는 게 없어요</button></div>
-    </aside>
+  <div class="track fade"><span class="pill blue">마지막 한 가지</span><h1 class="display">후보에 없는 질문이<br>하나 떠오르나요?</h1><p class="sub white">"이건 왜 안 물어봤지?" 싶었던 게 있으면 적어주세요. 없으면 없다고 답해도 충분해요. 그것도 기록이에요.</p></div>
+  <div class="fade" style="display:flex;flex-direction:column;gap:20px">
+    <div class="field"><label>리뷰에서 자주 나오는 말 · 눌러서 그 리뷰만 보기</label><div class="chips">${hits.map(([a,h]) => `<button type="button" class="chip ${H.term===a?'on':''}" data-t="${esc(a)}">${esc(a)}<b>${h.reviews}</b></button>`).join('')}</div></div>
+    ${H.term ? `<div class="grid">${shown.slice(0,9).map(r => `<div class="card ${evIds.has(r.reviewId)?'positive':''}"><div class="tags"><span class="tagc">${stars(r.rating)}</span><span class="tagc">${esc(r.conditionLine.split(' · ')[0])}</span>${evIds.has(r.reviewId)?'<span class="tagc" style="color:var(--mint)">근거에 있음</span>':''}</div>
+        <div style="display:flex;flex-direction:column;gap:8px">${sentences(r).map(s => `<div class="sent"><span>${txt(s)}</span></div><div class="pills">${['positive','negative','neutral'].map(st => `<button type="button" class="sm ${H.evidence.some(e=>e.reviewId===r.reviewId&&e.quote===s&&e.stance===st)?('on-'+(st==='positive'?'good':st==='negative'?'bad':'neu')):''}" data-add='${esc(JSON.stringify({reviewId:r.reviewId, quote:s, stance:st}))}'>${STANCE[st]}</button>`).join('')}</div>`).join('')}</div></div>`).join('')}</div>
+      ${shown.length>9 ? `<div class="note">이 말이 나온 리뷰 ${shown.length}개 중 9개만 보여요</div>` : ''}` : ''}
+    <div class="grid" style="align-items:start">
+      <div class="card wide" style="gap:16px">
+        <div class="field"><label>고른 근거 ${H.evidence.length}개</label>${H.evidence.length ? `<div class="pills">${H.evidence.map((e,i)=>`<span class="pill ${e.stance==='positive'?'mint':e.stance==='negative'?'coral':''}">${txt(e.quote.slice(0,24))}${e.quote.length>24?'…':''} <button type="button" class="sm" data-rm="${i}" style="height:24px;padding:0 8px">✕</button></span>`).join('')}</div>` : `<span class="note">위에서 문장 아래 버튼을 눌러 근거를 모으세요</span>`}</div>
+        <div class="field"><label>리뷰가 말하는 것 (답)</label><textarea id="ha" placeholder="예: 냄새가 불쾌하다는 리뷰가 여러 개 있어요">${esc(H.answer)}</textarea></div>
+        <div class="field"><label>그 답을 묻는 질문</label><textarea class="big" id="hq" placeholder="예: 향이나 냄새가 불쾌하다는 사람이 있나요?">${esc(H.question)}</textarea></div>
+        ${msg ? `<div class="msg ${msg.cls}">${esc(msg.text)}</div>` : ''}
+        <div class="row"><button class="btn" id="none">떠오르는 게 없어요</button><button class="btn white" id="add">추가하고 제품 마치기 〉</button></div>
+      </div>
+    </div>
   </div>`;
   const keep = () => { H.answer = $('#ha').value; H.question = $('#hq').value; };
-  const keepScroll = fn => { const l = $('.pane-l'); const y = l ? l.scrollTop : 0; fn(); const l2 = $('.pane-l'); if (l2) l2.scrollTop = y; };
-  document.querySelectorAll('[data-t]').forEach(b => b.onclick = () => { keep(); H.term = b.dataset.t || null; renderMissed(); });
-  document.querySelectorAll('[data-add]').forEach(b => b.onclick = () => { keep(); const e = JSON.parse(b.dataset.add); H.evidence = H.evidence.filter(x=>x.reviewId!==e.reviewId).concat([e]); keepScroll(() => renderMissed()); });
-  document.querySelectorAll('[data-rm]').forEach(b => b.onclick = () => { keep(); H.evidence.splice(+b.dataset.rm,1); keepScroll(() => renderMissed()); });
+  document.querySelectorAll('[data-t]').forEach(b => b.onclick = () => { keep(); H.term = H.term===b.dataset.t ? null : b.dataset.t; renderMissed(); });
+  document.querySelectorAll('[data-add]').forEach(b => b.onclick = () => { keep(); const e = JSON.parse(b.dataset.add); H.evidence = H.evidence.filter(x=>x.reviewId!==e.reviewId).concat([e]); renderMissed(); });
+  document.querySelectorAll('[data-rm]').forEach(b => b.onclick = () => { keep(); H.evidence.splice(+b.dataset.rm,1); renderMissed(); });
   $('#none').onclick = async () => { try { await api('/api/human', {labelerId:S.me.labelerId, none:true}); await finish(); } catch (e) { renderMissed({cls:'err', text:e.message}); } };
   $('#add').onclick = async () => { keep(); try { await api('/api/human', {labelerId:S.me.labelerId, question:H.question, answer:H.answer, aspect:H.term||null, evidence:H.evidence, minutesSpent:minutes()}); S.human=null; await finish(); } catch (e) { renderMissed({cls:'err', text:e.message}); } };
 }
