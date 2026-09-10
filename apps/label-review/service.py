@@ -1,7 +1,7 @@
 """
 라벨 검수 앱 — 업무 규칙 (PER-178 외부 라벨러용).
 
-라벨러가 보는 개념은 넷이다: 질문·답, 색칠된 근거 문장(좋다/나쁘다/말만), 놓친 리뷰, 아니에요 이유 4개.
+라벨러가 보는 개념은 넷이다: 질문·답, 색칠된 근거 문장(긍정/부정/중립), 놓친 리뷰, 아니에요 이유 4개.
 나머지(labelId·출처·조건·평가상태·방향·실패유형 키)는 **여기서 채운다.** 계약 검증은 `golden_contract.validate_label`
 그대로 — 이 앱이 규격을 느슨하게 만들지 않는다.
 
@@ -52,7 +52,7 @@ REASONS = [
     {"key": "not_in_reviews", "failure": "unsupported_claim", "title": "리뷰에 없는 얘기예요", "desc": "답이나 숫자가 색칠된 문장에서 나오지 않아요"},
 ]
 REASON_BY_KEY = {r["key"]: r for r in REASONS}
-STANCE_LABEL = {"positive": "좋다고 함", "negative": "나쁘다고 함", "neutral": "말은 하는데 좋다 나쁘다 없음"}
+STANCE_LABEL = {"positive": "긍정", "negative": "부정", "neutral": "중립"}
 
 
 class ServiceError(ValueError):
