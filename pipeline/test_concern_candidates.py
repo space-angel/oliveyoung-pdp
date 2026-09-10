@@ -125,7 +125,7 @@ class TestRecheck(TestImport):
 
     def test_import_stamps_schema_version(self):
         rows = cc.import_candidates("B01", self.output(GOOD), model="m")
-        self.assertEqual(rows[0]["checkedWith"], "concern-golden-v2")
+        self.assertEqual(rows[0]["checkedWith"], "concern-golden-v3")
 
 
 class TestAutoChecks(unittest.TestCase):
@@ -144,6 +144,12 @@ class TestAutoChecks(unittest.TestCase):
         keys = {c["key"] for c in cc.auto_checks(thin, bundle_record(), [self.wrap(thin)])}
         self.assertIn("thin_evidence", keys)
         self.assertIn("question_broad", keys)
+
+    def test_neutral_only_is_info_and_counts_as_spoke(self):
+        cand = dict(GOOD, direction="neutral", evidence=[{"reviewId": 1, "stance": "neutral", "quote": "속보습은"}, {"reviewId": 2, "stance": "neutral", "quote": "촉촉하고"}])
+        keys = {c["key"] for c in cc.auto_checks(cand, bundle_record(), [self.wrap(cand)])}
+        self.assertIn("neutral_only", keys)
+        self.assertNotIn("thin_evidence", keys)  # 중립 2명도 언급한 사람 2명이다
 
     def test_generalizing_from_silence_is_flagged(self):
         cand = dict(GOOD, answer="대부분 트러블이 없다")
