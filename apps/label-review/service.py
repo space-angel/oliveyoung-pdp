@@ -158,7 +158,7 @@ class Service:
                 quotes.append({
                     "reviewId": e["reviewId"], "stance": e["stance"], "stanceLabel": STANCE_LABEL.get(e["stance"], e["stance"]),
                     "quote": e["quote"], "rating": r["raw"]["rating"], "conditionLine": _condition_line(r, self.codebook),
-                    "before": content[max(0, i - 90):i] if i >= 0 else "", "after": content[i + len(e["quote"]):i + len(e["quote"]) + 90] if i >= 0 else "",
+                    "before": content[:i] if i >= 0 else "", "after": content[i + len(e["quote"]):] if i >= 0 else "",  # 전문 — 앞뒤 맥락이 없으면 인용이 무슨 얘긴지 모른다
                     "verbatim": i >= 0,
                 })
             spoke = {authors[e["reviewId"]] for e in k.get("evidence") or [] if e["reviewId"] in authors}
