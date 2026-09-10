@@ -135,7 +135,17 @@
   @media (max-width:640px) { .tip { left:0 !important; right:0; top:auto !important; bottom:0; width:auto; border-radius:24px 24px 0 0; padding:24px 24px 36px; } }
   .tipbg { position:fixed; inset:0; z-index:19; }
   /* 마지막 한 가지: 리뷰 전체를 글로 읽는 상자. 문장을 누르면 선택창 */
-  .rbox { max-height:62vh; overflow:auto; display:flex; flex-direction:column; gap:10px; padding:4px 6px 4px 0; scrollbar-width:thin; }
+  .rbox { display:flex; flex-direction:column; gap:10px; }
+  /* 마지막 한 가지 도크: 고른 근거 + 버튼. '질문 적기'를 누르면 도크 안에서 폼이 펼쳐진다 */
+  .hdock { position:sticky; bottom:0; z-index:2; margin:-24px -16px -160px; padding:44px 16px 24px; display:flex; flex-direction:column; gap:14px; align-items:stretch; background:linear-gradient(to top, rgba(12,12,14,.97) 0, rgba(12,12,14,.97) calc(100% - 40px), rgba(12,12,14,0)); }
+  .hdock .hbar { display:flex; align-items:center; gap:14px; width:min(1100px, 100%); margin:0 auto; }
+  .hdock .evs { flex:1; min-width:0; display:flex; gap:8px; overflow-x:auto; scrollbar-width:none; padding:2px 0; } .hdock .evs::-webkit-scrollbar { display:none; }
+  .hdock .evs .pill { flex:none; height:36px; font-size:15px; } .hdock .evs .note { align-self:center; white-space:nowrap; }
+  .hdock .acts { display:flex; gap:10px; flex:none; } .hdock .acts .btn { height:52px; padding:0 22px; min-width:0; }
+  .hdock .form { width:min(1100px, 100%); margin:0 auto; display:grid; grid-template-columns:1fr 1fr; gap:14px; padding:18px 20px 20px; border-radius:20px; background:#17171B; border:1px solid rgba(255,255,255,.1); box-shadow:0 -20px 60px rgba(0,0,0,.45); }
+  .hdock .form .field textarea { min-height:72px; } .hdock .form .field textarea.big { min-height:72px; font-size:20px; }
+  .hdock .form .row { grid-column:1 / -1; justify-content:flex-end; gap:10px; }
+  @media (max-width:760px) { .hdock .form { grid-template-columns:1fr; } .hdock .hbar { flex-wrap:wrap; } }
   .rbox-hint { display:flex; gap:14px; align-items:flex-start; padding:16px 18px; border-radius:16px; background:var(--blue-bg); letter-spacing:-.3px; margin-bottom:4px; }
   .rbox-hint .ico { flex:none; width:28px; height:28px; border-radius:50%; background:var(--blue); color:#fff; font-size:14px; font-weight:800; display:inline-flex; align-items:center; justify-content:center; margin-top:1px; }
   .rbox-hint b { display:block; font-size:16px; font-weight:700; color:var(--fg); line-height:1.4; margin-bottom:3px; } .rbox-hint span:not(.ico) { display:block; font-size:14px; line-height:1.5; color:var(--fg2); }
@@ -381,7 +391,7 @@ function renderMissed(msg) {
     return `<span class="sq ${st?('on-'+st):''} ${hit?'hit':''}" data-q='${esc(JSON.stringify({reviewId:r.reviewId, quote:x}))}'>${txt(x)}</span>`; }).join(' ');
   const used = r => [...evKey.keys()].some(k => k.startsWith(r.reviewId + ' '));
   $('#main').innerHTML = `
-  <div class="track fade"><span class="pill blue">마지막 한 가지</span><h1 class="display">후보에 없는 질문이<br>하나 떠오르나요?</h1><p class="sub white">리뷰를 쭉 읽어보고 "이건 왜 안 물어봤지?" 싶은 게 있으면, 근거가 되는 문장을 눌러 모으고 아래에 적어주세요. 없으면 없다고 답해도 충분해요. 그것도 기록이에요.</p></div>
+  <div class="track fade"><span class="pill blue">마지막 한 가지</span><h1 class="display">후보에 없는 질문이<br>하나 떠오르나요?</h1><p class="sub white">리뷰를 쭉 읽어보고 "이건 왜 안 물어봤지?" 싶은 게 있으면, 근거가 되는 문장을 눌러 모으고 아래 "질문 적기"에 적어주세요. 없으면 없다고 답해도 충분해요. 그것도 기록이에요.</p></div>
   <div class="fade" style="display:flex;flex-direction:column;gap:20px">
     <div class="field" style="padding:0 4px"><label>리뷰 ${v.reviews.length}개 전체 · 자주 나오는 말로 좁혀 볼 수도 있어요</label><div class="chips"><button type="button" class="chip ${H.term?'':'on'}" data-t="">전체<b>${v.reviews.length}</b></button>${hits.map(([a,h]) => `<button type="button" class="chip ${H.term===a?'on':''}" data-t="${esc(a)}">${esc(a)}<b>${h.reviews}</b></button>`).join('')}</div></div>
     <div class="rbox">
@@ -389,18 +399,23 @@ function renderMissed(msg) {
       ${shown.map(r => `<article class="rv ${used(r)?'used':''}"><div class="m"><span>${stars(r.rating)}</span><span>${esc(r.conditionLine.split(' · ')[0])}</span><span>${esc(r.month||'')}</span></div><p>${para(r)}</p></article>`).join('')}
       ${shown.length ? '' : '<div class="note" style="padding:12px">이 말이 나온 리뷰가 없어요</div>'}
     </div>
-    <div class="grid" style="align-items:start">
-      <div class="card wide" style="gap:16px">
-        <div class="field"><label>고른 근거 ${H.evidence.length}개</label>${H.evidence.length ? `<div class="pills">${H.evidence.map((e,i)=>`<span class="pill ${e.stance==='positive'?'mint':e.stance==='negative'?'coral':''}">${txt(e.quote.slice(0,28))}${e.quote.length>28?'…':''} <button type="button" class="sm" data-rm="${i}" style="height:24px;padding:0 8px">✕</button></span>`).join('')}</div>` : `<span class="note">위 리뷰에서 문장을 눌러 근거를 모으세요</span>`}</div>
+  </div>
+  <div class="hdock">
+    ${H.open ? `<div class="form fade">
         <div class="field"><label>리뷰가 말하는 것 (답)</label><textarea id="ha" placeholder="예: 냄새가 불쾌하다는 리뷰가 여러 개 있어요">${esc(H.answer)}</textarea></div>
         <div class="field"><label>그 답을 묻는 질문</label><textarea class="big" id="hq" placeholder="예: 향이나 냄새가 불쾌하다는 사람이 있나요?">${esc(H.question)}</textarea></div>
-        ${msg ? `<div class="msg ${msg.cls}">${esc(msg.text)}</div>` : ''}
-        <div class="row"><button class="btn" id="none">떠오르는 게 없어요</button><button class="btn white" id="add">추가하고 제품 마치기 〉</button></div>
-      </div>
+        ${msg ? `<div class="msg ${msg.cls}" style="grid-column:1 / -1">${esc(msg.text)}</div>` : ''}
+        <div class="row"><button class="btn ghost" id="close">접기</button><button class="btn white" id="add">추가하고 제품 마치기 〉</button></div>
+      </div>` : (msg ? `<div class="msg ${msg.cls}" style="width:min(1100px,100%);margin:0 auto">${esc(msg.text)}</div>` : '')}
+    <div class="hbar">
+      <div class="evs">${H.evidence.length ? H.evidence.map((e,i)=>`<span class="pill ${e.stance==='positive'?'mint':e.stance==='negative'?'coral':''}">${txt(e.quote.slice(0,22))}${e.quote.length>22?'…':''} <button type="button" class="sm" data-rm="${i}" style="height:22px;padding:0 7px">✕</button></span>`).join('') : `<span class="note">고른 근거 0개 · 위 리뷰에서 문장을 누르면 여기에 모여요</span>`}</div>
+      <div class="acts"><button class="btn ghost" id="none">떠오르는 게 없어요</button><button class="btn white" id="open">${H.open ? '질문 적는 중' : `질문 적기${H.evidence.length ? ` <small>근거 ${H.evidence.length}개</small>` : ''}`}</button></div>
     </div>
   </div>`;
-  const keep = () => { H.answer = $('#ha').value; H.question = $('#hq').value; };
-  const rerender = () => { const box = $('.rbox'); const y = box ? box.scrollTop : 0; renderMissed(); const b2 = $('.rbox'); if (b2) b2.scrollTop = y; };
+  const keep = () => { if ($('#ha')) { H.answer = $('#ha').value; H.question = $('#hq').value; } };
+  $('#open').onclick = () => { keep(); H.open = true; renderMissed(); $('#hq')?.focus(); };
+  $('#close')?.addEventListener('click', () => { keep(); H.open = false; renderMissed(); });
+  const rerender = () => { const y = window.scrollY; renderMissed(); window.scrollTo(0, y); };
   document.querySelectorAll('[data-t]').forEach(b => b.onclick = () => { keep(); H.term = b.dataset.t || null; renderMissed(); });
   document.querySelectorAll('[data-rm]').forEach(b => b.onclick = () => { keep(); H.evidence.splice(+b.dataset.rm,1); rerender(); });
   document.querySelectorAll('.sq').forEach(el => el.onclick = ev => {
@@ -420,7 +435,7 @@ function renderMissed(msg) {
     });
   });
   $('#none').onclick = async () => { try { await api('/api/human', {labelerId:S.me.labelerId, none:true}); await finish(); } catch (e) { renderMissed({cls:'err', text:e.message}); } };
-  $('#add').onclick = async () => { keep(); try { await api('/api/human', {labelerId:S.me.labelerId, question:H.question, answer:H.answer, aspect:H.term||null, evidence:H.evidence, minutesSpent:minutes()}); S.human=null; await finish(); } catch (e) { renderMissed({cls:'err', text:e.message}); } };
+  $('#add')?.addEventListener('click', async () => { keep(); try { await api('/api/human', {labelerId:S.me.labelerId, question:H.question, answer:H.answer, aspect:H.term||null, evidence:H.evidence, minutesSpent:minutes()}); S.human=null; await finish(); } catch (e) { renderMissed({cls:'err', text:e.message}); } });
 }
 async function finish() {
   try { S.doneInfo = await api('/api/complete', {labelerId:S.me.labelerId}); S.screen='done'; render(); }
