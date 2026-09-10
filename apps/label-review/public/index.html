@@ -271,7 +271,7 @@ function quoteHtml(q, i) {
     ${(q.before||q.after) ? `<div class="ctx"><p class="ctxp short">${q.before.length>90?'…':''}${txt(q.before.slice(-90).trim())}<b>${txt(q.quote)}</b>${txt(q.after.slice(0,90).trim())}${q.after.length>90?'…':''}</p><p class="ctxp full"><span class="lbl">리뷰 전문</span>${txt(q.before)}<b>${txt(q.quote)}</b>${txt(q.after)}</p>${(q.before.length>90||q.after.length>90) ? `<button type="button" class="more" data-more><span class="m1">전문 보기 ⌵</span><span class="m2">접기 ⌃</span></button>` : ''}</div>` : ''}
     <div class="tags"><span class="tagc">${stars(q.rating)}</span><span class="tagc">${esc(q.conditionLine.split(' · ')[0])}</span>${q.added?'<span class="tagc" style="color:var(--blue)">놓친 리뷰에서 넣음</span>':''}</div>
     <div class="tools"><button type="button" class="sm on-${q.stance==='positive'?'good':q.stance==='negative'?'bad':'neu'}" data-cycle="${i}">입장 바꾸기 ⇄</button><button type="button" class="sm" data-rm="${i}">근거에서 빼기</button></div>
-    <div class="foot"><span class="who ${q.stance}">${who}</span><span class="chev">〉</span></div>
+    <div class="foot"><span class="who ${q.stance}">${who}</span></div>
   </div>`;
 }
 function missedHtml(list, mode) {
