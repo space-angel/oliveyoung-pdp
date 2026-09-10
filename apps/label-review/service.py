@@ -41,8 +41,18 @@ LABELER_CHECKS = {
 }
 
 
-def labeler_checks(checks: list[dict]) -> list[dict]:
-    return [{"key": c["key"], "level": "warn", "text": LABELER_CHECKS[c["key"]]} for c in checks if c["key"] in LABELER_CHECKS]
+def labeler_checks(checks: list[dict], spoke: int | None = None, total: int | None = None) -> list[dict]:
+    """라벨러 화면용 문구. 침묵 수(언급 없음)는 기본 화면에 안 보이고, 답이 일반화할 때 이 경고 안에서만 숫자로 나온다."""
+    out = []
+    for c in checks:
+        if c["key"] not in LABELER_CHECKS:
+            continue
+        text = LABELER_CHECKS[c["key"]]
+        if c["key"] == "generalizes_from_silence" and spoke is not None and total is not None:
+            text = (f"답이 \"대부분\"처럼 뭉뚱그리는데, 이 얘기를 실제로 한 사람은 {spoke}명이고 {total - spoke}명은 언급이 없어요. "
+                    "말 안 한 사람은 근거가 아니에요 — 답을 좁히거나 아니에요를 골라주세요.")
+        out.append({"key": c["key"], "level": "warn", "text": text})
+    return out
 
 
 REASONS = [
@@ -167,7 +177,7 @@ class Service:
                 "candidateId": c["candidateId"], "aspect": k.get("aspect"), "question": k.get("question"), "answer": k.get("answer"),
                 "direction": derive_direction(k.get("evidence") or [], b) if k.get("evidence") else None,
                 "condition": k.get("condition"), "quotes": quotes, "counts": {**by, "silent": total_authors - len(spoke)},
-                "contractErrors": c.get("contractErrors") or [], "checks": labeler_checks(auto_checks(k, b, cands)),
+                "contractErrors": c.get("contractErrors") or [], "checks": labeler_checks(auto_checks(k, b, cands), len(spoke), total_authors),
                 "stanceMigrated": bool(c.get("stanceMigrated")),
                 "decision": decided.get(c["candidateId"]),
                 "missed": self.missed_reviews(b, k, exclude={e["reviewId"] for e in k.get("evidence") or []}),
