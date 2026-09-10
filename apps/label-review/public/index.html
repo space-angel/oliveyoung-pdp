@@ -46,7 +46,10 @@
   /* 색 글자 뒤 글로우 — 카드 왼쪽 위(인용)와 왼쪽 아래(라벨) */
   .card .big { margin:0; font-size:28px; line-height:1.4; font-weight:600; letter-spacing:-1px; color:var(--fg); text-wrap:pretty; }
   .card .ctx { color:var(--fg50); font-weight:400; font-size:19px; }
-  .card .ctxp { margin:-6px 0 0; font-size:15px; line-height:1.65; color:var(--fg50); letter-spacing:-0.5px; white-space:pre-line; } .card .ctxp .lbl { display:block; font-size:12px; font-weight:600; color:var(--grey); letter-spacing:0; margin-bottom:6px; text-transform:none; } .card .ctxp b { color:var(--fg70); font-weight:600; }
+  .card .ctx { display:flex; flex-direction:column; gap:10px; align-items:flex-start; }
+  .card .ctxp { margin:-6px 0 0; font-size:15px; line-height:1.65; color:var(--fg50); letter-spacing:-0.5px; }
+  .card .ctxp.full { white-space:pre-line; display:none; } .card .ctx.open .ctxp.full { display:block; } .card .ctx.open .ctxp.short { display:none; }
+  .card .more { background:none; border:0; padding:0; color:var(--blue); font-size:14px; font-weight:600; cursor:pointer; letter-spacing:-.3px; font-family:inherit; } .card .more .m2 { display:none; } .card .ctx.open .more .m1 { display:none; } .card .ctx.open .more .m2 { display:inline; } .card .ctxp .lbl { display:block; font-size:12px; font-weight:600; color:var(--grey); letter-spacing:0; margin-bottom:6px; text-transform:none; } .card .ctxp b { color:var(--fg70); font-weight:600; }
   .card .tags { display:flex; flex-wrap:wrap; gap:8px; }
   .tagc { height:30px; padding:0 10px; border-radius:8px; background:rgba(255,255,255,.04); box-shadow:inset 0 0 0 1px rgba(255,255,255,.04); color:var(--fg50); font-size:15px; font-weight:500; line-height:1.4; display:inline-flex; align-items:center; }
   .card .foot { margin-top:auto; padding-top:8px; display:flex; align-items:center; justify-content:space-between; font-size:18px; font-weight:600; letter-spacing:-0.5px; }
@@ -126,7 +129,7 @@ const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;
 const txt = s => esc(String(s ?? '').replace(/&(lt|gt|amp|quot|#39|nbsp);/g, m => ({'&lt;':'<','&gt;':'>','&amp;':'&','&quot;':'"','&#39;':"'",'&nbsp;':' '}[m])));
 const stars = n => '★'.repeat(n) + '☆'.repeat(5-n);
 const S = { me:null, view:null, idx:0, screen:'start', editing:false, draft:null, reason:null, startedAt:Date.now(), human:null };
-const STANCE = { positive:'좋다고 함', negative:'나쁘다고 함', neutral:'말은 하는데 좋다 나쁘다 없음' };
+const STANCE = { positive:'긍정', negative:'부정', neutral:'중립' };
 const NEXT = { positive:'negative', negative:'neutral', neutral:'positive' };
 
 async function api(path, body) {
@@ -195,10 +198,10 @@ function renderNoWork() {
 
 // ---------- 판정 ----------
 function quoteHtml(q, i) {
-  const who = {positive:'좋다고 함', negative:'나쁘다고 함', neutral:'말은 하는데 좋다 나쁘다 없음'}[q.stance];
+  const who = STANCE[q.stance];
   return `<div class="card ${q.stance}" data-i="${i}">
     <p class="big"><mark>${txt(q.quote)}</mark></p>
-    ${(q.before||q.after) ? `<p class="ctxp"><span class="lbl">리뷰 전문</span>${txt(q.before)}<b>${txt(q.quote)}</b>${txt(q.after)}</p>` : ''}
+    ${(q.before||q.after) ? `<div class="ctx"><p class="ctxp short">${q.before.length>90?'…':''}${txt(q.before.slice(-90).trim())}<b>${txt(q.quote)}</b>${txt(q.after.slice(0,90).trim())}${q.after.length>90?'…':''}</p><p class="ctxp full"><span class="lbl">리뷰 전문</span>${txt(q.before)}<b>${txt(q.quote)}</b>${txt(q.after)}</p>${(q.before.length>90||q.after.length>90) ? `<button type="button" class="more" data-more><span class="m1">전문 보기 ⌵</span><span class="m2">접기 ⌃</span></button>` : ''}</div>` : ''}
     <div class="tags"><span class="tagc">${stars(q.rating)}</span><span class="tagc">${esc(q.conditionLine.split(' · ')[0])}</span></div>
     <div class="tools"><button type="button" class="sm on-${q.stance==='positive'?'good':q.stance==='negative'?'bad':'neu'}" data-cycle="${i}">입장 바꾸기 ⇄</button><button type="button" class="sm" data-rm="${i}">근거에서 빼기</button></div>
     <div class="foot"><span class="who ${q.stance}">${who}</span><span class="chev">〉</span></div>
@@ -207,12 +210,12 @@ function quoteHtml(q, i) {
 function missedHtml(list, mode) {
   if (!list.length) return '';
   return `<details class="missed"><summary>같은 얘기를 하는 리뷰가 <b>${list.length}개</b> 더 있어요<small style="color:var(--fg50);font-weight:400;margin-left:10px">위 카드에 안 들어간 리뷰예요 · 근거를 놓쳤는지만 확인해요</small><span style="margin-left:auto">보기 〉</span></summary>
-    <div class="note" style="padding:0 28px 14px;line-height:1.6">이 질문과 같은 주제를 말하는 리뷰인데 후보에는 빠져 있어요. 문장이 <b>이 답을 뒷받침하면</b> 그 주제를 좋게 말했는지(좋다고 함) · 나쁘게 말했는지(나쁘다고 함) · 좋다 나쁘다 없이 언급만 했는지(말만) 하나를 눌러 근거에 넣어요. 뒷받침하지 않으면 그냥 두면 돼요.</div>
+    <div class="note" style="padding:0 28px 14px;line-height:1.6">이 질문과 같은 주제를 말하는 리뷰인데 후보에는 빠져 있어요. 문장이 <b>이 답을 뒷받침하면</b> 그 문장이 이 주제를 좋게 말하면 <b>긍정</b>, 나쁘게 말하면 <b>부정</b>, 좋다 나쁘다 없이 언급만 하면 <b>중립</b>을 눌러 근거에 넣어요. 뒷받침하지 않으면 그냥 두면 돼요.</div>
     <div class="body">${list.map(r => `<div class="mr"><div class="m"><span>${stars(r.rating)}</span><span>${esc(r.conditionLine.split(' · ')[0])}</span><span>· ${esc(r.hits.join(' '))}</span></div>
       ${r.sentences.map(s => `<div class="sent"><span>${txt(s)}</span>
-        <button type="button" class="sm" data-add='${esc(JSON.stringify({reviewId:r.reviewId, quote:s, stance:'positive'}))}'>좋다고 함</button>
-        <button type="button" class="sm" data-add='${esc(JSON.stringify({reviewId:r.reviewId, quote:s, stance:'negative'}))}'>나쁘다고 함</button>
-        <button type="button" class="sm" data-add='${esc(JSON.stringify({reviewId:r.reviewId, quote:s, stance:'neutral'}))}'>말만</button></div>`).join('')}</div>`).join('')}
+        <button type="button" class="sm" data-add='${esc(JSON.stringify({reviewId:r.reviewId, quote:s, stance:'positive'}))}'>긍정</button>
+        <button type="button" class="sm" data-add='${esc(JSON.stringify({reviewId:r.reviewId, quote:s, stance:'negative'}))}'>부정</button>
+        <button type="button" class="sm" data-add='${esc(JSON.stringify({reviewId:r.reviewId, quote:s, stance:'neutral'}))}'>중립</button></div>`).join('')}</div>`).join('')}
     <div class="note" style="padding:0 8px 8px">${mode==='judge' ? '누르면 "고칠게요"로 바뀌고 근거에 들어가요.' : '누르면 근거에 들어가요.'}</div></div></details>`;
 }
 function renderJudge(msg) {
@@ -220,7 +223,7 @@ function renderJudge(msg) {
   const d = S.draft || { question:c.question, answer:c.answer, aspect:c.aspect, evidence: c.quotes.map(q=>({reviewId:q.reviewId, stance:q.stance, quote:q.quote})) };
   const quotes = S.editing ? d.evidence.map(e => { const q = c.quotes.find(x=>x.reviewId===e.reviewId && x.quote===e.quote) || {before:'', after:'', rating:0, conditionLine:''}; return {...q, ...e}; }) : c.quotes;
   const warn = [...(c.contractErrors.length ? ['이 후보의 인용이 원문과 달라요. 그대로는 저장할 수 없어요 — 고쳐서 저장하거나 "아니에요"를 눌러주세요.'] : []),
-                ...(c.stanceMigrated ? ['좋다/나쁘다 표시는 자동으로 붙인 값이에요. 문장을 읽고 다르면 고쳐주세요.'] : []),
+                ...(c.stanceMigrated ? ['긍정/부정 표시는 자동으로 붙인 값이에요. 문장을 읽고 다르면 고쳐주세요.'] : []),
                 ...c.checks.filter(x=>x.level==='warn').map(x=>x.text)];
   $('#main').innerHTML = `
   <div class="track fade ${S.editing?'editing':''}" id="cand">
@@ -250,6 +253,7 @@ function renderJudge(msg) {
   });
   document.querySelectorAll('[data-cycle]').forEach(b => b.onclick = () => { syncDraft(); const e = S.draft.evidence[+b.dataset.cycle]; e.stance = NEXT[e.stance]; renderJudge(); });
   document.querySelectorAll('[data-rm]').forEach(b => b.onclick = () => { syncDraft(); S.draft.evidence.splice(+b.dataset.rm,1); renderJudge(); });
+  document.querySelectorAll('[data-more]').forEach(b => b.onclick = () => b.closest('.ctx').classList.toggle('open'));
   document.querySelectorAll('[data-add]').forEach(b => b.onclick = () => { const e = JSON.parse(b.dataset.add); if (!S.editing) { S.editing = true; S.draft = d; } else syncDraft(); S.draft.evidence = S.draft.evidence.filter(x=>x.reviewId!==e.reviewId).concat([e]); renderJudge({cls:'ok', text:'근거에 넣었어요. 저장하면 candidate_edited 로 기록돼요.'}); });
 }
 function syncDraft() { if (S.editing) { const q=$('#eq'), a=$('#ea'); if (q) S.draft.question=q.value; if (a) S.draft.answer=a.value; } }
@@ -257,7 +261,7 @@ function renderCounts(quotes) {
   const authors = new Map(S.view.reviews.map(r=>[r.reviewId, r.author]));
   const u = st => new Set(quotes.filter(q=>q.stance===st).map(q=>authors.get(q.reviewId))).size;
   const spoke = new Set(quotes.map(q=>authors.get(q.reviewId))).size;
-  $('#counts').innerHTML = `<span class="pill coral">나쁘다고 함 ${u('negative')}명</span><span class="pill mint">좋다고 함 ${u('positive')}명</span>${u('neutral')?`<span class="pill">말만 ${u('neutral')}명</span>`:''}<span class="pill" title="이 주제를 말하지 않은 사람. 좋다 나쁘다 어느 쪽도 아니에요">이 얘기 안 한 사람 ${S.view.bundle.authors - spoke}명</span>`;
+  $('#counts').innerHTML = `<span class="pill coral">부정 ${u('negative')}명</span><span class="pill mint">긍정 ${u('positive')}명</span>${u('neutral')?`<span class="pill">중립 ${u('neutral')}명</span>`:''}<span class="pill" title="이 주제를 말하지 않은 사람. 좋다 나쁘다 어느 쪽도 아니에요">이 얘기 안 한 사람 ${S.view.bundle.authors - spoke}명</span>`;
 }
 async function decide(extra) {
   const c = S.view.candidates[S.idx];
@@ -299,7 +303,7 @@ function renderMissed(msg) {
   <div class="fade" style="display:flex;flex-direction:column;gap:20px">
     <div class="field"><label>리뷰에서 자주 나오는 말 · 눌러서 그 리뷰만 보기</label><div class="chips">${hits.map(([a,h]) => `<button type="button" class="chip ${H.term===a?'on':''}" data-t="${esc(a)}">${esc(a)}<b>${h.reviews}</b></button>`).join('')}</div></div>
     ${H.term ? `<div class="grid">${shown.slice(0,9).map(r => `<div class="card ${evIds.has(r.reviewId)?'positive':''}"><div class="tags"><span class="tagc">${stars(r.rating)}</span><span class="tagc">${esc(r.conditionLine.split(' · ')[0])}</span>${evIds.has(r.reviewId)?'<span class="tagc" style="color:var(--mint)">근거에 있음</span>':''}</div>
-        <div style="display:flex;flex-direction:column;gap:8px">${sentences(r).map(s => `<div class="sent"><span>${txt(s)}</span></div><div class="pills">${['positive','negative','neutral'].map(st => `<button type="button" class="sm ${H.evidence.some(e=>e.reviewId===r.reviewId&&e.quote===s&&e.stance===st)?('on-'+(st==='positive'?'good':st==='negative'?'bad':'neu')):''}" data-add='${esc(JSON.stringify({reviewId:r.reviewId, quote:s, stance:st}))}'>${st==='neutral'?'말만':STANCE[st]}</button>`).join('')}</div>`).join('')}</div></div>`).join('')}</div>
+        <div style="display:flex;flex-direction:column;gap:8px">${sentences(r).map(s => `<div class="sent"><span>${txt(s)}</span></div><div class="pills">${['positive','negative','neutral'].map(st => `<button type="button" class="sm ${H.evidence.some(e=>e.reviewId===r.reviewId&&e.quote===s&&e.stance===st)?('on-'+(st==='positive'?'good':st==='negative'?'bad':'neu')):''}" data-add='${esc(JSON.stringify({reviewId:r.reviewId, quote:s, stance:st}))}'>${STANCE[st]}</button>`).join('')}</div>`).join('')}</div></div>`).join('')}</div>
       ${shown.length>9 ? `<div class="note">이 말이 나온 리뷰 ${shown.length}개 중 9개만 보여요</div>` : ''}` : ''}
     <div class="grid" style="align-items:start">
       <div class="card wide" style="gap:16px">
