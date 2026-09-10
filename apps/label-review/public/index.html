@@ -81,6 +81,10 @@
   .sm:hover { background:var(--card3); }
   .sm.on-good { background:var(--card3); color:var(--mint); } .sm.on-bad { background:var(--card3); color:var(--coral); } .sm.on-neu { background:var(--card3); color:var(--fg); }
   .actions { display:flex; gap:14px; justify-content:center; flex-wrap:wrap; padding-top:8px; }
+  .dock { position:sticky; bottom:0; z-index:2; margin:-24px -16px -160px; padding:44px 16px 28px; display:flex; flex-direction:column; gap:16px; align-items:center; background:linear-gradient(to top, rgba(12,12,14,.97) 0, rgba(12,12,14,.97) calc(100% - 40px), rgba(12,12,14,0)); }
+  .dock .actions { padding-top:0; }
+  .criteria { display:flex; gap:10px 28px; flex-wrap:wrap; justify-content:center; font-size:15px; color:var(--fg2); letter-spacing:-.3px; }
+  .criteria b { display:inline-flex; width:20px; height:20px; border-radius:50%; align-items:center; justify-content:center; background:rgba(255,255,255,.08); font-size:12px; margin-right:6px; vertical-align:middle; }
   .actions .btn { min-width:220px; }
   .row { display:flex; gap:12px; flex-wrap:wrap; } .row > .btn { flex:1; }
   /* 입력 */
@@ -118,6 +122,8 @@
 <script>
 const $ = (s, r=document) => r.querySelector(s);
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+// 원문에 HTML 엔티티(&lt;색깔&gt;)가 그대로 들어 있다. 보여줄 때만 풀고, 저장되는 인용은 원문 그대로 둔다 (계약: 원문 부분문자열).
+const txt = s => esc(String(s ?? '').replace(/&(lt|gt|amp|quot|#39|nbsp);/g, m => ({'&lt;':'<','&gt;':'>','&amp;':'&','&quot;':'"','&#39;':"'",'&nbsp;':' '}[m])));
 const stars = n => '★'.repeat(n) + '☆'.repeat(5-n);
 const S = { me:null, view:null, idx:0, screen:'start', editing:false, draft:null, reason:null, startedAt:Date.now(), human:null };
 const STANCE = { positive:'좋다고 함', negative:'나쁘다고 함', neutral:'말은 하는데 좋다 나쁘다 없음' };
@@ -145,8 +151,8 @@ function renderStart(err) {
       <div class="note">이름은 누가 어떤 판단을 했는지 기록하는 데만 써요. 다른 참여자에게는 보이지 않아요.</div>
     </div>
     <div class="card wide">
-      <p class="big">리뷰에서 뽑은 질문 후보를 보고<br>맞아요 · 고칠게요 · 아니에요<br>중 하나를 고르면 끝이에요</p>
-      <div class="tags"><span class="tagc">색칠된 문장이 근거</span><span class="tagc">제품 하나씩</span><span class="tagc">언제든 이어서</span></div>
+      <p class="big">리뷰가 정말 그렇게 말하는지<br>확인하는 일이에요</p><p class="sub white" style="font-size:17px">제품마다 "구매자가 물을 질문 + 리뷰가 주는 답" 후보가 있어요. 굵게 칠한 리뷰 문장이 그 답을 뒷받침하면 <b>맞아요</b>, 조금 다르면 <b>고칠게요</b>, 아니면 <b>아니에요</b>.</p>
+      <div class="tags"><span class="tagc">근거는 굵은 문장</span><span class="tagc">한 번에 결정 하나</span><span class="tagc">중간에 닫아도 이어져요</span></div>
       <div class="foot"><span style="color:var(--blue)">30초면 감이 와요</span><span class="chev">〉</span></div>
     </div>
   </div>`;
@@ -191,8 +197,8 @@ function renderNoWork() {
 function quoteHtml(q, i) {
   const who = {positive:'좋다고 함', negative:'나쁘다고 함', neutral:'말은 하는데 좋다 나쁘다 없음'}[q.stance];
   return `<div class="card ${q.stance}" data-i="${i}">
-    <p class="big"><mark>${esc(q.quote)}</mark></p>
-    ${(q.before||q.after) ? `<p class="ctxp">${q.before?'…'+esc(q.before.trim()):''}<b>${esc(q.quote)}</b>${q.after?esc(q.after.trim())+'…':''}</p>` : ''}
+    <p class="big"><mark>${txt(q.quote)}</mark></p>
+    ${(q.before||q.after) ? `<p class="ctxp">${q.before?'…'+txt(q.before.trim()):''}<b>${txt(q.quote)}</b>${q.after?txt(q.after.trim())+'…':''}</p>` : ''}
     <div class="tags"><span class="tagc">${stars(q.rating)}</span><span class="tagc">${esc(q.conditionLine.split(' · ')[0])}</span></div>
     <div class="tools"><button type="button" class="sm on-${q.stance==='positive'?'good':q.stance==='negative'?'bad':'neu'}" data-cycle="${i}">입장 바꾸기 ⇄</button><button type="button" class="sm" data-rm="${i}">근거에서 빼기</button></div>
     <div class="foot"><span class="who ${q.stance}">${who}</span><span class="chev">〉</span></div>
@@ -200,9 +206,9 @@ function quoteHtml(q, i) {
 }
 function missedHtml(list, mode) {
   if (!list.length) return '';
-  return `<details class="missed"><summary>같은 얘기를 하는 리뷰가 <b>${list.length}개</b> 더 있어요 <span style="margin-left:auto">보기 〉</span></summary>
+  return `<details class="missed"><summary>같은 얘기를 하는 리뷰가 <b>${list.length}개</b> 더 있어요 <small style="color:var(--fg50);font-weight:400;margin-left:10px">근거로 쓸 문장이 있으면 눌러 넣어요</small><span style="margin-left:auto">보기 〉</span></summary>
     <div class="body">${list.map(r => `<div class="mr"><div class="m"><span>${stars(r.rating)}</span><span>${esc(r.conditionLine.split(' · ')[0])}</span><span>· ${esc(r.hits.join(' '))}</span></div>
-      ${r.sentences.map(s => `<div class="sent"><span>${esc(s)}</span>
+      ${r.sentences.map(s => `<div class="sent"><span>${txt(s)}</span>
         <button type="button" class="sm" data-add='${esc(JSON.stringify({reviewId:r.reviewId, quote:s, stance:'positive'}))}'>좋다고 함</button>
         <button type="button" class="sm" data-add='${esc(JSON.stringify({reviewId:r.reviewId, quote:s, stance:'negative'}))}'>나쁘다고 함</button>
         <button type="button" class="sm" data-add='${esc(JSON.stringify({reviewId:r.reviewId, quote:s, stance:'neutral'}))}'>말만</button></div>`).join('')}</div>`).join('')}
@@ -229,7 +235,8 @@ function renderJudge(msg) {
   ${msg ? `<div class="msg ${msg.cls}">${esc(msg.text)}</div>` : ''}
   ${S.editing
     ? `<div class="actions"><button class="btn ghost" id="cancelEdit">그대로 두기</button><button class="btn white" id="saveEdit">고친 대로 저장하고 다음 〉</button></div>`
-    : `<div class="actions"><button class="btn white" id="accept">맞아요 <small>그대로 저장</small></button><button class="btn" id="edit">고칠게요 <small>문장·근거 수정</small></button><button class="btn coral" id="reject">아니에요 <small>이유 하나 선택</small></button></div>`}`;
+    : `<div class="dock"><div class="criteria"><span><b>1</b> 굵은 문장이 이 답을 실제로 말하나요?</span><span><b>2</b> 한 사람 얘기가 아니라 여럿인가요?</span><span><b>3</b> 사기 전에 물어볼 만한 질문인가요?</span></div>
+       <div class="actions"><button class="btn white" id="accept">맞아요 <small>셋 다 그래요</small></button><button class="btn" id="edit">고칠게요 <small>문장·근거 수정</small></button><button class="btn coral" id="reject">아니에요 <small>이유 하나 선택</small></button></div></div>`}`;
   renderCounts(quotes);
   if (S.editing) S.draft = d;
   $('#accept')?.addEventListener('click', () => decide({kind:'accept'}));
@@ -291,11 +298,11 @@ function renderMissed(msg) {
   <div class="fade" style="display:flex;flex-direction:column;gap:20px">
     <div class="field"><label>리뷰에서 자주 나오는 말 · 눌러서 그 리뷰만 보기</label><div class="chips">${hits.map(([a,h]) => `<button type="button" class="chip ${H.term===a?'on':''}" data-t="${esc(a)}">${esc(a)}<b>${h.reviews}</b></button>`).join('')}</div></div>
     ${H.term ? `<div class="grid">${shown.slice(0,9).map(r => `<div class="card ${evIds.has(r.reviewId)?'positive':''}"><div class="tags"><span class="tagc">${stars(r.rating)}</span><span class="tagc">${esc(r.conditionLine.split(' · ')[0])}</span>${evIds.has(r.reviewId)?'<span class="tagc" style="color:var(--mint)">근거에 있음</span>':''}</div>
-        <div style="display:flex;flex-direction:column;gap:8px">${sentences(r).map(s => `<div class="sent"><span>${esc(s)}</span></div><div class="pills">${['positive','negative','neutral'].map(st => `<button type="button" class="sm ${H.evidence.some(e=>e.reviewId===r.reviewId&&e.quote===s&&e.stance===st)?('on-'+(st==='positive'?'good':st==='negative'?'bad':'neu')):''}" data-add='${esc(JSON.stringify({reviewId:r.reviewId, quote:s, stance:st}))}'>${st==='neutral'?'말만':STANCE[st]}</button>`).join('')}</div>`).join('')}</div></div>`).join('')}</div>
+        <div style="display:flex;flex-direction:column;gap:8px">${sentences(r).map(s => `<div class="sent"><span>${txt(s)}</span></div><div class="pills">${['positive','negative','neutral'].map(st => `<button type="button" class="sm ${H.evidence.some(e=>e.reviewId===r.reviewId&&e.quote===s&&e.stance===st)?('on-'+(st==='positive'?'good':st==='negative'?'bad':'neu')):''}" data-add='${esc(JSON.stringify({reviewId:r.reviewId, quote:s, stance:st}))}'>${st==='neutral'?'말만':STANCE[st]}</button>`).join('')}</div>`).join('')}</div></div>`).join('')}</div>
       ${shown.length>9 ? `<div class="note">이 말이 나온 리뷰 ${shown.length}개 중 9개만 보여요</div>` : ''}` : ''}
     <div class="grid" style="align-items:start">
       <div class="card wide" style="gap:16px">
-        <div class="field"><label>고른 근거 ${H.evidence.length}개</label>${H.evidence.length ? `<div class="pills">${H.evidence.map((e,i)=>`<span class="pill ${e.stance==='positive'?'mint':e.stance==='negative'?'coral':''}">${esc(e.quote.slice(0,24))}${e.quote.length>24?'…':''} <button type="button" class="sm" data-rm="${i}" style="height:24px;padding:0 8px">✕</button></span>`).join('')}</div>` : `<span class="note">위에서 문장 아래 버튼을 눌러 근거를 모으세요</span>`}</div>
+        <div class="field"><label>고른 근거 ${H.evidence.length}개</label>${H.evidence.length ? `<div class="pills">${H.evidence.map((e,i)=>`<span class="pill ${e.stance==='positive'?'mint':e.stance==='negative'?'coral':''}">${txt(e.quote.slice(0,24))}${e.quote.length>24?'…':''} <button type="button" class="sm" data-rm="${i}" style="height:24px;padding:0 8px">✕</button></span>`).join('')}</div>` : `<span class="note">위에서 문장 아래 버튼을 눌러 근거를 모으세요</span>`}</div>
         <div class="field"><label>리뷰가 말하는 것 (답)</label><textarea id="ha" placeholder="예: 냄새가 불쾌하다는 리뷰가 여러 개 있어요">${esc(H.answer)}</textarea></div>
         <div class="field"><label>그 답을 묻는 질문</label><textarea class="big" id="hq" placeholder="예: 향이나 냄새가 불쾌하다는 사람이 있나요?">${esc(H.question)}</textarea></div>
         ${msg ? `<div class="msg ${msg.cls}">${esc(msg.text)}</div>` : ''}

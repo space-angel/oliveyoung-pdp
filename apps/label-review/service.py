@@ -32,6 +32,19 @@ from sample_concern_golden import load_bundles  # noqa: E402
 from tag_contract import fold_invisible  # noqa: E402
 
 # 라벨러가 보는 일상어 → 택소노미 키. 8종 중 라벨러가 판단할 수 있는 4개만 노출한다.
+# auto_checks 의 문구는 내부 도구용(실패유형 키가 들어 있다). 라벨러 화면에는 일상어로 바꿔 보낸다. 없는 키는 보내지 않는다.
+LABELER_CHECKS = {
+    "thin_evidence": "근거로 쓴 리뷰가 적어요. 아래 \"같은 얘기를 하는 리뷰\"에 더 있는지 봐주세요.",
+    "generalizes_from_silence": "답이 \"대부분\"처럼 뭉뚱그리는데, 실제로 이 얘기를 한 사람은 몇 명뿐이에요. 말 안 한 사람은 근거가 아니에요.",
+    "question_broad": "질문이 너무 넓어요. 무엇을 묻는지 한 가지로 좁혀지는지 봐주세요.",
+    "number_not_in_quotes": "답에 있는 숫자가 리뷰 문장에는 없어요.",
+}
+
+
+def labeler_checks(checks: list[dict]) -> list[dict]:
+    return [{"key": c["key"], "level": "warn", "text": LABELER_CHECKS[c["key"]]} for c in checks if c["key"] in LABELER_CHECKS]
+
+
 REASONS = [
     {"key": "one_person", "failure": "overfit_question", "title": "한 사람만 한 얘기예요", "desc": "특수한 상황이라 다른 구매자의 질문이 되기 어려워요"},
     {"key": "too_broad", "failure": "overbroad_question", "title": "너무 뭉뚱그린 질문이에요", "desc": "\"좋은가요?\"처럼 무엇을 묻는지 알 수 없어요"},
@@ -154,7 +167,7 @@ class Service:
                 "candidateId": c["candidateId"], "aspect": k.get("aspect"), "question": k.get("question"), "answer": k.get("answer"),
                 "direction": derive_direction(k.get("evidence") or [], b) if k.get("evidence") else None,
                 "condition": k.get("condition"), "quotes": quotes, "counts": {**by, "silent": total_authors - len(spoke)},
-                "contractErrors": c.get("contractErrors") or [], "checks": auto_checks(k, b, cands),
+                "contractErrors": c.get("contractErrors") or [], "checks": labeler_checks(auto_checks(k, b, cands)),
                 "stanceMigrated": bool(c.get("stanceMigrated")),
                 "decision": decided.get(c["candidateId"]),
                 "missed": self.missed_reviews(b, k, exclude={e["reviewId"] for e in k.get("evidence") or []}),
