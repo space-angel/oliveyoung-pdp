@@ -210,7 +210,7 @@ function quoteHtml(q, i) {
   return `<div class="card ${q.stance}" data-i="${i}">
     <p class="big"><mark>${txt(q.quote)}</mark></p>
     ${(q.before||q.after) ? `<div class="ctx"><p class="ctxp short">${q.before.length>90?'…':''}${txt(q.before.slice(-90).trim())}<b>${txt(q.quote)}</b>${txt(q.after.slice(0,90).trim())}${q.after.length>90?'…':''}</p><p class="ctxp full"><span class="lbl">리뷰 전문</span>${txt(q.before)}<b>${txt(q.quote)}</b>${txt(q.after)}</p>${(q.before.length>90||q.after.length>90) ? `<button type="button" class="more" data-more><span class="m1">전문 보기 ⌵</span><span class="m2">접기 ⌃</span></button>` : ''}</div>` : ''}
-    <div class="tags"><span class="tagc">${stars(q.rating)}</span><span class="tagc">${esc(q.conditionLine.split(' · ')[0])}</span></div>
+    <div class="tags"><span class="tagc">${stars(q.rating)}</span><span class="tagc">${esc(q.conditionLine.split(' · ')[0])}</span>${q.added?'<span class="tagc" style="color:var(--blue)">놓친 리뷰에서 넣음</span>':''}</div>
     <div class="tools"><button type="button" class="sm on-${q.stance==='positive'?'good':q.stance==='negative'?'bad':'neu'}" data-cycle="${i}">입장 바꾸기 ⇄</button><button type="button" class="sm" data-rm="${i}">근거에서 빼기</button></div>
     <div class="foot"><span class="who ${q.stance}">${who}</span><span class="chev">〉</span></div>
   </div>`;
@@ -228,7 +228,14 @@ function missedHtml(list, mode) {
 function renderJudge(msg) {
   const c = S.view.candidates[S.idx];
   const d = S.draft || { question:c.question, answer:c.answer, aspect:c.aspect, evidence: c.quotes.map(q=>({reviewId:q.reviewId, stance:q.stance, quote:q.quote})) };
-  const quotes = S.editing ? d.evidence.map(e => { const q = c.quotes.find(x=>x.reviewId===e.reviewId && x.quote===e.quote) || {before:'', after:'', rating:0, conditionLine:''}; return {...q, ...e}; }) : c.quotes;
+  const quotes = S.editing ? d.evidence.map(e => {
+    const q = c.quotes.find(x=>x.reviewId===e.reviewId && x.quote===e.quote);
+    if (q) return {...q, ...e};
+    // 놓친 리뷰에서 새로 넣은 근거 — 후보 인용이 아니라 메타가 없으니 번들 리뷰에서 채운다 (별점·조건·앞뒤 원문)
+    const r = S.view.reviews.find(x=>x.reviewId===e.reviewId) || {content:'', rating:0, conditionLine:''};
+    const i = r.content.indexOf(e.quote);
+    return {rating:r.rating, conditionLine:r.conditionLine, before: i>=0 ? r.content.slice(0,i) : '', after: i>=0 ? r.content.slice(i+e.quote.length) : '', added:true, ...e};
+  }) : c.quotes;
   const warn = [...(c.contractErrors.length ? ['이 후보의 인용이 원문과 달라요. 그대로는 저장할 수 없어요 — 고쳐서 저장하거나 "아니에요"를 눌러주세요.'] : []),
                 ...(c.stanceMigrated ? ['긍정/부정 표시는 자동으로 붙인 값이에요. 문장을 읽고 다르면 고쳐주세요.'] : []),
                 ...c.checks.filter(x=>x.level==='warn').map(x=>x.text)];
