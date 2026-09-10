@@ -74,6 +74,8 @@
   .missed summary { list-style:none; cursor:pointer; padding:18px 28px; display:flex; align-items:center; gap:12px; font-size:18px; color:var(--blue); font-weight:500; letter-spacing:-0.5px; }
   .missed summary::-webkit-details-marker { display:none; } .missed summary b { font-weight:700; }
   .missed .body { display:flex; flex-direction:column; gap:10px; padding:0 12px 12px; }
+  .missed .hint { font-size:15px; line-height:1.5; color:var(--fg2); letter-spacing:-.3px; padding:10px 16px 12px; border-top:1px solid rgba(255,255,255,.06); } .missed .hint b { color:var(--fg); font-weight:700; margin-right:4px; }
+  .missed .sent .sm { opacity:.55; transition:opacity .15s; } .missed .sent:hover .sm, .missed .sent .sm[class*="on-"] { opacity:1; }
   .mr { background:rgba(255,255,255,.03); border-radius:16px; padding:16px 18px; display:flex; flex-direction:column; gap:8px; }
   .mr .m { font-size:14px; color:var(--fg50); display:flex; gap:10px; }
   .sent { display:flex; gap:8px; align-items:center; background:var(--card); border-radius:12px; padding:10px 12px; font-size:16px; color:var(--fg70); }
@@ -249,7 +251,7 @@ function quoteHtml(q, i) {
 function missedHtml(list, mode) {
   if (!list.length) return '';
   return `<details class="missed"><summary>같은 얘기를 하는 리뷰가 <b>${list.length}개</b> 더 있어요<small style="color:var(--fg50);font-weight:400;margin-left:10px">근거를 놓쳤는지만 봐요</small>${help('missed')}<span style="margin-left:auto">보기 〉</span></summary>
-    <div class="body">${list.map(r => `<div class="mr"><div class="m"><span>${stars(r.rating)}</span><span>${esc(r.conditionLine.split(' · ')[0])}</span><span>· ${esc(r.hits.join(' '))}</span></div>
+    <div class="body">${mode==='locked' ? '' : `<div class="hint"><b>전부 고르는 게 아니에요.</b> 이 답을 뒷받침하는 문장이 있을 때만 그 문장 옆에서 긍정·부정·중립 하나를 눌러요. 나머지는 그냥 두면 돼요.</div>`}${list.map(r => `<div class="mr"><div class="m"><span>${stars(r.rating)}</span><span>${esc(r.conditionLine.split(' · ')[0])}</span><span>· ${esc(r.hits.join(' '))}</span></div>
       ${r.sentences.map(s => `<div class="sent"><span>${txt(s)}</span>${mode==='locked' ? '' : `
         <button type="button" class="sm" data-add='${esc(JSON.stringify({reviewId:r.reviewId, quote:s, stance:'positive'}))}'>긍정</button>
         <button type="button" class="sm" data-add='${esc(JSON.stringify({reviewId:r.reviewId, quote:s, stance:'negative'}))}'>부정</button>
@@ -361,7 +363,7 @@ function renderMissed(msg) {
   <div class="track fade"><span class="pill blue">마지막 한 가지</span><h1 class="display">후보에 없는 질문이<br>하나 떠오르나요?</h1><p class="sub white">"이건 왜 안 물어봤지?" 싶었던 게 있으면 적어주세요. 없으면 없다고 답해도 충분해요. 그것도 기록이에요.</p></div>
   <div class="fade" style="display:flex;flex-direction:column;gap:20px">
     <div class="field"><label>리뷰에서 자주 나오는 말 · 눌러서 그 리뷰만 보기</label><div class="chips">${hits.map(([a,h]) => `<button type="button" class="chip ${H.term===a?'on':''}" data-t="${esc(a)}">${esc(a)}<b>${h.reviews}</b></button>`).join('')}</div></div>
-    ${H.term ? `<div class="grid">${shown.slice(0,9).map(r => `<div class="card ${evIds.has(r.reviewId)?'positive':''}"><div class="tags"><span class="tagc">${stars(r.rating)}</span><span class="tagc">${esc(r.conditionLine.split(' · ')[0])}</span>${evIds.has(r.reviewId)?'<span class="tagc" style="color:var(--mint)">근거에 있음</span>':''}</div>
+    ${H.term ? `<div class="msg" style="align-self:flex-start"><b style="color:var(--fg)">전부 고르는 게 아니에요.</b> 떠오른 질문의 근거가 되는 문장만 긍정·부정·중립 하나로 눌러요.</div><div class="grid">${shown.slice(0,9).map(r => `<div class="card ${evIds.has(r.reviewId)?'positive':''}"><div class="tags"><span class="tagc">${stars(r.rating)}</span><span class="tagc">${esc(r.conditionLine.split(' · ')[0])}</span>${evIds.has(r.reviewId)?'<span class="tagc" style="color:var(--mint)">근거에 있음</span>':''}</div>
         <div style="display:flex;flex-direction:column;gap:8px">${sentences(r).map(s => `<div class="sent"><span>${txt(s)}</span></div><div class="pills">${['positive','negative','neutral'].map(st => `<button type="button" class="sm ${H.evidence.some(e=>e.reviewId===r.reviewId&&e.quote===s&&e.stance===st)?('on-'+(st==='positive'?'good':st==='negative'?'bad':'neu')):''}" data-add='${esc(JSON.stringify({reviewId:r.reviewId, quote:s, stance:st}))}'>${STANCE[st]}</button>`).join('')}</div>`).join('')}</div></div>`).join('')}</div>
       ${shown.length>9 ? `<div class="note">이 말이 나온 리뷰 ${shown.length}개 중 9개만 보여요</div>` : ''}` : ''}
     <div class="grid" style="align-items:start">
