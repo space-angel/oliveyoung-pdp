@@ -107,6 +107,27 @@ class TestImport(unittest.TestCase):
         self.assertEqual((row["candidates"], row["decided"], row["humanLabels"]), (1, 1, 1))
 
 
+class TestRecheck(TestImport):
+    """계약 표시는 들여올 때의 값이다 — 규칙이 바뀌면 recheck 가 드리프트를 잡아야 한다."""
+
+    def test_recheck_detects_stale_contract_marks(self):
+        cc.import_candidates("B01", self.output(GOOD, BAD_QUOTE), model="m")
+        cands = cc.load_candidates()
+        cands[1]["contractErrors"] = []          # 낡은 표시를 흉내낸다
+        cands[0]["checkedWith"] = "concern-golden-v0"
+        self.cands.write_text("".join(json.dumps(c, ensure_ascii=False) + "\n" for c in cands))
+        r = cc.recheck(write=False)
+        self.assertEqual(r["changed"], 2)
+        self.assertEqual(r["violations"], 1)
+        r = cc.recheck(write=True)
+        self.assertEqual(cc.recheck(write=False)["changed"], 0)
+        self.assertIn("원문 부분문자열", cc.load_candidates()[1]["contractErrors"][0])
+
+    def test_import_stamps_schema_version(self):
+        rows = cc.import_candidates("B01", self.output(GOOD), model="m")
+        self.assertEqual(rows[0]["checkedWith"], "concern-golden-v2")
+
+
 class TestAutoChecks(unittest.TestCase):
     """규칙 점검은 주의 표시다 — 있어야 할 때 있고, 정상 후보에는 없어야 한다."""
 

@@ -388,7 +388,7 @@ function renderPanel() {
     <div class="q">${esc(k.question||'')}</div>
     <div class="a">${esc(k.answer||'')}</div>
     <div class="cond">조건 ${['skinType','skinTrouble','option'].map(a=>`${a} ${k.condition&&k.condition[a]!=null?esc(JSON.stringify(k.condition[a])):'—'}`).join(' · ')}${c.note?' · note: '+esc(c.note):''}</div>
-    <div class="checks">${checks || '<div class="chk ok">자동 점검 통과 — 그래도 인용을 원문에서 확인하세요</div>'}</div>
+    <div class="checks">${c.stanceMigrated ? '<div class="chk warn">이 후보의 긍정/부정 표시는 옛 규칙에서 기계 변환된 값입니다 — 인용 문장을 직접 읽고 틀리면 근거 목록의 ⇄ 로 뒤집으세요</div>' : ''}${checks || '<div class="chk ok">자동 점검 통과 — 그래도 인용을 원문에서 확인하세요</div>'}</div>
     <h2 class="s" style="margin-top:14px">이 질문을 뽑은 근거 ${(k.evidence||[]).length}개 <span style="font-weight:500">· 누르면 원문 위치로. 가운데 형광펜 <mark class="qs">지지</mark> <mark class="qo">반대</mark></span></h2>
     <div class="quotes">${(k.evidence||[]).map(e => { const r = rv(e.reviewId); return `
       <div class="quote ${e.stance}" data-rid="${e.reviewId}"><span class="bar"></span>
@@ -544,7 +544,7 @@ function renderEvidence() {
     <div class="item"><span class="stance ${e.stance}">${e.stance}</span><code>${e.reviewId}</code><q data-rid="${e.reviewId}">${esc(e.quote)}</q>
       <button type="button" class="small" data-flip="${i}" title="입장 바꾸기">⇄</button><button type="button" class="small" data-i="${i}">✕</button></div>`).join('') +
     `<div class="mute" style="font-size:12px;margin-top:4px">고유 작성자 긍정 ${uniq('positive')} · 부정 ${uniq('negative')} → 방향 <b>${derived()}</b> (자동) · <span title="주제를 언급하지 않은 작성자. 긍정도 부정도 아니다 — 답에서 '대부분 없다'로 세지 않는다">언급 없음 ${silentCount()}</span> · N_min ${state.data.vocab.nMin} 은 참고값</div>`
-    : '<span class="mute">아직 없음 — 가운데에서 드래그하거나 문장 옆 S/O</span>';
+    : '<span class="mute">아직 없음 — 가운데에서 원문을 드래그하거나 문장 옆 긍정/부정</span>';
   const dir = document.querySelector('[name=direction]'); if (dir) dir.value = state.evidence.length ? derived() : '';
   box.querySelectorAll('[data-i]').forEach(b => b.onclick = () => { state.evidence.splice(Number(b.dataset.i),1); renderEvidence(); applyFilter(); });
   box.querySelectorAll('[data-flip]').forEach(b => b.onclick = () => { const e = state.evidence[Number(b.dataset.flip)]; e.stance = e.stance==='positive'?'negative':'positive'; renderEvidence(); applyFilter(); });

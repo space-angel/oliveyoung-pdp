@@ -125,6 +125,76 @@ class TestWebApi(unittest.TestCase):
         self.assertEqual(hits["유분/번들거림"]["reviewIds"], [4])
         self.assertEqual(hits["분사력"]["reviews"], 0)
 
+    # --- 후보 검수 경로 (이 프로젝트의 핵심 흐름) ---
+
+    def seed_candidate(self, cand=None):
+        import concern_candidates as cc
+        cands_path = Path(self.tmp.name) / "c.jsonl"
+        self._cc_patch = mock.patch.object(cc, "CANDIDATES_PATH", cands_path); self._cc_patch.start()
+        cc.load_candidates.__defaults__ = (cands_path,)
+        cand = cand or {"aspect": "보습감", "question": "속보습까지 촉촉하게 유지되나요?", "answer": "속보습은 못 느꼈다는 리뷰와 촉촉하다는 리뷰가 있다",
+                        "condition": {"skinType": None, "skinTrouble": None, "option": None}, "direction": "mixed",
+                        "evidence": [{"reviewId": 1, "stance": "negative", "quote": "속보습은 못 느꼈어요"},
+                                     {"reviewId": 2, "stance": "positive", "quote": "촉촉하고 순해요"}]}
+        cc.import_candidates("B01", json.dumps({"bundleId": "B01", "candidates": [cand]}, ensure_ascii=False), model="test-model")
+        self.addCleanup(self._cc_patch.stop)
+        self.addCleanup(lambda: setattr(cc.load_candidates, "__defaults__", (cc.CANDIDATES_PATH,)))
+        return web.api_bundle("B01")["candidates"][0]
+
+    def candidate_payload(self, c, **over):
+        k = c["candidate"]
+        base = {"labelId": "B01-1", "bundleId": "B01", "aspect": k["aspect"], "question": k["question"], "answer": k["answer"],
+                "condition": k["condition"], "direction": k["direction"], "evidence": k["evidence"],
+                "failureReasons": [], "evaluation": "complete", "notes": None, "minutesSpent": 2,
+                "source": "candidate_accepted", "candidateId": c["candidateId"]}
+        base.update(over)
+        return base
+
+    def test_candidate_view_carries_checks_and_no_decision(self):
+        c = self.seed_candidate()
+        self.assertEqual(c["candidateId"], "B01-c1")
+        self.assertIsNone(c["decision"])
+        self.assertEqual(c["contractErrors"], [])
+        self.assertIn("checks", c)
+
+    def test_accept_candidate_records_source_and_decision(self):
+        c = self.seed_candidate()
+        status, body = web.api_add_label(self.candidate_payload(c))
+        self.assertEqual(status, 200, body)
+        self.assertEqual((body["label"]["source"], body["label"]["candidateId"]), ("candidate_accepted", "B01-c1"))
+        again = web.api_bundle("B01")["candidates"][0]
+        self.assertEqual((again["decision"], again["labelId"]), ("candidate_accepted", "B01-1"))
+
+    def test_edited_candidate_is_saved_with_edited_source(self):
+        c = self.seed_candidate()
+        payload = self.candidate_payload(c, source="candidate_edited",
+                                         evidence=c["candidate"]["evidence"] + [{"reviewId": 3, "stance": "positive", "quote": "촉촉함이 오래가요"}])
+        status, body = web.api_add_label(payload)
+        self.assertEqual(status, 200, body)
+        self.assertEqual(body["label"]["source"], "candidate_edited")
+        self.assertEqual(body["counts"]["positiveAuthors"], 2)
+
+    def test_reject_candidate_requires_failure_reason(self):
+        c = self.seed_candidate()
+        status, body = web.api_add_label(self.candidate_payload(c, source="candidate_rejected"))
+        self.assertEqual(status, 400)
+        self.assertIn("기각 사유", body["error"])
+        status, body = web.api_add_label(self.candidate_payload(c, source="candidate_rejected", failureReasons=["overbroad_question"]))
+        self.assertEqual(status, 200, body)
+        self.assertEqual(web.api_bundle("B01")["candidates"][0]["decision"], "candidate_rejected")
+
+    def test_candidate_source_without_candidate_id_is_rejected(self):
+        c = self.seed_candidate()
+        status, body = web.api_add_label(self.candidate_payload(c, candidateId=None))
+        self.assertEqual(status, 400)
+        self.assertIn("candidateId", body["error"])
+
+    def test_direction_mismatch_from_candidate_is_rejected(self):
+        c = self.seed_candidate()
+        status, body = web.api_add_label(self.candidate_payload(c, direction="positive"))
+        self.assertEqual(status, 400)
+        self.assertIn("계산한 방향", body["error"])
+
     def test_stats_after_add(self):
         web.api_add_label(self.payload())
         status, body = web.api_stats()

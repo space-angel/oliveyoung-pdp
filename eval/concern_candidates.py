@@ -262,6 +262,7 @@ def import_candidates(bundle_id: str, text: str, model: str, replace: bool = Fal
                 "candidate": body,
                 "note": (cand.get("note") or "").strip() or None,
                 "contractErrors": check_candidate(body, bundle, cid, taxonomy),
+                "checkedWith": __import__("golden_contract").GOLDEN_SCHEMA_VERSION,
             }
         )
     kept = [c for c in existing if c["bundleId"] != bundle_id] + rows
@@ -281,6 +282,45 @@ def cmd_import(args) -> None:
         print(f"  {flag}{r['candidateId']}  {r['candidate'].get('aspect') or '-':8s} {r['candidate'].get('direction') or '-':8s} {q}")
         for e in r["contractErrors"]:
             print(f"       {e}")
+
+
+def recheck(write: bool = True) -> dict:
+    """후보 파일의 contractErrors 를 **현재** 계약으로 다시 계산한다.
+
+    들여올 때의 값은 그때의 규칙이다. 규칙이 바뀌면(v1→v2 처럼) 표시가 조용히 낡는다 — 그래서 게이트가
+    `recheck --check` 로 드리프트를 잡는다. 후보 본문(candidate)은 건드리지 않는다.
+    """
+    from golden_contract import GOLDEN_SCHEMA_VERSION
+    bundles = load_bundles()
+    taxonomy = load_failure_taxonomy()
+    cands = load_candidates()
+    changed = 0
+    for c in cands:
+        b = bundles.get(c["bundleId"])
+        errors = [f"번들 {c['bundleId']} 이 표본에 없다"] if b is None else check_candidate(c["candidate"], b, c["candidateId"], taxonomy)
+        if errors != c.get("contractErrors") or c.get("checkedWith") != GOLDEN_SCHEMA_VERSION:
+            changed += 1
+        c["contractErrors"] = errors
+        c["checkedWith"] = GOLDEN_SCHEMA_VERSION
+    if write and changed:
+        CANDIDATES_PATH.write_text("".join(json.dumps(c, ensure_ascii=False) + "\n" for c in cands))
+    return {"candidates": len(cands), "changed": changed, "violations": sum(1 for c in cands if c["contractErrors"]), "schema": GOLDEN_SCHEMA_VERSION}
+
+
+def cmd_recheck(args) -> None:
+    if not CANDIDATES_PATH.exists():
+        print(f"OK: 후보 파일 없음 ({rel(CANDIDATES_PATH)})")
+        return
+    r = recheck(write=not args.check)
+    if args.check:
+        if r["changed"]:
+            raise SystemExit(
+                f"FAIL: 후보 {r['changed']}개의 계약 표시가 현재 규칙({r['schema']})과 다르다 — "
+                f"python3 {rel(Path(__file__))} recheck 로 다시 계산하라"
+            )
+        print(f"OK: 후보 {r['candidates']}개 계약 표시가 현재 규칙({r['schema']})과 일치 (위반 {r['violations']})")
+        return
+    print(f"[재점검] 후보 {r['candidates']}개 · 갱신 {r['changed']} · 위반 {r['violations']} · 규칙 {r['schema']} → {rel(CANDIDATES_PATH)}")
 
 
 def status(bundles: dict[str, dict] | None = None) -> list[dict]:
@@ -357,6 +397,9 @@ def main(argv=None) -> None:
     p.add_argument("--model", required=True)
     p.add_argument("--replace", action="store_true")
     p.set_defaults(fn=cmd_import_dir)
+    p = sub.add_parser("recheck", help="후보 파일의 계약 표시를 현재 규칙으로 다시 계산 (--check 는 드리프트만 검사)")
+    p.add_argument("--check", action="store_true")
+    p.set_defaults(fn=cmd_recheck)
     p = sub.add_parser("status")
     p.set_defaults(fn=cmd_status)
     args = ap.parse_args(argv)
