@@ -1,0 +1,336 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>리뷰 질문 검수</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+  :root {
+    --bg:#0C0C0E; --fg:#FBFBFB; --fg70:rgba(251,251,251,.7); --fg50:rgba(251,251,251,.5); --fg30:rgba(251,251,251,.3);
+    --card:rgba(255,255,255,.04); --card2:rgba(255,255,255,.08); --card3:rgba(255,255,255,.12); --line:rgba(255,255,255,.08);
+    --blue:#478BFF; --blue80:rgba(71,139,255,.8); --blue-bg:rgba(71,139,255,.15);
+    --mint:#4BEC8B; --mint-bg:rgba(70,236,136,.13); --lime:#DDF34F; --lime-bg:rgba(221,244,87,.10);
+    --coral:#FF7A6B; --coral-bg:rgba(255,122,107,.14);
+    --r:24px; --pill:40px;
+  }
+  * { box-sizing:border-box; }
+  html { -webkit-font-smoothing:antialiased; scroll-behavior:smooth; }
+  body { margin:0; background:var(--bg); color:var(--fg); font:17px/1.55 "Pretendard Variable", Pretendard, -apple-system, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif; letter-spacing:-0.02em; }
+  button { font:inherit; letter-spacing:inherit; cursor:pointer; color:inherit; }
+  header { position:sticky; top:16px; z-index:3; margin:16px auto 0; width:min(1100px, calc(100% - 32px)); height:64px; border-radius:var(--pill); background:rgba(20,20,22,.72); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); display:flex; align-items:center; gap:14px; padding:0 14px 0 28px; }
+  header .name { font-size:20px; font-weight:600; letter-spacing:-0.03em; }
+  header .tag { font-size:15px; color:var(--fg50); border-left:1px solid var(--line); padding-left:14px; }
+  header .right { margin-left:auto; display:flex; align-items:center; gap:8px; }
+  .navpill { height:40px; padding:0 18px; border-radius:var(--pill); background:var(--card2); display:flex; align-items:center; gap:10px; font-size:15px; font-weight:500; color:var(--fg); }
+  .navpill b { font-variant-numeric:tabular-nums; font-weight:600; }
+  .navpill.white { background:#FBFBFB; color:#0C0C0E; }
+  .bar { width:80px; height:4px; border-radius:2px; background:var(--card3); overflow:hidden; } .bar i { display:block; height:100%; background:var(--blue); }
+  main { width:min(1100px, calc(100% - 32px)); margin:0 auto; padding:72px 0 120px; display:flex; flex-direction:column; gap:28px; }
+  .fade { animation: fade .3s ease; } @keyframes fade { from { opacity:0; transform:translateY(8px);} to { opacity:1; transform:none;} }
+  /* 트랙 헤더 문법: 작은 알약 → 큰 제목 → 색 부제 */
+  .track { display:flex; flex-direction:column; gap:14px; padding:0 8px; }
+  .track .pill { align-self:flex-start; }
+  h1.display { margin:0; font-size:clamp(36px, 5vw, 64px); line-height:1.15; font-weight:600; letter-spacing:-1.5px; color:var(--blue); text-wrap:pretty; }
+  h1.display.mint { color:var(--mint); } h1.display.white { color:var(--fg); }
+  .sub { margin:0; font-size:24px; line-height:36px; letter-spacing:-0.5px; color:var(--blue80); font-weight:500; text-wrap:pretty; }
+  .sub.white { color:var(--fg70); }
+  .pill { display:inline-flex; align-items:center; gap:6px; height:32px; padding:0 14px; border-radius:var(--pill); font-size:15px; font-weight:500; background:var(--card2); color:var(--fg50); white-space:nowrap; }
+  .pill.blue { background:var(--blue-bg); color:var(--blue); } .pill.mint { background:var(--mint-bg); color:var(--mint); } .pill.coral { background:var(--coral-bg); color:var(--coral); } .pill.lime { background:var(--lime-bg); color:var(--lime); }
+  .pills { display:flex; flex-wrap:wrap; gap:8px; }
+  .eyebrow { font-size:15px; color:var(--fg50); padding:0 8px; }
+  /* 세션 카드 문법: 큰 문장 · 태그 · 하단 색 라벨 + 〉 */
+  .grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(320px, 1fr)); gap:20px; }
+  .card { background:var(--card); border-radius:var(--r); padding:28px; display:flex; flex-direction:column; gap:18px; min-height:240px; position:relative; }
+  .card .big { margin:0; font-size:28px; line-height:1.35; font-weight:600; letter-spacing:-0.03em; color:var(--fg); text-wrap:pretty; }
+  .card .ctx { color:var(--fg50); font-weight:400; font-size:19px; }
+  .card .ctxp { margin:-6px 0 0; font-size:15px; line-height:1.6; color:var(--fg50); letter-spacing:-0.01em; } .card .ctxp b { color:var(--fg70); font-weight:600; }
+  .card .tags { display:flex; flex-wrap:wrap; gap:8px; }
+  .tagc { height:30px; padding:0 12px; border-radius:8px; background:var(--card2); color:var(--fg50); font-size:15px; display:inline-flex; align-items:center; }
+  .card .foot { margin-top:auto; display:flex; align-items:center; justify-content:space-between; font-size:17px; font-weight:500; }
+  .card .foot .who.positive { color:var(--mint); } .card .foot .who.negative { color:var(--coral); } .card .foot .who.neutral { color:var(--fg50); }
+  .card .foot .chev { color:var(--fg30); font-size:20px; }
+  .card.positive { box-shadow: inset 0 0 0 1px rgba(70,236,136,.18); } .card.negative { box-shadow: inset 0 0 0 1px rgba(255,122,107,.18); }
+  .card mark { background:transparent; color:inherit; }
+  .card .tools { display:none; gap:8px; } .editing .card .tools { display:flex; }
+  .card.wide { min-height:0; }
+  /* 놓친 근거 */
+  .missed { border-radius:var(--r); background:var(--lime-bg); overflow:hidden; }
+  .missed summary { list-style:none; cursor:pointer; padding:18px 28px; display:flex; align-items:center; gap:12px; font-size:17px; color:var(--lime); font-weight:500; }
+  .missed summary::-webkit-details-marker { display:none; } .missed summary b { font-weight:600; }
+  .missed .body { display:flex; flex-direction:column; gap:10px; padding:0 12px 12px; }
+  .mr { background:rgba(12,12,14,.6); border-radius:16px; padding:16px 18px; display:flex; flex-direction:column; gap:8px; }
+  .mr .m { font-size:14px; color:var(--fg50); display:flex; gap:10px; }
+  .sent { display:flex; gap:8px; align-items:center; background:var(--card); border-radius:12px; padding:10px 12px; font-size:16px; color:var(--fg70); }
+  .sent span { flex:1; }
+  /* 버튼: 알약 */
+  .btn { height:60px; padding:0 28px; border-radius:var(--pill); border:0; background:var(--card2); color:var(--fg); font-weight:600; font-size:17px; display:flex; align-items:center; justify-content:center; gap:10px; transition:background .15s; }
+  .btn small { font-size:14px; font-weight:400; color:var(--fg50); }
+  .btn:hover { background:var(--card3); }
+  .btn.white { background:#FBFBFB; color:#0C0C0E; } .btn.white small { color:rgba(12,12,14,.55); } .btn.white:hover { background:#fff; }
+  .btn.blue { background:var(--blue); color:#fff; } .btn.blue small { color:rgba(255,255,255,.75); } .btn.blue:hover { background:#5C98FF; }
+  .btn.coral { color:var(--coral); }
+  .btn.ghost { background:transparent; color:var(--fg50); } .btn.ghost:hover { background:var(--card); }
+  .btn:disabled { opacity:.35; cursor:default; }
+  .sm { height:34px; padding:0 12px; border-radius:var(--pill); border:0; background:var(--card2); color:var(--fg70); font-size:14px; font-weight:500; }
+  .sm:hover { background:var(--card3); }
+  .sm.on-good { background:var(--mint-bg); color:var(--mint); } .sm.on-bad { background:var(--coral-bg); color:var(--coral); } .sm.on-neu { background:var(--card3); color:var(--fg); }
+  .actions { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
+  .actions .btn { min-width:220px; }
+  .row { display:flex; gap:12px; flex-wrap:wrap; } .row > .btn { flex:1; }
+  /* 입력 */
+  .field { display:flex; flex-direction:column; gap:8px; }
+  .field label { font-size:15px; color:var(--fg50); }
+  input, textarea { width:100%; font:inherit; letter-spacing:inherit; color:var(--fg); background:var(--card2); border:1px solid transparent; border-radius:16px; padding:16px 18px; outline:none; }
+  input:focus, textarea:focus { border-color:var(--blue); background:var(--card3); }
+  textarea { min-height:72px; resize:vertical; line-height:1.5; }
+  textarea.big { font-size:24px; font-weight:600; letter-spacing:-0.03em; line-height:1.35; }
+  .chips { display:flex; flex-wrap:wrap; gap:8px; }
+  .chip { height:40px; padding:0 18px; border-radius:var(--pill); border:0; background:var(--card2); color:var(--fg70); font-size:16px; }
+  .chip b { color:var(--fg50); font-weight:500; margin-left:6px; } .chip.on { background:#FBFBFB; color:#0C0C0E; } .chip.on b { color:#666; }
+  .opt { display:flex; align-items:center; gap:16px; padding:22px 24px; border-radius:20px; border:0; background:var(--card); text-align:left; width:100%; }
+  .opt:hover { background:var(--card2); } .opt.on { background:var(--blue-bg); box-shadow: inset 0 0 0 1px var(--blue); }
+  .opt .dot { width:24px; height:24px; border-radius:50%; border:2px solid var(--fg30); flex:none; display:flex; align-items:center; justify-content:center; } .opt.on .dot { background:var(--blue); border-color:var(--blue); }
+  .opt b { display:block; font-size:20px; font-weight:600; letter-spacing:-0.03em; } .opt small { color:var(--fg50); font-size:15px; }
+  .msg { padding:14px 18px; border-radius:16px; font-size:15px; font-weight:500; } .msg.err { background:var(--coral-bg); color:var(--coral); } .msg.ok { background:var(--mint-bg); color:var(--mint); } .msg.warn { background:var(--lime-bg); color:var(--lime); }
+  .note { font-size:15px; color:var(--fg50); }
+  .stats { display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:12px; }
+  .stat { background:var(--card); border-radius:20px; padding:22px 12px; text-align:center; } .stat b { display:block; font-size:40px; font-weight:600; letter-spacing:-0.03em; font-variant-numeric:tabular-nums; line-height:1.1; } .stat span { font-size:15px; color:var(--fg50); }
+  .stat.hi b { color:var(--mint); }
+  .center { display:flex; flex-direction:column; align-items:center; text-align:center; gap:28px; }
+  .narrow { width:min(640px, 100%); margin:0 auto; }
+  .hero { padding:24px 8px 8px; display:flex; flex-direction:column; gap:20px; }
+  [hidden] { display:none !important; }
+</style>
+</head>
+<body>
+<header>
+  <span class="name" id="hName">리뷰 질문 검수</span>
+  <span class="tag" id="hTag" hidden></span>
+  <div class="right" id="hRight"></div>
+</header>
+<main id="main"></main>
+<script>
+const $ = (s, r=document) => r.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const stars = n => '★'.repeat(n) + '☆'.repeat(5-n);
+const S = { me:null, view:null, idx:0, screen:'start', editing:false, draft:null, reason:null, startedAt:Date.now(), human:null };
+const STANCE = { positive:'좋다고 함', negative:'나쁘다고 함', neutral:'말은 하는데 좋다 나쁘다 없음' };
+const NEXT = { positive:'negative', negative:'neutral', neutral:'positive' };
+
+async function api(path, body) {
+  const r = await fetch(path, body ? {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body)} : undefined);
+  const j = await r.json().catch(()=>({error:'서버 응답을 읽을 수 없어요'}));
+  if (!r.ok) throw new Error(j.error || r.statusText);
+  return j;
+}
+const minutes = () => Math.max(0.5, Math.round((Date.now()-S.startedAt)/60000*2)/2);
+
+// ---------- 시작 ----------
+function renderStart(err) {
+  setHeader(null);
+  $('#main').innerHTML = `
+  <div class="track fade"><span class="pill blue">리뷰 질문 검수</span><h1 class="display white">리뷰가 답해주는 질문을<br>함께 골라요</h1><p class="sub">한 화면에 결정은 하나, 저장은 자동이에요</p></div>
+  <div class="grid fade" style="align-items:start">
+    <div class="card wide" style="gap:20px">
+      <div class="field"><label>이름 또는 닉네임</label><input id="name" placeholder="예: 호윤" autocomplete="off"></div>
+      <div class="field"><label>접속 코드 <span style="color:var(--fg30)">(안내받은 게 있으면)</span></label><input id="code" placeholder="없으면 비워두세요" autocomplete="off"></div>
+      ${err ? `<div class="msg err">${esc(err)}</div>` : ''}
+      <button class="btn white" id="go">시작 〉</button>
+      <div class="note">이름은 누가 어떤 판단을 했는지 기록하는 데만 써요. 다른 참여자에게는 보이지 않아요.</div>
+    </div>
+    <div class="card wide">
+      <p class="big">리뷰에서 뽑은 질문 후보를 보고<br>맞아요 · 고칠게요 · 아니에요<br>중 하나를 고르면 끝이에요</p>
+      <div class="tags"><span class="tagc">색칠된 문장이 근거</span><span class="tagc">제품 하나씩</span><span class="tagc">언제든 이어서</span></div>
+      <div class="foot"><span class="who positive">30초면 감이 와요</span><span class="chev">〉</span></div>
+    </div>
+  </div>`;
+  const saved = JSON.parse(localStorage.getItem('labeler') || 'null');
+  if (saved) $('#name').value = saved.name;
+  $('#go').onclick = async () => {
+    try {
+      S.me = await api('/api/start', {name: $('#name').value, code: $('#code').value});
+      localStorage.setItem('labeler', JSON.stringify(S.me));
+      await load();
+    } catch (e) { renderStart(e.message); }
+  };
+}
+
+// ---------- 번들 로드 ----------
+async function load() {
+  S.view = await api(`/api/bundle?labeler=${encodeURIComponent(S.me.labelerId)}&name=${encodeURIComponent(S.me.name)}`);
+  if (!S.view.assignment) { renderNoWork(); return; }
+  const undecided = S.view.candidates.findIndex(c => !c.decision);
+  S.idx = undecided; S.editing = false; S.draft = null; S.reason = null; S.startedAt = Date.now();
+  if (undecided < 0) { S.screen = S.view.noMissed || S.view.labels.some(l=>l.source==='human') ? 'done' : 'missed'; }
+  else S.screen = 'judge';
+  render();
+}
+function setHeader(v) {
+  const c = v?.candidates || [];
+  const done = c.filter(x=>x.decision).length;
+  $('#hName').textContent = v ? v.bundle.displayName : '리뷰 질문 검수';
+  $('#hTag').hidden = !v; if (v) $('#hTag').textContent = `${v.bundle.category} · 리뷰 ${v.bundle.reviewCount}개`;
+  $('#hRight').innerHTML = v ? `<span class="navpill"><b>${done} / ${c.length}</b> 봤어요 <span class="bar"><i style="width:${c.length?Math.round(100*done/c.length):0}%"></i></span></span><span class="navpill white">${esc(S.me.name)}</span>` : (S.me ? `<span class="navpill white">${esc(S.me.name)}</span>` : '');
+}
+function render() {
+  setHeader(S.view);
+  ({judge: renderJudge, reject: renderReject, missed: renderMissed, done: renderDone})[S.screen]();
+}
+function renderNoWork() {
+  setHeader(null);
+  $('#main').innerHTML = `<div class="track fade"><h1 class="display white">지금은 볼 제품이 없어요</h1><p class="sub white">모든 제품이 배정됐어요. 고마워요, ${esc(S.me.name)}.</p></div>`;
+}
+
+// ---------- 판정 ----------
+function quoteHtml(q, i) {
+  const who = {positive:'좋다고 함', negative:'나쁘다고 함', neutral:'말은 하는데 좋다 나쁘다 없음'}[q.stance];
+  return `<div class="card ${q.stance}" data-i="${i}">
+    <p class="big"><mark>${esc(q.quote)}</mark></p>
+    ${(q.before||q.after) ? `<p class="ctxp">${q.before?'…'+esc(q.before.trim()):''}<b>${esc(q.quote)}</b>${q.after?esc(q.after.trim())+'…':''}</p>` : ''}
+    <div class="tags"><span class="tagc">${stars(q.rating)}</span><span class="tagc">${esc(q.conditionLine.split(' · ')[0])}</span></div>
+    <div class="tools"><button type="button" class="sm on-${q.stance==='positive'?'good':q.stance==='negative'?'bad':'neu'}" data-cycle="${i}">입장 바꾸기 ⇄</button><button type="button" class="sm" data-rm="${i}">근거에서 빼기</button></div>
+    <div class="foot"><span class="who ${q.stance}">${who}</span><span class="chev">〉</span></div>
+  </div>`;
+}
+function missedHtml(list, mode) {
+  if (!list.length) return '';
+  return `<details class="missed"><summary>같은 얘기를 하는 리뷰가 <b>${list.length}개</b> 더 있어요 <span style="margin-left:auto">보기 〉</span></summary>
+    <div class="body">${list.map(r => `<div class="mr"><div class="m"><span>${stars(r.rating)}</span><span>${esc(r.conditionLine.split(' · ')[0])}</span><span>· ${esc(r.hits.join(' '))}</span></div>
+      ${r.sentences.map(s => `<div class="sent"><span>${esc(s)}</span>
+        <button type="button" class="sm" data-add='${esc(JSON.stringify({reviewId:r.reviewId, quote:s, stance:'positive'}))}'>좋다고 함</button>
+        <button type="button" class="sm" data-add='${esc(JSON.stringify({reviewId:r.reviewId, quote:s, stance:'negative'}))}'>나쁘다고 함</button>
+        <button type="button" class="sm" data-add='${esc(JSON.stringify({reviewId:r.reviewId, quote:s, stance:'neutral'}))}'>말만</button></div>`).join('')}</div>`).join('')}
+    <div class="note" style="padding:0 8px 8px">${mode==='judge' ? '누르면 "고칠게요"로 바뀌고 근거에 들어가요.' : '누르면 근거에 들어가요.'}</div></div></details>`;
+}
+function renderJudge(msg) {
+  const c = S.view.candidates[S.idx];
+  const d = S.draft || { question:c.question, answer:c.answer, aspect:c.aspect, evidence: c.quotes.map(q=>({reviewId:q.reviewId, stance:q.stance, quote:q.quote})) };
+  const quotes = S.editing ? d.evidence.map(e => { const q = c.quotes.find(x=>x.reviewId===e.reviewId && x.quote===e.quote) || {before:'', after:'', rating:0, conditionLine:''}; return {...q, ...e}; }) : c.quotes;
+  const warn = [...(c.contractErrors.length ? ['이 후보의 인용이 원문과 달라요. 그대로는 저장할 수 없어요 — 고쳐서 저장하거나 "아니에요"를 눌러주세요.'] : []),
+                ...(c.stanceMigrated ? ['좋다/나쁘다 표시는 자동으로 붙인 값이에요. 문장을 읽고 다르면 고쳐주세요.'] : []),
+                ...c.checks.filter(x=>x.level==='warn').map(x=>x.text)];
+  $('#main').innerHTML = `
+  <div class="track fade ${S.editing?'editing':''}" id="cand">
+    <div class="pills"><span class="pill blue">질문 후보 ${S.idx+1} / ${S.view.candidates.length}</span><span class="pill">${esc(c.aspect || '주제 없음')}</span></div>
+    ${S.editing ? `<div class="field"><label>질문</label><textarea class="big" id="eq">${esc(d.question)}</textarea></div><div class="field"><label>답 — 리뷰가 말하는 것</label><textarea id="ea">${esc(d.answer)}</textarea></div>`
+                : `<h1 class="display">${esc(c.question)}</h1><p class="sub">${esc(c.answer)}</p>`}
+    <div class="pills" id="counts"></div>
+    ${warn.length ? `<div class="msg warn">${warn.map(esc).join('<br>')}</div>` : ''}
+  </div>
+  <div class="eyebrow">이 질문을 만든 리뷰 ${quotes.length}개 · 굵은 문장이 근거예요</div>
+  <div class="grid ${S.editing?'editing':''}" id="quotes">${quotes.map(quoteHtml).join('')}</div>
+  ${missedHtml(c.missed, 'judge')}
+  ${msg ? `<div class="msg ${msg.cls}">${esc(msg.text)}</div>` : ''}
+  ${S.editing
+    ? `<div class="actions"><button class="btn ghost" id="cancelEdit">그대로 두기</button><button class="btn white" id="saveEdit">고친 대로 저장하고 다음 〉</button></div>`
+    : `<div class="actions"><button class="btn white" id="accept">맞아요 <small>그대로 저장</small></button><button class="btn" id="edit">고칠게요 <small>문장·근거 수정</small></button><button class="btn coral" id="reject">아니에요 <small>이유 하나 선택</small></button></div>`}`;
+  renderCounts(quotes);
+  if (S.editing) S.draft = d;
+  $('#accept')?.addEventListener('click', () => decide({kind:'accept'}));
+  $('#reject')?.addEventListener('click', () => { S.screen='reject'; S.reason=null; render(); });
+  $('#edit')?.addEventListener('click', () => { S.editing = true; S.draft = d; renderJudge(); });
+  $('#cancelEdit')?.addEventListener('click', () => { S.editing=false; S.draft=null; renderJudge(); });
+  $('#saveEdit')?.addEventListener('click', () => {
+    S.draft.question = $('#eq').value; S.draft.answer = $('#ea').value;
+    decide({kind:'edit', edits:{question:S.draft.question, answer:S.draft.answer, aspect:S.draft.aspect, evidence:S.draft.evidence}});
+  });
+  document.querySelectorAll('[data-cycle]').forEach(b => b.onclick = () => { syncDraft(); const e = S.draft.evidence[+b.dataset.cycle]; e.stance = NEXT[e.stance]; renderJudge(); });
+  document.querySelectorAll('[data-rm]').forEach(b => b.onclick = () => { syncDraft(); S.draft.evidence.splice(+b.dataset.rm,1); renderJudge(); });
+  document.querySelectorAll('[data-add]').forEach(b => b.onclick = () => { const e = JSON.parse(b.dataset.add); if (!S.editing) { S.editing = true; S.draft = d; } else syncDraft(); S.draft.evidence = S.draft.evidence.filter(x=>x.reviewId!==e.reviewId).concat([e]); renderJudge({cls:'ok', text:'근거에 넣었어요. 저장하면 candidate_edited 로 기록돼요.'}); });
+}
+function syncDraft() { if (S.editing) { const q=$('#eq'), a=$('#ea'); if (q) S.draft.question=q.value; if (a) S.draft.answer=a.value; } }
+function renderCounts(quotes) {
+  const authors = new Map(S.view.reviews.map(r=>[r.reviewId, r.author]));
+  const u = st => new Set(quotes.filter(q=>q.stance===st).map(q=>authors.get(q.reviewId))).size;
+  const spoke = new Set(quotes.map(q=>authors.get(q.reviewId))).size;
+  $('#counts').innerHTML = `<span class="pill coral">나쁘다고 함 ${u('negative')}명</span><span class="pill mint">좋다고 함 ${u('positive')}명</span>${u('neutral')?`<span class="pill">말만 ${u('neutral')}명</span>`:''}<span class="pill" title="이 주제를 말하지 않은 사람. 좋다 나쁘다 어느 쪽도 아니에요">이 얘기 안 한 사람 ${S.view.bundle.authors - spoke}명</span>`;
+}
+async function decide(extra) {
+  const c = S.view.candidates[S.idx];
+  try {
+    const r = await api('/api/decide', {labelerId:S.me.labelerId, candidateId:c.candidateId, minutesSpent:minutes(), reason:S.reason, ...extra});
+    await load();
+    if (r.note && S.screen==='judge') renderJudge({cls:'warn', text:r.note});
+  } catch (e) { S.screen==='reject' ? renderReject(e.message) : renderJudge({cls:'err', text:e.message}); }
+}
+
+// ---------- 아니에요 ----------
+function renderReject(err) {
+  const c = S.view.candidates[S.idx];
+  $('#main').innerHTML = `
+  <div class="track fade"><div class="pills"><span class="pill coral">아니에요</span><span class="pill">${esc(c.aspect||'주제 없음')}</span></div><h1 class="display white" style="color:var(--fg50);font-size:clamp(28px,3.4vw,40px)">${esc(c.question)}</h1></div>
+  <div class="track fade"><h1 class="display" style="color:var(--coral)">왜 아닌가요?</h1><p class="sub white">가장 가까운 이유 하나만 골라주세요. 이 선택도 정답의 일부로 저장돼요.</p></div>
+  <div class="narrow fade" style="display:flex;flex-direction:column;gap:12px">
+    ${S.view.reasons.map(r => `<button type="button" class="opt ${S.reason===r.key?'on':''}" data-r="${r.key}"><span class="dot">${S.reason===r.key?'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"></path></svg>':''}</span><span><b>${esc(r.title)}</b><small>${esc(r.desc)}</small></span></button>`).join('')}
+    ${err ? `<div class="msg err">${esc(err)}</div>` : ''}
+    <div class="row" style="margin-top:8px"><button class="btn ghost" id="back" style="flex:0 0 160px">〈 돌아가기</button><button class="btn white" id="save" ${S.reason?'':'disabled'}>이 이유로 저장하고 다음 〉</button></div>
+  </div>`;
+  document.querySelectorAll('[data-r]').forEach(b => b.onclick = () => { S.reason = b.dataset.r; renderReject(); });
+  $('#back').onclick = () => { S.screen='judge'; render(); };
+  $('#save').onclick = () => decide({kind:'reject', reason:S.reason});
+}
+
+// ---------- 놓친 질문 ----------
+function renderMissed(msg) {
+  const v = S.view;
+  if (!S.human) S.human = { term:null, evidence:[], question:'', answer:'' };
+  const H = S.human;
+  const hits = Object.entries(v.aspectHits).filter(([,h])=>h.reviews>0).sort((a,b)=>b[1].reviews-a[1].reviews);
+  const terms = H.term ? v.aspectHits[H.term].keywords : [];
+  const shown = H.term ? v.reviews.filter(r => terms.some(t=>r.content.includes(t))) : [];
+  const evIds = new Set(H.evidence.map(e=>e.reviewId));
+  const sentences = r => r.content.split(/(?<=[.!?…~])\s+|\n+/).map(s=>s.trim()).filter(s => s.length>=4 && terms.some(t=>s.includes(t))).slice(0,3);
+  $('#main').innerHTML = `
+  <div class="track fade"><span class="pill lime">마지막 한 가지</span><h1 class="display" style="color:var(--lime)">후보에 없는 질문이<br>하나 떠오르나요?</h1><p class="sub white">"이건 왜 안 물어봤지?" 싶었던 게 있으면 적어주세요. 없으면 없다고 답해도 충분해요. 그것도 기록이에요.</p></div>
+  <div class="fade" style="display:flex;flex-direction:column;gap:20px">
+    <div class="field"><label>리뷰에서 자주 나오는 말 · 눌러서 그 리뷰만 보기</label><div class="chips">${hits.map(([a,h]) => `<button type="button" class="chip ${H.term===a?'on':''}" data-t="${esc(a)}">${esc(a)}<b>${h.reviews}</b></button>`).join('')}</div></div>
+    ${H.term ? `<div class="grid">${shown.slice(0,9).map(r => `<div class="card ${evIds.has(r.reviewId)?'positive':''}"><div class="tags"><span class="tagc">${stars(r.rating)}</span><span class="tagc">${esc(r.conditionLine.split(' · ')[0])}</span>${evIds.has(r.reviewId)?'<span class="tagc" style="color:var(--mint)">근거에 있음</span>':''}</div>
+        <div style="display:flex;flex-direction:column;gap:8px">${sentences(r).map(s => `<div class="sent"><span>${esc(s)}</span></div><div class="pills">${['positive','negative','neutral'].map(st => `<button type="button" class="sm ${H.evidence.some(e=>e.reviewId===r.reviewId&&e.quote===s&&e.stance===st)?('on-'+(st==='positive'?'good':st==='negative'?'bad':'neu')):''}" data-add='${esc(JSON.stringify({reviewId:r.reviewId, quote:s, stance:st}))}'>${st==='neutral'?'말만':STANCE[st]}</button>`).join('')}</div>`).join('')}</div></div>`).join('')}</div>
+      ${shown.length>9 ? `<div class="note">이 말이 나온 리뷰 ${shown.length}개 중 9개만 보여요</div>` : ''}` : ''}
+    <div class="grid" style="align-items:start">
+      <div class="card wide" style="gap:16px">
+        <div class="field"><label>고른 근거 ${H.evidence.length}개</label>${H.evidence.length ? `<div class="pills">${H.evidence.map((e,i)=>`<span class="pill ${e.stance==='positive'?'mint':e.stance==='negative'?'coral':''}">${esc(e.quote.slice(0,24))}${e.quote.length>24?'…':''} <button type="button" class="sm" data-rm="${i}" style="height:24px;padding:0 8px">✕</button></span>`).join('')}</div>` : `<span class="note">위에서 문장 아래 버튼을 눌러 근거를 모으세요</span>`}</div>
+        <div class="field"><label>리뷰가 말하는 것 (답)</label><textarea id="ha" placeholder="예: 냄새가 불쾌하다는 리뷰가 여러 개 있어요">${esc(H.answer)}</textarea></div>
+        <div class="field"><label>그 답을 묻는 질문</label><textarea class="big" id="hq" placeholder="예: 향이나 냄새가 불쾌하다는 사람이 있나요?">${esc(H.question)}</textarea></div>
+        ${msg ? `<div class="msg ${msg.cls}">${esc(msg.text)}</div>` : ''}
+        <div class="row"><button class="btn" id="none">떠오르는 게 없어요</button><button class="btn white" id="add">추가하고 제품 마치기 〉</button></div>
+      </div>
+    </div>
+  </div>`;
+  const keep = () => { H.answer = $('#ha').value; H.question = $('#hq').value; };
+  document.querySelectorAll('[data-t]').forEach(b => b.onclick = () => { keep(); H.term = H.term===b.dataset.t ? null : b.dataset.t; renderMissed(); });
+  document.querySelectorAll('[data-add]').forEach(b => b.onclick = () => { keep(); const e = JSON.parse(b.dataset.add); H.evidence = H.evidence.filter(x=>x.reviewId!==e.reviewId).concat([e]); renderMissed(); });
+  document.querySelectorAll('[data-rm]').forEach(b => b.onclick = () => { keep(); H.evidence.splice(+b.dataset.rm,1); renderMissed(); });
+  $('#none').onclick = async () => { try { await api('/api/human', {labelerId:S.me.labelerId, none:true}); await finish(); } catch (e) { renderMissed({cls:'err', text:e.message}); } };
+  $('#add').onclick = async () => { keep(); try { await api('/api/human', {labelerId:S.me.labelerId, question:H.question, answer:H.answer, aspect:H.term||null, evidence:H.evidence, minutesSpent:minutes()}); S.human=null; await finish(); } catch (e) { renderMissed({cls:'err', text:e.message}); } };
+}
+async function finish() {
+  try { S.doneInfo = await api('/api/complete', {labelerId:S.me.labelerId}); S.screen='done'; render(); }
+  catch (e) { renderMissed({cls:'err', text:e.message}); }
+}
+
+// ---------- 완료 ----------
+function renderDone() {
+  const d = S.doneInfo || { summary:{accept:0,edit:0,reject:0,human:0}, next:null, bundleId:S.view.bundle.bundleId };
+  const s = d.summary; const p = S.view.progress || {doneBundles:0};
+  $('#main').innerHTML = `
+  <div class="track fade"><span class="pill mint">${esc(S.view.bundle.displayName)}</span><h1 class="display mint">끝났어요</h1><p class="sub white">판단은 모두 자동으로 저장됐어요. 지금까지 제품 ${p.doneBundles + 1}개.</p></div>
+  <div class="stats fade"><div class="stat"><b>${s.accept}</b><span>맞아요</span></div><div class="stat"><b>${s.edit}</b><span>고쳤어요</span></div><div class="stat"><b>${s.reject}</b><span>아니에요</span></div><div class="stat hi"><b>${s.human}</b><span>직접 추가</span></div></div>
+  <div class="actions fade">
+    ${d.next ? `<button class="btn white" id="next">다음 제품 시작 〉 <small>${esc(d.next.displayName)} · 리뷰 ${d.next.reviewCount}개</small></button>` : `<div class="msg ok">남은 제품이 없어요. 고마워요!</div>`}
+    <button class="btn ghost" id="stop">오늘은 여기까지</button>
+  </div>`;
+  $('#next')?.addEventListener('click', () => { S.human=null; load(); });
+  $('#stop').onclick = () => { localStorage.setItem('labeler', JSON.stringify(S.me)); $('#main').innerHTML = `<div class="track fade"><h1 class="display white">수고했어요</h1><p class="sub white">다음에 같은 이름으로 들어오면 이어서 할 수 있어요.</p><button class="btn ghost" style="align-self:flex-start" onclick="location.reload()">다시 시작</button></div>`; setHeader(null); };
+}
+
+// ---------- 부팅 ----------
+(async () => {
+  const saved = JSON.parse(localStorage.getItem('labeler') || 'null');
+  if (saved) { S.me = saved; try { await load(); return; } catch (e) { /* fall through */ } }
+  renderStart();
+})();
+</script>
+</body>
+</html>
