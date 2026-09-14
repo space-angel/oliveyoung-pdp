@@ -459,6 +459,8 @@ class Service:
         msg = re.sub(r"^\[labelId=[^\]]*\]\s*", "", msg)
         if "부분문자열" in msg:
             return "원문과 한 글자라도 다르면 저장할 수 없어요. 문장을 다시 선택해 주세요."
+        if "두 번 있다" in msg:
+            return "한 리뷰에서는 문장 하나만 근거로 쓸 수 있어요. 같은 리뷰의 근거를 하나만 남겨주세요."
         if "evidence 가 비었다" in msg:
             return "근거 문장을 하나 이상 골라주세요."
         if "question" in msg and "비었" in msg:
