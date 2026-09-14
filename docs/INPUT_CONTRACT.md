@@ -20,7 +20,7 @@
 | **집계 단위** | `productId` — 계보 50 / 세대 53 | `catalog.resolve_goods_no()` | `UnknownGoodsNoError` |
 | **식별자** | `reviewId` (양의 정수, 스냅샷 내 유일) | `contracts._validate_required` · `ingest.ingest` | `ContractError` |
 | **작성자 키** | `NFC(userName)` 원문 | `contracts.author_key` | `ContractError` (공백·결측) |
-| **중복 단위** | `(authorKey, productId)`, 카운트는 **고유 작성자 수** | 게이트2 (PER-183) | — |
+| **중복 단위** | `(authorKey, productId)`, 카운트는 **고유 작성자 수** | `gates.run_duplicate_gate()` · `gates.independent_reviews()` (PER-183) | `rejected[]` 행 (`중복`/`동일작성자`) / 통과 안 한 묶음에서 세면 `GateError` |
 | **조건축** | `skinType`(단일) · `skinTrouble`(다중) · `option`(자유 문자열) | `contracts.CONDITION_AXES` | `ContractError` |
 | **조건 어휘** | 코드북 26종(A01~A07·B01~B06·C01~C13). 라벨 금지 | `codebook.assert_code()` | `ContractError` |
 | **미기재** | 조건 없음이 아니라 **별도 세그먼트** `미기재` | `contracts.MISSING_SEGMENT` | `segment` 는 절대 null 이 아니다 |

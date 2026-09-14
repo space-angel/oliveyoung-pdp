@@ -79,7 +79,7 @@ catalog → ingest → tag → gates → claims → judge
 | `catalog` | `goodsNo` → `productId`. 제품 동일성 확정 | **구현** | PER-171 |
 | `ingest` | 25K를 원문/조건/파생 3층으로 적재. LLM 없음 | **구현** | PER-173 |
 | `tag` | 전수 aspect/polarity 태깅 (Batch API) | 계약·정답셋 **완료** / 배치 실행 미완 | PER-175 |
-| `gates` | 동일성 → 중복 → 방향성 → 충분성 4게이트 + `rejected[]` | 게이트1(동일성) **구현** / 2~4 미구현 | PER-182~188 |
+| `gates` | 동일성 → 중복 → 방향성 → 충분성 4게이트 + `rejected[]` | 게이트1·2 **구현** / 3~4 미구현 | PER-182~188 |
 | `claims` | 주장 생성 + 인용 원문 부분문자열 강제 + 스키마 검증 | 미구현 | PER-189~195 |
 | `judge` | 루브릭 judge(생성과 다른 모델) + 전수 평가 | 미구현 | PER-196~201 |
 
@@ -96,7 +96,7 @@ catalog → ingest → tag → gates → claims → judge
 | 게이트 | 판정 | 실측된 필요성 |
 |---|---|---|
 | 1 동일성 **(구현)** | 정규화 제품 ID 일치, 옵션 질문이면 같은 옵션만, 리뉴얼 세대 + 리센시 컷 | `goodsNo` 153개 → `productId` 53개(계보 50). 옵션 문자열 798개는 색상 **452개**라, 정규화 없이는 색상 질문의 근거가 잘게 쪼개진다 |
-| 2 중복 | 본문 해시 + **동일 작성자 1표** + 의미 유사 클러스터 | 안 걸면 카운트가 **22.4% 부풀고**, 본문 해시는 그중 12.1%만 잡는다 |
+| 2 중복 **(구현)** | 본문 해시 + **동일 작성자 1표** + 의미 유사 클러스터(PER-184) | 안 걸면 카운트가 **22.4% 부푼다**. 25,000건은 독립 근거 **19,392건**이고, 해시가 잡는 몫은 제거량의 12.4%뿐이다 |
 | 3 방향성 | polarity를 `(리뷰 × 주제)` 단위로. 별점과 교차 검증, 불일치는 플래그 | 한 리뷰가 "발색은 좋은데 지속력은 별로"라고 말한다 |
 | 4 충분성 | 절대하한 **AND** 비율 **AND** 세그먼트 최소 — 낮은 쪽이 아니라 높은 쪽 | N_min=8 기준으로 `productId×skinType` 셀 407개 중 297개만 통과 (리센시 컷 후 284) |
 
@@ -155,7 +155,7 @@ UI 정리가 아니라 정확도 문제다. 조건을 붙이면 상충하는 리
 |---|---|---|
 | 리뷰 / 제품 | 25,000 / **53 `productId`** (계보 50) | `goodsNo` 153개를 카탈로그가 50계보로 묶고, 그중 3개를 리뉴얼 세대로 나눈다 (미해결 0) |
 | 조건 기재율 | `skinType` 57.1% · `skinTrouble` 53.9% · `option` 68.1% | 절반은 미기재 세그먼트로 간다 |
-| 중복 | 고유 `(작성자, 제품)` 19,401 → **초과 표 5,599건 (22.4%)** | 게이트2 없이는 "리뷰 N건" 숫자가 거짓. PER-170 측정치(19,389)와 12 차이는 세대 분할분 |
+| 중복 | 고유 `(작성자, 제품)` 19,401 → **초과 표 5,599건 (22.4%)**. 게이트2 통과 = 독립 근거 **19,392건** | 게이트2 없이는 "리뷰 N건" 숫자가 거짓. PER-170 측정치(19,389)와 12 차이는 세대 분할분 |
 | 동일 본문 | 587그룹 | 템플릿·복붙. 본문 해시로 잡히는 건 초과 표의 12.1%뿐 |
 | `productId×skinType` 셀 | 407개 중 N≥8이 314 → **작성자 dedup 후 297** | 리센시 컷(2024-09) 적용 후에는 **284** |
 | 평점 분포 | 5점 85%, 1~2점 **407건(1.6%)** | 부정 신호가 희소 클래스 → 층화 표본 필수 |
@@ -192,7 +192,7 @@ pipeline/    v5 — 작업 대상
   contracts.py             입력 계약 3층
   catalog.py               goodsNo → productId. 미등록은 에러. 세대는 (goodsNo, 날짜)로 가른다
   policy.py                리뉴얼 취급 · 리센시 컷 (PER-172). 게이트1이 소비한다
-  gates.py                 게이트1 동일성 (PER-182). 탈락은 드롭이 아니라 rejected[] 행
+  gates.py                 게이트1 동일성 (PER-182) · 게이트2 중복 (PER-183). 탈락은 드롭이 아니라 rejected[] 행
   option_norm.py           옵션 → 색상 키 정규화 (PER-182). LLM 없음
   option_markers.json      판촉 어휘 — 코드가 아니라 여기서 고친다
   build_product_catalog.py 카탈로그 생성기 (--check 로 재현 확인)
@@ -294,6 +294,7 @@ v5가 넘어야 하는 선: **인용 정확도 100%** (생성 시점에 원문 �
 | [`docs/DECISION_PER175_TAGGING_CONTRACT.md`](docs/DECISION_PER175_TAGGING_CONTRACT.md) | 태깅 계약 — 태그 단위 · 힌트 · 인용 정규화 · 택소노미 동결 |
 | [`docs/DECISION_PER174_TRUST_PRIOR.md`](docs/DECISION_PER174_TRUST_PRIOR.md) | 신뢰도 사전 점수 — 6개 신호 실측 · 가중치 근거 · `usefulPoint` 기각 |
 | [`docs/DECISION_PER182_OPTION_IDENTITY.md`](docs/DECISION_PER182_OPTION_IDENTITY.md) | 게이트1 동일성 — 옵션 정규화 규칙 · 과대병합 회귀 사례 · 컷 비용 |
+| [`docs/DECISION_PER183_DUPLICATE_GATE.md`](docs/DECISION_PER183_DUPLICATE_GATE.md) | 게이트2 중복 — 두 축이 대체하지 않는다는 실측 · 판정/게이트 순서 · `independentReviews` 정의 |
 | [`docs/DECISION_PER178_GOLDEN_LABELING_SPEC.md`](docs/DECISION_PER178_GOLDEN_LABELING_SPEC.md) | 주장 골든셋 규격 — 라벨 1건의 모양 · 층화 번들 40개 · 블라인드 절차 · v4 15문항 미이관 근거 |
 | [`docs/DECISION_PER178_SILENCE_IS_NOT_EVIDENCE.md`](docs/DECISION_PER178_SILENCE_IS_NOT_EVIDENCE.md) | 침묵은 근거가 아니다 — U+/U−/D/S 보존, 단계별 유지 규칙, 아마존·NN/G·자기선택 편향 사례 |
 | [`eval/gold/README.md`](eval/gold/README.md) | 평가 고정물(표본·정답셋) 규칙과 재현 절차 |

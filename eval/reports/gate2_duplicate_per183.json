@@ -1,0 +1,618 @@
+{
+  "issue": "PER-183",
+  "source": {
+    "path": "data/input/reviews_50products.json",
+    "sha256": "04e089d078d5482855f04481b7144661834b391d55b3cec0033431454903a773",
+    "reviews": 25000,
+    "products": 53
+  },
+  "policy": {
+    "authorKey": "NFC(userName) 원문 (PER-170)",
+    "mergeUnit": "(authorKey, productId)",
+    "representative": "신뢰도 점수 최고 → reviewDate 최신 → reviewId 최소",
+    "snapshotLatestMonth": "2026-08",
+    "recencyCutoffMonth": "2024-09",
+    "sufficiencyNMin": 8
+  },
+  "contamination": {
+    "reviews": 25000,
+    "uniqueAuthors": 13876,
+    "authorsWithMultipleReviews": 4517,
+    "reviewsByMultiReviewAuthors": 15641,
+    "maxReviewsPerAuthor": 59,
+    "authorProductPairs": 19401,
+    "excessVotes": 5599,
+    "excessVotesPct": 22.4,
+    "identicalContentGroupsInProduct": 509,
+    "identicalContentGroupsCorpus": 587,
+    "excessByContentHash": 695,
+    "inflationPerProduct": {
+      "min": 1.0,
+      "median": 1.292,
+      "p95": 1.7065,
+      "max": 1.7283
+    }
+  },
+  "gate": {
+    "reviews": 25000,
+    "independentReviews": 19392,
+    "rejected": {
+      "duplicate_content": {
+        "reviews": 416,
+        "pct": 1.66,
+        "label": "중복"
+      },
+      "same_author": {
+        "reviews": 5192,
+        "pct": 20.77,
+        "label": "동일작성자"
+      }
+    },
+    "byProduct": {
+      "p001": {
+        "displayName": "3CE 캐시미어 허그 립스틱",
+        "reviews": 500,
+        "independentReviews": 343,
+        "inflation": 1.4577,
+        "rejected": {
+          "duplicate_content": 11,
+          "same_author": 146
+        }
+      },
+      "p002": {
+        "displayName": "롬앤 더 쥬시 래스팅 틴트",
+        "reviews": 500,
+        "independentReviews": 395,
+        "inflation": 1.2658,
+        "rejected": {
+          "duplicate_content": 7,
+          "same_author": 98
+        }
+      },
+      "p003": {
+        "displayName": "유리아쥬 스틱레브르 컬러드",
+        "reviews": 500,
+        "independentReviews": 354,
+        "inflation": 1.4124,
+        "rejected": {
+          "duplicate_content": 20,
+          "same_author": 126
+        }
+      },
+      "p004": {
+        "displayName": "컬러그램 누디 블러 틴트",
+        "reviews": 493,
+        "independentReviews": 382,
+        "inflation": 1.2906,
+        "rejected": {
+          "duplicate_content": 12,
+          "same_author": 99
+        }
+      },
+      "p005": {
+        "displayName": "퓌 3D 볼류밍 글로스",
+        "reviews": 500,
+        "independentReviews": 394,
+        "inflation": 1.269,
+        "rejected": {
+          "duplicate_content": 7,
+          "same_author": 99
+        }
+      },
+      "p006": {
+        "displayName": "하트퍼센트 도트 온 무드 립펜슬",
+        "reviews": 500,
+        "independentReviews": 439,
+        "inflation": 1.139,
+        "rejected": {
+          "duplicate_content": 4,
+          "same_author": 57
+        }
+      },
+      "p007": {
+        "displayName": "힌스 로 글로우 젤 틴트",
+        "reviews": 500,
+        "independentReviews": 421,
+        "inflation": 1.1876,
+        "rejected": {
+          "duplicate_content": 8,
+          "same_author": 71
+        }
+      },
+      "p008": {
+        "displayName": "VDL 치크스테인 블러셔",
+        "reviews": 500,
+        "independentReviews": 363,
+        "inflation": 1.3774,
+        "rejected": {
+          "duplicate_content": 7,
+          "same_author": 130
+        }
+      },
+      "p009": {
+        "displayName": "더샘 커버 퍼펙션 트리플 팟 컨실러",
+        "reviews": 500,
+        "independentReviews": 460,
+        "inflation": 1.087,
+        "rejected": {
+          "duplicate_content": 3,
+          "same_author": 37
+        }
+      },
+      "p010": {
+        "displayName": "바닐라코 프라임 프라이머 피니쉬 파우더",
+        "reviews": 500,
+        "independentReviews": 324,
+        "inflation": 1.5432,
+        "rejected": {
+          "duplicate_content": 13,
+          "same_author": 163
+        }
+      },
+      "p011": {
+        "displayName": "에스쁘아 비벨벳 커버쿠션",
+        "reviews": 496,
+        "independentReviews": 426,
+        "inflation": 1.1643,
+        "rejected": {
+          "duplicate_content": 8,
+          "same_author": 62
+        }
+      },
+      "p012": {
+        "displayName": "연작 스킨 퍼펙팅 프로텍티브 베이스프렙",
+        "reviews": 500,
+        "independentReviews": 459,
+        "inflation": 1.0893,
+        "rejected": {
+          "duplicate_content": 5,
+          "same_author": 36
+        }
+      },
+      "p013": {
+        "displayName": "오프라 미니 하이라이터",
+        "reviews": 500,
+        "independentReviews": 393,
+        "inflation": 1.2723,
+        "rejected": {
+          "duplicate_content": 6,
+          "same_author": 101
+        }
+      },
+      "p014": {
+        "displayName": "정샘물 에센셜 스킨 누더 쿠션",
+        "reviews": 500,
+        "independentReviews": 369,
+        "inflation": 1.355,
+        "rejected": {
+          "duplicate_content": 16,
+          "same_author": 115
+        }
+      },
+      "p015": {
+        "displayName": "클리오 킬 커버 파운웨어 쿠션",
+        "reviews": 500,
+        "independentReviews": 452,
+        "inflation": 1.1062,
+        "rejected": {
+          "duplicate_content": 5,
+          "same_author": 43
+        }
+      },
+      "p016": {
+        "displayName": "프레시안 에그라이크 크림 블러셔",
+        "reviews": 500,
+        "independentReviews": 366,
+        "inflation": 1.3661,
+        "rejected": {
+          "duplicate_content": 12,
+          "same_author": 122
+        }
+      },
+      "p017": {
+        "displayName": "헤라 블랙 쿠션 파운데이션",
+        "reviews": 341,
+        "independentReviews": 275,
+        "inflation": 1.24,
+        "rejected": {
+          "duplicate_content": 4,
+          "same_author": 62
+        }
+      },
+      "p018": {
+        "displayName": "데이지크 섀도우팔레트",
+        "reviews": 500,
+        "independentReviews": 380,
+        "inflation": 1.3158,
+        "rejected": {
+          "same_author": 120
+        }
+      },
+      "p019": {
+        "displayName": "리필드 사이토카인 아이래쉬 듀얼 앰플",
+        "reviews": 500,
+        "independentReviews": 394,
+        "inflation": 1.269,
+        "rejected": {
+          "duplicate_content": 7,
+          "same_author": 99
+        }
+      },
+      "p020": {
+        "displayName": "에뛰드 컬 픽스 마스카라",
+        "reviews": 500,
+        "independentReviews": 437,
+        "inflation": 1.1442,
+        "rejected": {
+          "duplicate_content": 5,
+          "same_author": 58
+        }
+      },
+      "p021": {
+        "displayName": "웨이크메이크 소프트 블러링 아이팔레트",
+        "reviews": 500,
+        "independentReviews": 387,
+        "inflation": 1.292,
+        "rejected": {
+          "duplicate_content": 14,
+          "same_author": 99
+        }
+      },
+      "p022": {
+        "displayName": "코스노리 아이래쉬 세럼 비건 속눈썹영양제",
+        "reviews": 500,
+        "independentReviews": 459,
+        "inflation": 1.0893,
+        "rejected": {
+          "duplicate_content": 2,
+          "same_author": 39
+        }
+      },
+      "p023": {
+        "displayName": "투크 워터프루프 슬림 아이라이너",
+        "reviews": 500,
+        "independentReviews": 450,
+        "inflation": 1.1111,
+        "rejected": {
+          "duplicate_content": 7,
+          "same_author": 43
+        }
+      },
+      "p024": {
+        "displayName": "페리페라 스피디 스키니 브로우",
+        "reviews": 500,
+        "independentReviews": 434,
+        "inflation": 1.1521,
+        "rejected": {
+          "duplicate_content": 9,
+          "same_author": 57
+        }
+      },
+      "p025": {
+        "displayName": "홀리카홀리카 마이페이브 피스 아이섀도우",
+        "reviews": 500,
+        "independentReviews": 328,
+        "inflation": 1.5244,
+        "rejected": {
+          "duplicate_content": 29,
+          "same_author": 143
+        }
+      },
+      "p026": {
+        "displayName": "구달 청귤 비타C 잡티케어 세럼",
+        "reviews": 500,
+        "independentReviews": 451,
+        "inflation": 1.1086,
+        "rejected": {
+          "duplicate_content": 5,
+          "same_author": 44
+        }
+      },
+      "p027": {
+        "displayName": "넘버즈인 판토텐산 액티브업 수딩세럼",
+        "reviews": 500,
+        "independentReviews": 464,
+        "inflation": 1.0776,
+        "rejected": {
+          "duplicate_content": 5,
+          "same_author": 31
+        }
+      },
+      "p028": {
+        "displayName": "달바 퍼스트 스프레이 세럼",
+        "reviews": 500,
+        "independentReviews": 292,
+        "inflation": 1.7123,
+        "rejected": {
+          "duplicate_content": 16,
+          "same_author": 192
+        }
+      },
+      "p029": {
+        "displayName": "메디큐브 PDRN 핑크 앰플",
+        "reviews": 500,
+        "independentReviews": 376,
+        "inflation": 1.3298,
+        "rejected": {
+          "duplicate_content": 11,
+          "same_author": 113
+        }
+      },
+      "p030": {
+        "displayName": "메디힐 PDRN 모공 탄력 세럼",
+        "reviews": 500,
+        "independentReviews": 370,
+        "inflation": 1.3514,
+        "rejected": {
+          "duplicate_content": 4,
+          "same_author": 126
+        }
+      },
+      "p031": {
+        "displayName": "메디힐 마데카소사이드 흔적 리페어 세럼",
+        "reviews": 500,
+        "independentReviews": 371,
+        "inflation": 1.3477,
+        "rejected": {
+          "duplicate_content": 9,
+          "same_author": 120
+        }
+      },
+      "p032": {
+        "displayName": "성분에디터 그린토마토 NMN 포어 리프팅 앰플",
+        "reviews": 500,
+        "independentReviews": 387,
+        "inflation": 1.292,
+        "rejected": {
+          "duplicate_content": 9,
+          "same_author": 104
+        }
+      },
+      "p033": {
+        "displayName": "셀라딕스 트러블 세범 리밸런싱 앰플",
+        "reviews": 500,
+        "independentReviews": 384,
+        "inflation": 1.3021,
+        "rejected": {
+          "duplicate_content": 14,
+          "same_author": 102
+        }
+      },
+      "p034": {
+        "displayName": "아누아 TXA 나이아신 흔적 세럼",
+        "reviews": 500,
+        "independentReviews": 291,
+        "inflation": 1.7182,
+        "rejected": {
+          "duplicate_content": 1,
+          "same_author": 208
+        }
+      },
+      "p035": {
+        "displayName": "아누아 피디알엔 히알루론산 캡슐 100 세럼",
+        "reviews": 500,
+        "independentReviews": 344,
+        "inflation": 1.4535,
+        "rejected": {
+          "duplicate_content": 9,
+          "same_author": 147
+        }
+      },
+      "p036": {
+        "displayName": "아이오페 레티놀 슈퍼 바운스 세럼",
+        "reviews": 500,
+        "independentReviews": 301,
+        "inflation": 1.6611,
+        "rejected": {
+          "duplicate_content": 9,
+          "same_author": 190
+        }
+      },
+      "p037": {
+        "displayName": "웰라쥬 리얼 히알루로닉 블루 100 앰플",
+        "reviews": 500,
+        "independentReviews": 464,
+        "inflation": 1.0776,
+        "rejected": {
+          "duplicate_content": 6,
+          "same_author": 30
+        }
+      },
+      "p038": {
+        "displayName": "이니스프리 레티놀 시카 흔적 앰플",
+        "reviews": 500,
+        "independentReviews": 339,
+        "inflation": 1.4749,
+        "rejected": {
+          "duplicate_content": 9,
+          "same_author": 152
+        }
+      },
+      "p039": {
+        "displayName": "토리든 다이브인 저분자 히알루론산 세럼",
+        "reviews": 500,
+        "independentReviews": 356,
+        "inflation": 1.4045,
+        "rejected": {
+          "duplicate_content": 11,
+          "same_author": 133
+        }
+      },
+      "p040": {
+        "displayName": "파티온 노스카나인 트러블 세럼",
+        "reviews": 500,
+        "independentReviews": 422,
+        "inflation": 1.1848,
+        "rejected": {
+          "duplicate_content": 2,
+          "same_author": 76
+        }
+      },
+      "p041": {
+        "displayName": "닥터지 레드 블레미쉬 클리어 수딩크림",
+        "reviews": 500,
+        "independentReviews": 365,
+        "inflation": 1.3699,
+        "rejected": {
+          "duplicate_content": 9,
+          "same_author": 126
+        }
+      },
+      "p042": {
+        "displayName": "라로슈포제 시카플라스트 밤 B5+",
+        "reviews": 500,
+        "independentReviews": 450,
+        "inflation": 1.1111,
+        "rejected": {
+          "duplicate_content": 4,
+          "same_author": 46
+        }
+      },
+      "p043": {
+        "displayName": "메디큐브 PDRN 핑크 콜라겐 캡슐크림",
+        "reviews": 500,
+        "independentReviews": 386,
+        "inflation": 1.2953,
+        "rejected": {
+          "duplicate_content": 12,
+          "same_author": 102
+        }
+      },
+      "p044": {
+        "displayName": "아누아 피디알엔 히알루론산 100 수분크림",
+        "reviews": 500,
+        "independentReviews": 355,
+        "inflation": 1.4085,
+        "rejected": {
+          "duplicate_content": 9,
+          "same_author": 136
+        }
+      },
+      "p045": {
+        "displayName": "에스네이처 아쿠아 스쿠알란 수분크림",
+        "reviews": 500,
+        "independentReviews": 402,
+        "inflation": 1.2438,
+        "rejected": {
+          "duplicate_content": 5,
+          "same_author": 93
+        }
+      },
+      "p046": {
+        "displayName": "에스트라 아토베리어365 크림",
+        "reviews": 500,
+        "independentReviews": 446,
+        "inflation": 1.1211,
+        "rejected": {
+          "duplicate_content": 7,
+          "same_author": 47
+        }
+      },
+      "p047": {
+        "displayName": "유세린 하이알루론 3X 아이크림",
+        "reviews": 500,
+        "independentReviews": 359,
+        "inflation": 1.3928,
+        "rejected": {
+          "duplicate_content": 7,
+          "same_author": 134
+        }
+      },
+      "p048": {
+        "displayName": "제로이드 인텐시브 크림",
+        "reviews": 500,
+        "independentReviews": 343,
+        "inflation": 1.4577,
+        "rejected": {
+          "duplicate_content": 12,
+          "same_author": 145
+        }
+      },
+      "p049": {
+        "displayName": "토리든 다이브인 히알루론산 수딩 크림",
+        "reviews": 500,
+        "independentReviews": 358,
+        "inflation": 1.3966,
+        "rejected": {
+          "duplicate_content": 10,
+          "same_author": 132
+        }
+      },
+      "p050": {
+        "displayName": "피지오겔 DMT 페이셜크림",
+        "reviews": 500,
+        "independentReviews": 329,
+        "inflation": 1.5198,
+        "rejected": {
+          "same_author": 171
+        }
+      },
+      "p051": {
+        "displayName": "컬러그램 누디 블러 틴트 (기존 용기)",
+        "reviews": 7,
+        "independentReviews": 7,
+        "inflation": 1.0,
+        "rejected": {}
+      },
+      "p052": {
+        "displayName": "에스쁘아 비벨벳 커버쿠션 (2025 리뉴얼 이전)",
+        "reviews": 4,
+        "independentReviews": 4,
+        "inflation": 1.0,
+        "rejected": {}
+      },
+      "p053": {
+        "displayName": "헤라 블랙 쿠션 (2024 리뉴얼 이전)",
+        "reviews": 159,
+        "independentReviews": 92,
+        "inflation": 1.7283,
+        "rejected": {
+          "same_author": 67
+        }
+      }
+    }
+  },
+  "axisCoverage": {
+    "note": "제품 안에서만 센다 — 합치는 단위가 productId 다",
+    "reviews": 25000,
+    "removedByContentHashOnly": 695,
+    "removedByAuthorOnly": 5599,
+    "removedByBoth": 5608,
+    "rejectedAsDuplicateContentInGate": 416,
+    "residualIfContentHashOnly": 4913,
+    "residualIfContentHashOnlyPct": 19.65,
+    "residualIfAuthorOnly": 9,
+    "contentHashCoverageOfBothPct": 12.39
+  },
+  "orderSensitivity": {
+    "samePassedSet": true,
+    "reasonCounts": {
+      "contentFirst": {
+        "duplicate_content": 416,
+        "same_author": 5192
+      },
+      "authorFirst": {
+        "duplicate_content": 11,
+        "same_author": 5597
+      }
+    },
+    "reviewsWithDifferentReason": 405,
+    "note": "통과 집합은 순서와 무관하고 사유 귀속만 달라진다. 좁은 판정(본문 완전일치)을 먼저 붙이는 쪽을 택했다 — '왜 빠졌나'가 읽기 쉽다"
+  },
+  "gateOrder": {
+    "independentReviewsGate1Then2": 17672,
+    "independentReviewsGate2Then1": 17585,
+    "evidenceLostIfFlipped": 87,
+    "productsAffected": 15,
+    "note": "뒤집으면 컷된 리뷰가 1표를 가져가고, 그 1표가 게이트1에서 탈락하면서 살아 있던 같은 작성자의 리뷰까지 함께 사라진다"
+  },
+  "sufficiencyImpact": {
+    "nMin": 8,
+    "cells": 407,
+    "atLeastNminRaw": 314,
+    "atLeastNminAfterGate2": 296,
+    "atLeastNminAfterGate1And2": 283,
+    "reviewsAfterGate1And2": 17672,
+    "note": "셀 크기는 게이트2 통과 수다. 줄어든 셀은 손실이 아니라 원래 없던 근거다. 입수 프로파일(v5_ingest_profile.json)의 297·284 는 작성자 축만 건 수치라 본문 해시 축이 더해진 여기서 각각 1 셀씩 낮다"
+  }
+}
