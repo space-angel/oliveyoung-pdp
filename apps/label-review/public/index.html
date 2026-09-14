@@ -166,6 +166,16 @@
   .coach .acts { display:flex; justify-content:space-between; align-items:center; gap:10px; margin-top:18px; } .coach .acts .btn { height:48px; padding:0 22px; min-width:0; } .coach .acts .btn:disabled { opacity:.45; cursor:default; }
   header .navpill.guide { border:1px solid rgba(255,255,255,.14); background:transparent; color:var(--fg2); cursor:pointer; font-family:inherit; font-size:16px; gap:8px; padding:0 16px 0 10px; transition:background .15s; }
   header .navpill.guide:hover { background:var(--card2); } header .navpill.guide .q { width:22px; height:22px; border-radius:50%; background:var(--blue-bg); color:var(--blue); font-size:13px; font-weight:800; display:inline-flex; align-items:center; justify-content:center; }
+  /* 저장 중: 상단 진행 바, 누른 버튼에 스피너, 나머지 버튼 잠금 */
+  body.busy::before { content:''; position:fixed; left:0; top:0; height:3px; width:30%; background:var(--blue); z-index:50; border-radius:0 3px 3px 0; animation:loadbar 1s ease-in-out infinite; }
+  @keyframes loadbar { 0% { left:-30%; } 100% { left:100%; } }
+  body.busy .btn, body.busy .sm, body.busy .chip, body.busy .opt { pointer-events:none; }
+  body.busy .btn:not(.loading), body.busy .sm, body.busy .opt { opacity:.55; }
+  .btn.loading { position:relative; color:transparent !important; }
+  .btn.loading small { visibility:hidden; }
+  .btn.loading::after { content:''; position:absolute; left:50%; top:50%; width:20px; height:20px; margin:-10px 0 0 -10px; border-radius:50%; border:2px solid currentColor; border-top-color:transparent; color:var(--fg); animation:spin .7s linear infinite; }
+  .btn.white.loading::after { color:#0C0C0E; }
+  @keyframes spin { to { transform:rotate(360deg); } }
   [hidden] { display:none !important; }
 </style>
 </head>
@@ -185,11 +195,22 @@ const S = { me:null, view:null, idx:0, screen:'start', editing:false, draft:null
 const STANCE = { positive:'긍정', negative:'부정', neutral:'중립' };
 const NEXT = { positive:'negative', negative:'neutral', neutral:'positive' };
 
+let lastBtn = null;   // 마지막으로 누른 버튼 — 저장 중 스피너를 여기에 붙인다
+document.addEventListener('pointerdown', ev => { lastBtn = ev.target.closest('.btn, .sm, .chip') || null; }, true);
+function setBusy(on, btn) {
+  document.body.classList.toggle('busy', on);
+  document.querySelectorAll('.btn.loading').forEach(b => b.classList.remove('loading'));
+  if (on && btn && btn.classList.contains('btn')) btn.classList.add('loading');
+}
 async function api(path, body) {
-  const r = await fetch(path, body ? {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body)} : undefined);
-  const j = await r.json().catch(()=>({error:'서버 응답을 읽을 수 없어요'}));
-  if (!r.ok) throw new Error(j.error || r.statusText);
-  return j;
+  const busy = !!body;   // GET 은 화면 로드라 조용히, POST(저장·완료·시작)만 표시
+  if (busy) setBusy(true, lastBtn);
+  try {
+    const r = await fetch(path, body ? {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body)} : undefined);
+    const j = await r.json().catch(()=>({error:'서버 응답을 읽을 수 없어요'}));
+    if (!r.ok) throw new Error(j.error || r.statusText);
+    return j;
+  } finally { if (busy) setBusy(false); }
 }
 const minutes = () => Math.max(0.5, Math.round((Date.now()-S.startedAt)/60000*2)/2);
 
@@ -315,11 +336,14 @@ function verdictText(d) {
 }
 function redrawJudge(msg) {
   const y = window.scrollY, missedOpen = !!$('.missed')?.open;
+  const anchorTop = $('.missed')?.getBoundingClientRect().top;   // 이 상자가 화면에서 있던 자리
   const openCards = new Set([...document.querySelectorAll('.card .ctx.open')].map(e => e.closest('.card')?.querySelector('mark')?.textContent));
   renderJudge(msg);
   if (missedOpen && $('.missed')) $('.missed').open = true;
   document.querySelectorAll('.card').forEach(c => { if (openCards.has(c.querySelector('mark')?.textContent)) c.querySelector('.ctx')?.classList.add('open'); });
   window.scrollTo({ top: y, behavior: 'instant' });   // scroll-behavior:smooth 이라 기본 scrollTo 는 애니메이션이 된다
+  const m = $('.missed');
+  if (m && anchorTop != null) window.scrollBy({ top: m.getBoundingClientRect().top - anchorTop, behavior: 'instant' });   // 위에 카드가 늘어난 만큼 보정
 }
 function renderJudge(msg) {
   const c = S.view.candidates[S.idx];
