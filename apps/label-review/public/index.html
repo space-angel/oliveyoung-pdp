@@ -301,7 +301,9 @@ function renderNoWork() {
   // 상한(1인당 제품 수)에 닿았으면 "없다"가 아니라 "여기까지" — 판단은 이미 저장돼 있다
   $('#main').innerHTML = p.limitReached
     ? `<div class="track fade"><h1 class="display mint">여기까지예요</h1><p class="sub white">고마워요, ${esc(S.me.name)}. 판단은 모두 저장됐어요. 제품 ${p.doneBundles}개를 봤어요.</p></div>`
-    : `<div class="track fade"><h1 class="display white">지금은 볼 제품이 없어요</h1><p class="sub white">모든 제품이 배정됐어요. 고마워요, ${esc(S.me.name)}.${p.doneBundles ? ` 지금까지 제품 ${p.doneBundles}개.` : ''}</p></div>`;
+    : `<div class="track fade"><h1 class="display white">지금은 볼 제품이 없어요</h1><p class="sub white">모든 제품이 배정됐어요. 고마워요, ${esc(S.me.name)}.${p.doneBundles ? ` 지금까지 제품 ${p.doneBundles}개.` : ''}</p></div>
+       <div class="actions fade"><button class="btn ghost" id="restart">다른 이름으로 다시 시작</button></div>`;
+  $('#restart')?.addEventListener('click', () => { try { localStorage.removeItem('labeler'); } catch (e) {} S.me = null; S.view = null; renderStart(); });
 }
 
 // ---------- 판정 ----------

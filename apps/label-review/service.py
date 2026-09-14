@@ -189,6 +189,8 @@ class Service:
             return mine
         if self.limit_reached(lid):
             return None
+        # 라벨러 행이 없으면(브라우저에 id 만 남고 DB 에서 지워진 경우) FK 때문에 배정 insert 가 전부 실패해 '볼 제품 없음'으로 보인다 → 먼저 복구
+        self.store.upsert_labeler({"labelerId": lid, "name": (name or lid).strip()})
         taken: set[str] = set()
         stale: dict[str, dict] = {}
         for a in self.store.assignments():
