@@ -39,7 +39,7 @@ LABEL_ADMIN_KEY=비밀 python3 apps/label-review/server.py      # → http://127
 
 | 변수 | 무엇 | 기본 |
 |---|---|---|
-| `SUPABASE_URL` | Supabase 프로젝트 URL (`https://xxxx.supabase.co`). `SUPABASE_SERVICE_KEY` 와 둘 다 있으면 SupabaseStore | 없음 → LocalStore |
+| `SUPABASE_URL` | Supabase 프로젝트 URL (`https://xxxx.supabase.co`, Project Settings → Data API 의 Project URL. `/rest/v1` 은 붙이지 않아도 되고 붙어 있어도 된다). `SUPABASE_SERVICE_KEY` 와 둘 다 있으면 SupabaseStore | 없음 → LocalStore |
 | `SUPABASE_SERVICE_KEY` | **service role** 키. 서버와 운영자의 `sync_supabase.py` 에서만 쓴다. anon 키가 아니고, 브라우저에 절대 내보내지 않는다 (RLS 정책이 없어 anon 은 전부 차단) | 없음 |
 | `LABEL_ACCESS_CODE` | 라벨러에게 줄 접속 코드. 비우면 이름만으로 들어온다 | 없음 |
 | `LABEL_MAX_BUNDLES` | 한 사람이 받을 수 있는 번들 수. `0` 은 무제한 | `2` |

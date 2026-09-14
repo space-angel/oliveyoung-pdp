@@ -20,6 +20,7 @@
 from __future__ import annotations
 
 import json
+import re
 import os
 import urllib.error
 import urllib.parse
@@ -125,7 +126,7 @@ class SupabaseStore:
     """PostgREST. 테이블 스키마는 apps/label-review/supabase/schema.sql. service role 키는 서버에서만 쓴다."""
 
     def __init__(self, url: str, key: str):
-        self.base = url.rstrip("/") + "/rest/v1"
+        self.base = re.sub(r"/rest/v1/?$", "", url.strip().rstrip("/")) + "/rest/v1"  # 대시보드에서 복사한 URL 에 /rest/v1 이 붙어 와도 그대로 동작
         self.key = key
 
     def _req(self, method: str, table: str, *, params: dict | None = None, body=None, prefer: str | None = None):
