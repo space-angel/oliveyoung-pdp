@@ -357,8 +357,11 @@ function renderJudge(msg) {
   const c = S.view.candidates[S.idx];
   const decided = c.decision || null;
   if (decided) S.editing = false;
+  // 판단이 끝난 카드는 저장된 라벨(고친 질문·답·근거)을 보여준다 — 후보 원본이 아니라
+  const saved = decided?.labelId ? (S.view.labels || []).find(l => l.labelId === decided.labelId) : null;
+  const shown = saved ? { question: saved.question, answer: saved.answer, evidence: saved.evidence } : c;
   const d = S.draft || { question:c.question, answer:c.answer, aspect:c.aspect, evidence: c.quotes.map(q=>({reviewId:q.reviewId, stance:q.stance, quote:q.quote})) };
-  const quotes = S.editing ? d.evidence.map(e => {
+  const quotes = (S.editing || saved) ? (S.editing ? d.evidence : saved.evidence).map(e => {
     const q = c.quotes.find(x=>x.reviewId===e.reviewId && x.quote===e.quote);
     if (q) return {...q, ...e};
     // 놓친 리뷰에서 새로 넣은 근거 — 후보 인용이 아니라 메타가 없으니 번들 리뷰에서 채운다 (별점·조건·앞뒤 원문)
@@ -374,7 +377,7 @@ function renderJudge(msg) {
   <div class="track fade ${S.editing?'editing':''}" id="cand">
     <div class="pills"><span class="pill blue">질문 후보 ${S.idx+1} / ${S.view.candidates.length}</span><span class="pill">${esc(c.aspect || '주제 없음')}</span></div>
     ${S.editing ? `<div class="field"><label>질문</label><textarea class="big" id="eq">${esc(d.question)}</textarea></div><div class="field"><label>답 — 리뷰가 말하는 것</label><textarea id="ea">${esc(d.answer)}</textarea></div>`
-                : `<h1 class="display">${esc(c.question)}</h1><p class="sub">${esc(c.answer)}</p>`}
+                : `<h1 class="display">${esc(shown.question)}</h1><p class="sub">${esc(shown.answer)}</p>`}
     <div class="pills" id="counts"></div>
     ${warn.length ? `<div class="msg warn">${warn.map(esc).join('<br>')}</div>` : ''}
   </div>
@@ -391,7 +394,7 @@ function renderJudge(msg) {
     : `<div class="dock"><div class="criteria"><span><b>1</b> 굵은 문장이 이 답을 실제로 말하나요?</span><span><b>2</b> 한 명의 특수한 사정이 아니라, 다른 구매자도 겪을 얘기인가요?</span><span><b>3</b> 사기 전에 물어볼 만한 질문인가요?</span>${help('criteria')}</div>
        <div class="actions">${S.idx>0?'<button class="btn ghost" id="prev">〈 이전</button>':''}<button class="btn white" id="accept">맞아요 <small>셋 다 그래요</small></button><button class="btn" id="edit">고칠게요 <small>문장·근거 수정</small></button><button class="btn coral" id="reject">아니에요 <small>이유 하나 선택</small></button></div></div>`}`;
   renderCounts(quotes);
-  watchHero(c);
+  watchHero({ question: shown.question, answer: shown.answer });
   if (S.editing) S.draft = d;
   $('#accept')?.addEventListener('click', () => decide({kind:'accept'}));
   $('#next')?.addEventListener('click', goNext);
