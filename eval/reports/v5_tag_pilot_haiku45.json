@@ -1,0 +1,348 @@
+{
+  "issue": "PER-175",
+  "label": "pilot_haiku45",
+  "tagger": "claude-haiku-4-5",
+  "prompt": {
+    "path": "pipeline/prompts/tag/v1.md",
+    "sha256": "a8cc2a7d4cb7eb3583df4b2a7c80ca7336e8dface0d7ec9d1175abd9c23079eb",
+    "schemaVersion": "tag-v1"
+  },
+  "sample": {
+    "path": "eval/gold/v5_tag_pilot_sample.jsonl",
+    "sha256": "bc3033cb5b0225f58c95ac2a5896545d9e97303de9dfff01fe2198dfeb69537c",
+    "seed": 20260904,
+    "strata": [
+      {
+        "name": "rating_1_2",
+        "population": 407,
+        "sampled": 60,
+        "skinTypeStated": 30,
+        "skinTypeMissing": 30,
+        "weight": 6.7833
+      },
+      {
+        "name": "rating_3",
+        "population": 828,
+        "sampled": 40,
+        "skinTypeStated": 20,
+        "skinTypeMissing": 20,
+        "weight": 20.7
+      },
+      {
+        "name": "rating_4",
+        "population": 2403,
+        "sampled": 40,
+        "skinTypeStated": 20,
+        "skinTypeMissing": 20,
+        "weight": 60.075
+      },
+      {
+        "name": "rating_5",
+        "population": 21362,
+        "sampled": 60,
+        "skinTypeStated": 30,
+        "skinTypeMissing": 30,
+        "weight": 356.0333
+      }
+    ]
+  },
+  "profile": {
+    "reviews": 200,
+    "tags": 254,
+    "tagsPerReview": 1.27,
+    "coverage": {
+      "reviewsWithTag": 157,
+      "pctReviewsWithTag": 78.5,
+      "silentReviews": 43
+    },
+    "snippet": {
+      "verbatimStrict": 254,
+      "pctVerbatimStrict": 100.0,
+      "verbatimAfterWhitespaceFold": 254,
+      "maxLen": 46,
+      "note": "v4 는 88.8% 였다. 계약은 100% 를 요구한다 — 미달이면 validate_tags 가 이미 세운다"
+    },
+    "polarity": {
+      "positive": 148,
+      "negative": 102,
+      "neutral": 4
+    },
+    "ratingDisagreement": {
+      "count": 29,
+      "pct": 11.4,
+      "note": "오류가 아니라 게이트3 플래그. 5점 리뷰의 불만을 잡았다는 뜻"
+    },
+    "mixedDirectionReviews": {
+      "count": 21,
+      "pct": 10.5,
+      "note": "리뷰 단위 감성으로는 표현 불가능한 몫. (리뷰 × 주제) 단위의 근거"
+    },
+    "aspects": {
+      "distinct": 14,
+      "unusedOfTaxonomy": [],
+      "top6Share": 76.0,
+      "counts": {
+        "발림감/텍스처": 41,
+        "보습감": 39,
+        "트러블/자극": 36,
+        "발색": 35,
+        "유분/번들거림": 21,
+        "지속성": 21,
+        "흡수력": 17,
+        "커버력": 11,
+        "밀착력": 9,
+        "광택/윤기": 9,
+        "향": 5,
+        "탄력/탱탱함": 5,
+        "가성비": 4,
+        "분사력": 1
+      }
+    },
+    "skinTypeHint": {
+      "tagsWithHint": 57,
+      "reviewsWithHint": 37,
+      "onMissingCondition": 14,
+      "conflictWithCondition": [
+        {
+          "reviewId": 21046157,
+          "condition": "A03",
+          "hint": "A01"
+        },
+        {
+          "reviewId": 32320525,
+          "condition": "A02",
+          "hint": "A03"
+        },
+        {
+          "reviewId": 10551325,
+          "condition": "A03",
+          "hint": "A01"
+        },
+        {
+          "reviewId": 63327651,
+          "condition": "A06",
+          "hint": "A01"
+        },
+        {
+          "reviewId": 49816619,
+          "condition": "A04",
+          "hint": "A01"
+        },
+        {
+          "reviewId": 61639725,
+          "condition": "A01",
+          "hint": "A04"
+        },
+        {
+          "reviewId": 7800110,
+          "condition": "A03",
+          "hint": "A04"
+        },
+        {
+          "reviewId": 39732419,
+          "condition": "A02",
+          "hint": "A05"
+        },
+        {
+          "reviewId": 29934025,
+          "condition": "A05",
+          "hint": "A02"
+        },
+        {
+          "reviewId": 24154192,
+          "condition": "A05",
+          "hint": "A03"
+        },
+        {
+          "reviewId": 38248029,
+          "condition": "A03",
+          "hint": "A04"
+        },
+        {
+          "reviewId": 29593705,
+          "condition": "A01",
+          "hint": "A03"
+        }
+      ],
+      "note": "onMissingCondition 이 조건축을 실제로 늘린 몫이다 (v4 는 이 값을 집계에서 잃었다)"
+    },
+    "perStratum": {
+      "rating_1_2": {
+        "reviews": 60,
+        "tagged": 48,
+        "tags": 71,
+        "tagsPerReview": 1.18,
+        "polarity": {
+          "positive": 12,
+          "negative": 58,
+          "neutral": 1
+        }
+      },
+      "rating_3": {
+        "reviews": 40,
+        "tagged": 31,
+        "tags": 45,
+        "tagsPerReview": 1.12,
+        "polarity": {
+          "positive": 17,
+          "negative": 27,
+          "neutral": 1
+        }
+      },
+      "rating_4": {
+        "reviews": 40,
+        "tagged": 29,
+        "tags": 45,
+        "tagsPerReview": 1.12,
+        "polarity": {
+          "positive": 35,
+          "negative": 9,
+          "neutral": 1
+        }
+      },
+      "rating_5": {
+        "reviews": 60,
+        "tagged": 49,
+        "tags": 93,
+        "tagsPerReview": 1.55,
+        "polarity": {
+          "positive": 84,
+          "negative": 8,
+          "neutral": 1
+        }
+      }
+    }
+  },
+  "corpusEstimate": {
+    "corpusReviews": 25000,
+    "estTags": 37228,
+    "estTagsPerReview": 1.49,
+    "estNegativeShare": 11.7,
+    "sampleNegativeShare": 40.2,
+    "perStratum": {
+      "rating_1_2": {
+        "sampleTags": 71,
+        "weight": 6.7833,
+        "estCorpusTags": 482
+      },
+      "rating_3": {
+        "sampleTags": 45,
+        "weight": 20.7,
+        "estCorpusTags": 932
+      },
+      "rating_4": {
+        "sampleTags": 45,
+        "weight": 60.075,
+        "estCorpusTags": 2703
+      },
+      "rating_5": {
+        "sampleTags": 93,
+        "weight": 356.0333,
+        "estCorpusTags": 33111
+      }
+    },
+    "note": "표본은 희소 클래스를 과표집했다. 코퍼스 수치는 가중치로 되돌린 추정이고 표본 수치와 다르다"
+  },
+  "comparison": {
+    "goldPairs": 432,
+    "candidatePairs": 254,
+    "overlap": 214,
+    "precision": 84.3,
+    "recall": 49.5,
+    "polarityAgreementOnOverlap": 97.7,
+    "missedByCandidate": [
+      "10151614:발림감/텍스처",
+      "10151614:향",
+      "10551325:가성비",
+      "11516742:가성비",
+      "11516742:향",
+      "11886119:가성비",
+      "11886119:발림감/텍스처",
+      "21046157:보습감",
+      "21808809:가성비",
+      "22159121:유분/번들거림",
+      "22159121:지속성",
+      "22159121:트러블/자극",
+      "23309143:가성비",
+      "23309143:지속성",
+      "24113860:가성비",
+      "24113860:분사력",
+      "24154192:가성비",
+      "24154192:광택/윤기",
+      "24833075:가성비",
+      "25495639:가성비",
+      "25495639:밀착력",
+      "25837778:가성비",
+      "26552632:가성비",
+      "26843518:발림감/텍스처",
+      "26843518:흡수력",
+      "28077603:가성비",
+      "28077603:발색",
+      "28077603:분사력",
+      "28810511:가성비",
+      "29593705:발림감/텍스처",
+      "29593705:지속성",
+      "29934025:트러블/자극",
+      "32320525:향",
+      "34521596:가성비",
+      "34521596:보습감",
+      "34686144:가성비",
+      "35565215:가성비",
+      "35565215:트러블/자극",
+      "36204872:발림감/텍스처",
+      "36204872:트러블/자극",
+      "37409582:가성비",
+      "37635624:가성비",
+      "37635624:광택/윤기",
+      "37635624:발림감/텍스처",
+      "37761237:가성비",
+      "37761237:발림감/텍스처",
+      "38248029:발림감/텍스처",
+      "38248029:발색",
+      "38248029:지속성",
+      "39732419:가성비"
+    ],
+    "extraInCandidate": [
+      "11516742:보습감",
+      "11886119:흡수력",
+      "21046157:유분/번들거림",
+      "22159121:광택/윤기",
+      "25837778:광택/윤기",
+      "26843518:밀착력",
+      "28077603:커버력",
+      "29934025:탄력/탱탱함",
+      "35565215:발림감/텍스처",
+      "37409582:지속성",
+      "37761237:커버력",
+      "38248029:광택/윤기",
+      "39732419:지속성",
+      "4119503:보습감",
+      "54190893:탄력/탱탱함",
+      "58459899:트러블/자극",
+      "61313541:지속성",
+      "61639725:유분/번들거림",
+      "61892256:발림감/텍스처",
+      "62235031:탄력/탱탱함",
+      "62434536:발색",
+      "62867684:발림감/텍스처",
+      "62867684:탄력/탱탱함",
+      "63140144:분사력",
+      "63163701:발색",
+      "63327651:트러블/자극",
+      "63358864:발색",
+      "63435402:유분/번들거림",
+      "63456706:광택/윤기",
+      "63456706:발림감/텍스처",
+      "63491955:트러블/자극",
+      "63624404:발림감/텍스처",
+      "63668502:발림감/텍스처",
+      "63712242:발림감/텍스처",
+      "63721797:밀착력",
+      "63731163:밀착력",
+      "63739906:발색",
+      "63800153:보습감",
+      "63908757:보습감",
+      "63982690:유분/번들거림"
+    ]
+  }
+}
