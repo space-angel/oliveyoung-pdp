@@ -71,8 +71,9 @@ def parse_dotenv(text: str) -> dict[str, str]:
     return out
 
 
-def load_env(env_path: Path = ENV_PATH, environ: dict | None = None) -> dict[str, str]:
-    """.env 가 있으면 먼저, 환경변수가 그 위에 덮는다 (환경변수 우선)."""
+def load_env(env_path: Path | None = None, environ: dict | None = None) -> dict[str, str]:
+    """.env 가 있으면 먼저, 환경변수가 그 위에 덮는다 (환경변수 우선). 경로는 호출 시점의 ENV_PATH (테스트가 바꿀 수 있게)."""
+    env_path = ENV_PATH if env_path is None else env_path
     merged: dict[str, str] = {}
     if env_path.exists():
         merged.update(parse_dotenv(env_path.read_text()))
