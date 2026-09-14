@@ -151,7 +151,9 @@ def main() -> None:
     svc = get_service()
     kind = type(svc.store).__name__
     server = ThreadingHTTPServer(("0.0.0.0", args.port), handler)
-    print(f"리뷰 질문 검수 → http://127.0.0.1:{args.port}   저장소 {kind} · 접속 코드 {'있음' if svc.access_code else '없음'} · Ctrl-C 종료")
+    admin = "있음" if os.environ.get("LABEL_ADMIN_KEY") else "없음 → /admin 은 404"
+    print(f"리뷰 질문 검수 → http://127.0.0.1:{args.port}   저장소 {kind} · 접속 코드 {'있음' if svc.access_code else '없음'} · 관리자 키 {admin} · "
+          f"상한 {os.environ.get('LABEL_MAX_BUNDLES', '2')}개 · Ctrl-C 종료", flush=True)
     try:
         server.serve_forever()
     except KeyboardInterrupt:
