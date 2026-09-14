@@ -1,0 +1,106 @@
+{
+  "results": [
+    {
+      "reviewId": 61378639,
+      "aspects": [
+        {
+          "aspect": "발림감/텍스처",
+          "polarity": "positive",
+          "snippet": "뭉침 없이 자연스럽게 퍼져서 초보자도 사용하기 편했어요",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "발색",
+          "polarity": "positive",
+          "snippet": "실제 색감이 눈 위에서도 거의 그대로 발색된다는 점",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "지속성",
+          "polarity": "positive",
+          "snippet": "지속력도 괜찮은 편이라",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "가성비",
+          "polarity": "positive",
+          "snippet": "더 진한 색상도 구매해서 함께 사용해 보고 싶네요",
+          "skinTypeHint": null
+        }
+      ]
+    },
+    {
+      "reviewId": 61393817,
+      "aspects": [
+        {
+          "aspect": "발색",
+          "polarity": "positive",
+          "snippet": "은은한 뮤트색과 광이 진짜 이뻐요",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "광택/윤기",
+          "polarity": "positive",
+          "snippet": "은은한 뮤트색과 광이 진짜 이뻐요",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "발림감/텍스처",
+          "polarity": "positive",
+          "snippet": "발림성 넘 부드럽고",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "밀착력",
+          "polarity": "positive",
+          "snippet": "끼임없어서 바르기 편하고",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "향",
+          "polarity": "positive",
+          "snippet": "향도 은은하게 달달한데 인위적이지않고 좋구",
+          "skinTypeHint": null
+        }
+      ]
+    },
+    {
+      "reviewId": 61446147,
+      "aspects": [
+        {
+          "aspect": "트러블/자극",
+          "polarity": "negative",
+          "snippet": "이거 쓰고 피부 완전 뒤집어졌어요",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "밀착력",
+          "polarity": "negative",
+          "snippet": "화장도 안먹으요",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "가성비",
+          "polarity": "negative",
+          "snippet": "절대 사지마세요",
+          "skinTypeHint": null
+        }
+      ]
+    },
+    {
+      "reviewId": 61479701,
+      "aspects": []
+    },
+    {
+      "reviewId": 61497062,
+      "aspects": [
+        {
+          "aspect": "트러블/자극",
+          "polarity": "negative",
+          "snippet": "살짝 따가운느김 들엇슈",
+          "skinTypeHint": null
+        }
+      ]
+    }
+  ]
+}

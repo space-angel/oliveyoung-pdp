@@ -1,0 +1,89 @@
+{
+  "results": [
+    {
+      "reviewId": 63456706,
+      "aspects": [
+        {
+          "aspect": "보습감",
+          "polarity": "positive",
+          "snippet": "촉촉하게 발리면서도",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "밀착력",
+          "polarity": "positive",
+          "snippet": "피부에 얇고 균일하게 밀착돼",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "커버력",
+          "polarity": "positive",
+          "snippet": "붉은기와 잡티를 자연스럽게 가려주고",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "지속성",
+          "polarity": "positive",
+          "snippet": "시간이 지나도 다크닝이 심하지 않고 무너짐도 예쁘게 유지돼",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "가성비",
+          "polarity": "positive",
+          "snippet": "가격 대비 만족도가 높아",
+          "skinTypeHint": null
+        }
+      ]
+    },
+    {
+      "reviewId": 63458429,
+      "aspects": [
+        {
+          "aspect": "흡수력",
+          "polarity": "positive",
+          "snippet": "흡수도 잘 돼고",
+          "skinTypeHint": null
+        }
+      ]
+    },
+    {
+      "reviewId": 63462862,
+      "aspects": [
+        {
+          "aspect": "발색",
+          "polarity": "negative",
+          "snippet": "공홈보다 뮤트하고 흰끼돌아서 당황했습니다",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "가성비",
+          "polarity": "negative",
+          "snippet": "재구매는 굳이 안 할 듯해요",
+          "skinTypeHint": null
+        }
+      ]
+    },
+    {
+      "reviewId": 63487343,
+      "aspects": [
+        {
+          "aspect": "분사력",
+          "polarity": "negative",
+          "snippet": "바르려고 하면 부러지고",
+          "skinTypeHint": null
+        }
+      ]
+    },
+    {
+      "reviewId": 63488559,
+      "aspects": [
+        {
+          "aspect": "가성비",
+          "polarity": "negative",
+          "snippet": "질감 대비 가격이 비싼 느낌",
+          "skinTypeHint": null
+        }
+      ]
+    }
+  ]
+}

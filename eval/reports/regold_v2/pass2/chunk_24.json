@@ -1,0 +1,117 @@
+{
+  "results": [
+    {
+      "reviewId": 63140144,
+      "aspects": [
+        {
+          "aspect": "가성비",
+          "polarity": "positive",
+          "snippet": "오특으로 올라 올때마다 쟁이는편",
+          "skinTypeHint": null
+        }
+      ]
+    },
+    {
+      "reviewId": 63152698,
+      "aspects": [
+        {
+          "aspect": "보습감",
+          "polarity": "positive",
+          "snippet": "촉촉하고 수분감이 가득해서 좋았습니다",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "발색",
+          "polarity": "positive",
+          "snippet": "발색이 잘 되었습니다",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "지속성",
+          "polarity": "negative",
+          "snippet": "지속력은 짧은 편이에요",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "발림감/텍스처",
+          "polarity": "positive",
+          "snippet": "퍼프에 묻힐 때 부들부들하고 기분이 좋습니다",
+          "skinTypeHint": null
+        }
+      ]
+    },
+    {
+      "reviewId": 63163701,
+      "aspects": [
+        {
+          "aspect": "밀착력",
+          "polarity": "positive",
+          "snippet": "베이스 까짐 없는 건 원탑인 것 같아요",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "지속성",
+          "polarity": "negative",
+          "snippet": "지속력은 한 4시간 쯤 지나면 수정해줘야 하고요",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "발림감/텍스처",
+          "polarity": "positive",
+          "snippet": "미니퍼프가 좀 찰진 퍼프여야 발색도 잘 올라가고 바르기 쉬워요",
+          "skinTypeHint": null
+        }
+      ]
+    },
+    {
+      "reviewId": 63164740,
+      "aspects": [
+        {
+          "aspect": "트러블/자극",
+          "polarity": "positive",
+          "snippet": "피부가 정말 뒤집어질 때마다 약처럼 쓰는 아이템입니다",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "보습감",
+          "polarity": "positive",
+          "snippet": "보습력은 두말할 필요 없이 좋고",
+          "skinTypeHint": null
+        }
+      ]
+    },
+    {
+      "reviewId": 63198048,
+      "aspects": [
+        {
+          "aspect": "지속성",
+          "polarity": "negative",
+          "snippet": "지속력이 너무 짧아여",
+          "skinTypeHint": null
+        }
+      ]
+    }
+  ],
+  "reviewNotes": [
+    {
+      "reviewId": 63140144,
+      "note": "사용기한은 도포 후 지속성과 다름."
+    },
+    {
+      "reviewId": 63152698,
+      "note": "14축 재검토 완료. 추가로 확정할 축 없음. 1차 태그 유지."
+    },
+    {
+      "reviewId": 63163701,
+      "note": "찰진 퍼프 조건의 발림 용이함 회수. 발색 강도 호평과 색감 불만이 같은 축이므로 발색 제외."
+    },
+    {
+      "reviewId": 63164740,
+      "note": "두껍게 바르는 사용량은 제형 자체의 두꺼움이 아님."
+    },
+    {
+      "reviewId": 63198048,
+      "note": "14축 재검토 완료. 추가로 확정할 축 없음. 1차 태그 유지."
+    }
+  ]
+}

@@ -1,0 +1,105 @@
+{
+  "results": [
+    {
+      "reviewId": 62812410,
+      "aspects": [
+        {
+          "aspect": "트러블/자극",
+          "polarity": "negative",
+          "snippet": "이거만 사용하면 얼굴에 좁쌀 다음날에 장난아님",
+          "skinTypeHint": null
+        }
+      ]
+    },
+    {
+      "reviewId": 62822430,
+      "aspects": [
+        {
+          "aspect": "가성비",
+          "polarity": "positive",
+          "snippet": "전반적으로 가성비 만족",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "분사력",
+          "polarity": "positive",
+          "snippet": "그리기 편함",
+          "skinTypeHint": null
+        }
+      ]
+    },
+    {
+      "reviewId": 62867684,
+      "aspects": [
+        {
+          "aspect": "보습감",
+          "polarity": "positive",
+          "snippet": "촉촉하게 발리는데",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "광택/윤기",
+          "polarity": "positive",
+          "snippet": "광택도 너무 예뻐요",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "발색",
+          "polarity": "positive",
+          "snippet": "차분하면서 분위기 있어서",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "가성비",
+          "polarity": "positive",
+          "snippet": "다 쓰면 또 재구매할 것 같습니다",
+          "skinTypeHint": null
+        }
+      ]
+    },
+    {
+      "reviewId": 62875560,
+      "aspects": [
+        {
+          "aspect": "가성비",
+          "polarity": "negative",
+          "snippet": "다시쓸일 없을듯",
+          "skinTypeHint": null
+        }
+      ]
+    },
+    {
+      "reviewId": 62880857,
+      "aspects": [
+        {
+          "aspect": "가성비",
+          "polarity": "negative",
+          "snippet": "돈만 날린 기분이랄까 재구매 의사 없습니다",
+          "skinTypeHint": null
+        }
+      ]
+    }
+  ],
+  "reviewNotes": [
+    {
+      "reviewId": 62812410,
+      "note": "얼굴 좁쌀은 트러블 부정. 몸 모공각화증 개선은 이 프롬프트의 트러블/자극 증상 예시와 달라 자동 긍정으로 확장하지 않음."
+    },
+    {
+      "reviewId": 62822430,
+      "note": "스키니 펜슬의 그리기 편함은 도포 방식 성능으로 분사력 유지."
+    },
+    {
+      "reviewId": 62867684,
+      "note": "탱글해 보이는 광택 표현은 실제 탄력 회복과 구분."
+    },
+    {
+      "reviewId": 62875560,
+      "note": "맛은 향으로 바꾸지 않음. 사용 후 거부/재사용 의사 없음은 구매 후회로 유지."
+    },
+    {
+      "reviewId": 62880857,
+      "note": "14축 재검토 완료. 추가로 확정할 축 없음. 1차 태그 유지."
+    }
+  ]
+}

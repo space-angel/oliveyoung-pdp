@@ -1,0 +1,100 @@
+{
+  "results": [
+    {
+      "reviewId": 24833075,
+      "aspects": [
+        {
+          "aspect": "가성비",
+          "polarity": "positive",
+          "snippet": "좋은 기획으로 나와서",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "지속성",
+          "polarity": "positive",
+          "snippet": "확실히 타 제품들에 비해 지속력이 좋고",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "발색",
+          "polarity": "neutral",
+          "snippet": "전체적으로 옐로우 베이스 제품이 많아서",
+          "skinTypeHint": null
+        }
+      ]
+    },
+    {
+      "reviewId": 25495639,
+      "aspects": [
+        {
+          "aspect": "가성비",
+          "polarity": "negative",
+          "snippet": "비싸서 못 샀던",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "밀착력",
+          "polarity": "negative",
+          "snippet": "기초를 확실히 해줘야 안 뜬다는 점",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "커버력",
+          "polarity": "positive",
+          "snippet": "이 정도의 커버력과 지속력을 가질 수 있었던 게 아닐까",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "지속성",
+          "polarity": "positive",
+          "snippet": "이 정도의 커버력과 지속력을 가질 수 있었던 게 아닐까",
+          "skinTypeHint": null
+        }
+      ]
+    },
+    {
+      "reviewId": 25651605,
+      "aspects": []
+    },
+    {
+      "reviewId": 25837778,
+      "aspects": [
+        {
+          "aspect": "가성비",
+          "polarity": "negative",
+          "snippet": "이걸 왜 플미주면서 사는지 모르겠어요",
+          "skinTypeHint": null
+        }
+      ]
+    },
+    {
+      "reviewId": 26552632,
+      "aspects": [
+        {
+          "aspect": "트러블/자극",
+          "polarity": "positive",
+          "snippet": "진짜 순해서 입문용으로 추천해요",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "발림감/텍스처",
+          "polarity": "positive",
+          "snippet": "바르기 부담스럽지 않은 제형입니다",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "흡수력",
+          "polarity": "positive",
+          "snippet": "흡수가 빨라서 답답한 느낌 없어요",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "가성비",
+          "polarity": "negative",
+          "snippet": "가격은 쬐끔 비싼편이라서",
+          "skinTypeHint": null
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,76 @@
+{
+  "results": [
+    {
+      "reviewId": 63283705,
+      "aspects": []
+    },
+    {
+      "reviewId": 63287990,
+      "aspects": [
+        {
+          "aspect": "유분/번들거림",
+          "polarity": "positive",
+          "snippet": "기름도 적어졌다고 하네요",
+          "skinTypeHint": null
+        }
+      ]
+    },
+    {
+      "reviewId": 63326580,
+      "aspects": [
+        {
+          "aspect": "발림감/텍스처",
+          "polarity": "positive",
+          "snippet": "발림좋은 느낌뿐이네요",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "흡수력",
+          "polarity": "positive",
+          "snippet": "흡수는 잘 되고",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "트러블/자극",
+          "polarity": "positive",
+          "snippet": "트러블은 없었구요",
+          "skinTypeHint": null
+        }
+      ]
+    },
+    {
+      "reviewId": 63327598,
+      "aspects": [
+        {
+          "aspect": "트러블/자극",
+          "polarity": "negative",
+          "snippet": "이것만 쓰면 여드름 남",
+          "skinTypeHint": null
+        }
+      ]
+    },
+    {
+      "reviewId": 63327651,
+      "aspects": [
+        {
+          "aspect": "유분/번들거림",
+          "polarity": "negative",
+          "snippet": "지성피부는 기름져서",
+          "skinTypeHint": "A01"
+        },
+        {
+          "aspect": "지속성",
+          "polarity": "negative",
+          "snippet": "시간지나니 떡지고",
+          "skinTypeHint": "A01"
+        },
+        {
+          "aspect": "발림감/텍스처",
+          "polarity": "negative",
+          "snippet": "시간지나니 떡지고",
+          "skinTypeHint": "A01"
+        }
+      ]
+    }
+  ]
+}

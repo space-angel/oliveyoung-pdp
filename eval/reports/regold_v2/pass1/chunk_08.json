@@ -1,0 +1,101 @@
+{
+  "results": [
+    {
+      "reviewId": 44333221,
+      "aspects": [
+        {
+          "aspect": "가성비",
+          "polarity": "negative",
+          "snippet": "가격도 비싼편인데",
+          "skinTypeHint": null
+        }
+      ]
+    },
+    {
+      "reviewId": 46412276,
+      "aspects": [
+        {
+          "aspect": "유분/번들거림",
+          "polarity": "negative",
+          "snippet": "일단 유분이 좀 있습니다",
+          "skinTypeHint": "A01"
+        }
+      ]
+    },
+    {
+      "reviewId": 49428848,
+      "aspects": [
+        {
+          "aspect": "보습감",
+          "polarity": "positive",
+          "snippet": "진짜 촉촉한데",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "밀착력",
+          "polarity": "positive",
+          "snippet": "컬러 끼임 없이 매끄럽게 밀착될 정도로",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "발림감/텍스처",
+          "polarity": "positive",
+          "snippet": "뭉침이나 각질부각 없이 너무 깔끔해요",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "가성비",
+          "polarity": "positive",
+          "snippet": "온라인으로 쟁이는 김에",
+          "skinTypeHint": null
+        }
+      ]
+    },
+    {
+      "reviewId": 49577275,
+      "aspects": [
+        {
+          "aspect": "유분/번들거림",
+          "polarity": "negative",
+          "snippet": "이걸 바르면 기름이 올라오는 기분이라",
+          "skinTypeHint": "A02"
+        }
+      ]
+    },
+    {
+      "reviewId": 49583986,
+      "aspects": [
+        {
+          "aspect": "탄력/탱탱함",
+          "polarity": "negative",
+          "snippet": "피부 탄력 회복도 가시적인 효과는 없어요",
+          "skinTypeHint": "A02"
+        },
+        {
+          "aspect": "트러블/자극",
+          "polarity": "positive",
+          "snippet": "피부 당김이나 트러블 없어서",
+          "skinTypeHint": "A02"
+        },
+        {
+          "aspect": "흡수력",
+          "polarity": "positive",
+          "snippet": "흡수가 빠른 편이고",
+          "skinTypeHint": "A02"
+        },
+        {
+          "aspect": "유분/번들거림",
+          "polarity": "positive",
+          "snippet": "제품 특유의 유분감이 오히려 좋았으나",
+          "skinTypeHint": "A02"
+        },
+        {
+          "aspect": "분사력",
+          "polarity": "positive",
+          "snippet": "유리용기+스포이드형이라 위생적으로 사용하기 좋아요",
+          "skinTypeHint": "A02"
+        }
+      ]
+    }
+  ]
+}

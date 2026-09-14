@@ -1,0 +1,87 @@
+{
+  "results": [
+    {
+      "reviewId": 62883889,
+      "aspects": [
+        {
+          "aspect": "지속성",
+          "polarity": "positive",
+          "snippet": "지속렷도 좋아서",
+          "skinTypeHint": null
+        }
+      ]
+    },
+    {
+      "reviewId": 62892619,
+      "aspects": [
+        {
+          "aspect": "발림감/텍스처",
+          "polarity": "negative",
+          "snippet": "끈적거리고 좀 꾸덕해서",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "흡수력",
+          "polarity": "negative",
+          "snippet": "오히려 밀려서 발리는 느낌",
+          "skinTypeHint": null
+        }
+      ]
+    },
+    {
+      "reviewId": 62917355,
+      "aspects": [
+        {
+          "aspect": "밀착력",
+          "polarity": "positive",
+          "snippet": "확실히 화장이 아주 잘먹는게 느껴져요",
+          "skinTypeHint": null
+        }
+      ]
+    },
+    {
+      "reviewId": 62936665,
+      "aspects": [
+        {
+          "aspect": "광택/윤기",
+          "polarity": "positive",
+          "snippet": "잔잔한펄이라 괜찮은거같아요",
+          "skinTypeHint": null
+        }
+      ]
+    },
+    {
+      "reviewId": 62941548,
+      "aspects": [
+        {
+          "aspect": "발색",
+          "polarity": "negative",
+          "snippet": "너무 붉은끼 돌아서 별로네요",
+          "skinTypeHint": null
+        }
+      ]
+    }
+  ],
+  "reviewNotes": [
+    {
+      "reviewId": 62883889,
+      "note": "예쁨만으로 색감/광택/패키지를 특정 못 해 해당 축 추가하지 않음."
+    },
+    {
+      "reviewId": 62892619,
+      "note": "14축 재검토 완료. 추가로 확정할 축 없음. 1차 태그 유지."
+    },
+    {
+      "reviewId": 62917355,
+      "note": "14축 재검토 완료. 추가로 확정할 축 없음. 1차 태그 유지."
+    },
+    {
+      "reviewId": 62936665,
+      "note": "일반적으로 펄이 안 어울린다는 전제와 달리 이 제품의 잔잔한 펄은 괜찮다는 평가."
+    },
+    {
+      "reviewId": 62941548,
+      "note": "갈웜은 퍼스널 컬러이며 skinTypeHint 코드 아님."
+    }
+  ]
+}

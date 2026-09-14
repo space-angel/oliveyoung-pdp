@@ -1,0 +1,129 @@
+{
+  "results": [
+    {
+      "reviewId": 35565215,
+      "aspects": [
+        {
+          "aspect": "가성비",
+          "polarity": "positive",
+          "snippet": "2병에 2만원대라는 부담없는 가격까지",
+          "skinTypeHint": "A04"
+        },
+        {
+          "aspect": "트러블/자극",
+          "polarity": "positive",
+          "snippet": "순하게 발려서 매우 민감한 제 피부에도 좋았습니다",
+          "skinTypeHint": "A04"
+        }
+      ]
+    },
+    {
+      "reviewId": 36204872,
+      "aspects": [
+        {
+          "aspect": "보습감",
+          "polarity": "positive",
+          "snippet": "촉촉하고",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "발림감/텍스처",
+          "polarity": "positive",
+          "snippet": "끈적거리지 않아요",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "트러블/자극",
+          "polarity": "positive",
+          "snippet": "진정에 좋아요",
+          "skinTypeHint": null
+        }
+      ]
+    },
+    {
+      "reviewId": 37409582,
+      "aspects": [
+        {
+          "aspect": "가성비",
+          "polarity": "negative",
+          "snippet": "한 통 되게 금방 쓰는 것 같아요",
+          "skinTypeHint": null
+        }
+      ]
+    },
+    {
+      "reviewId": 37635624,
+      "aspects": [
+        {
+          "aspect": "발색",
+          "polarity": "positive",
+          "snippet": "발색이 잘 되어서 놀랐어요",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "발림감/텍스처",
+          "polarity": "positive",
+          "snippet": "가루날림이 크게 없는",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "광택/윤기",
+          "polarity": "positive",
+          "snippet": "빡!! 발광하는거 보이시나용",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "가성비",
+          "polarity": "positive",
+          "snippet": "이거 하나만으로도 충분히 구매할 이유가 있었다고 생각합니다",
+          "skinTypeHint": null
+        }
+      ]
+    },
+    {
+      "reviewId": 37761237,
+      "aspects": [
+        {
+          "aspect": "가성비",
+          "polarity": "positive",
+          "snippet": "재구매 의사 100퍼 입니다",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "발림감/텍스처",
+          "polarity": "positive",
+          "snippet": "금액, 입자, 지속력면에서 바닐라코가 저는 탑인 것 같아요",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "지속성",
+          "polarity": "positive",
+          "snippet": "금액, 입자, 지속력면에서 바닐라코가 저는 탑인 것 같아요",
+          "skinTypeHint": null
+        }
+      ]
+    }
+  ],
+  "reviewNotes": [
+    {
+      "reviewId": 35565215,
+      "note": "14축 재검토 완료. 추가로 확정할 축 없음. 1차 태그 유지."
+    },
+    {
+      "reviewId": 36204872,
+      "note": "14축 재검토 완료. 추가로 확정할 축 없음. 1차 태그 유지."
+    },
+    {
+      "reviewId": 37409582,
+      "note": "파우치의 주름은 피부 탄력과 무관. 소모가 빠름만 가성비로 유지."
+    },
+    {
+      "reviewId": 37635624,
+      "note": "증정 싱섀의 가치와 광택도 구매 구성 평가로 유지."
+    },
+    {
+      "reviewId": 37761237,
+      "note": "브러쉬 그립/힘은 좋지만 선호 도포 방식에는 안 맞는다는 혼합 판단이어서 분사력 추가하지 않음."
+    }
+  ]
+}

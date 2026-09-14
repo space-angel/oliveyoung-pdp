@@ -1,0 +1,105 @@
+{
+  "results": [
+    {
+      "reviewId": 63417357,
+      "aspects": [
+        {
+          "aspect": "발림감/텍스처",
+          "polarity": "positive",
+          "snippet": "발림성도 좋고",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "발색",
+          "polarity": "positive",
+          "snippet": "색이 예뻐서",
+          "skinTypeHint": null
+        }
+      ]
+    },
+    {
+      "reviewId": 63417909,
+      "aspects": [
+        {
+          "aspect": "가성비",
+          "polarity": "positive",
+          "snippet": "재구매 하겠어요",
+          "skinTypeHint": null
+        }
+      ]
+    },
+    {
+      "reviewId": 63419052,
+      "aspects": [
+        {
+          "aspect": "유분/번들거림",
+          "polarity": "negative",
+          "snippet": "생각보다 기름짐 여름 지성은 힘들다",
+          "skinTypeHint": "A01"
+        }
+      ]
+    },
+    {
+      "reviewId": 63426331,
+      "aspects": [
+        {
+          "aspect": "보습감",
+          "polarity": "positive",
+          "snippet": "로션 바르기 전까지 촉촉해서 좋아요",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "지속성",
+          "polarity": "positive",
+          "snippet": "로션 바르기 전까지 촉촉해서 좋아요",
+          "skinTypeHint": null
+        }
+      ]
+    },
+    {
+      "reviewId": 63435402,
+      "aspects": [
+        {
+          "aspect": "트러블/자극",
+          "polarity": "positive",
+          "snippet": "트러블도 안올라오고 좋아요",
+          "skinTypeHint": "A01"
+        },
+        {
+          "aspect": "발림감/텍스처",
+          "polarity": "positive",
+          "snippet": "발라도 답답하지 않아서 좋았어요",
+          "skinTypeHint": "A01"
+        },
+        {
+          "aspect": "광택/윤기",
+          "polarity": "positive",
+          "snippet": "바르면 약간 보송해지면서",
+          "skinTypeHint": "A01"
+        }
+      ]
+    }
+  ],
+  "reviewNotes": [
+    {
+      "reviewId": 63417357,
+      "note": "예쁜 패키지는 발색/분사력과 무관."
+    },
+    {
+      "reviewId": 63417909,
+      "note": "14축 재검토 완료. 추가로 확정할 축 없음. 1차 태그 유지."
+    },
+    {
+      "reviewId": 63419052,
+      "note": "14축 재검토 완료. 추가로 확정할 축 없음. 1차 태그 유지."
+    },
+    {
+      "reviewId": 63426331,
+      "note": "두 펌프 사용은 토출 성능 평가 아님. 다음 단계까지 수분 유지 두 축 유지."
+    },
+    {
+      "reviewId": 63435402,
+      "note": "유분이 많은 것은 다른 장벽 크림 설명. 대상은 보송 마무리·답답하지 않음·트러블 없음."
+    }
+  ]
+}

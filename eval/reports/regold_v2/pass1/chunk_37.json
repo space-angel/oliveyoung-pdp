@@ -1,0 +1,76 @@
+{
+  "results": [
+    {
+      "reviewId": 63816271,
+      "aspects": []
+    },
+    {
+      "reviewId": 63826926,
+      "aspects": [
+        {
+          "aspect": "발림감/텍스처",
+          "polarity": "positive",
+          "snippet": "제형은 좋으나",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "트러블/자극",
+          "polarity": "negative",
+          "snippet": "입술에 자극이 느껴져서",
+          "skinTypeHint": null
+        }
+      ]
+    },
+    {
+      "reviewId": 63844692,
+      "aspects": [
+        {
+          "aspect": "발림감/텍스처",
+          "polarity": "negative",
+          "snippet": "잘 안 그려져서",
+          "skinTypeHint": null
+        }
+      ]
+    },
+    {
+      "reviewId": 63856516,
+      "aspects": [
+        {
+          "aspect": "흡수력",
+          "polarity": "positive",
+          "snippet": "스며드는건 빠른데",
+          "skinTypeHint": "A02"
+        },
+        {
+          "aspect": "보습감",
+          "polarity": "negative",
+          "snippet": "수분감은 없는것같아요",
+          "skinTypeHint": "A02"
+        }
+      ]
+    },
+    {
+      "reviewId": 63867884,
+      "aspects": [
+        {
+          "aspect": "발림감/텍스처",
+          "polarity": "negative",
+          "snippet": "생각보다 넘 뻑뻑?",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "보습감",
+          "polarity": "negative",
+          "snippet": "건조해지고",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "밀착력",
+          "polarity": "negative",
+          "snippet": "다 들뜨고 각질부각 오짐",
+          "skinTypeHint": null
+        }
+      ]
+    }
+  ]
+}
