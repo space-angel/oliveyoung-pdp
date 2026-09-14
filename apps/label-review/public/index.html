@@ -310,6 +310,14 @@ function verdictText(d) {
   const r = S.view.reasons.find(x => x.key === d.reason);
   return `아니에요 — ${r ? r.title : '이유 선택'}${d.contractError ? ' · 기각 기록만 남김' : ''}`;
 }
+function redrawJudge(msg) {
+  const y = window.scrollY, missedOpen = !!$('.missed')?.open;
+  const openCards = new Set([...document.querySelectorAll('.card .ctx.open')].map(e => e.closest('.card')?.querySelector('mark')?.textContent));
+  renderJudge(msg);
+  if (missedOpen && $('.missed')) $('.missed').open = true;
+  document.querySelectorAll('.card').forEach(c => { if (openCards.has(c.querySelector('mark')?.textContent)) c.querySelector('.ctx')?.classList.add('open'); });
+  window.scrollTo({ top: y, behavior: 'instant' });   // scroll-behavior:smooth 이라 기본 scrollTo 는 애니메이션이 된다
+}
 function renderJudge(msg) {
   const c = S.view.candidates[S.idx];
   const decided = c.decision || null;
@@ -353,16 +361,16 @@ function renderJudge(msg) {
   $('#next')?.addEventListener('click', goNext);
   $('#prev')?.addEventListener('click', goPrev);
   $('#reject')?.addEventListener('click', () => { S.screen='reject'; S.reason=null; render(); });
-  $('#edit')?.addEventListener('click', () => { S.editing = true; S.draft = d; renderJudge(); });
-  $('#cancelEdit')?.addEventListener('click', () => { S.editing=false; S.draft=null; renderJudge(); });
+  $('#edit')?.addEventListener('click', () => { S.editing = true; S.draft = d; redrawJudge(); });
+  $('#cancelEdit')?.addEventListener('click', () => { S.editing=false; S.draft=null; redrawJudge(); });
   $('#saveEdit')?.addEventListener('click', () => {
     S.draft.question = $('#eq').value; S.draft.answer = $('#ea').value;
     decide({kind:'edit', edits:{question:S.draft.question, answer:S.draft.answer, aspect:S.draft.aspect, evidence:S.draft.evidence}});
   });
-  document.querySelectorAll('[data-cycle]').forEach(b => b.onclick = () => { syncDraft(); const e = S.draft.evidence[+b.dataset.cycle]; e.stance = NEXT[e.stance]; renderJudge(); });
-  document.querySelectorAll('[data-rm]').forEach(b => b.onclick = () => { syncDraft(); S.draft.evidence.splice(+b.dataset.rm,1); renderJudge(); });
+  document.querySelectorAll('[data-cycle]').forEach(b => b.onclick = () => { syncDraft(); const e = S.draft.evidence[+b.dataset.cycle]; e.stance = NEXT[e.stance]; redrawJudge(); });
+  document.querySelectorAll('[data-rm]').forEach(b => b.onclick = () => { syncDraft(); S.draft.evidence.splice(+b.dataset.rm,1); redrawJudge(); });
   document.querySelectorAll('[data-more]').forEach(b => b.onclick = () => b.closest('.ctx').classList.toggle('open'));
-  document.querySelectorAll('[data-add]').forEach(b => b.onclick = () => { const e = JSON.parse(b.dataset.add); if (!S.editing) { S.editing = true; S.draft = d; } else syncDraft(); S.draft.evidence = S.draft.evidence.filter(x=>x.reviewId!==e.reviewId).concat([e]); renderJudge({cls:'ok', text:'근거에 넣었어요. 저장하면 candidate_edited 로 기록돼요.'}); });
+  document.querySelectorAll('[data-add]').forEach(b => b.onclick = () => { const e = JSON.parse(b.dataset.add); if (!S.editing) { S.editing = true; S.draft = d; } else syncDraft(); S.draft.evidence = S.draft.evidence.filter(x=>x.reviewId!==e.reviewId).concat([e]); redrawJudge({cls:'ok', text:'근거에 넣었어요. 저장하면 candidate_edited 로 기록돼요.'}); });
 }
 function syncDraft() { if (S.editing) { const q=$('#eq'), a=$('#ea'); if (q) S.draft.question=q.value; if (a) S.draft.answer=a.value; } }
 // 만료된 배정을 이어받은 번들 — 다른 사람의 판단이 이미 일부 들어 있다
@@ -378,8 +386,8 @@ async function decide(extra) {
   try {
     const r = await api('/api/decide', {labelerId:S.me.labelerId, candidateId:c.candidateId, minutesSpent:minutes(), reason:S.reason, ...extra});
     await load(c.candidateId);
-    if (r.note && S.screen==='judge') renderJudge({cls:'warn', text:r.note});
-  } catch (e) { S.screen==='reject' ? renderReject(e.message) : renderJudge({cls:'err', text:e.message}); }
+    if (r.note && S.screen==='judge') redrawJudge({cls:'warn', text:r.note});
+  } catch (e) { S.screen==='reject' ? renderReject(e.message) : redrawJudge({cls:'err', text:e.message}); }
 }
 
 // ---------- 아니에요 ----------
