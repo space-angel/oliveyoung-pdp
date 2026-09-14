@@ -1,0 +1,31 @@
+{
+  "issue": "PER-182",
+  "version": "option-v1",
+  "note": "옵션 문자열에서 '판촉 포장'을 걷어내고 색상·호수만 남기기 위한 어휘. 코드 상수가 아니라 여기서 고친다. 새 수집분이 들어오면 eval/measure_gate1_identity.py 를 다시 돌려 evidence 를 갱신한다. 어휘를 늘리면 병합이 늘고(근거 증가) 잘못 늘리면 서로 다른 색상이 합쳐진다(잘못된 귀속) — 그래서 각 토큰에 관측 근거를 붙인다.",
+  "evidence": {
+    "snapshot": "data/input/reviews_50products.json",
+    "statedForms": 797,
+    "statedReviews": 17016,
+    "measuredAt": "eval/reports/gate1_identity_per182.json"
+  },
+  "promoTokens": {
+    "기획": {"forms": 252, "reviews": 6487},
+    "단품": {"forms": 79, "reviews": 860},
+    "리필": {"forms": 80, "reviews": 1902},
+    "본품": {"forms": 65, "reviews": 1268},
+    "NEW": {"forms": 35, "reviews": 479},
+    "증정": {"forms": 29, "reviews": 557},
+    "어워즈": {"forms": 29, "reviews": 252},
+    "한정": {"forms": 27, "reviews": 144},
+    "에디션": {"forms": 18, "reviews": 1035},
+    "단독": {"forms": 17, "reviews": 204},
+    "홀리데이": {"forms": 9, "reviews": 72},
+    "추천": {"forms": 7, "reviews": 253},
+    "베스트": {"forms": 5, "reviews": 160},
+    "콜라보": {"forms": 2, "reviews": 454},
+    "추가": {"forms": 1, "reviews": 14},
+    "수량": {"forms": 1, "reviews": 17},
+    "SET": {"forms": 1, "reviews": 460}
+  },
+  "unitTokens": ["ml", "mL", "ML", "g", "G", "kg", "매", "입", "ea", "EA", "구", "개", "정", "팩", "세트"]
+}
