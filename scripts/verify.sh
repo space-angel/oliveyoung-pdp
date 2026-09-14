@@ -20,6 +20,8 @@ echo "== 생성물 재현 확인 =="
 "$PY" pipeline/sample_concern_golden.py --check
 "$PY" eval/label_concern_golden.py validate
 "$PY" eval/measure_v4_golden_migration.py --check
+# 게이트1 동일성 — 옵션 어휘·정규화 규칙이 바뀌면 리포트가 조용히 낡는다 (PER-182)
+"$PY" eval/measure_gate1_identity.py --check
 # 모델 후보의 계약 표시가 현재 규칙과 같은지 — 규칙이 바뀌면 표시가 조용히 낡는다 (PER-178)
 "$PY" eval/concern_candidates.py recheck --check
 

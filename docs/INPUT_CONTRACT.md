@@ -159,6 +159,11 @@ option       단일  자유 문자열     → SingleCondition  (도메인 없음
 | `skinTrouble` | 53.92% | 코드북 13종 | 0 |
 | `option` | 68.06% | 없음 (25K 에서 797종) | — |
 
+`option` 은 도메인이 없지만 **집계에 쓰기 전에 정규화한다.** 797종 문자열이 색상 452개이고,
+판촉 포장을 걷어내지 않으면 같은 색이 여러 조각으로 흩어진다. 규칙과 실측은
+[`docs/DECISION_PER182_OPTION_IDENTITY.md`](DECISION_PER182_OPTION_IDENTITY.md),
+구현은 `pipeline/option_norm.py` (게이트1, PER-182).
+
 ### 어휘는 코드다. 라벨이 아니다
 
 **조건 코드는 코드북(`data/input/skin_codebook.json`, PDP DOM 실측 26종) 도메인 안이어야 한다.**

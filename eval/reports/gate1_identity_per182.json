@@ -1,0 +1,4085 @@
+{
+  "issue": "PER-182",
+  "source": {
+    "path": "data/input/reviews_50products.json",
+    "sha256": "04e089d078d5482855f04481b7144661834b391d55b3cec0033431454903a773",
+    "reviews": 25000
+  },
+  "policy": {
+    "snapshotLatestMonth": "2026-08",
+    "recencyWindowMonths": 24,
+    "recencyCutoffMonth": "2024-09",
+    "sufficiencyNMin": 8
+  },
+  "optionNormalization": {
+    "markersVersion": "option-v1",
+    "statedReviews": 17016,
+    "reviewsByKind": {
+      "pack": 2157,
+      "shade": 14859,
+      "unstated": 7984
+    },
+    "distinctFormsNote": "제품별로 센 뒤 합산한다 — 같은 문자열이 두 제품에 나오면 2로 센다",
+    "distinctForms": 798,
+    "distinctShadeKeys": 452,
+    "formsPerShadeKey": 1.765,
+    "productsWithShadeAxis": 31,
+    "atLeastNmin": {
+      "nMin": 8,
+      "cellsBefore": 369,
+      "cellsAfter": 252,
+      "reviewsBefore": 13644,
+      "reviewsAfter": 14212
+    },
+    "byCategory": {
+      "립메이크업": {
+        "products": 8,
+        "shadeAxis": 8,
+        "statedForms": 225,
+        "shadeKeys": 175
+      },
+      "베이스메이크업": {
+        "products": 12,
+        "shadeAxis": 12,
+        "statedForms": 285,
+        "shadeKeys": 105
+      },
+      "아이메이크업": {
+        "products": 8,
+        "shadeAxis": 7,
+        "statedForms": 241,
+        "shadeKeys": 154
+      },
+      "에센스/세럼": {
+        "products": 8,
+        "shadeAxis": 1,
+        "statedForms": 23,
+        "shadeKeys": 7
+      },
+      "크림": {
+        "products": 8,
+        "shadeAxis": 3,
+        "statedForms": 24,
+        "shadeKeys": 11
+      }
+    },
+    "byProduct": {
+      "p001": {
+        "displayName": "3CE 캐시미어 허그 립스틱",
+        "category": "립메이크업",
+        "statedForms": 21,
+        "shadeForms": 21,
+        "shadeKeys": 14,
+        "hasShadeAxis": true,
+        "wrappers": [
+          "미니립스틱"
+        ],
+        "cellsAtLeastNmin": 10,
+        "formsAtLeastNmin": 14,
+        "reviewsAtLeastNminBefore": 474,
+        "reviewsAtLeastNminAfter": 487
+      },
+      "p002": {
+        "displayName": "롬앤 더 쥬시 래스팅 틴트",
+        "category": "립메이크업",
+        "statedForms": 52,
+        "shadeForms": 52,
+        "shadeKeys": 39,
+        "hasShadeAxis": true,
+        "wrappers": [
+          "두유",
+          "미피",
+          "조앤프렌즈",
+          "태닝 시나모롤",
+          "태닝 포차코"
+        ],
+        "cellsAtLeastNmin": 17,
+        "formsAtLeastNmin": 20,
+        "reviewsAtLeastNminBefore": 399,
+        "reviewsAtLeastNminAfter": 415
+      },
+      "p003": {
+        "displayName": "유리아쥬 스틱레브르 컬러드",
+        "category": "립메이크업",
+        "statedForms": 7,
+        "shadeForms": 7,
+        "shadeKeys": 7,
+        "hasShadeAxis": true,
+        "wrappers": [],
+        "cellsAtLeastNmin": 7,
+        "formsAtLeastNmin": 7,
+        "reviewsAtLeastNminBefore": 500,
+        "reviewsAtLeastNminAfter": 500
+      },
+      "p004": {
+        "displayName": "컬러그램 누디 블러 틴트",
+        "category": "립메이크업",
+        "statedForms": 40,
+        "shadeForms": 40,
+        "shadeKeys": 28,
+        "hasShadeAxis": true,
+        "wrappers": [
+          "위글위글/캡키링",
+          "틴케이스"
+        ],
+        "cellsAtLeastNmin": 20,
+        "formsAtLeastNmin": 26,
+        "reviewsAtLeastNminBefore": 445,
+        "reviewsAtLeastNminAfter": 460
+      },
+      "p005": {
+        "displayName": "퓌 3D 볼류밍 글로스",
+        "category": "립메이크업",
+        "statedForms": 32,
+        "shadeForms": 32,
+        "shadeKeys": 25,
+        "hasShadeAxis": true,
+        "wrappers": [
+          "망그러진 곰"
+        ],
+        "cellsAtLeastNmin": 12,
+        "formsAtLeastNmin": 13,
+        "reviewsAtLeastNminBefore": 433,
+        "reviewsAtLeastNminAfter": 451
+      },
+      "p006": {
+        "displayName": "하트퍼센트 도트 온 무드 립펜슬",
+        "category": "립메이크업",
+        "statedForms": 35,
+        "shadeForms": 35,
+        "shadeKeys": 33,
+        "hasShadeAxis": true,
+        "wrappers": [],
+        "cellsAtLeastNmin": 14,
+        "formsAtLeastNmin": 14,
+        "reviewsAtLeastNminBefore": 429,
+        "reviewsAtLeastNminAfter": 431
+      },
+      "p007": {
+        "displayName": "힌스 로 글로우 젤 틴트",
+        "category": "립메이크업",
+        "statedForms": 35,
+        "shadeForms": 35,
+        "shadeKeys": 26,
+        "hasShadeAxis": true,
+        "wrappers": [
+          "LIMITED"
+        ],
+        "cellsAtLeastNmin": 19,
+        "formsAtLeastNmin": 24,
+        "reviewsAtLeastNminBefore": 451,
+        "reviewsAtLeastNminAfter": 459
+      },
+      "p008": {
+        "displayName": "VDL 치크스테인 블러셔",
+        "category": "베이스메이크업",
+        "statedForms": 28,
+        "shadeForms": 28,
+        "shadeKeys": 19,
+        "hasShadeAxis": true,
+        "wrappers": [],
+        "cellsAtLeastNmin": 14,
+        "formsAtLeastNmin": 15,
+        "reviewsAtLeastNminBefore": 449,
+        "reviewsAtLeastNminAfter": 480
+      },
+      "p009": {
+        "displayName": "더샘 커버 퍼펙션 트리플 팟 컨실러",
+        "category": "베이스메이크업",
+        "statedForms": 22,
+        "shadeForms": 22,
+        "shadeKeys": 6,
+        "hasShadeAxis": true,
+        "wrappers": [],
+        "cellsAtLeastNmin": 3,
+        "formsAtLeastNmin": 7,
+        "reviewsAtLeastNminBefore": 447,
+        "reviewsAtLeastNminAfter": 484
+      },
+      "p010": {
+        "displayName": "바닐라코 프라임 프라이머 피니쉬 파우더",
+        "category": "베이스메이크업",
+        "statedForms": 13,
+        "shadeForms": 10,
+        "shadeKeys": 3,
+        "hasShadeAxis": true,
+        "wrappers": [
+          "3.2g",
+          "퍼프내장",
+          "헬로키티"
+        ],
+        "cellsAtLeastNmin": 3,
+        "formsAtLeastNmin": 10,
+        "reviewsAtLeastNminBefore": 387,
+        "reviewsAtLeastNminAfter": 387
+      },
+      "p011": {
+        "displayName": "에스쁘아 비벨벳 커버쿠션",
+        "category": "베이스메이크업",
+        "statedForms": 30,
+        "shadeForms": 30,
+        "shadeKeys": 10,
+        "hasShadeAxis": true,
+        "wrappers": [
+          "AD",
+          "미니 쿠션"
+        ],
+        "cellsAtLeastNmin": 7,
+        "formsAtLeastNmin": 16,
+        "reviewsAtLeastNminBefore": 458,
+        "reviewsAtLeastNminAfter": 488
+      },
+      "p012": {
+        "displayName": "연작 스킨 퍼펙팅 프로텍티브 베이스프렙",
+        "category": "베이스메이크업",
+        "statedForms": 16,
+        "shadeForms": 12,
+        "shadeKeys": 4,
+        "hasShadeAxis": true,
+        "wrappers": [],
+        "cellsAtLeastNmin": 2,
+        "formsAtLeastNmin": 9,
+        "reviewsAtLeastNminBefore": 421,
+        "reviewsAtLeastNminAfter": 428
+      },
+      "p013": {
+        "displayName": "오프라 미니 하이라이터",
+        "category": "베이스메이크업",
+        "statedForms": 43,
+        "shadeForms": 43,
+        "shadeKeys": 14,
+        "hasShadeAxis": true,
+        "wrappers": [
+          "코랄"
+        ],
+        "cellsAtLeastNmin": 7,
+        "formsAtLeastNmin": 17,
+        "reviewsAtLeastNminBefore": 413,
+        "reviewsAtLeastNminAfter": 462
+      },
+      "p014": {
+        "displayName": "정샘물 에센셜 스킨 누더 쿠션",
+        "category": "베이스메이크업",
+        "statedForms": 50,
+        "shadeForms": 50,
+        "shadeKeys": 12,
+        "hasShadeAxis": true,
+        "wrappers": [],
+        "cellsAtLeastNmin": 8,
+        "formsAtLeastNmin": 18,
+        "reviewsAtLeastNminBefore": 398,
+        "reviewsAtLeastNminAfter": 486
+      },
+      "p015": {
+        "displayName": "클리오 킬 커버 파운웨어 쿠션",
+        "category": "베이스메이크업",
+        "statedForms": 21,
+        "shadeForms": 21,
+        "shadeKeys": 5,
+        "hasShadeAxis": true,
+        "wrappers": [],
+        "cellsAtLeastNmin": 5,
+        "formsAtLeastNmin": 14,
+        "reviewsAtLeastNminBefore": 482,
+        "reviewsAtLeastNminAfter": 500
+      },
+      "p016": {
+        "displayName": "프레시안 에그라이크 크림 블러셔",
+        "category": "베이스메이크업",
+        "statedForms": 21,
+        "shadeForms": 21,
+        "shadeKeys": 12,
+        "hasShadeAxis": true,
+        "wrappers": [
+          "그린용기"
+        ],
+        "cellsAtLeastNmin": 9,
+        "formsAtLeastNmin": 12,
+        "reviewsAtLeastNminBefore": 459,
+        "reviewsAtLeastNminAfter": 486
+      },
+      "p017": {
+        "displayName": "헤라 블랙 쿠션 파운데이션",
+        "category": "베이스메이크업",
+        "statedForms": 26,
+        "shadeForms": 26,
+        "shadeKeys": 9,
+        "hasShadeAxis": true,
+        "wrappers": [
+          "미니쿠션&코렉팅쿼드+퍼프1매",
+          "미니쿠션+미니파우더+퍼프1매",
+          "쿠션블러셔+립펜슬듀오"
+        ],
+        "cellsAtLeastNmin": 6,
+        "formsAtLeastNmin": 13,
+        "reviewsAtLeastNminBefore": 311,
+        "reviewsAtLeastNminAfter": 334
+      },
+      "p018": {
+        "displayName": "데이지크 섀도우팔레트",
+        "category": "아이메이크업",
+        "statedForms": 47,
+        "shadeForms": 47,
+        "shadeKeys": 28,
+        "hasShadeAxis": true,
+        "wrappers": [],
+        "cellsAtLeastNmin": 14,
+        "formsAtLeastNmin": 19,
+        "reviewsAtLeastNminBefore": 395,
+        "reviewsAtLeastNminAfter": 439
+      },
+      "p019": {
+        "displayName": "리필드 사이토카인 아이래쉬 듀얼 앰플",
+        "category": "아이메이크업",
+        "statedForms": 3,
+        "shadeForms": 0,
+        "shadeKeys": 0,
+        "hasShadeAxis": false,
+        "wrappers": [],
+        "cellsAtLeastNmin": 0,
+        "formsAtLeastNmin": 0,
+        "reviewsAtLeastNminBefore": 0,
+        "reviewsAtLeastNminAfter": 0
+      },
+      "p020": {
+        "displayName": "에뛰드 컬 픽스 마스카라",
+        "category": "아이메이크업",
+        "statedForms": 35,
+        "shadeForms": 35,
+        "shadeKeys": 8,
+        "hasShadeAxis": true,
+        "wrappers": [],
+        "cellsAtLeastNmin": 7,
+        "formsAtLeastNmin": 15,
+        "reviewsAtLeastNminBefore": 442,
+        "reviewsAtLeastNminAfter": 493
+      },
+      "p021": {
+        "displayName": "웨이크메이크 소프트 블러링 아이팔레트",
+        "category": "아이메이크업",
+        "statedForms": 24,
+        "shadeForms": 24,
+        "shadeKeys": 15,
+        "hasShadeAxis": true,
+        "wrappers": [
+          "갸루키티",
+          "재입고"
+        ],
+        "cellsAtLeastNmin": 8,
+        "formsAtLeastNmin": 13,
+        "reviewsAtLeastNminBefore": 477,
+        "reviewsAtLeastNminAfter": 485
+      },
+      "p022": {
+        "displayName": "코스노리 아이래쉬 세럼 비건 속눈썹영양제",
+        "category": "아이메이크업",
+        "statedForms": 8,
+        "shadeForms": 8,
+        "shadeKeys": 2,
+        "hasShadeAxis": true,
+        "wrappers": [],
+        "cellsAtLeastNmin": 2,
+        "formsAtLeastNmin": 4,
+        "reviewsAtLeastNminBefore": 491,
+        "reviewsAtLeastNminAfter": 500
+      },
+      "p023": {
+        "displayName": "투크 워터프루프 슬림 아이라이너",
+        "category": "아이메이크업",
+        "statedForms": 23,
+        "shadeForms": 23,
+        "shadeKeys": 16,
+        "hasShadeAxis": true,
+        "wrappers": [
+          "리뉴얼"
+        ],
+        "cellsAtLeastNmin": 14,
+        "formsAtLeastNmin": 15,
+        "reviewsAtLeastNminBefore": 477,
+        "reviewsAtLeastNminAfter": 495
+      },
+      "p024": {
+        "displayName": "페리페라 스피디 스키니 브로우",
+        "category": "아이메이크업",
+        "statedForms": 14,
+        "shadeForms": 14,
+        "shadeKeys": 8,
+        "hasShadeAxis": true,
+        "wrappers": [
+          "2개입"
+        ],
+        "cellsAtLeastNmin": 8,
+        "formsAtLeastNmin": 11,
+        "reviewsAtLeastNminBefore": 497,
+        "reviewsAtLeastNminAfter": 500
+      },
+      "p025": {
+        "displayName": "홀리카홀리카 마이페이브 피스 아이섀도우",
+        "category": "아이메이크업",
+        "statedForms": 87,
+        "shadeForms": 87,
+        "shadeKeys": 77,
+        "hasShadeAxis": true,
+        "wrappers": [
+          "HOT",
+          "싱글",
+          "아이글리츠/HOT",
+          "젤테일",
+          "피스 밤",
+          "피스빔"
+        ],
+        "cellsAtLeastNmin": 16,
+        "formsAtLeastNmin": 15,
+        "reviewsAtLeastNminBefore": 329,
+        "reviewsAtLeastNminAfter": 359
+      },
+      "p026": {
+        "displayName": "구달 청귤 비타C 잡티케어 세럼",
+        "category": "에센스/세럼",
+        "statedForms": 5,
+        "shadeForms": 0,
+        "shadeKeys": 0,
+        "hasShadeAxis": false,
+        "wrappers": [],
+        "cellsAtLeastNmin": 0,
+        "formsAtLeastNmin": 0,
+        "reviewsAtLeastNminBefore": 0,
+        "reviewsAtLeastNminAfter": 0
+      },
+      "p027": {
+        "displayName": "넘버즈인 판토텐산 액티브업 수딩세럼",
+        "category": "에센스/세럼",
+        "statedForms": 2,
+        "shadeForms": 1,
+        "shadeKeys": 1,
+        "hasShadeAxis": false,
+        "wrappers": [],
+        "cellsAtLeastNmin": 1,
+        "formsAtLeastNmin": 1,
+        "reviewsAtLeastNminBefore": 17,
+        "reviewsAtLeastNminAfter": 17
+      },
+      "p028": {
+        "displayName": "달바 퍼스트 스프레이 세럼",
+        "category": "에센스/세럼",
+        "statedForms": 1,
+        "shadeForms": 1,
+        "shadeKeys": 1,
+        "hasShadeAxis": false,
+        "wrappers": [],
+        "cellsAtLeastNmin": 1,
+        "formsAtLeastNmin": 1,
+        "reviewsAtLeastNminBefore": 89,
+        "reviewsAtLeastNminAfter": 89
+      },
+      "p029": {
+        "displayName": "메디큐브 PDRN 핑크 앰플",
+        "category": "에센스/세럼",
+        "statedForms": 2,
+        "shadeForms": 0,
+        "shadeKeys": 0,
+        "hasShadeAxis": false,
+        "wrappers": [],
+        "cellsAtLeastNmin": 0,
+        "formsAtLeastNmin": 0,
+        "reviewsAtLeastNminBefore": 0,
+        "reviewsAtLeastNminAfter": 0
+      },
+      "p031": {
+        "displayName": "메디힐 마데카소사이드 흔적 리페어 세럼",
+        "category": "에센스/세럼",
+        "statedForms": 5,
+        "shadeForms": 4,
+        "shadeKeys": 2,
+        "hasShadeAxis": true,
+        "wrappers": [],
+        "cellsAtLeastNmin": 2,
+        "formsAtLeastNmin": 3,
+        "reviewsAtLeastNminBefore": 378,
+        "reviewsAtLeastNminAfter": 379
+      },
+      "p035": {
+        "displayName": "아누아 피디알엔 히알루론산 캡슐 100 세럼",
+        "category": "에센스/세럼",
+        "statedForms": 3,
+        "shadeForms": 2,
+        "shadeKeys": 1,
+        "hasShadeAxis": false,
+        "wrappers": [],
+        "cellsAtLeastNmin": 1,
+        "formsAtLeastNmin": 1,
+        "reviewsAtLeastNminBefore": 196,
+        "reviewsAtLeastNminAfter": 197
+      },
+      "p037": {
+        "displayName": "웰라쥬 리얼 히알루로닉 블루 100 앰플",
+        "category": "에센스/세럼",
+        "statedForms": 2,
+        "shadeForms": 2,
+        "shadeKeys": 1,
+        "hasShadeAxis": false,
+        "wrappers": [
+          "망곰"
+        ],
+        "cellsAtLeastNmin": 1,
+        "formsAtLeastNmin": 2,
+        "reviewsAtLeastNminBefore": 51,
+        "reviewsAtLeastNminAfter": 51
+      },
+      "p038": {
+        "displayName": "이니스프리 레티놀 시카 흔적 앰플",
+        "category": "에센스/세럼",
+        "statedForms": 3,
+        "shadeForms": 3,
+        "shadeKeys": 1,
+        "hasShadeAxis": false,
+        "wrappers": [],
+        "cellsAtLeastNmin": 1,
+        "formsAtLeastNmin": 3,
+        "reviewsAtLeastNminBefore": 235,
+        "reviewsAtLeastNminAfter": 235
+      },
+      "p041": {
+        "displayName": "닥터지 레드 블레미쉬 클리어 수딩크림",
+        "category": "크림",
+        "statedForms": 5,
+        "shadeForms": 4,
+        "shadeKeys": 4,
+        "hasShadeAxis": true,
+        "wrappers": [],
+        "cellsAtLeastNmin": 2,
+        "formsAtLeastNmin": 2,
+        "reviewsAtLeastNminBefore": 150,
+        "reviewsAtLeastNminAfter": 150
+      },
+      "p042": {
+        "displayName": "라로슈포제 시카플라스트 밤 B5+",
+        "category": "크림",
+        "statedForms": 2,
+        "shadeForms": 2,
+        "shadeKeys": 2,
+        "hasShadeAxis": true,
+        "wrappers": [],
+        "cellsAtLeastNmin": 1,
+        "formsAtLeastNmin": 1,
+        "reviewsAtLeastNminBefore": 460,
+        "reviewsAtLeastNminAfter": 460
+      },
+      "p044": {
+        "displayName": "아누아 피디알엔 히알루론산 100 수분크림",
+        "category": "크림",
+        "statedForms": 4,
+        "shadeForms": 4,
+        "shadeKeys": 1,
+        "hasShadeAxis": false,
+        "wrappers": [],
+        "cellsAtLeastNmin": 1,
+        "formsAtLeastNmin": 2,
+        "reviewsAtLeastNminBefore": 467,
+        "reviewsAtLeastNminAfter": 473
+      },
+      "p045": {
+        "displayName": "에스네이처 아쿠아 스쿠알란 수분크림",
+        "category": "크림",
+        "statedForms": 3,
+        "shadeForms": 3,
+        "shadeKeys": 1,
+        "hasShadeAxis": false,
+        "wrappers": [],
+        "cellsAtLeastNmin": 1,
+        "formsAtLeastNmin": 1,
+        "reviewsAtLeastNminBefore": 478,
+        "reviewsAtLeastNminAfter": 490
+      },
+      "p047": {
+        "displayName": "유세린 하이알루론 3X 아이크림",
+        "category": "크림",
+        "statedForms": 2,
+        "shadeForms": 0,
+        "shadeKeys": 0,
+        "hasShadeAxis": false,
+        "wrappers": [],
+        "cellsAtLeastNmin": 0,
+        "formsAtLeastNmin": 0,
+        "reviewsAtLeastNminBefore": 0,
+        "reviewsAtLeastNminAfter": 0
+      },
+      "p048": {
+        "displayName": "제로이드 인텐시브 크림",
+        "category": "크림",
+        "statedForms": 5,
+        "shadeForms": 0,
+        "shadeKeys": 0,
+        "hasShadeAxis": false,
+        "wrappers": [],
+        "cellsAtLeastNmin": 0,
+        "formsAtLeastNmin": 0,
+        "reviewsAtLeastNminBefore": 0,
+        "reviewsAtLeastNminAfter": 0
+      },
+      "p049": {
+        "displayName": "토리든 다이브인 히알루론산 수딩 크림",
+        "category": "크림",
+        "statedForms": 2,
+        "shadeForms": 2,
+        "shadeKeys": 2,
+        "hasShadeAxis": true,
+        "wrappers": [],
+        "cellsAtLeastNmin": 1,
+        "formsAtLeastNmin": 1,
+        "reviewsAtLeastNminBefore": 405,
+        "reviewsAtLeastNminAfter": 405
+      },
+      "p050": {
+        "displayName": "피지오겔 DMT 페이셜크림",
+        "category": "크림",
+        "statedForms": 1,
+        "shadeForms": 1,
+        "shadeKeys": 1,
+        "hasShadeAxis": false,
+        "wrappers": [],
+        "cellsAtLeastNmin": 1,
+        "formsAtLeastNmin": 1,
+        "reviewsAtLeastNminBefore": 100,
+        "reviewsAtLeastNminAfter": 100
+      },
+      "p051": {
+        "displayName": "컬러그램 누디 블러 틴트 (기존 용기)",
+        "category": "립메이크업",
+        "statedForms": 3,
+        "shadeForms": 3,
+        "shadeKeys": 3,
+        "hasShadeAxis": true,
+        "wrappers": [
+          "기존용기"
+        ],
+        "cellsAtLeastNmin": 0,
+        "formsAtLeastNmin": 0,
+        "reviewsAtLeastNminBefore": 0,
+        "reviewsAtLeastNminAfter": 0
+      },
+      "p052": {
+        "displayName": "에스쁘아 비벨벳 커버쿠션 (2025 리뉴얼 이전)",
+        "category": "베이스메이크업",
+        "statedForms": 4,
+        "shadeForms": 4,
+        "shadeKeys": 4,
+        "hasShadeAxis": true,
+        "wrappers": [],
+        "cellsAtLeastNmin": 0,
+        "formsAtLeastNmin": 0,
+        "reviewsAtLeastNminBefore": 0,
+        "reviewsAtLeastNminAfter": 0
+      },
+      "p053": {
+        "displayName": "헤라 블랙 쿠션 (2024 리뉴얼 이전)",
+        "category": "베이스메이크업",
+        "statedForms": 11,
+        "shadeForms": 11,
+        "shadeKeys": 7,
+        "hasShadeAxis": true,
+        "wrappers": [],
+        "cellsAtLeastNmin": 6,
+        "formsAtLeastNmin": 9,
+        "reviewsAtLeastNminBefore": 154,
+        "reviewsAtLeastNminAfter": 157
+      }
+    },
+    "mergedForms": {
+      "p001": {
+        "니트": [
+          {
+            "option": "니트(웜 베스트)",
+            "reviews": 34
+          },
+          {
+            "option": "[기획] 니트+파우치",
+            "reviews": 17
+          },
+          {
+            "option": "니트 기획(미니립스틱)",
+            "reviews": 10
+          },
+          {
+            "option": "[기획] 니트+미니립스틱",
+            "reviews": 3
+          }
+        ],
+        "버디": [
+          {
+            "option": "버디(웜 추천)",
+            "reviews": 33
+          },
+          {
+            "option": "[기획] 버디+미니립스틱",
+            "reviews": 3
+          }
+        ],
+        "허쉬레드": [
+          {
+            "option": "허쉬 레드(뉴트럴 베스트)",
+            "reviews": 58
+          },
+          {
+            "option": "허쉬 레드 기획(미니립스틱)",
+            "reviews": 19
+          },
+          {
+            "option": "[기획] 허쉬 레드+파우치",
+            "reviews": 17
+          },
+          {
+            "option": "[기획] 허쉬 레드+미니립스틱",
+            "reviews": 7
+          }
+        ]
+      },
+      "p002": {
+        "23|피치피치미": [
+          {
+            "option": "[올리브영단독] 23 피치 피치 미",
+            "reviews": 8
+          },
+          {
+            "option": "[틴뚜링기획] 23 피치 피치 미",
+            "reviews": 2
+          },
+          {
+            "option": "[태닝포차코/기획] 23 피치 피치 미",
+            "reviews": 1
+          },
+          {
+            "option": "[올리브영단독]23 피치 피치 미",
+            "reviews": 1
+          },
+          {
+            "option": "[틴뚜링 기획] 23 피치 피치 미",
+            "reviews": 1
+          }
+        ],
+        "29|조선무화과": [
+          {
+            "option": "[올리브영단독] 29 조선 무화과",
+            "reviews": 7
+          },
+          {
+            "option": "[조앤프렌즈][기획]29조선무화과",
+            "reviews": 1
+          }
+        ],
+        "2|누카다미아": [
+          {
+            "option": "[미피][OY단독] 02 누카다미아",
+            "reviews": 20
+          },
+          {
+            "option": "[올리브영단독] 02 누카다미아",
+            "reviews": 19
+          },
+          {
+            "option": "[더쥬시미니기획] 02누카다미아",
+            "reviews": 1
+          }
+        ],
+        "31|탠드코코": [
+          {
+            "option": "31 탠드 코코",
+            "reviews": 2
+          },
+          {
+            "option": "[태닝 포차코] 31 탠드 코코",
+            "reviews": 1
+          }
+        ],
+        "32|태니구아바": [
+          {
+            "option": "32 태니 구아바",
+            "reviews": 3
+          },
+          {
+            "option": "[태닝 시나모롤]32태니구아바 기획",
+            "reviews": 2
+          }
+        ],
+        "3|베어그레이프": [
+          {
+            "option": "[두유][기획]03베어그레이프",
+            "reviews": 51
+          },
+          {
+            "option": "[올리브영단독] 03 베어 그레이프",
+            "reviews": 40
+          },
+          {
+            "option": "[미피][OY단독] 03 베어 그레이프",
+            "reviews": 11
+          },
+          {
+            "option": "[더쥬시미니기획] 03 베어그레이프",
+            "reviews": 10
+          },
+          {
+            "option": "[조앤프렌즈][기획]03베어그레이프",
+            "reviews": 2
+          }
+        ]
+      },
+      "p003": {},
+      "p004": {
+        "14|딸기멜로": [
+          {
+            "option": "[포켓몬 에디션] 14 딸기멜로",
+            "reviews": 39
+          },
+          {
+            "option": "14 딸기멜로",
+            "reviews": 15
+          }
+        ],
+        "22|잔망베이지": [
+          {
+            "option": "22 잔망베이지",
+            "reviews": 21
+          },
+          {
+            "option": "[잔망루피/키링증정] 22 잔망베이지",
+            "reviews": 2
+          }
+        ],
+        "23|잔망로즈": [
+          {
+            "option": "23 잔망로즈",
+            "reviews": 10
+          },
+          {
+            "option": "[잔망루피/키링증정] 23 잔망로즈",
+            "reviews": 1
+          }
+        ],
+        "2|플러핑크": [
+          {
+            "option": "02 플러핑크",
+            "reviews": 31
+          },
+          {
+            "option": "[위글위글/캡키링] 02 플러핑크",
+            "reviews": 9
+          }
+        ],
+        "7|긱로즈": [
+          {
+            "option": "[포켓몬 에디션] 07 긱로즈",
+            "reviews": 38
+          },
+          {
+            "option": "[한정기획/미니증정] 07 긱로즈",
+            "reviews": 17
+          },
+          {
+            "option": "[ZB1건욱 기획] 07 긱로즈",
+            "reviews": 11
+          },
+          {
+            "option": "[랜덤 인형 기획] 07 긱로즈",
+            "reviews": 8
+          },
+          {
+            "option": "[어워즈 기획/틴팅라이너] 07 긱로즈",
+            "reviews": 6
+          },
+          {
+            "option": "07 긱로즈",
+            "reviews": 4
+          },
+          {
+            "option": "[틴케이스] 07 긱로즈",
+            "reviews": 1
+          },
+          {
+            "option": "[잔망루피/키링증정] 07 긱로즈",
+            "reviews": 1
+          }
+        ],
+        "8|힙초콜릿": [
+          {
+            "option": "[한정기획/미니증정] 08 힙초콜릿",
+            "reviews": 26
+          },
+          {
+            "option": "08 힙초콜릿",
+            "reviews": 15
+          }
+        ]
+      },
+      "p005": {
+        "바닐라70": [
+          {
+            "option": "[바닐라에디션기획] 바닐라 70%",
+            "reviews": 47
+          },
+          {
+            "option": "바닐라 70%",
+            "reviews": 16
+          },
+          {
+            "option": "[망그러진 곰] 바닐라 70%",
+            "reviews": 13
+          },
+          {
+            "option": "(+피치우롱 미니) 바닐라70%",
+            "reviews": 3
+          },
+          {
+            "option": "[피치우롱미니기획] 바닐라 70%",
+            "reviews": 3
+          }
+        ],
+        "요거트70": [
+          {
+            "option": "[로즈힙미니기획] 요거트 70%",
+            "reviews": 8
+          },
+          {
+            "option": "요거트 70%",
+            "reviews": 2
+          },
+          {
+            "option": "(+로즈힙 미니) 요거트70%",
+            "reviews": 1
+          }
+        ],
+        "피치70": [
+          {
+            "option": "[망그러진 곰] 피치 70%",
+            "reviews": 6
+          },
+          {
+            "option": "피치 70%",
+            "reviews": 3
+          }
+        ]
+      },
+      "p006": {
+        "20|살몬베이지": [
+          {
+            "option": "20 살몬 베이지",
+            "reviews": 94
+          },
+          {
+            "option": "[기획] 20 살몬베이지 베스트 기획*",
+            "reviews": 1
+          }
+        ],
+        "2|크리미핑크": [
+          {
+            "option": "02 크리미핑크",
+            "reviews": 22
+          },
+          {
+            "option": "[기획] 02크리미핑크 베스트 기획",
+            "reviews": 1
+          }
+        ]
+      },
+      "p007": {
+        "10|로체리": [
+          {
+            "option": "10 로 체리",
+            "reviews": 12
+          },
+          {
+            "option": "[한정기획] 10 로 체리+펄 글로스",
+            "reviews": 1
+          }
+        ],
+        "12|로휘그": [
+          {
+            "option": "[기획] 12 로 휘그+미니 글로스",
+            "reviews": 13
+          },
+          {
+            "option": "12 로 휘그",
+            "reviews": 12
+          },
+          {
+            "option": "[한정기획] 12 로 휘그+핑크글로스",
+            "reviews": 5
+          }
+        ],
+        "16|로베리": [
+          {
+            "option": "16 로 베리",
+            "reviews": 18
+          },
+          {
+            "option": "[LIMITED] 16 로 베리",
+            "reviews": 8
+          }
+        ],
+        "2|로로즈": [
+          {
+            "option": "02 로 로즈",
+            "reviews": 25
+          },
+          {
+            "option": "[기획] 02 로 로즈+미니 글로스",
+            "reviews": 18
+          }
+        ],
+        "34|오드로즈": [
+          {
+            "option": "[기획]34 오드로즈+미니글로스",
+            "reviews": 32
+          },
+          {
+            "option": "[NEW] 34 오드 로즈",
+            "reviews": 15
+          }
+        ],
+        "37|칠링로즈": [
+          {
+            "option": "[NEW/기획] 37 칠링 로즈+립펜슬",
+            "reviews": 61
+          },
+          {
+            "option": "[NEW/OY단독컬러] 37 칠링 로즈",
+            "reviews": 1
+          }
+        ],
+        "4|피버": [
+          {
+            "option": "[기획] 04 피버+미니 글로스",
+            "reviews": 23
+          },
+          {
+            "option": "04 피버",
+            "reviews": 12
+          }
+        ],
+        "8|레어": [
+          {
+            "option": "08 레어",
+            "reviews": 8
+          },
+          {
+            "option": "[LIMITED] 08 레어",
+            "reviews": 1
+          }
+        ]
+      },
+      "p008": {
+        "10|칠린라일락": [
+          {
+            "option": "[단품] 10 칠린 라일락",
+            "reviews": 11
+          },
+          {
+            "option": "[기획] 10칠린라일락(+핑거 브러쉬)",
+            "reviews": 10
+          }
+        ],
+        "11|보헤미안핑크": [
+          {
+            "option": "[기획] 11 보헤미안핑크(+복숭아퍼프)",
+            "reviews": 18
+          },
+          {
+            "option": "[단품] 11 보헤미안 핑크",
+            "reviews": 3
+          }
+        ],
+        "13|하이퍼핑크": [
+          {
+            "option": "[단품] 13 하이퍼 핑크",
+            "reviews": 7
+          },
+          {
+            "option": "[기획] 13하이퍼핑크(+핑거 브러쉬)",
+            "reviews": 7
+          }
+        ],
+        "19|토스트피치": [
+          {
+            "option": "[기획] 19 토스트피치(+벨벳퍼프2개)",
+            "reviews": 16
+          },
+          {
+            "option": "[기획] 19 토스트피치(+복숭아퍼프)",
+            "reviews": 14
+          }
+        ],
+        "1|바운싱피치": [
+          {
+            "option": "[기획] 01 바운싱피치(+벨벳퍼프2개)",
+            "reviews": 29
+          },
+          {
+            "option": "[기획] 01 바운싱피치(+복숭아퍼프)",
+            "reviews": 13
+          },
+          {
+            "option": "[단품] 01 바운싱 피치",
+            "reviews": 4
+          },
+          {
+            "option": "[기획] 01 바운싱피치(+삼각브러쉬)",
+            "reviews": 1
+          }
+        ],
+        "8|모브헤이즈": [
+          {
+            "option": "[기획] 08 모브헤이즈(+복숭아퍼프)",
+            "reviews": 4
+          },
+          {
+            "option": "[단품] 08 모브 헤이즈",
+            "reviews": 2
+          }
+        ],
+        "9|플러팅핑크": [
+          {
+            "option": "[기획] 09플러팅핑크(+핑거 브러쉬)",
+            "reviews": 6
+          },
+          {
+            "option": "[단품] 09 플러팅 핑크",
+            "reviews": 3
+          }
+        ]
+      },
+      "p009": {
+        "1|코렉트베이지": [
+          {
+            "option": "[브라이트너기획] 01코렉트 베이지",
+            "reviews": 132
+          },
+          {
+            "option": "01 코렉트 베이지",
+            "reviews": 86
+          },
+          {
+            "option": "[립펜슬 기획] 01 코렉트 베이지",
+            "reviews": 18
+          },
+          {
+            "option": "[블러실러증정] 01 코렉트베이지",
+            "reviews": 5
+          },
+          {
+            "option": "[2024어워즈기획]01코렉트베이지",
+            "reviews": 5
+          },
+          {
+            "option": "[브러쉬기획]01코렉트베이지",
+            "reviews": 4
+          },
+          {
+            "option": "[립컨실러 기획]01 코렉트 베이지",
+            "reviews": 2
+          },
+          {
+            "option": "[립컨실러기획] 01 코렉트 베이지",
+            "reviews": 1
+          },
+          {
+            "option": "[레디베이스기획]01코렉트베이지",
+            "reviews": 1
+          }
+        ],
+        "3|코렉트업베이지": [
+          {
+            "option": "[브라이트너기획] 03 코렉트업 베이지",
+            "reviews": 102
+          },
+          {
+            "option": "03 코렉트업 베이지",
+            "reviews": 71
+          },
+          {
+            "option": "[립펜슬 기획] 03 코렉트업 베이지",
+            "reviews": 19
+          },
+          {
+            "option": "[2024어워즈기획]03코렉트업베이지",
+            "reviews": 7
+          },
+          {
+            "option": "[블러실러증정] 03 코렉트업베이지",
+            "reviews": 5
+          },
+          {
+            "option": "[립컨실러 기획]03 코렉트업베이지",
+            "reviews": 5
+          }
+        ],
+        "5|다크업베이지": [
+          {
+            "option": "05 다크업 베이지",
+            "reviews": 19
+          },
+          {
+            "option": "05 다크업베이지",
+            "reviews": 2
+          }
+        ],
+        "6|블루베이지": [
+          {
+            "option": "06 블루베이지",
+            "reviews": 3
+          },
+          {
+            "option": "06 블루 베이지",
+            "reviews": 1
+          }
+        ],
+        "7|핑크베이지": [
+          {
+            "option": "07 핑크 베이지",
+            "reviews": 3
+          },
+          {
+            "option": "07 핑크베이지",
+            "reviews": 3
+          }
+        ]
+      },
+      "p010": {
+        "파우더": [
+          {
+            "option": "[단품]파우더12g(퍼프내장)",
+            "reviews": 123
+          },
+          {
+            "option": "[기획]파우더12g(퍼프내장)+브러쉬",
+            "reviews": 56
+          },
+          {
+            "option": "[헬로키티] 파우더+브러쉬",
+            "reviews": 34
+          },
+          {
+            "option": "[스누피에디션] 파우더12g+퍼프3개",
+            "reviews": 25
+          },
+          {
+            "option": "[기획] 파우더+미니파우더(3.2g)",
+            "reviews": 20
+          },
+          {
+            "option": "[한정기획] 파우더+브러쉬",
+            "reviews": 15
+          },
+          {
+            "option": "[기획]파우더+브러쉬+퍼프2개",
+            "reviews": 9
+          },
+          {
+            "option": "[기획]파우더12g+프라이머15ml",
+            "reviews": 8
+          }
+        ]
+      },
+      "p011": {
+        "13|포슬린": [
+          {
+            "option": "[기획/치크 증정] 13호 포슬린",
+            "reviews": 9
+          },
+          {
+            "option": "[기획/디즈니퍼프 증정] 13호 포슬린",
+            "reviews": 5
+          }
+        ],
+        "20|바닐라": [
+          {
+            "option": "[기획/세범컷 미니] 20호 바닐라",
+            "reviews": 27
+          },
+          {
+            "option": "[기획/치크 증정] 20호 바닐라",
+            "reviews": 25
+          },
+          {
+            "option": "[기획/디즈니퍼프 증정] 20호 바닐라",
+            "reviews": 16
+          },
+          {
+            "option": "[AD][본품+리필]20호 바닐라",
+            "reviews": 10
+          },
+          {
+            "option": "[기획/블러셔 키링] 20호 바닐라",
+            "reviews": 1
+          },
+          {
+            "option": "[본품+리필+미니 파우더] 20호 바닐라",
+            "reviews": 1
+          },
+          {
+            "option": "[기획/컨실러 20호] 20호 바닐라",
+            "reviews": 1
+          }
+        ],
+        "21|아이보리": [
+          {
+            "option": "[기획/디즈니퍼프 증정] 21호 아이보리",
+            "reviews": 37
+          },
+          {
+            "option": "[기획/세범컷 미니] 21호 아이보리",
+            "reviews": 33
+          },
+          {
+            "option": "[AD][본품+리필]21호 아이보리",
+            "reviews": 25
+          },
+          {
+            "option": "[기획/치크 증정] 21호 아이보리",
+            "reviews": 21
+          },
+          {
+            "option": "[기획/컨실러 21호] 21호 아이보리",
+            "reviews": 7
+          },
+          {
+            "option": "[미니 쿠션] 21호 아이보리",
+            "reviews": 2
+          }
+        ],
+        "22|페탈": [
+          {
+            "option": "[기획/세범컷 미니] 22호 페탈",
+            "reviews": 35
+          },
+          {
+            "option": "[AD][본품+리필]22호 페탈",
+            "reviews": 15
+          },
+          {
+            "option": "[기획/디즈니퍼프 증정] 22호 페탈",
+            "reviews": 15
+          },
+          {
+            "option": "[본품+리필+미니 파우더] 22호 페탈",
+            "reviews": 4
+          },
+          {
+            "option": "[기획/치크 증정] 22호 페탈",
+            "reviews": 4
+          },
+          {
+            "option": "[미니 쿠션] 22호 페탈",
+            "reviews": 2
+          },
+          {
+            "option": "[기획/블러셔 키링] 22호 페탈",
+            "reviews": 2
+          },
+          {
+            "option": "[기획/컨실러 22호] 22호 페탈",
+            "reviews": 1
+          }
+        ],
+        "23|베이지": [
+          {
+            "option": "[AD][본품+리필]23호 베이지",
+            "reviews": 25
+          },
+          {
+            "option": "[기획/디즈니퍼프 증정] 23호 베이지",
+            "reviews": 13
+          }
+        ]
+      },
+      "p012": {
+        "프렙": [
+          {
+            "option": "[기획] 프렙25ml+벨벳10ml+4ml",
+            "reviews": 200
+          },
+          {
+            "option": "[기획] 프렙 25ml+10ml",
+            "reviews": 74
+          },
+          {
+            "option": "[기획] 프렙40ml+벨벳10ml+펄4m",
+            "reviews": 47
+          },
+          {
+            "option": "[기획] 프렙 25ml+4ml+퍼프",
+            "reviews": 23
+          },
+          {
+            "option": "[단품] 프렙 40ml",
+            "reviews": 22
+          },
+          {
+            "option": "[단품] 프렙 25ml",
+            "reviews": 16
+          },
+          {
+            "option": "[기획] 프렙 40ml+선베이스10ml",
+            "reviews": 15
+          },
+          {
+            "option": "[기획] 프렙40ml+프렙10ml",
+            "reviews": 10
+          },
+          {
+            "option": "[기획]프렙40ml+물풀프렙10ml+퍼프",
+            "reviews": 7
+          }
+        ]
+      },
+      "p013": {
+        "글레이즈드도넛": [
+          {
+            "option": "글레이즈드 도넛 + 브러쉬 2ea",
+            "reviews": 61
+          },
+          {
+            "option": "글레이즈드 도넛",
+            "reviews": 36
+          },
+          {
+            "option": "[단품] 글레이즈드 도넛",
+            "reviews": 29
+          },
+          {
+            "option": "글레이즈드도넛 + 브러쉬",
+            "reviews": 9
+          },
+          {
+            "option": "[한정] 글레이즈드 도넛 +브러쉬&스티커",
+            "reviews": 1
+          },
+          {
+            "option": "[어워즈] 글레이즈드 도넛+ 룸스프레이",
+            "reviews": 1
+          }
+        ],
+        "데이드림": [
+          {
+            "option": "[코랄] 데이드림",
+            "reviews": 21
+          },
+          {
+            "option": "[단품] 데이드림",
+            "reviews": 15
+          },
+          {
+            "option": "데이드림+미니샤이닝퍼프",
+            "reviews": 3
+          }
+        ],
+        "라벤더아이싱": [
+          {
+            "option": "[홀리데이] 라벤더 아이싱 + 룸스프레이",
+            "reviews": 35
+          },
+          {
+            "option": "[단품] 라벤더 아이싱",
+            "reviews": 1
+          }
+        ],
+        "샴페인허쉬": [
+          {
+            "option": "[단품] 샴페인 허쉬",
+            "reviews": 12
+          },
+          {
+            "option": "샴페인 허쉬 + 브러쉬&스티커",
+            "reviews": 10
+          },
+          {
+            "option": "[NEW] 샴페인허쉬",
+            "reviews": 10
+          },
+          {
+            "option": "[홀리데이] 샴페인 허쉬 + 룸스프레이",
+            "reviews": 1
+          },
+          {
+            "option": "[한정] 샴페인허쉬 +브러쉬&스티커",
+            "reviews": 1
+          }
+        ],
+        "서울": [
+          {
+            "option": "서울",
+            "reviews": 4
+          },
+          {
+            "option": "[단품] 서울",
+            "reviews": 3
+          }
+        ],
+        "슈가쿠키": [
+          {
+            "option": "[단품] 슈가쿠키",
+            "reviews": 5
+          },
+          {
+            "option": "슈가쿠키",
+            "reviews": 1
+          }
+        ],
+        "스타아일랜드": [
+          {
+            "option": "[단품] 스타 아일랜드",
+            "reviews": 2
+          },
+          {
+            "option": "스타 아일랜드",
+            "reviews": 1
+          }
+        ],
+        "클라우드9": [
+          {
+            "option": "클라우드9 + 브러쉬 2ea",
+            "reviews": 54
+          },
+          {
+            "option": "[단품] 클라우드9",
+            "reviews": 25
+          },
+          {
+            "option": "클라우드9",
+            "reviews": 12
+          },
+          {
+            "option": "클라우드9+미니샤이닝퍼프",
+            "reviews": 6
+          },
+          {
+            "option": "[홀리데이] 클라우드 9 + 룸스프레이",
+            "reviews": 6
+          },
+          {
+            "option": "클라우드9 + 브러쉬&스티커",
+            "reviews": 3
+          },
+          {
+            "option": "[한정] 클라우드9+스크런치",
+            "reviews": 3
+          },
+          {
+            "option": "[한정] 클라우드9 +브러쉬&스티커",
+            "reviews": 2
+          }
+        ],
+        "페퍼민트": [
+          {
+            "option": "[단품] 페퍼민트",
+            "reviews": 25
+          },
+          {
+            "option": "[한정] 페퍼민트+스크런치",
+            "reviews": 6
+          },
+          {
+            "option": "페퍼민트",
+            "reviews": 6
+          },
+          {
+            "option": "[한정]페퍼민트+미니립스틱",
+            "reviews": 3
+          },
+          {
+            "option": "페퍼민트+ 브러쉬",
+            "reviews": 1
+          }
+        ],
+        "필로우토크": [
+          {
+            "option": "필로우토크 + 브러쉬 2ea",
+            "reviews": 29
+          },
+          {
+            "option": "[단품] 필로우 토크",
+            "reviews": 22
+          },
+          {
+            "option": "필로우 토크",
+            "reviews": 8
+          },
+          {
+            "option": "필로우토크 + 브러쉬",
+            "reviews": 5
+          }
+        ]
+      },
+      "p014": {
+        "라이트": [
+          {
+            "option": "[본품+리필] 라이트",
+            "reviews": 44
+          },
+          {
+            "option": "[SS에디션기획]라이트(본품+리필)",
+            "reviews": 23
+          },
+          {
+            "option": "[23어워즈 토퍼기획]라이트",
+            "reviews": 12
+          },
+          {
+            "option": "[일루미네이터+베이스증정기획] 라이트",
+            "reviews": 6
+          },
+          {
+            "option": "[2025 어워즈기획] 라이트",
+            "reviews": 5
+          },
+          {
+            "option": "[컨실러기획]라이트",
+            "reviews": 5
+          },
+          {
+            "option": "[틴트기획]라이트",
+            "reviews": 4
+          },
+          {
+            "option": "[미니쿠션증정기획] 라이트",
+            "reviews": 3
+          },
+          {
+            "option": "[글리터팟+립토퍼+물크림기획] 라이트",
+            "reviews": 2
+          },
+          {
+            "option": "[악마프2 에디션]라이트(본품+리필)",
+            "reviews": 1
+          },
+          {
+            "option": "[쿠션블러쉬+퍼프2P기획] 라이트",
+            "reviews": 1
+          },
+          {
+            "option": "[23홀리데이본품+리필]라이트",
+            "reviews": 1
+          }
+        ],
+        "미디엄": [
+          {
+            "option": "[본품+리필] 미디엄",
+            "reviews": 12
+          },
+          {
+            "option": "[글리터팟+립토퍼+물크림기획] 미디엄",
+            "reviews": 6
+          },
+          {
+            "option": "[미니쿠션증정기획] 미디엄",
+            "reviews": 4
+          },
+          {
+            "option": "[2025 어워즈기획] 미디엄",
+            "reviews": 3
+          },
+          {
+            "option": "[23홀리데이본품+리필]미디엄",
+            "reviews": 3
+          },
+          {
+            "option": "[컨실러기획]미디엄",
+            "reviews": 3
+          }
+        ],
+        "엔라이트": [
+          {
+            "option": "[본품+리필] 엔라이트",
+            "reviews": 25
+          },
+          {
+            "option": "[2025 어워즈기획] 엔라이트",
+            "reviews": 3
+          },
+          {
+            "option": "[악마프2 에디션]엔라이트(본품+리필)",
+            "reviews": 3
+          }
+        ],
+        "크림": [
+          {
+            "option": "[단독컬러/본품+리필] 크림",
+            "reviews": 39
+          },
+          {
+            "option": "[SS에디션기획]크림(본품+리필)",
+            "reviews": 18
+          },
+          {
+            "option": "[2025 어워즈기획/OY단독] 크림",
+            "reviews": 2
+          },
+          {
+            "option": "[올영단독][미니쿠션+퍼프1P기획] 크림",
+            "reviews": 2
+          }
+        ],
+        "크림핑크": [
+          {
+            "option": "[본품+리필] 크림핑크",
+            "reviews": 19
+          },
+          {
+            "option": "[2025 어워즈기획] 크림핑크",
+            "reviews": 3
+          }
+        ],
+        "페어": [
+          {
+            "option": "[본품+리필] 페어",
+            "reviews": 26
+          },
+          {
+            "option": "[2025 어워즈기획] 페어",
+            "reviews": 4
+          },
+          {
+            "option": "[쿠션블러쉬+퍼프2P기획] 페어",
+            "reviews": 3
+          },
+          {
+            "option": "[24 홀리데이 본품+리필] 페어",
+            "reviews": 2
+          },
+          {
+            "option": "[23홀리데이본품+리필]페어",
+            "reviews": 1
+          }
+        ],
+        "페어라이트": [
+          {
+            "option": "[본품+리필] 페어라이트",
+            "reviews": 57
+          },
+          {
+            "option": "[SS에디션기획]페어라이트(본품+리필)",
+            "reviews": 27
+          },
+          {
+            "option": "[글리터팟+립토퍼+물크림기획] 페어라이트",
+            "reviews": 23
+          },
+          {
+            "option": "[23홀리데이본품+리필]페어라이트",
+            "reviews": 18
+          },
+          {
+            "option": "[컨실러기획]페어라이트",
+            "reviews": 16
+          },
+          {
+            "option": "[23어워즈 토퍼기획]페어라이트",
+            "reviews": 13
+          },
+          {
+            "option": "[미니쿠션증정기획] 페어라이트",
+            "reviews": 9
+          },
+          {
+            "option": "[일루미네이터+베이스증정기획] 페어라이트",
+            "reviews": 8
+          },
+          {
+            "option": "[쿠션블러쉬+퍼프2P기획] 페어라이트",
+            "reviews": 7
+          },
+          {
+            "option": "[틴트기획]페어라이트",
+            "reviews": 5
+          },
+          {
+            "option": "[2025 어워즈기획] 페어라이트",
+            "reviews": 4
+          },
+          {
+            "option": "[악마프2 에디션]페어라이트(본품+리필)",
+            "reviews": 1
+          },
+          {
+            "option": "[미니쿠션+퍼프1P기획] 페어라이트",
+            "reviews": 1
+          }
+        ]
+      },
+      "p015": {
+        "19|C라이트": [
+          {
+            "option": "[미니파운데이션+퍼프+리필]19C 라이트",
+            "reviews": 43
+          },
+          {
+            "option": "[리필기획] 19C 라이트",
+            "reviews": 35
+          },
+          {
+            "option": "[액막이&본품&리필] 19C 라이트",
+            "reviews": 24
+          },
+          {
+            "option": "[어워즈ㅣ미니쿠션&리필] 19C 라이트",
+            "reviews": 3
+          },
+          {
+            "option": "[앰플본품&리필기획] 19C 라이트",
+            "reviews": 3
+          }
+        ],
+        "19|N포슬린": [
+          {
+            "option": "[미니파운데이션+퍼프+리필]19N 포슬린",
+            "reviews": 24
+          },
+          {
+            "option": "[액막이&본품&리필]19N 포슬린",
+            "reviews": 12
+          },
+          {
+            "option": "[리필기획] 19N 포슬린",
+            "reviews": 8
+          }
+        ],
+        "21|C란제리": [
+          {
+            "option": "[리필기획] 21C 란제리",
+            "reviews": 57
+          },
+          {
+            "option": "[미니파운데이션+퍼프+리필]21C 란제리",
+            "reviews": 50
+          },
+          {
+            "option": "[액막이&본품&리필] 21C 란제리",
+            "reviews": 24
+          },
+          {
+            "option": "[어워즈ㅣ미니쿠션&리필] 21C 란제리",
+            "reviews": 3
+          },
+          {
+            "option": "[앰플본품&리필기획] 21C 란제리",
+            "reviews": 1
+          }
+        ],
+        "21|N리넨": [
+          {
+            "option": "[미니파운데이션+퍼프+리필] 21N 리넨",
+            "reviews": 65
+          },
+          {
+            "option": "[리필기획] 21N 리넨",
+            "reviews": 44
+          },
+          {
+            "option": "[액막이&본품&리필] 21N 리넨",
+            "reviews": 23
+          },
+          {
+            "option": "[앰플본품&리필기획] 21N 리넨",
+            "reviews": 2
+          },
+          {
+            "option": "[어워즈ㅣ미니쿠션&리필] 21N 리넨",
+            "reviews": 2
+          }
+        ],
+        "23|N진저": [
+          {
+            "option": "[리필기획] 23N 진저",
+            "reviews": 37
+          },
+          {
+            "option": "[미니파운데이션+퍼프+리필] 23N 진저",
+            "reviews": 36
+          },
+          {
+            "option": "[액막이&본품&리필] 23N 진저",
+            "reviews": 4
+          }
+        ]
+      },
+      "p016": {
+        "11|클라우드피치": [
+          {
+            "option": "11 클라우드 피치",
+            "reviews": 17
+          },
+          {
+            "option": "[기획] 11 클라우드 피치+밀착퍼프",
+            "reviews": 6
+          }
+        ],
+        "12|피치넛": [
+          {
+            "option": "12 피치넛",
+            "reviews": 7
+          },
+          {
+            "option": "[기획] 12 피치넛+밀착퍼프",
+            "reviews": 6
+          }
+        ],
+        "13|로즈수플레": [
+          {
+            "option": "[기획] 13 로즈 수플레 + 타포린키링",
+            "reviews": 144
+          },
+          {
+            "option": "[단품] 13 로즈수플레 (그린용기)",
+            "reviews": 27
+          }
+        ],
+        "7|밀키모카": [
+          {
+            "option": "[기획] 07 밀키모카 + 타포린키링",
+            "reviews": 70
+          },
+          {
+            "option": "07 밀키모카",
+            "reviews": 12
+          },
+          {
+            "option": "[기획] 07 밀키모카+밀착퍼프",
+            "reviews": 9
+          },
+          {
+            "option": "[기획] 07 밀키모카+쿠키퍼프",
+            "reviews": 2
+          }
+        ],
+        "8|핑크티": [
+          {
+            "option": "[기획] 08 핑크티 + 타포린키링",
+            "reviews": 40
+          },
+          {
+            "option": "08 핑크티",
+            "reviews": 18
+          },
+          {
+            "option": "[기획] 08 핑크티+밀착퍼프",
+            "reviews": 4
+          },
+          {
+            "option": "[기획] 08 핑크티+쿠키퍼프",
+            "reviews": 2
+          }
+        ]
+      },
+      "p017": {
+        "13|N1": [
+          {
+            "option": "[+리필+쿠션블러셔+퍼프2p] 13N1",
+            "reviews": 29
+          },
+          {
+            "option": "13N1(본품+리필)",
+            "reviews": 26
+          }
+        ],
+        "17|N1": [
+          {
+            "option": "[+리필+쿠션블러셔+퍼프2p] 17N1",
+            "reviews": 50
+          },
+          {
+            "option": "17N1(본품+리필)",
+            "reviews": 16
+          },
+          {
+            "option": "[미니쿠션+미니파우더+퍼프1매]17N1",
+            "reviews": 8
+          },
+          {
+            "option": "[쿠션블러셔+립펜슬듀오] 17N1",
+            "reviews": 3
+          },
+          {
+            "option": "[미니쿠션&코렉팅쿼드+퍼프1매] 17N1",
+            "reviews": 2
+          }
+        ],
+        "21|C1": [
+          {
+            "option": "[+리필+쿠션블러셔+퍼프2p] 21C1",
+            "reviews": 29
+          },
+          {
+            "option": "21C1(본품+리필)",
+            "reviews": 11
+          },
+          {
+            "option": "[미니쿠션+미니파우더+퍼프1매]]21C1",
+            "reviews": 4
+          },
+          {
+            "option": "[미니쿠션+미니파우더+퍼프1매]21C1",
+            "reviews": 2
+          },
+          {
+            "option": "[미니쿠션&하이라이터기획] 21C1",
+            "reviews": 1
+          }
+        ],
+        "21|N1": [
+          {
+            "option": "[+리필+쿠션블러셔+퍼프2p] 21N1",
+            "reviews": 46
+          },
+          {
+            "option": "21N1(본품+리필)",
+            "reviews": 36
+          },
+          {
+            "option": "[미니쿠션+미니파우더+퍼프1매] 21N1",
+            "reviews": 11
+          },
+          {
+            "option": "[미니쿠션&하이라이터기획] 21N1",
+            "reviews": 11
+          },
+          {
+            "option": "[쿠션블러셔+립펜슬듀오] 21N1",
+            "reviews": 4
+          },
+          {
+            "option": "[미니쿠션&코렉팅쿼드+퍼프1매] 21N1",
+            "reviews": 3
+          },
+          {
+            "option": "[미니쿠션+미니파우더+퍼프1매]21N1",
+            "reviews": 2
+          }
+        ],
+        "23|N1": [
+          {
+            "option": "23N1(본품+리필)",
+            "reviews": 14
+          },
+          {
+            "option": "[쿠션블러셔+립펜슬듀오] 23N1",
+            "reviews": 1
+          },
+          {
+            "option": "[미니쿠션&하이라이터기획] 23N1",
+            "reviews": 1
+          }
+        ]
+      },
+      "p018": {
+        "13|쿨블렌딩": [
+          {
+            "option": "[단품] 13 쿨 블렌딩",
+            "reviews": 27
+          },
+          {
+            "option": "[브러쉬기획] 13 쿨 블렌딩",
+            "reviews": 1
+          },
+          {
+            "option": "[싱글섀도우기획]13 쿨 블렌딩*",
+            "reviews": 1
+          }
+        ],
+        "16|바이올렛니트": [
+          {
+            "option": "[단품] 16 바이올렛니트",
+            "reviews": 4
+          },
+          {
+            "option": "[브러쉬기획] 16바이올렛니트",
+            "reviews": 2
+          }
+        ],
+        "18|베리스무디": [
+          {
+            "option": "[단품]18 베리 스무디",
+            "reviews": 5
+          },
+          {
+            "option": "[글리터팟기획]18 베리스무디",
+            "reviews": 2
+          }
+        ],
+        "23|썸머코랄": [
+          {
+            "option": "[기획]23 썸머 코랄",
+            "reviews": 12
+          },
+          {
+            "option": "[단품]23 썸머 코랄*",
+            "reviews": 2
+          },
+          {
+            "option": "[증정기획]23 썸머 코랄",
+            "reviews": 1
+          }
+        ],
+        "27|로즈밀크티": [
+          {
+            "option": "[기획]27로즈밀크티(+스틱섀도우)",
+            "reviews": 31
+          },
+          {
+            "option": "[브러쉬 기획]27 로즈 밀크티",
+            "reviews": 27
+          },
+          {
+            "option": "[단품]27 로즈 밀크티",
+            "reviews": 8
+          },
+          {
+            "option": "[기획] 27 로즈밀크티 기획",
+            "reviews": 3
+          }
+        ],
+        "32|밀키애프리콧": [
+          {
+            "option": "[단품] 32 밀키 애프리콧",
+            "reviews": 31
+          },
+          {
+            "option": "[기획] 32 밀키 애프리콧 기획",
+            "reviews": 15
+          }
+        ],
+        "33|밀키베리": [
+          {
+            "option": "[기획] 33 밀키 베리 기획",
+            "reviews": 34
+          },
+          {
+            "option": "[단품] 33 밀키 베리",
+            "reviews": 12
+          }
+        ],
+        "35|러브엔젤": [
+          {
+            "option": "[기획]35러브엔젤(+발레리나키링)*",
+            "reviews": 7
+          },
+          {
+            "option": "[단품] 35 러브 엔젤",
+            "reviews": 4
+          }
+        ],
+        "36|다크엔젤": [
+          {
+            "option": "[단품] 36 다크 엔젤",
+            "reviews": 11
+          },
+          {
+            "option": "[기획]36다크엔젤(+발레리나키링)*",
+            "reviews": 4
+          }
+        ],
+        "38|코랄코티지": [
+          {
+            "option": "[NEW 단품] 38 코랄 코티지",
+            "reviews": 9
+          },
+          {
+            "option": "[NEW기획]코랄 코티지(+미니틴트)*",
+            "reviews": 6
+          }
+        ],
+        "39|로즈코티지": [
+          {
+            "option": "[NEW 단품] 39 로즈 코티지",
+            "reviews": 13
+          },
+          {
+            "option": "[NEW기획] 로즈 코티지(+미니틴트)*",
+            "reviews": 6
+          }
+        ],
+        "7|밀크라떼": [
+          {
+            "option": "[2024어워즈]07 밀크라떼 기획",
+            "reviews": 54
+          },
+          {
+            "option": "[기획] 07밀크라떼(+스틱섀도우)",
+            "reviews": 23
+          },
+          {
+            "option": "[단품] 07 밀크라떼",
+            "reviews": 10
+          },
+          {
+            "option": "[어워즈기획] 07 밀크라떼",
+            "reviews": 7
+          },
+          {
+            "option": "[어워즈 기획]07 밀크라떼 (+양말)*",
+            "reviews": 2
+          }
+        ]
+      },
+      "p019": {},
+      "p020": {
+        "1|블랙": [
+          {
+            "option": "(빙그레/1+1 기획) 01 블랙",
+            "reviews": 67
+          },
+          {
+            "option": "(1+1/기획) 01 블랙",
+            "reviews": 44
+          },
+          {
+            "option": "(1+1 기획) 01 블랙",
+            "reviews": 24
+          },
+          {
+            "option": "(트위저/기획) 01 블랙",
+            "reviews": 21
+          },
+          {
+            "option": "(망곰/픽서 기획) 01 블랙",
+            "reviews": 4
+          },
+          {
+            "option": "(단품) 01 블랙",
+            "reviews": 3
+          },
+          {
+            "option": "[어워즈 한정기획] 01 블랙",
+            "reviews": 1
+          },
+          {
+            "option": "01_블랙(1+1기획)",
+            "reviews": 1
+          }
+        ],
+        "2|브라운": [
+          {
+            "option": "(빙그레/1+1 기획) 02 브라운",
+            "reviews": 18
+          },
+          {
+            "option": "(1+1/기획) 02 브라운",
+            "reviews": 14
+          },
+          {
+            "option": "(트위저/기획) 02 브라운",
+            "reviews": 7
+          },
+          {
+            "option": "(망곰/픽서 기획) 02 브라운",
+            "reviews": 4
+          },
+          {
+            "option": "(1+1 기획) 02 브라운",
+            "reviews": 2
+          },
+          {
+            "option": "(단품) 02 브라운",
+            "reviews": 1
+          },
+          {
+            "option": "(어워즈/리무버 기획) 02 브라운",
+            "reviews": 1
+          }
+        ],
+        "3|그레이브라운": [
+          {
+            "option": "(1+1/기획) 03 그레이 브라운",
+            "reviews": 11
+          },
+          {
+            "option": "(트위저/기획) 03 그레이 브라운",
+            "reviews": 8
+          },
+          {
+            "option": "(망곰/픽서 기획) 03 그레이 브라운",
+            "reviews": 6
+          },
+          {
+            "option": "(1+1 기획) 03 그레이 브라운",
+            "reviews": 2
+          }
+        ],
+        "4|가닥볼륨": [
+          {
+            "option": "(1+1/기획) 04 가닥 볼륨",
+            "reviews": 32
+          },
+          {
+            "option": "(빙그레/1+1 기획) 04 가닥 볼륨",
+            "reviews": 14
+          },
+          {
+            "option": "(트위저/기획) 04 가닥볼륨",
+            "reviews": 10
+          },
+          {
+            "option": "(1+1 기획) 04 가닥 볼륨",
+            "reviews": 6
+          },
+          {
+            "option": "[어워즈 한정기획] 04 가닥볼륨",
+            "reviews": 1
+          },
+          {
+            "option": "(단품) 04 가닥볼륨",
+            "reviews": 1
+          },
+          {
+            "option": "(어워즈/리무버 기획) 04 가닥볼륨",
+            "reviews": 1
+          },
+          {
+            "option": "(망곰/픽서 기획) 04 가닥 볼륨",
+            "reviews": 1
+          },
+          {
+            "option": "(단품) 04 가닥 볼륨",
+            "reviews": 1
+          }
+        ],
+        "5|가닥롱래쉬": [
+          {
+            "option": "(미니 증정/기획) 05 가닥 롱래쉬",
+            "reviews": 110
+          },
+          {
+            "option": "(빙그레/1+1 기획) 05 가닥 롱래쉬",
+            "reviews": 30
+          },
+          {
+            "option": "(1+1/기획) 05 가닥 롱래쉬",
+            "reviews": 5
+          },
+          {
+            "option": "(단품) 05 가닥 롱래쉬",
+            "reviews": 3
+          }
+        ]
+      },
+      "p021": {
+        "10|레이지핑크블러링": [
+          {
+            "option": "[블러셔 기획]10호 레이지 핑크 블러링",
+            "reviews": 22
+          },
+          {
+            "option": "[아이프라이머 증정]10 레이지핑크블러링",
+            "reviews": 10
+          },
+          {
+            "option": "10 레이지 핑크 블러링",
+            "reviews": 10
+          },
+          {
+            "option": "[NEW/한정기획] 10 레이지핑크블러링",
+            "reviews": 2
+          }
+        ],
+        "21|폴인피그블러링": [
+          {
+            "option": "21 폴 인 피그 블러링",
+            "reviews": 1
+          },
+          {
+            "option": "[기획]21 폴 인 피그 블러링",
+            "reviews": 1
+          }
+        ],
+        "29|소이핑크블러링": [
+          {
+            "option": "[헬로키티/NEW/]29 소이핑크 블러링",
+            "reviews": 68
+          },
+          {
+            "option": "[재입고]29 소이 핑크 블러링",
+            "reviews": 37
+          }
+        ],
+        "30|클래시누드블러링": [
+          {
+            "option": "[갸루키티]30호 클래시누드블러링",
+            "reviews": 141
+          },
+          {
+            "option": "[블러셔 기획]30호 클래시 누드 블러링",
+            "reviews": 66
+          },
+          {
+            "option": "[재입고] ]30호 클래시 누드 블러링",
+            "reviews": 5
+          }
+        ],
+        "8|캔디코랄블러링": [
+          {
+            "option": "08 캔디 코랄 블러링",
+            "reviews": 45
+          },
+          {
+            "option": "[아이프라이머 증정]08 캔디코랄블러링",
+            "reviews": 8
+          },
+          {
+            "option": "[NEW/어워즈기획]08 캔디코랄블러링",
+            "reviews": 1
+          }
+        ]
+      },
+      "p022": {
+        "블랙속눈썹영양제": [
+          {
+            "option": "[포켓몬에디션] 블랙속눈썹영양제",
+            "reviews": 75
+          },
+          {
+            "option": "[단품] 블랙 속눈썹영양제",
+            "reviews": 9
+          },
+          {
+            "option": "[기획] 블랙 속눈썹영양제",
+            "reviews": 4
+          }
+        ],
+        "속눈썹영양제": [
+          {
+            "option": "[포켓몬에디션] 속눈썹영양제",
+            "reviews": 345
+          },
+          {
+            "option": "[단품] 속눈썹영양제",
+            "reviews": 62
+          },
+          {
+            "option": "[2025 어워즈] 속눈썹영양제",
+            "reviews": 3
+          },
+          {
+            "option": "[핑구콜라보] 속눈썹영양제",
+            "reviews": 1
+          },
+          {
+            "option": "[기획/4ml] 속눈썹영양제",
+            "reviews": 1
+          }
+        ]
+      },
+      "p023": {
+        "도화살몬": [
+          {
+            "option": "도화살몬",
+            "reviews": 58
+          },
+          {
+            "option": "[도화트임더블기획]도화살몬+로지뮤트*",
+            "reviews": 5
+          }
+        ],
+        "도화피그": [
+          {
+            "option": "도화피그",
+            "reviews": 8
+          },
+          {
+            "option": "[프라이머 기획] 도화피그*",
+            "reviews": 1
+          }
+        ],
+        "로지뮤트": [
+          {
+            "option": "[미니샤벳틴트기획] 로지뮤트*",
+            "reviews": 27
+          },
+          {
+            "option": "[단품] 로지뮤트",
+            "reviews": 12
+          },
+          {
+            "option": "[프라이머 기획] 로지뮤트*",
+            "reviews": 1
+          }
+        ],
+        "언더토프넛": [
+          {
+            "option": "[리뉴얼] 언더토프넛*",
+            "reviews": 50
+          },
+          {
+            "option": "[가로트임더블기획]언더토프넛+번트토스트*",
+            "reviews": 4
+          }
+        ],
+        "코코얼그레이": [
+          {
+            "option": "[미니샤벳틴트기획] 코코 얼그레이*",
+            "reviews": 27
+          },
+          {
+            "option": "[NEW/한정컬러]코코 얼그레이",
+            "reviews": 3
+          }
+        ],
+        "쿨티어": [
+          {
+            "option": "쿨티어",
+            "reviews": 47
+          },
+          {
+            "option": "[펜라이너 증정 기획] 쿨티어*",
+            "reviews": 4
+          }
+        ]
+      },
+      "p024": {
+        "11|모카토프": [
+          {
+            "option": "11 모카토프",
+            "reviews": 27
+          },
+          {
+            "option": "[더블기획] 11 모카토프",
+            "reviews": 1
+          }
+        ],
+        "3|내추럴브라운": [
+          {
+            "option": "03 내추럴 브라운",
+            "reviews": 49
+          },
+          {
+            "option": "[2개입] 03 내추럴브라운",
+            "reviews": 36
+          },
+          {
+            "option": "[+럭키부적/더블] 03 내추럴브라운",
+            "reviews": 1
+          }
+        ],
+        "8|토프베이지": [
+          {
+            "option": "08 토프 베이지",
+            "reviews": 82
+          },
+          {
+            "option": "[2개입] 08 토프베이지",
+            "reviews": 74
+          },
+          {
+            "option": "[+럭키부적/더블] 08 토프베이지",
+            "reviews": 1
+          }
+        ],
+        "9|토프브라운": [
+          {
+            "option": "[2개입] 09 토프브라운",
+            "reviews": 57
+          },
+          {
+            "option": "09 토프 브라운",
+            "reviews": 55
+          }
+        ]
+      },
+      "p025": {
+        "11|레터프롬스프링": [
+          {
+            "option": "[단품] 11 레터프롬스프링",
+            "reviews": 6
+          },
+          {
+            "option": "[기획] 레터프롬스프링",
+            "reviews": 2
+          }
+        ],
+        "12|폴인오트": [
+          {
+            "option": "[NEW 기획] 폴인오트",
+            "reviews": 10
+          },
+          {
+            "option": "[단품] 12 폴인오트",
+            "reviews": 1
+          }
+        ],
+        "13|얼모스트그레이프": [
+          {
+            "option": "[단품] 13 얼모스트 그레이프",
+            "reviews": 5
+          },
+          {
+            "option": "[한정] 얼모스트 그레이프(싱글)",
+            "reviews": 1
+          }
+        ],
+        "돌체피치": [
+          {
+            "option": "돌체 피치 (올영 단독)",
+            "reviews": 9
+          },
+          {
+            "option": "NEW 돌체 피치",
+            "reviews": 1
+          }
+        ],
+        "디뮤어": [
+          {
+            "option": "디뮤어(아이글리츠/HOT)",
+            "reviews": 1
+          },
+          {
+            "option": "디뮤어",
+            "reviews": 1
+          }
+        ],
+        "유자시트러스티": [
+          {
+            "option": "[기획] 유자 시트러스 티",
+            "reviews": 12
+          },
+          {
+            "option": "[단품] 유자 시트러스 티",
+            "reviews": 10
+          }
+        ],
+        "팔레트케이스": [
+          {
+            "option": "팔레트 케이스(8구)",
+            "reviews": 7
+          },
+          {
+            "option": "[NEW] 팔레트 케이스(3구)",
+            "reviews": 7
+          },
+          {
+            "option": "팔레트 케이스(4구)",
+            "reviews": 5
+          },
+          {
+            "option": "팔레트 케이스(3구)",
+            "reviews": 1
+          }
+        ],
+        "환타스틱": [
+          {
+            "option": "[올영단독] 환타스틱",
+            "reviews": 6
+          },
+          {
+            "option": "NEW 환타스틱",
+            "reviews": 1
+          }
+        ]
+      },
+      "p026": {},
+      "p027": {},
+      "p028": {},
+      "p029": {},
+      "p031": {
+        "40": [
+          {
+            "option": "40+40ml",
+            "reviews": 282
+          },
+          {
+            "option": "[10ml 추가] 40+40+10ml",
+            "reviews": 14
+          },
+          {
+            "option": "[어워즈기획] 40+40+10ml",
+            "reviews": 1
+          }
+        ]
+      },
+      "p035": {
+        "피디알엔세럼": [
+          {
+            "option": "피디알엔 세럼 30ml(+크림30ml)",
+            "reviews": 196
+          },
+          {
+            "option": "피디알엔 세럼 30ml 단품",
+            "reviews": 1
+          }
+        ]
+      },
+      "p037": {
+        "100|앰플2": [
+          {
+            "option": "100앰플 75ml*2+마스크팩1매",
+            "reviews": 40
+          },
+          {
+            "option": "(망곰) 100앰플 75ml*2+파우치",
+            "reviews": 11
+          }
+        ]
+      },
+      "p038": {
+        "30": [
+          {
+            "option": "[더블기획] 30+30ml",
+            "reviews": 204
+          },
+          {
+            "option": "[리필기획] 30+30ml+버즈파우치",
+            "reviews": 20
+          },
+          {
+            "option": "30+30ml+뚱시바키캡",
+            "reviews": 11
+          }
+        ]
+      },
+      "p041": {},
+      "p042": {},
+      "p044": {
+        "피디알엔크림": [
+          {
+            "option": "피디알엔 크림 60ml 2입",
+            "reviews": 239
+          },
+          {
+            "option": "피디알엔 크림 60ml (+30ml)",
+            "reviews": 228
+          },
+          {
+            "option": "피디알엔 크림 60ml 2입(+토너40)",
+            "reviews": 5
+          },
+          {
+            "option": "피디알엔 크림 60ml 단품",
+            "reviews": 1
+          }
+        ]
+      },
+      "p045": {
+        "크림60": [
+          {
+            "option": "[더블기획] 크림60+60ml",
+            "reviews": 478
+          },
+          {
+            "option": "[광채거울기획] 크림60+60+거울",
+            "reviews": 6
+          },
+          {
+            "option": "[어워즈기획] 크림60+60+세럼10ml",
+            "reviews": 6
+          }
+        ]
+      },
+      "p047": {},
+      "p048": {},
+      "p049": {},
+      "p050": {},
+      "p051": {},
+      "p052": {},
+      "p053": {
+        "21|N1": [
+          {
+            "option": "[본품+리필] 21N1",
+            "reviews": 29
+          },
+          {
+            "option": "[한정기획] 21N1",
+            "reviews": 15
+          },
+          {
+            "option": "[본품+미니쿠션+퍼프]21N1",
+            "reviews": 9
+          }
+        ],
+        "23|N1": [
+          {
+            "option": "[본품+미니쿠션+퍼프]23N1",
+            "reviews": 24
+          },
+          {
+            "option": "[본품+리필] 23N1",
+            "reviews": 14
+          },
+          {
+            "option": "[한정기획] 23N1",
+            "reviews": 3
+          }
+        ]
+      }
+    },
+    "containmentPairs": [
+      {
+        "productId": "p005",
+        "narrow": "소르베70",
+        "wide": "바닐라소르베70",
+        "narrowReviews": 9,
+        "wideReviews": 131
+      },
+      {
+        "productId": "p006",
+        "narrow": "21|로지립스",
+        "wide": "21|로지립스아이스페어리세트",
+        "narrowReviews": 21,
+        "wideReviews": 4
+      },
+      {
+        "productId": "p006",
+        "narrow": "20|살몬베이지",
+        "wide": "20|살몬베이지소프트아몬드",
+        "narrowReviews": 95,
+        "wideReviews": 73
+      },
+      {
+        "productId": "p006",
+        "narrow": "20|살몬베이지",
+        "wide": "20|살몬베이지오버립라이팅",
+        "narrowReviews": 95,
+        "wideReviews": 6
+      },
+      {
+        "productId": "p006",
+        "narrow": "6|로즈베이지",
+        "wide": "6|로즈베이지토스티드",
+        "narrowReviews": 60,
+        "wideReviews": 8
+      },
+      {
+        "productId": "p006",
+        "narrow": "2|크리미핑크",
+        "wide": "2|크리미핑크오버립라이팅",
+        "narrowReviews": 23,
+        "wideReviews": 19
+      },
+      {
+        "productId": "p006",
+        "narrow": "2|크리미핑크",
+        "wide": "2|크리미핑크에겐걸",
+        "narrowReviews": 23,
+        "wideReviews": 1
+      },
+      {
+        "productId": "p006",
+        "narrow": "14|캄핑크",
+        "wide": "14|캄핑크비터스트로베리",
+        "narrowReviews": 16,
+        "wideReviews": 49
+      },
+      {
+        "productId": "p006",
+        "narrow": "14|캄핑크",
+        "wide": "14|캄핑크블렌드모브",
+        "narrowReviews": 16,
+        "wideReviews": 9
+      },
+      {
+        "productId": "p007",
+        "narrow": "8|레어",
+        "wide": "18|레어피치",
+        "narrowReviews": 9,
+        "wideReviews": 7
+      },
+      {
+        "productId": "p007",
+        "narrow": "7|칠",
+        "wide": "38|칠링모브",
+        "narrowReviews": 4,
+        "wideReviews": 47
+      },
+      {
+        "productId": "p007",
+        "narrow": "7|칠",
+        "wide": "37|칠링로즈",
+        "narrowReviews": 4,
+        "wideReviews": 62
+      },
+      {
+        "productId": "p010",
+        "narrow": "파우더",
+        "wide": "미니파우더",
+        "narrowReviews": 290,
+        "wideReviews": 23
+      },
+      {
+        "productId": "p011",
+        "narrow": "20|바닐라",
+        "wide": "1|바닐라",
+        "narrowReviews": 81,
+        "wideReviews": 2
+      },
+      {
+        "productId": "p011",
+        "narrow": "1|바닐라",
+        "wide": "20|바닐라",
+        "narrowReviews": 2,
+        "wideReviews": 81
+      },
+      {
+        "productId": "p012",
+        "narrow": "프렙",
+        "wide": "벨벳프렙",
+        "narrowReviews": 414,
+        "wideReviews": 14
+      },
+      {
+        "productId": "p012",
+        "narrow": "프렙",
+        "wide": "펄프렙",
+        "narrowReviews": 414,
+        "wideReviews": 1
+      },
+      {
+        "productId": "p014",
+        "narrow": "라이트",
+        "wide": "페어라이트",
+        "narrowReviews": 107,
+        "wideReviews": 189
+      },
+      {
+        "productId": "p014",
+        "narrow": "라이트",
+        "wide": "로즈라이트",
+        "narrowReviews": 107,
+        "wideReviews": 4
+      },
+      {
+        "productId": "p014",
+        "narrow": "라이트",
+        "wide": "엔라이트",
+        "narrowReviews": 107,
+        "wideReviews": 31
+      },
+      {
+        "productId": "p014",
+        "narrow": "라이트",
+        "wide": "핑크라이트",
+        "narrowReviews": 107,
+        "wideReviews": 6
+      },
+      {
+        "productId": "p014",
+        "narrow": "크림",
+        "wide": "크림핑크",
+        "narrowReviews": 61,
+        "wideReviews": 22
+      },
+      {
+        "productId": "p014",
+        "narrow": "페어",
+        "wide": "페어라이트",
+        "narrowReviews": 36,
+        "wideReviews": 189
+      },
+      {
+        "productId": "p014",
+        "narrow": "페어",
+        "wide": "페어로즈",
+        "narrowReviews": 36,
+        "wideReviews": 9
+      },
+      {
+        "productId": "p014",
+        "narrow": "페어",
+        "wide": "페어핑크",
+        "narrowReviews": 36,
+        "wideReviews": 3
+      },
+      {
+        "productId": "p014",
+        "narrow": "미디엄",
+        "wide": "미디엄딥",
+        "narrowReviews": 31,
+        "wideReviews": 1
+      },
+      {
+        "productId": "p017",
+        "narrow": "21|N1",
+        "wide": "23|N1",
+        "narrowReviews": 113,
+        "wideReviews": 16
+      },
+      {
+        "productId": "p017",
+        "narrow": "21|N1",
+        "wide": "17|N1",
+        "narrowReviews": 113,
+        "wideReviews": 79
+      },
+      {
+        "productId": "p017",
+        "narrow": "21|N1",
+        "wide": "13|N1",
+        "narrowReviews": 113,
+        "wideReviews": 55
+      },
+      {
+        "productId": "p017",
+        "narrow": "21|N1",
+        "wide": "25|N1",
+        "narrowReviews": 113,
+        "wideReviews": 3
+      },
+      {
+        "productId": "p017",
+        "narrow": "21|N1",
+        "wide": "27|N1",
+        "narrowReviews": 113,
+        "wideReviews": 1
+      },
+      {
+        "productId": "p017",
+        "narrow": "23|N1",
+        "wide": "21|N1",
+        "narrowReviews": 16,
+        "wideReviews": 113
+      },
+      {
+        "productId": "p017",
+        "narrow": "23|N1",
+        "wide": "17|N1",
+        "narrowReviews": 16,
+        "wideReviews": 79
+      },
+      {
+        "productId": "p017",
+        "narrow": "23|N1",
+        "wide": "13|N1",
+        "narrowReviews": 16,
+        "wideReviews": 55
+      },
+      {
+        "productId": "p017",
+        "narrow": "23|N1",
+        "wide": "25|N1",
+        "narrowReviews": 16,
+        "wideReviews": 3
+      },
+      {
+        "productId": "p017",
+        "narrow": "23|N1",
+        "wide": "27|N1",
+        "narrowReviews": 16,
+        "wideReviews": 1
+      },
+      {
+        "productId": "p017",
+        "narrow": "21|C1",
+        "wide": "17|C1",
+        "narrowReviews": 47,
+        "wideReviews": 24
+      },
+      {
+        "productId": "p017",
+        "narrow": "21|C1",
+        "wide": "23|C1",
+        "narrowReviews": 47,
+        "wideReviews": 3
+      },
+      {
+        "productId": "p017",
+        "narrow": "17|N1",
+        "wide": "21|N1",
+        "narrowReviews": 79,
+        "wideReviews": 113
+      },
+      {
+        "productId": "p017",
+        "narrow": "17|N1",
+        "wide": "23|N1",
+        "narrowReviews": 79,
+        "wideReviews": 16
+      },
+      {
+        "productId": "p017",
+        "narrow": "17|N1",
+        "wide": "13|N1",
+        "narrowReviews": 79,
+        "wideReviews": 55
+      },
+      {
+        "productId": "p017",
+        "narrow": "17|N1",
+        "wide": "25|N1",
+        "narrowReviews": 79,
+        "wideReviews": 3
+      },
+      {
+        "productId": "p017",
+        "narrow": "17|N1",
+        "wide": "27|N1",
+        "narrowReviews": 79,
+        "wideReviews": 1
+      },
+      {
+        "productId": "p017",
+        "narrow": "13|N1",
+        "wide": "21|N1",
+        "narrowReviews": 55,
+        "wideReviews": 113
+      },
+      {
+        "productId": "p017",
+        "narrow": "13|N1",
+        "wide": "23|N1",
+        "narrowReviews": 55,
+        "wideReviews": 16
+      },
+      {
+        "productId": "p017",
+        "narrow": "13|N1",
+        "wide": "17|N1",
+        "narrowReviews": 55,
+        "wideReviews": 79
+      },
+      {
+        "productId": "p017",
+        "narrow": "13|N1",
+        "wide": "25|N1",
+        "narrowReviews": 55,
+        "wideReviews": 3
+      },
+      {
+        "productId": "p017",
+        "narrow": "13|N1",
+        "wide": "27|N1",
+        "narrowReviews": 55,
+        "wideReviews": 1
+      },
+      {
+        "productId": "p017",
+        "narrow": "25|N1",
+        "wide": "21|N1",
+        "narrowReviews": 3,
+        "wideReviews": 113
+      },
+      {
+        "productId": "p017",
+        "narrow": "25|N1",
+        "wide": "23|N1",
+        "narrowReviews": 3,
+        "wideReviews": 16
+      },
+      {
+        "productId": "p017",
+        "narrow": "25|N1",
+        "wide": "17|N1",
+        "narrowReviews": 3,
+        "wideReviews": 79
+      },
+      {
+        "productId": "p017",
+        "narrow": "25|N1",
+        "wide": "13|N1",
+        "narrowReviews": 3,
+        "wideReviews": 55
+      },
+      {
+        "productId": "p017",
+        "narrow": "25|N1",
+        "wide": "27|N1",
+        "narrowReviews": 3,
+        "wideReviews": 1
+      },
+      {
+        "productId": "p017",
+        "narrow": "17|C1",
+        "wide": "21|C1",
+        "narrowReviews": 24,
+        "wideReviews": 47
+      },
+      {
+        "productId": "p017",
+        "narrow": "17|C1",
+        "wide": "23|C1",
+        "narrowReviews": 24,
+        "wideReviews": 3
+      },
+      {
+        "productId": "p017",
+        "narrow": "23|C1",
+        "wide": "21|C1",
+        "narrowReviews": 3,
+        "wideReviews": 47
+      },
+      {
+        "productId": "p017",
+        "narrow": "23|C1",
+        "wide": "17|C1",
+        "narrowReviews": 3,
+        "wideReviews": 24
+      },
+      {
+        "productId": "p017",
+        "narrow": "27|N1",
+        "wide": "21|N1",
+        "narrowReviews": 1,
+        "wideReviews": 113
+      },
+      {
+        "productId": "p017",
+        "narrow": "27|N1",
+        "wide": "23|N1",
+        "narrowReviews": 1,
+        "wideReviews": 16
+      },
+      {
+        "productId": "p017",
+        "narrow": "27|N1",
+        "wide": "17|N1",
+        "narrowReviews": 1,
+        "wideReviews": 79
+      },
+      {
+        "productId": "p017",
+        "narrow": "27|N1",
+        "wide": "13|N1",
+        "narrowReviews": 1,
+        "wideReviews": 55
+      },
+      {
+        "productId": "p017",
+        "narrow": "27|N1",
+        "wide": "25|N1",
+        "narrowReviews": 1,
+        "wideReviews": 3
+      },
+      {
+        "productId": "p020",
+        "narrow": "1|블랙",
+        "wide": "닥터마스카라픽서02블랙",
+        "narrowReviews": 165,
+        "wideReviews": 20
+      },
+      {
+        "productId": "p020",
+        "narrow": "2|브라운",
+        "wide": "3|그레이브라운",
+        "narrowReviews": 47,
+        "wideReviews": 27
+      },
+      {
+        "productId": "p020",
+        "narrow": "2|브라운",
+        "wide": "닥터마스카라픽서03브라운",
+        "narrowReviews": 47,
+        "wideReviews": 7
+      },
+      {
+        "productId": "p022",
+        "narrow": "속눈썹영양제",
+        "wide": "블랙속눈썹영양제",
+        "narrowReviews": 412,
+        "wideReviews": 88
+      },
+      {
+        "productId": "p023",
+        "narrow": "도화살몬",
+        "wide": "도화살몬밀크",
+        "narrowReviews": 63,
+        "wideReviews": 46
+      },
+      {
+        "productId": "p023",
+        "narrow": "토프넛",
+        "wide": "언더토프넛",
+        "narrowReviews": 1,
+        "wideReviews": 54
+      },
+      {
+        "productId": "p025",
+        "narrow": "이너프",
+        "wide": "굿이너프",
+        "narrowReviews": 4,
+        "wideReviews": 4
+      },
+      {
+        "productId": "p041",
+        "narrow": "튜브",
+        "wide": "jar튜브",
+        "narrowReviews": 2,
+        "wideReviews": 1
+      },
+      {
+        "productId": "p041",
+        "narrow": "튜브",
+        "wide": "튜브튜브",
+        "narrowReviews": 2,
+        "wideReviews": 18
+      },
+      {
+        "productId": "p052",
+        "narrow": "21|아이보리",
+        "wide": "2|아이보리",
+        "narrowReviews": 1,
+        "wideReviews": 1
+      },
+      {
+        "productId": "p052",
+        "narrow": "2|아이보리",
+        "wide": "21|아이보리",
+        "narrowReviews": 1,
+        "wideReviews": 1
+      },
+      {
+        "productId": "p053",
+        "narrow": "13|N1",
+        "wide": "17|N1",
+        "narrowReviews": 15,
+        "wideReviews": 29
+      },
+      {
+        "productId": "p053",
+        "narrow": "13|N1",
+        "wide": "21|N1",
+        "narrowReviews": 15,
+        "wideReviews": 53
+      },
+      {
+        "productId": "p053",
+        "narrow": "13|N1",
+        "wide": "23|N1",
+        "narrowReviews": 15,
+        "wideReviews": 41
+      },
+      {
+        "productId": "p053",
+        "narrow": "17|N1",
+        "wide": "13|N1",
+        "narrowReviews": 29,
+        "wideReviews": 15
+      },
+      {
+        "productId": "p053",
+        "narrow": "17|N1",
+        "wide": "21|N1",
+        "narrowReviews": 29,
+        "wideReviews": 53
+      },
+      {
+        "productId": "p053",
+        "narrow": "17|N1",
+        "wide": "23|N1",
+        "narrowReviews": 29,
+        "wideReviews": 41
+      },
+      {
+        "productId": "p053",
+        "narrow": "21|N1",
+        "wide": "13|N1",
+        "narrowReviews": 53,
+        "wideReviews": 15
+      },
+      {
+        "productId": "p053",
+        "narrow": "21|N1",
+        "wide": "17|N1",
+        "narrowReviews": 53,
+        "wideReviews": 29
+      },
+      {
+        "productId": "p053",
+        "narrow": "21|N1",
+        "wide": "23|N1",
+        "narrowReviews": 53,
+        "wideReviews": 41
+      },
+      {
+        "productId": "p053",
+        "narrow": "23|N1",
+        "wide": "13|N1",
+        "narrowReviews": 41,
+        "wideReviews": 15
+      },
+      {
+        "productId": "p053",
+        "narrow": "23|N1",
+        "wide": "17|N1",
+        "narrowReviews": 41,
+        "wideReviews": 29
+      },
+      {
+        "productId": "p053",
+        "narrow": "23|N1",
+        "wide": "21|N1",
+        "narrowReviews": 41,
+        "wideReviews": 53
+      },
+      {
+        "productId": "p053",
+        "narrow": "17|C1",
+        "wide": "23|C1",
+        "narrowReviews": 9,
+        "wideReviews": 2
+      },
+      {
+        "productId": "p053",
+        "narrow": "17|C1",
+        "wide": "21|C1",
+        "narrowReviews": 9,
+        "wideReviews": 10
+      },
+      {
+        "productId": "p053",
+        "narrow": "23|C1",
+        "wide": "17|C1",
+        "narrowReviews": 2,
+        "wideReviews": 9
+      },
+      {
+        "productId": "p053",
+        "narrow": "23|C1",
+        "wide": "21|C1",
+        "narrowReviews": 2,
+        "wideReviews": 10
+      },
+      {
+        "productId": "p053",
+        "narrow": "21|C1",
+        "wide": "17|C1",
+        "narrowReviews": 10,
+        "wideReviews": 9
+      },
+      {
+        "productId": "p053",
+        "narrow": "21|C1",
+        "wide": "23|C1",
+        "narrowReviews": 10,
+        "wideReviews": 2
+      }
+    ]
+  },
+  "cuts": {
+    "reviews": 25000,
+    "passed": 22194,
+    "rejected": {
+      "recency_cut": {
+        "reviews": 2806,
+        "label": "기간초과"
+      }
+    },
+    "limitations": {
+      "renewal_unobserved": 45
+    },
+    "byProduct": {
+      "p001": {
+        "reviews": 500,
+        "passed": 500,
+        "rejected": {}
+      },
+      "p002": {
+        "reviews": 500,
+        "passed": 500,
+        "rejected": {}
+      },
+      "p003": {
+        "reviews": 500,
+        "passed": 500,
+        "rejected": {}
+      },
+      "p004": {
+        "reviews": 493,
+        "passed": 493,
+        "rejected": {}
+      },
+      "p005": {
+        "reviews": 500,
+        "passed": 500,
+        "rejected": {}
+      },
+      "p006": {
+        "reviews": 500,
+        "passed": 495,
+        "rejected": {
+          "recency_cut": 5
+        }
+      },
+      "p007": {
+        "reviews": 500,
+        "passed": 499,
+        "rejected": {
+          "recency_cut": 1
+        }
+      },
+      "p008": {
+        "reviews": 500,
+        "passed": 500,
+        "rejected": {}
+      },
+      "p009": {
+        "reviews": 500,
+        "passed": 500,
+        "rejected": {}
+      },
+      "p010": {
+        "reviews": 500,
+        "passed": 187,
+        "rejected": {
+          "recency_cut": 313
+        }
+      },
+      "p011": {
+        "reviews": 496,
+        "passed": 496,
+        "rejected": {}
+      },
+      "p012": {
+        "reviews": 500,
+        "passed": 500,
+        "rejected": {}
+      },
+      "p013": {
+        "reviews": 500,
+        "passed": 500,
+        "rejected": {}
+      },
+      "p014": {
+        "reviews": 500,
+        "passed": 370,
+        "rejected": {
+          "recency_cut": 130
+        }
+      },
+      "p015": {
+        "reviews": 500,
+        "passed": 500,
+        "rejected": {}
+      },
+      "p016": {
+        "reviews": 500,
+        "passed": 500,
+        "rejected": {}
+      },
+      "p017": {
+        "reviews": 341,
+        "passed": 289,
+        "rejected": {
+          "recency_cut": 52
+        }
+      },
+      "p018": {
+        "reviews": 500,
+        "passed": 427,
+        "rejected": {
+          "recency_cut": 73
+        }
+      },
+      "p019": {
+        "reviews": 500,
+        "passed": 500,
+        "rejected": {}
+      },
+      "p020": {
+        "reviews": 500,
+        "passed": 500,
+        "rejected": {}
+      },
+      "p021": {
+        "reviews": 500,
+        "passed": 500,
+        "rejected": {}
+      },
+      "p022": {
+        "reviews": 500,
+        "passed": 496,
+        "rejected": {
+          "recency_cut": 4
+        }
+      },
+      "p023": {
+        "reviews": 500,
+        "passed": 500,
+        "rejected": {}
+      },
+      "p024": {
+        "reviews": 500,
+        "passed": 500,
+        "rejected": {}
+      },
+      "p025": {
+        "reviews": 500,
+        "passed": 500,
+        "rejected": {}
+      },
+      "p026": {
+        "reviews": 500,
+        "passed": 500,
+        "rejected": {}
+      },
+      "p027": {
+        "reviews": 500,
+        "passed": 500,
+        "rejected": {}
+      },
+      "p028": {
+        "reviews": 500,
+        "passed": 429,
+        "rejected": {
+          "recency_cut": 71
+        }
+      },
+      "p029": {
+        "reviews": 500,
+        "passed": 500,
+        "rejected": {}
+      },
+      "p030": {
+        "reviews": 500,
+        "passed": 500,
+        "rejected": {}
+      },
+      "p031": {
+        "reviews": 500,
+        "passed": 471,
+        "rejected": {
+          "recency_cut": 29
+        }
+      },
+      "p032": {
+        "reviews": 500,
+        "passed": 500,
+        "rejected": {}
+      },
+      "p033": {
+        "reviews": 500,
+        "passed": 462,
+        "rejected": {
+          "recency_cut": 38
+        }
+      },
+      "p034": {
+        "reviews": 500,
+        "passed": 496,
+        "rejected": {
+          "recency_cut": 4
+        }
+      },
+      "p035": {
+        "reviews": 500,
+        "passed": 500,
+        "rejected": {}
+      },
+      "p036": {
+        "reviews": 500,
+        "passed": 196,
+        "rejected": {
+          "recency_cut": 304
+        }
+      },
+      "p037": {
+        "reviews": 500,
+        "passed": 500,
+        "rejected": {}
+      },
+      "p038": {
+        "reviews": 500,
+        "passed": 337,
+        "rejected": {
+          "recency_cut": 163
+        }
+      },
+      "p039": {
+        "reviews": 500,
+        "passed": 283,
+        "rejected": {
+          "recency_cut": 217
+        }
+      },
+      "p040": {
+        "reviews": 500,
+        "passed": 500,
+        "rejected": {}
+      },
+      "p041": {
+        "reviews": 500,
+        "passed": 401,
+        "rejected": {
+          "recency_cut": 99
+        }
+      },
+      "p042": {
+        "reviews": 500,
+        "passed": 498,
+        "rejected": {
+          "recency_cut": 2
+        }
+      },
+      "p043": {
+        "reviews": 500,
+        "passed": 500,
+        "rejected": {}
+      },
+      "p044": {
+        "reviews": 500,
+        "passed": 500,
+        "rejected": {}
+      },
+      "p045": {
+        "reviews": 500,
+        "passed": 342,
+        "rejected": {
+          "recency_cut": 158
+        }
+      },
+      "p046": {
+        "reviews": 500,
+        "passed": 499,
+        "rejected": {
+          "recency_cut": 1
+        }
+      },
+      "p047": {
+        "reviews": 500,
+        "passed": 245,
+        "rejected": {
+          "recency_cut": 255
+        }
+      },
+      "p048": {
+        "reviews": 500,
+        "passed": 481,
+        "rejected": {
+          "recency_cut": 19
+        }
+      },
+      "p049": {
+        "reviews": 500,
+        "passed": 269,
+        "rejected": {
+          "recency_cut": 231
+        }
+      },
+      "p050": {
+        "reviews": 500,
+        "passed": 26,
+        "rejected": {
+          "recency_cut": 474
+        }
+      },
+      "p051": {
+        "reviews": 7,
+        "passed": 7,
+        "rejected": {}
+      },
+      "p052": {
+        "reviews": 4,
+        "passed": 0,
+        "rejected": {
+          "recency_cut": 4
+        }
+      },
+      "p053": {
+        "reviews": 159,
+        "passed": 0,
+        "rejected": {
+          "recency_cut": 159
+        }
+      }
+    }
+  },
+  "optionScopedCut": {
+    "note": "제품별로 가장 큰 색상 1개를 범위로 걸었을 때",
+    "products": 31,
+    "totals": {
+      "option_mismatch": 7827,
+      "option_unstated": 295,
+      "passed": 4776,
+      "recency_cut": 1102,
+      "reviews": 14000
+    },
+    "byProduct": {
+      "p001": {
+        "displayName": "3CE 캐시미어 허그 립스틱",
+        "scope": "허쉬레드",
+        "reviews": 500,
+        "passed": 101,
+        "rejected": {
+          "option_mismatch": 399
+        }
+      },
+      "p002": {
+        "displayName": "롬앤 더 쥬시 래스팅 틴트",
+        "scope": "3|베어그레이프",
+        "reviews": 500,
+        "passed": 114,
+        "rejected": {
+          "option_mismatch": 386
+        }
+      },
+      "p003": {
+        "displayName": "유리아쥬 스틱레브르 컬러드",
+        "scope": "1|올리브영N성수누디브륄레",
+        "reviews": 500,
+        "passed": 115,
+        "rejected": {
+          "option_mismatch": 385
+        }
+      },
+      "p004": {
+        "displayName": "컬러그램 누디 블러 틴트",
+        "scope": "7|긱로즈",
+        "reviews": 493,
+        "passed": 86,
+        "rejected": {
+          "option_mismatch": 407
+        }
+      },
+      "p005": {
+        "displayName": "퓌 3D 볼류밍 글로스",
+        "scope": "바닐라쿠키70",
+        "reviews": 500,
+        "passed": 139,
+        "rejected": {
+          "option_mismatch": 361
+        }
+      },
+      "p006": {
+        "displayName": "하트퍼센트 도트 온 무드 립펜슬",
+        "scope": "20|살몬베이지",
+        "reviews": 500,
+        "passed": 95,
+        "rejected": {
+          "option_mismatch": 400,
+          "recency_cut": 5
+        }
+      },
+      "p007": {
+        "displayName": "힌스 로 글로우 젤 틴트",
+        "scope": "37|칠링로즈",
+        "reviews": 500,
+        "passed": 62,
+        "rejected": {
+          "option_mismatch": 437,
+          "recency_cut": 1
+        }
+      },
+      "p008": {
+        "displayName": "VDL 치크스테인 블러셔",
+        "scope": "22|바운싱레몬듀오",
+        "reviews": 500,
+        "passed": 131,
+        "rejected": {
+          "option_mismatch": 369
+        }
+      },
+      "p009": {
+        "displayName": "더샘 커버 퍼펙션 트리플 팟 컨실러",
+        "scope": "1|코렉트베이지",
+        "reviews": 500,
+        "passed": 254,
+        "rejected": {
+          "option_mismatch": 246
+        }
+      },
+      "p010": {
+        "displayName": "바닐라코 프라임 프라이머 피니쉬 파우더",
+        "scope": "파우더",
+        "reviews": 500,
+        "passed": 164,
+        "rejected": {
+          "option_mismatch": 23,
+          "recency_cut": 313
+        }
+      },
+      "p011": {
+        "displayName": "에스쁘아 비벨벳 커버쿠션",
+        "scope": "전용퍼프비벨벳쿠션퍼프5매입",
+        "reviews": 496,
+        "passed": 144,
+        "rejected": {
+          "option_mismatch": 352
+        }
+      },
+      "p012": {
+        "displayName": "연작 스킨 퍼펙팅 프로텍티브 베이스프렙",
+        "scope": "프렙",
+        "reviews": 500,
+        "passed": 414,
+        "rejected": {
+          "option_mismatch": 86
+        }
+      },
+      "p013": {
+        "displayName": "오프라 미니 하이라이터",
+        "scope": "글레이즈드도넛",
+        "reviews": 500,
+        "passed": 137,
+        "rejected": {
+          "option_mismatch": 351,
+          "option_unstated": 12
+        }
+      },
+      "p014": {
+        "displayName": "정샘물 에센셜 스킨 누더 쿠션",
+        "scope": "페어라이트",
+        "reviews": 500,
+        "passed": 120,
+        "rejected": {
+          "option_mismatch": 250,
+          "recency_cut": 130
+        }
+      },
+      "p015": {
+        "displayName": "클리오 킬 커버 파운웨어 쿠션",
+        "scope": "21|N리넨",
+        "reviews": 500,
+        "passed": 136,
+        "rejected": {
+          "option_mismatch": 364
+        }
+      },
+      "p016": {
+        "displayName": "프레시안 에그라이크 크림 블러셔",
+        "scope": "13|로즈수플레",
+        "reviews": 500,
+        "passed": 171,
+        "rejected": {
+          "option_mismatch": 329
+        }
+      },
+      "p017": {
+        "displayName": "헤라 블랙 쿠션 파운데이션",
+        "scope": "21|N1",
+        "reviews": 341,
+        "passed": 92,
+        "rejected": {
+          "option_mismatch": 197,
+          "recency_cut": 52
+        }
+      },
+      "p018": {
+        "displayName": "데이지크 섀도우팔레트",
+        "scope": "7|밀크라떼",
+        "reviews": 500,
+        "passed": 86,
+        "rejected": {
+          "option_mismatch": 341,
+          "recency_cut": 73
+        }
+      },
+      "p020": {
+        "displayName": "에뛰드 컬 픽스 마스카라",
+        "scope": "1|블랙",
+        "reviews": 500,
+        "passed": 165,
+        "rejected": {
+          "option_mismatch": 335
+        }
+      },
+      "p021": {
+        "displayName": "웨이크메이크 소프트 블러링 아이팔레트",
+        "scope": "30|클래시누드블러링",
+        "reviews": 500,
+        "passed": 212,
+        "rejected": {
+          "option_mismatch": 288
+        }
+      },
+      "p022": {
+        "displayName": "코스노리 아이래쉬 세럼 비건 속눈썹영양제",
+        "scope": "속눈썹영양제",
+        "reviews": 500,
+        "passed": 408,
+        "rejected": {
+          "option_mismatch": 88,
+          "recency_cut": 4
+        }
+      },
+      "p023": {
+        "displayName": "투크 워터프루프 슬림 아이라이너",
+        "scope": "도화살몬",
+        "reviews": 500,
+        "passed": 63,
+        "rejected": {
+          "option_mismatch": 437
+        }
+      },
+      "p024": {
+        "displayName": "페리페라 스피디 스키니 브로우",
+        "scope": "8|토프베이지",
+        "reviews": 500,
+        "passed": 157,
+        "rejected": {
+          "option_mismatch": 343
+        }
+      },
+      "p025": {
+        "displayName": "홀리카홀리카 마이페이브 피스 아이섀도우",
+        "scope": "HOT젤테일코코아브륄레",
+        "reviews": 500,
+        "passed": 111,
+        "rejected": {
+          "option_mismatch": 389
+        }
+      },
+      "p031": {
+        "displayName": "메디힐 마데카소사이드 흔적 리페어 세럼",
+        "scope": "40",
+        "reviews": 500,
+        "passed": 297,
+        "rejected": {
+          "option_mismatch": 135,
+          "option_unstated": 39,
+          "recency_cut": 29
+        }
+      },
+      "p041": {
+        "displayName": "닥터지 레드 블레미쉬 클리어 수딩크림",
+        "scope": "쫀냐미키링크림70",
+        "reviews": 500,
+        "passed": 132,
+        "rejected": {
+          "option_mismatch": 122,
+          "option_unstated": 147,
+          "recency_cut": 99
+        }
+      },
+      "p042": {
+        "displayName": "라로슈포제 시카플라스트 밤 B5+",
+        "scope": "시카밤",
+        "reviews": 500,
+        "passed": 460,
+        "rejected": {
+          "option_unstated": 38,
+          "recency_cut": 2
+        }
+      },
+      "p049": {
+        "displayName": "토리든 다이브인 히알루론산 수딩 크림",
+        "scope": "토리든다이브인수딩크림더블",
+        "reviews": 500,
+        "passed": 206,
+        "rejected": {
+          "option_mismatch": 4,
+          "option_unstated": 59,
+          "recency_cut": 231
+        }
+      },
+      "p051": {
+        "displayName": "컬러그램 누디 블러 틴트 (기존 용기)",
+        "scope": "1|살구살몬",
+        "reviews": 7,
+        "passed": 4,
+        "rejected": {
+          "option_mismatch": 3
+        }
+      },
+      "p052": {
+        "displayName": "에스쁘아 비벨벳 커버쿠션 (2025 리뉴얼 이전)",
+        "scope": "3|페탈",
+        "reviews": 4,
+        "passed": 0,
+        "rejected": {
+          "recency_cut": 4
+        }
+      },
+      "p053": {
+        "displayName": "헤라 블랙 쿠션 (2024 리뉴얼 이전)",
+        "scope": "21|N1",
+        "reviews": 159,
+        "passed": 0,
+        "rejected": {
+          "recency_cut": 159
+        }
+      }
+    }
+  }
+}

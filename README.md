@@ -79,7 +79,7 @@ catalog → ingest → tag → gates → claims → judge
 | `catalog` | `goodsNo` → `productId`. 제품 동일성 확정 | **구현** | PER-171 |
 | `ingest` | 25K를 원문/조건/파생 3층으로 적재. LLM 없음 | **구현** | PER-173 |
 | `tag` | 전수 aspect/polarity 태깅 (Batch API) | 계약·정답셋 **완료** / 배치 실행 미완 | PER-175 |
-| `gates` | 동일성 → 중복 → 방향성 → 충분성 4게이트 + `rejected[]` | 미구현 | PER-182~188 |
+| `gates` | 동일성 → 중복 → 방향성 → 충분성 4게이트 + `rejected[]` | 게이트1(동일성) **구현** / 2~4 미구현 | PER-182~188 |
 | `claims` | 주장 생성 + 인용 원문 부분문자열 강제 + 스키마 검증 | 미구현 | PER-189~195 |
 | `judge` | 루브릭 judge(생성과 다른 모델) + 전수 평가 | 미구현 | PER-196~201 |
 
@@ -95,7 +95,7 @@ catalog → ingest → tag → gates → claims → judge
 
 | 게이트 | 판정 | 실측된 필요성 |
 |---|---|---|
-| 1 동일성 | 정규화 제품 ID 일치, 옵션 질문이면 같은 옵션만, 리뉴얼 세대 + 리센시 컷 | `goodsNo` 153개 → `productId` 53개(계보 50). 안 묶으면 제품이 쪼개지고, 세대를 섞으면 무효가 된 주장이 남는다 |
+| 1 동일성 **(구현)** | 정규화 제품 ID 일치, 옵션 질문이면 같은 옵션만, 리뉴얼 세대 + 리센시 컷 | `goodsNo` 153개 → `productId` 53개(계보 50). 옵션 문자열 798개는 색상 **452개**라, 정규화 없이는 색상 질문의 근거가 잘게 쪼개진다 |
 | 2 중복 | 본문 해시 + **동일 작성자 1표** + 의미 유사 클러스터 | 안 걸면 카운트가 **22.4% 부풀고**, 본문 해시는 그중 12.1%만 잡는다 |
 | 3 방향성 | polarity를 `(리뷰 × 주제)` 단위로. 별점과 교차 검증, 불일치는 플래그 | 한 리뷰가 "발색은 좋은데 지속력은 별로"라고 말한다 |
 | 4 충분성 | 절대하한 **AND** 비율 **AND** 세그먼트 최소 — 낮은 쪽이 아니라 높은 쪽 | N_min=8 기준으로 `productId×skinType` 셀 407개 중 297개만 통과 (리센시 컷 후 284) |
@@ -192,12 +192,15 @@ pipeline/    v5 — 작업 대상
   contracts.py             입력 계약 3층
   catalog.py               goodsNo → productId. 미등록은 에러. 세대는 (goodsNo, 날짜)로 가른다
   policy.py                리뉴얼 취급 · 리센시 컷 (PER-172). 게이트1이 소비한다
+  gates.py                 게이트1 동일성 (PER-182). 탈락은 드롭이 아니라 rejected[] 행
+  option_norm.py           옵션 → 색상 키 정규화 (PER-182). LLM 없음
+  option_markers.json      판촉 어휘 — 코드가 아니라 여기서 고친다
   build_product_catalog.py 카탈로그 생성기 (--check 로 재현 확인)
   ingest.py                25K → v5 레코드 (LLM 없음, 재실행 일치)
   trust.py                 신뢰도 사전 점수 (PER-174). 필터가 아니라 가중치
   trust_weights.json       신호별 가중치 — 코드가 아니라 여기서 고친다
   run_v5.py                단계 레지스트리
-  test_*.py                계약 테스트 133케이스 (catalog·policy·ingest·tag·trust)
+  test_*.py                계약 테스트 (catalog·policy·ingest·tag·trust·option_norm·gates)
 legacy/v4/   v4 동결 — 비교 기준선. 고치지 않는다
 crawler/     올리브영 cursor API 크롤러 (상품당 최대 500건)
 eval/        평가 스크립트 + 리포트 (커밋됨 — 수치의 1차 근거)
@@ -290,6 +293,7 @@ v5가 넘어야 하는 선: **인용 정확도 100%** (생성 시점에 원문 �
 | [`docs/DECISION_PER172_RENEWAL_AND_RECENCY.md`](docs/DECISION_PER172_RENEWAL_AND_RECENCY.md) | 리뉴얼 취급 · 리센시 컷 결정과 근거 |
 | [`docs/DECISION_PER175_TAGGING_CONTRACT.md`](docs/DECISION_PER175_TAGGING_CONTRACT.md) | 태깅 계약 — 태그 단위 · 힌트 · 인용 정규화 · 택소노미 동결 |
 | [`docs/DECISION_PER174_TRUST_PRIOR.md`](docs/DECISION_PER174_TRUST_PRIOR.md) | 신뢰도 사전 점수 — 6개 신호 실측 · 가중치 근거 · `usefulPoint` 기각 |
+| [`docs/DECISION_PER182_OPTION_IDENTITY.md`](docs/DECISION_PER182_OPTION_IDENTITY.md) | 게이트1 동일성 — 옵션 정규화 규칙 · 과대병합 회귀 사례 · 컷 비용 |
 | [`docs/DECISION_PER178_GOLDEN_LABELING_SPEC.md`](docs/DECISION_PER178_GOLDEN_LABELING_SPEC.md) | 주장 골든셋 규격 — 라벨 1건의 모양 · 층화 번들 40개 · 블라인드 절차 · v4 15문항 미이관 근거 |
 | [`docs/DECISION_PER178_SILENCE_IS_NOT_EVIDENCE.md`](docs/DECISION_PER178_SILENCE_IS_NOT_EVIDENCE.md) | 침묵은 근거가 아니다 — U+/U−/D/S 보존, 단계별 유지 규칙, 아마존·NN/G·자기선택 편향 사례 |
 | [`eval/gold/README.md`](eval/gold/README.md) | 평가 고정물(표본·정답셋) 규칙과 재현 절차 |
