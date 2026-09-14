@@ -24,6 +24,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import os
 import sys
 import urllib.error
@@ -95,7 +96,7 @@ class PostgRestClient:
     동기화에 필요한 최소 호출을 여기서 직접 한다. 인터페이스는 select / insert 둘 — 테스트는 같은 모양의 가짜를 주입한다."""
 
     def __init__(self, url: str, key: str, timeout: int = 30):
-        self.base = url.rstrip("/") + "/rest/v1"
+        self.base = re.sub(r"/rest/v1/?$", "", url.strip().rstrip("/")) + "/rest/v1"  # 대시보드에서 복사한 URL 에 /rest/v1 이 붙어 와도 그대로 동작
         self.key = key
         self.timeout = timeout
 
