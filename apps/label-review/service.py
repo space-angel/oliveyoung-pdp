@@ -340,6 +340,25 @@ class Service:
             "evidence": k.get("evidence") or [], "failureReasons": [], "evaluation": "complete", "notes": None,
         }
 
+    def undo(self, lid: str, candidate_id: str) -> dict:
+        """판정 되돌리기. 이 라벨러의 활성 배정 안 후보만. 결정 기록과 그 결정이 만든 라벨을 지워 다시 판단할 수 있게 한다."""
+        a = self.current_assignment(lid)
+        if not a:
+            raise ServiceError("배정된 제품이 없어요", 409)
+        b = self.bundles[a["bundleId"]]
+        if not any(c["candidateId"] == candidate_id for c in self._bundle_candidates(b["bundleId"])):
+            raise ServiceError("이 제품의 후보가 아니에요")
+        mine = [d for d in self.store.decisions() if d["bundleId"] == b["bundleId"] and d.get("candidateId") == candidate_id]
+        if not mine:
+            raise ServiceError("아직 판단하지 않은 후보예요", 409)
+        removed_labels = 0
+        for d in mine:
+            if d.get("labelId") and self.store.delete_label(d["labelId"]):
+                removed_labels += 1
+        removed = self.store.delete_decisions(b["bundleId"], candidate_id)
+        self._touch(a)
+        return {"undone": True, "decisions": removed, "labels": removed_labels}
+
     def decide(self, lid: str, payload: dict) -> dict:
         a = self.current_assignment(lid)
         if not a:

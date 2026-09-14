@@ -13,6 +13,7 @@ API (모두 JSON)
   POST /api/decide       {labelerId, candidateId, kind, reason?, edits?, minutesSpent?}
   POST /api/human        {labelerId, none?|question, answer, aspect?, evidence[], condition?, minutesSpent?}
   POST /api/complete     {labelerId}                          → {summary, next}
+  POST /api/undo         {labelerId, candidateId}             → 판정 되돌리기 (결정·라벨 삭제, 다시 판단 가능)
 
 관리자 (환경변수 LABEL_ADMIN_KEY 가 있을 때만 열린다 — 비어 있으면 아래 두 주소는 404)
   GET  /admin                                                 → public/admin.html
@@ -139,6 +140,7 @@ class handler(BaseHTTPRequestHandler):  # noqa: N801  (Vercel 이 이 이름을 
             "/api/decide": lambda: svc.decide(lid, body),
             "/api/human": lambda: svc.add_human(lid, body),
             "/api/complete": lambda: svc.complete(lid),
+            "/api/undo": lambda: svc.undo(lid, body.get("candidateId") or ""),
         }
         if path not in routes:
             return self._json(404, {"error": "없는 주소예요"})

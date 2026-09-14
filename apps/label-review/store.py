@@ -121,6 +121,14 @@ class LocalStore:
         rows.append({"_kind": "decision", **d})
         self._save_meta(rows)
 
+    def delete_decisions(self, bundle_id: str, candidate_id: str) -> int:
+        """한 후보에 대한 결정 기록을 지운다(판정 되돌리기). 지운 수를 돌려준다."""
+        rows = self._meta()
+        kept = [r for r in rows if not (r.get("_kind") == "decision" and r.get("bundleId") == bundle_id and r.get("candidateId") == candidate_id)]
+        if len(kept) != len(rows):
+            self._save_meta(kept)
+        return len(rows) - len(kept)
+
 
 class SupabaseStore:
     """PostgREST. 테이블 스키마는 apps/label-review/supabase/schema.sql. service role 키는 서버에서만 쓴다."""
@@ -184,6 +192,11 @@ class SupabaseStore:
 
     def add_decision(self, d: dict) -> None:
         self._req("POST", "decisions", body={"bundle_id": d["bundleId"], "labeler_id": d["labelerId"], "decision": d}, prefer="return=minimal")
+
+    def delete_decisions(self, bundle_id: str, candidate_id: str) -> int:
+        out = self._req("DELETE", "decisions", params={"bundle_id": f"eq.{bundle_id}", "decision->>candidateId": f"eq.{candidate_id}"},
+                        prefer="return=representation")
+        return len(out or [])
 
 
 def open_store():

@@ -141,6 +141,24 @@ class TestLabelReview(unittest.TestCase):
                 self.assertFalse(re.search(r"[a-z]+_[a-z_]+", chk["text"]), chk["text"])
                 self.assertEqual(chk["level"], "warn")
 
+    def test_undo_removes_decision_and_label_then_allows_redecide(self):
+        v = self.open_bundle()
+        lid = self.me["labelerId"]
+        c = v["candidates"][0]
+        r = self.svc.decide(lid, {"candidateId": c["candidateId"], "kind": "accept"})
+        self.assertIn(r["labelId"], {l["labelId"] for l in self.store.labels()})
+        u = self.svc.undo(lid, c["candidateId"])
+        self.assertEqual((u["decisions"], u["labels"]), (1, 1))
+        self.assertNotIn(r["labelId"], {l["labelId"] for l in self.store.labels()})
+        self.assertIsNone(self.svc.bundle_view(lid)["candidates"][0]["decision"])
+        # 다시 판단할 수 있고, 다른 후보의 결정은 건드리지 않는다
+        self.svc.decide(lid, {"candidateId": v["candidates"][1]["candidateId"], "kind": "accept"})
+        r2 = self.svc.decide(lid, {"candidateId": c["candidateId"], "kind": "reject", "reason": "duplicate"})
+        self.assertEqual({l["labelId"] for l in self.store.labels()} >= {r2["labelId"]}, True)
+        self.assertEqual(len([d for d in self.store.decisions() if d["kind"] in ("accept", "reject")]), 2)
+        with self.assertRaises(ServiceError):
+            self.svc.undo(lid, v["candidates"][2]["candidateId"])   # 아직 판단 안 한 후보
+
     def test_reasons_map_to_taxonomy_keys(self):
         keys = {r["failure"] for r in REASONS}
         self.assertEqual(keys, {"overfit_question", "overbroad_question", "duplicate_claim", "unsupported_claim"})
