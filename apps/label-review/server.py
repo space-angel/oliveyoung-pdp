@@ -90,6 +90,11 @@ class handler(BaseHTTPRequestHandler):  # noqa: N801  (Vercel 이 이 이름을 
         given = self.headers.get("X-Admin-Key") or (q.get("key") or [""])[0]
         return bool(expected) and hmac.compare_digest(expected, given)
 
+    def do_HEAD(self) -> None:  # noqa: N802  (Render 헬스체크가 HEAD / 를 보낸다)
+        self.send_response(200)
+        self.send_header("Content-Length", "0")
+        self.end_headers()
+
     def do_GET(self) -> None:  # noqa: N802
         url = urllib.parse.urlparse(self.path)
         if url.path in ("/", "/index.html"):
