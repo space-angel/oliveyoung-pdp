@@ -145,6 +145,147 @@ class TestLabelReview(unittest.TestCase):
         keys = {r["failure"] for r in REASONS}
         self.assertEqual(keys, {"overfit_question", "overbroad_question", "duplicate_claim", "unsupported_claim"})
 
+    # ---------- 1인당 상한 (LABEL_MAX_BUNDLES) ----------
+    def finish_bundle(self, svc, me):
+        v = svc.bundle_view(me["labelerId"])
+        for c in v["candidates"]:
+            if not c["decision"]:  # 이어받은 번들이면 다른 사람이 판단한 후보가 있다
+                svc.decide(me["labelerId"], {"candidateId": c["candidateId"], "kind": "accept"})
+        svc.add_human(me["labelerId"], {"none": True})
+        return svc.complete(me["labelerId"])
+
+    def test_max_bundles_stops_new_assignments(self):
+        svc = Service(self.store, access_code="ok", max_bundles=1)
+        me = svc.start("상한", "ok")
+        svc.assign_next(me["labelerId"], me["name"])
+        self.assertFalse(svc.bundle_view(me["labelerId"])["progress"]["limitReached"])
+        r = self.finish_bundle(svc, me)
+        self.assertIsNone(r["next"])
+        self.assertEqual(r["progress"], {"doneBundles": 1, "maxBundles": 1, "limitReached": True})
+        self.assertIsNone(svc.assign_next(me["labelerId"], me["name"]))
+        v = svc.bundle_view(me["labelerId"])
+        self.assertIsNone(v["assignment"])
+        self.assertTrue(v["progress"]["limitReached"])
+        # 0 은 무제한
+        free = Service(self.store, access_code="ok", max_bundles=0)
+        self.assertEqual(free.progress(me["labelerId"]), {"doneBundles": 1, "maxBundles": 0, "limitReached": False})
+        self.assertIsNotNone(free.assign_next(me["labelerId"], me["name"]))
+
+    def test_max_bundles_does_not_interrupt_active_assignment(self):
+        # 상한은 새 배정에만 걸린다 — 하던 제품은 끝까지 볼 수 있다
+        svc = Service(self.store, access_code="ok", max_bundles=1)
+        me = svc.start("진행중", "ok")
+        a = svc.assign_next(me["labelerId"], me["name"])
+        self.store.upsert_assignment({"bundleId": "B99", "labelerId": me["labelerId"], "labelerName": me["name"], "status": "done"})
+        self.assertTrue(svc.limit_reached(me["labelerId"]))
+        self.assertEqual(svc.assign_next(me["labelerId"], me["name"])["bundleId"], a["bundleId"])
+
+    # ---------- 식별자: 이름 해시가 아니라 랜덤, 클라이언트 id 재사용 ----------
+    def test_same_name_gets_different_ids_and_client_id_is_reused(self):
+        import re
+        a = self.svc.start("호윤", "ok")
+        b = self.svc.start("호윤", "ok")
+        self.assertNotEqual(a["labelerId"], b["labelerId"])
+        for x in (a, b):
+            self.assertRegex(x["labelerId"], r"^labeler-[0-9a-f]{8}$")  # 한글 이름은 slug 에 안 들어간다 (URL 안전) — name 에 남는다
+        self.assertRegex(self.svc.start("Ho Yun!", "ok")["labelerId"], r"^HoYun-[0-9a-f]{8}$")
+        # 클라이언트가 들고 온 id 는 그대로 — 이름이 바뀌어도 id 는 유지되고 표시 이름만 갱신
+        again = self.svc.start("호윤(폰)", "ok", a["labelerId"])
+        self.assertEqual(again["labelerId"], a["labelerId"])
+        self.assertEqual({l["labelerId"]: l["name"] for l in self.store.labelers()}[a["labelerId"]], "호윤(폰)")
+        # 옛 형식(이름 해시)도 그대로 받는다 — 정본 배정 파일의 id 와 호환
+        self.assertEqual(self.svc.start("호윤", "ok", "호윤-e7dec4")["labelerId"], "호윤-e7dec4")
+        # 형식이 깨진 값은 쓰지 않고 새로 만든다
+        for bad in ("", "a", "x" * 80, "../etc", "호 윤-1234", 123, None):
+            self.assertRegex(self.svc.start("호윤", "ok", bad)["labelerId"], r"^labeler-[0-9a-f]{8}$")
+
+    def test_legacy_assignment_row_without_updated_at_is_read_and_not_expired(self):
+        lid = "호윤-e7dec4"
+        rows = self.store._meta()
+        rows.append({"_kind": "labeler", "labelerId": lid, "name": "호윤"})
+        rows.append({"_kind": "assignment", "bundleId": "B06", "labelerId": lid, "labelerName": "호윤", "status": "active"})
+        self.store._save_meta(rows)
+        svc = Service(self.store, access_code="ok", assignment_ttl_hours=1)
+        self.assertEqual(svc.current_assignment(lid)["bundleId"], "B06")
+        other = svc.start("둘째", "ok")
+        svc.assign_next(other["labelerId"], other["name"])
+        # updatedAt 이 없는 옛 배정은 만료로 치지 않는다 — 둘째는 B06 을 가져가지 못한다
+        self.assertNotEqual(svc.current_assignment(other["labelerId"])["bundleId"], "B06")
+        self.assertEqual(svc.bundle_view(lid)["assignment"]["bundleId"], "B06")
+
+    # ---------- 중간 이탈 만료 (LABEL_ASSIGNMENT_TTL_HOURS) ----------
+    def backdate(self, bid, lid, hours):
+        from datetime import datetime, timedelta, timezone
+        rows = self.store._meta()
+        for r in rows:
+            if r.get("_kind") == "assignment" and r["bundleId"] == bid and r["labelerId"] == lid:
+                r["updatedAt"] = (datetime.now(timezone.utc) - timedelta(hours=hours)).isoformat(timespec="seconds")
+        self.store._save_meta(rows)
+
+    def test_stale_assignment_is_taken_over_and_original_expires(self):
+        svc = Service(self.store, access_code="ok", assignment_ttl_hours=1)
+        a = svc.start("첫째", "ok")
+        b = svc.start("둘째", "ok")
+        svc.assign_next(a["labelerId"], a["name"])
+        v = svc.bundle_view(a["labelerId"])
+        self.assertEqual(v["assignment"]["bundleId"], "B01")
+        self.assertIn("updatedAt", v["assignment"])
+        svc.decide(a["labelerId"], {"candidateId": v["candidates"][0]["candidateId"], "kind": "accept"})
+        # 판정 직후엔 갱신돼 있어 만료가 아니다 — 둘째는 B02
+        svc.assign_next(b["labelerId"], b["name"])
+        self.assertEqual(svc.current_assignment(b["labelerId"])["bundleId"], "B02")
+        self.store.upsert_assignment({**svc.current_assignment(b["labelerId"]), "status": "done", "_update": True})
+        # 첫째가 2시간 자리를 비웠다 (라벨 1개가 이미 B01 에 있어도 이어받을 수 있어야 한다)
+        self.backdate("B01", a["labelerId"], 2)
+        self.assertEqual(svc.assign_next(b["labelerId"], b["name"])["bundleId"], "B01")
+        st = {(r["bundleId"], r["labelerId"]): r["status"] for r in self.store.assignments()}
+        self.assertEqual(st[("B01", a["labelerId"])], "expired")
+        self.assertEqual(st[("B01", b["labelerId"])], "active")
+        # 저장된 결정·라벨은 그대로, 새 사람 화면엔 resumed 표시
+        vb = svc.bundle_view(b["labelerId"])
+        self.assertTrue(vb["resumed"])
+        self.assertEqual(vb["candidates"][0]["decision"]["labelerId"], a["labelerId"])
+        self.assertEqual(len(self.store.labels()), 1)
+        self.assertFalse(svc.bundle_view(a["labelerId"]).get("resumed", False))
+        # 첫째가 돌아오면 expired 는 무시하고 새 배정을 받는다
+        self.assertIsNone(svc.current_assignment(a["labelerId"]))
+        self.assertEqual(svc.assign_next(a["labelerId"], a["name"])["bundleId"], "B03")
+        # 둘째가 이어서 마치면 결정 수는 두 사람 것이 합쳐진다
+        r = self.finish_bundle(svc, b)
+        self.assertEqual(r["summary"]["accept"], len(vb["candidates"]))
+
+    def test_touch_refreshes_updated_at_and_ttl_zero_never_expires(self):
+        svc = Service(self.store, access_code="ok", assignment_ttl_hours=1)
+        lid = self.me["labelerId"]
+        v = self.open_bundle()
+        self.backdate("B01", lid, 2)
+        self.assertTrue(svc._is_stale(svc.current_assignment(lid)))
+        svc.add_human(lid, {"none": True})  # 활동이 있으면 updatedAt 이 갱신된다
+        self.assertFalse(svc._is_stale(svc.current_assignment(lid)))
+        self.backdate("B01", lid, 200)
+        never = Service(self.store, access_code="ok", assignment_ttl_hours=0)
+        self.assertFalse(never._is_stale(never.current_assignment(lid)))
+        other = never.start("둘째", "ok")
+        self.assertEqual(never.assign_next(other["labelerId"], other["name"])["bundleId"], "B02")
+
+    # ---------- 작성자 원문은 화면에 안 나간다 ----------
+    def test_review_author_is_hashed(self):
+        import re
+        v = self.open_bundle()
+        b = self.svc.bundles[v["assignment"]["bundleId"]]
+        raw = {r["derived"]["authorKey"] for r in b["reviews"]}
+        for rv in v["reviews"]:
+            self.assertRegex(rv["author"], r"^[0-9a-f]{12}$")
+            self.assertNotIn(rv["author"], raw)
+        # 해시여도 고유 사람 수는 그대로다 — 화면은 이 수만 센다
+        self.assertEqual(len({rv["author"] for rv in v["reviews"]}), v["bundle"]["authors"])
+        # 다른 필드에도 작성자 원문이 새지 않는다
+        import json
+        blob = json.dumps(v, ensure_ascii=False)
+        for name in raw:
+            if len(name) >= 2:
+                self.assertNotIn(f'"{name}"', blob)
+
 
 if __name__ == "__main__":
     unittest.main()
