@@ -164,6 +164,7 @@
   .coach .t { font-size:20px; font-weight:700; color:var(--fg); letter-spacing:-.5px; line-height:1.3; margin-bottom:8px; }
   .coach .b { font-size:15px; line-height:1.6; color:var(--fg2); letter-spacing:-.3px; } .coach .b b { color:var(--fg); font-weight:700; }
   .coach .acts { display:flex; justify-content:space-between; align-items:center; gap:10px; margin-top:18px; } .coach .acts .btn { height:48px; padding:0 22px; min-width:0; } .coach .acts .btn:disabled { opacity:.45; cursor:default; }
+  header .navpill.white { border:0; cursor:pointer; font-family:inherit; }
   header .navpill.guide { border:1px solid rgba(255,255,255,.14); background:transparent; color:var(--fg2); cursor:pointer; font-family:inherit; font-size:16px; gap:8px; padding:0 16px 0 10px; transition:background .15s; }
   header .navpill.guide:hover { background:var(--card2); } header .navpill.guide .q { width:22px; height:22px; border-radius:50%; background:var(--blue-bg); color:var(--blue); font-size:13px; font-weight:800; display:inline-flex; align-items:center; justify-content:center; }
   /* 저장 중: 상단 진행 바, 누른 버튼에 스피너, 나머지 버튼 잠금 */
@@ -274,7 +275,8 @@ function setHeader(v) {
   document.querySelector('header').classList.remove('ctx');
   $('#hName').textContent = v ? v.bundle.displayName : '리뷰 질문 검수';
   $('#hTag').hidden = !v; if (v) $('#hTag').textContent = `${v.bundle.category} · 리뷰 ${v.bundle.reviewCount}개`;
-  $('#hRight').innerHTML = v ? `<span class="navpill"><b>${done} / ${c.length}</b> 봤어요 <span class="bar"><i style="width:${c.length?Math.round(100*done/c.length):0}%"></i></span></span><button type="button" class="navpill guide" id="guideBtn"><span class="q">?</span>안내</button><span class="navpill white">${esc(S.me.name)}</span>` : (S.me ? `<span class="navpill white">${esc(S.me.name)}</span>` : '');
+  $('#hRight').innerHTML = v ? `<span class="navpill"><b>${done} / ${c.length}</b> 봤어요 <span class="bar"><i style="width:${c.length?Math.round(100*done/c.length):0}%"></i></span></span><button type="button" class="navpill guide" id="guideBtn"><span class="q">?</span>안내</button><button type="button" class="navpill white" id="meBtn" title="다른 이름으로 다시 시작">${esc(S.me.name)}</button>` : (S.me ? `<button type="button" class="navpill white" id="meBtn" title="다른 이름으로 다시 시작">${esc(S.me.name)}</button>` : '');
+  $('#meBtn')?.addEventListener('click', ev => { ev.stopPropagation(); showMeMenu(ev.currentTarget); });
   $('#guideBtn')?.addEventListener('click', () => { if (S.screen === 'judge') startTour(); else alert_(); });
 }
 function headerContext(on, c) {
@@ -595,6 +597,16 @@ function endTour(markDone) {
   if (markDone) { try { localStorage.setItem('tourDone', '1'); } catch (e) {} }
 }
 
+// 이름 pill → 이 브라우저에 저장된 사람을 바꾼다 (하던 제품은 서버에 그대로 남고, 같은 이름·ID 로는 돌아올 수 없다)
+function showMeMenu(btn) {
+  closeTip();
+  const tip = document.createElement('div'); tip.className = 'tip';
+  tip.innerHTML = `<span class="t">${esc(S.me.name)} 으로 들어와 있어요</span>이 브라우저에 저장된 이름이에요. 다른 이름으로 새로 시작하면 지금 보던 제품은 이 이름의 기록으로 남고, 새 이름은 새 제품을 받아요.
+    <div class="pills" style="margin-top:12px"><button type="button" class="sm" id="switchMe">다른 이름으로 다시 시작</button></div>`;
+  const bg = document.createElement('div'); bg.className = 'tipbg'; document.body.append(bg, tip);
+  const r = btn.getBoundingClientRect(); tip.style.top = (r.bottom + 10) + 'px'; tip.style.left = Math.min(r.right - tip.offsetWidth, window.innerWidth - tip.offsetWidth - 16) + 'px';
+  $('#switchMe').onclick = () => { closeTip(); try { localStorage.removeItem('labeler'); } catch (e) {} S.me = null; S.view = null; S.human = null; endTour(false); renderStart(); window.scrollTo(0, 0); };
+}
 function alert_() {
   closeTip();
   const b = $('#guideBtn'); if (!b) return;
