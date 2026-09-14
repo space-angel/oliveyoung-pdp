@@ -10,12 +10,21 @@
   기각 사유    일상어 4개 → PER-177 키 (REASONS)
   놓친 질문    source=human. "없어요" 도 결정으로 남긴다 (no_missed)
   완료        후보를 모두 결정했을 때만. 사람 claim 0 이면 경고를 돌려주되 막지는 않는다 (명시적 선택이 조건보다 우선)
+  상한        1인당 done 번들 LABEL_MAX_BUNDLES 개(기본 2, 0 = 무제한). 도달하면 새 배정을 주지 않는다
+  이탈 만료    active 배정이 LABEL_ASSIGNMENT_TTL_HOURS 시간(기본 48, 0 = 만료 없음) 갱신 없으면 다른 사람이 가져갈 수 있다.
+              옛 배정은 expired, 이미 저장된 결정·라벨은 그대로. 새 사람 화면에는 resumed=true
+  식별자       labelerId 는 클라이언트(localStorage)가 들고 오는 값을 우선 쓰고, 없으면 `slug-랜덤8자` 를 새로 만든다.
+              같은 닉네임이 같은 사람으로 합쳐지지 않는다. 이름은 표시용
+  작성자       reviews[].author 는 원문 이름이 아니라 sha256 앞 12자 — 화면은 고유 사람 수만 센다
 """
 from __future__ import annotations
 
 import hashlib
+import os
 import re
+import secrets
 import sys
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -71,15 +80,60 @@ class ServiceError(ValueError):
         self.status = status
 
 
-def labeler_id(name: str) -> str:
-    slug = re.sub(r"[^0-9A-Za-z가-힣]+", "", name.strip())[:12] or "labeler"
-    return f"{slug}-{hashlib.sha256(name.strip().encode('utf-8')).hexdigest()[:6]}"
+# 클라이언트가 들고 오는 labelerId 의 허용 형식. 옛 형식(`호윤-e7dec4`, 한글 slug)도 다시 들어올 수 있어 한글을 허용한다
+LABELER_ID_RE = re.compile(r"^[0-9A-Za-z가-힣][0-9A-Za-z가-힣_-]{2,63}$")
+
+
+def _slug(name: str) -> str:
+    # 새 id 는 영숫자만 — URL 쿼리(?labeler=)로 오가는 값이라 비ASCII 를 피한다. 한글 이름은 표시용 name 에 있다
+    return re.sub(r"[^0-9A-Za-z]+", "", name.strip())[:12] or "labeler"
+
+
+def new_labeler_id(name: str) -> str:
+    """`slug-랜덤8자`(영숫자·하이픈). 이름 해시가 아니다 — 같은 닉네임 두 사람이 한 사람으로 합쳐지지 않는다."""
+    return f"{_slug(name)}-{secrets.token_hex(4)}"
+
+
+def valid_labeler_id(lid) -> bool:
+    return isinstance(lid, str) and bool(LABELER_ID_RE.match(lid))
+
+
+def author_hash(author_key: str) -> str:
+    """화면에는 작성자 원문 이름을 보내지 않는다. 고유 사람 수를 세는 데는 해시로 충분하다."""
+    return hashlib.sha256(author_key.encode("utf-8")).hexdigest()[:12]
+
+
+def _env_int(name: str, default: int) -> int:
+    raw = (os.environ.get(name) or "").strip()
+    if not raw:
+        return default
+    try:
+        v = int(raw)
+    except ValueError:
+        raise RuntimeError(f"{name} 는 0 이상의 정수여야 해요: {raw!r}") from None
+    if v < 0:
+        raise RuntimeError(f"{name} 는 0 이상의 정수여야 해요: {raw!r}")
+    return v
+
+
+def _parse_ts(s) -> datetime | None:
+    """ISO8601 → aware datetime. 못 읽으면 None (updatedAt 없는 옛 배정은 만료 판정에서 뺀다)."""
+    if not s or not isinstance(s, str):
+        return None
+    try:
+        dt = datetime.fromisoformat(s.replace("Z", "+00:00"))
+    except ValueError:
+        return None
+    return dt if dt.tzinfo else dt.replace(tzinfo=timezone.utc)
 
 
 class Service:
-    def __init__(self, store, access_code: str | None = None):
+    def __init__(self, store, access_code: str | None = None, max_bundles: int | None = None, assignment_ttl_hours: int | None = None):
         self.store = store
         self.access_code = access_code
+        # server.py 는 인자를 넘기지 않으니 기본값은 환경변수에서 읽는다. 0 은 각각 무제한 / 만료 없음
+        self.max_bundles = _env_int("LABEL_MAX_BUNDLES", 2) if max_bundles is None else max_bundles
+        self.assignment_ttl_hours = _env_int("LABEL_ASSIGNMENT_TTL_HOURS", 48) if assignment_ttl_hours is None else assignment_ttl_hours
         self.bundles = load_bundles()
         self.candidates = load_candidates()
         self.codebook = load_codebook()
@@ -87,13 +141,14 @@ class Service:
         self.keywords = load_aspect_keywords()
 
     # ---------- 세션 ----------
-    def start(self, name: str, code: str | None) -> dict:
+    def start(self, name: str, code: str | None, labeler_id: str | None = None) -> dict:
+        """클라이언트가 저장해 둔 labelerId 가 형식에 맞으면 그대로 쓴다(같은 브라우저에서 이어하기). 없거나 깨졌으면 새로 만든다."""
         if not name or not name.strip():
             raise ServiceError("이름을 알려주세요")
         if self.access_code and (code or "") != self.access_code:
             raise ServiceError("접속 코드가 맞지 않아요", 403)
-        lid = labeler_id(name)
-        self.store.upsert_labeler({"labelerId": lid, "name": name.strip()})
+        lid = labeler_id if valid_labeler_id(labeler_id) else new_labeler_id(name)
+        self.store.upsert_labeler({"labelerId": lid, "name": name.strip()})  # 이름은 표시용 — 바뀌면 갱신만
         return {"labelerId": lid, "name": name.strip()}
 
     # ---------- 배정 ----------
@@ -104,24 +159,57 @@ class Service:
         return out
 
     def current_assignment(self, lid: str) -> dict | None:
+        # expired(다른 사람이 가져간 배정)는 내 것이 아니다 — 다시 들어오면 새 배정을 받는다
         for a in self.store.assignments():
             if a["labelerId"] == lid and a["status"] == "active":
                 return a
         return None
 
+    def _done_count(self, lid: str) -> int:
+        return sum(1 for a in self.store.assignments() if a["labelerId"] == lid and a["status"] == "done")
+
+    def limit_reached(self, lid: str) -> bool:
+        return self.max_bundles > 0 and self._done_count(lid) >= self.max_bundles
+
+    def _is_stale(self, a: dict) -> bool:
+        """active 인데 TTL 넘게 갱신이 없다. updatedAt 이 없는 옛 배정은 만료로 치지 않는다 (보수적)."""
+        if self.assignment_ttl_hours <= 0 or a.get("status") != "active":
+            return False
+        ts = _parse_ts(a.get("updatedAt"))
+        return ts is not None and datetime.now(timezone.utc) - ts > timedelta(hours=self.assignment_ttl_hours)
+
+    def _touch(self, a: dict) -> None:
+        """판정·추가가 일어날 때 배정 updatedAt 을 갱신한다 — 일하는 중인 배정이 만료되면 안 된다."""
+        self.store.upsert_assignment({**a, "_update": True})
+
     def assign_next(self, lid: str, name: str) -> dict | None:
-        """활성 배정이 있으면 그것. 없으면 라벨 0·배정 없음인 가장 낮은 번들을 잡는다."""
+        """활성 배정이 있으면 그것. 상한에 닿았으면 None. 아니면 라벨 0·배정 없음(또는 TTL 만료)인 가장 낮은 번들을 잡는다."""
         mine = self.current_assignment(lid)
         if mine:
             return mine
-        taken = {a["bundleId"] for a in self.store.assignments()}
+        if self.limit_reached(lid):
+            return None
+        taken: set[str] = set()
+        stale: dict[str, dict] = {}
+        for a in self.store.assignments():
+            if a["status"] == "expired":
+                continue
+            if self._is_stale(a):
+                stale[a["bundleId"]] = a
+            else:
+                taken.add(a["bundleId"])
         labeled = set(self._labels_by_bundle())
         for bid in sorted(self.bundles):
-            if bid in taken or bid in labeled:
+            if bid in taken:
                 continue
+            if bid in labeled and bid not in stale:
+                continue  # 이미 라벨이 있는 번들(B01~B05) — 만료된 배정의 부분 라벨은 예외
             a = {"bundleId": bid, "labelerId": lid, "labelerName": name, "status": "active"}
             try:
-                self.store.upsert_assignment(a)
+                if bid in stale:
+                    self.store.take_over_assignment(stale[bid], a)
+                else:
+                    self.store.upsert_assignment(a)
             except Exception:
                 continue  # 동시에 다른 사람이 잡았다 — 다음 번들
             return a
@@ -141,14 +229,14 @@ class Service:
     def _review_view(self, r: dict) -> dict:
         return {
             "reviewId": r["reviewId"], "rating": r["raw"]["rating"], "month": r["derived"]["reviewYearMonth"],
-            "author": r["derived"]["authorKey"], "conditionLine": _condition_line(r, self.codebook),
+            "author": author_hash(r["derived"]["authorKey"]), "conditionLine": _condition_line(r, self.codebook),
             "content": fold_invisible(r["raw"]["content"]),
         }
 
     def bundle_view(self, lid: str) -> dict:
         a = self.current_assignment(lid)
         if not a:
-            return {"assignment": None}
+            return {"assignment": None, "progress": self.progress(lid)}
         b = self.bundles[a["bundleId"]]
         cands = self._bundle_candidates(b["bundleId"])
         decided = self._decided(b["bundleId"])
@@ -183,6 +271,9 @@ class Service:
                 "missed": self.missed_reviews(b, k, exclude={e["reviewId"] for e in k.get("evidence") or []}),
             })
         my_labels = [l for l in self._labels_by_bundle().get(b["bundleId"], [])]
+        all_decisions = self.store.decisions()
+        # 만료된 배정을 이어받았으면 다른 사람의 결정이 이미 있다 — 화면에 알린다
+        resumed = any(d["bundleId"] == b["bundleId"] and d["labelerId"] != lid for d in all_decisions)
         scope = b["scope"]
         scope_label = None
         if scope["axis"]:
@@ -198,7 +289,9 @@ class Service:
             "reasons": REASONS,
             "stanceLabels": STANCE_LABEL,
             "labels": my_labels,
-            "noMissed": any(d["bundleId"] == b["bundleId"] and d["kind"] == "no_missed" for d in self.store.decisions()),
+            "noMissed": any(d["bundleId"] == b["bundleId"] and d["kind"] == "no_missed" for d in all_decisions),
+            "resumed": resumed,
+            "progress": self.progress(lid),
         }
 
     # ---------- 놓친 근거 (문자열 매칭, 모델 없음) ----------
@@ -294,6 +387,7 @@ class Service:
         self.store.add_decision({"bundleId": b["bundleId"], "labelerId": lid, "candidateId": cid, "kind": kind,
                                  "reason": payload.get("reason"), "labelId": saved_label["labelId"] if saved_label else None,
                                  "contractError": error})
+        self._touch(a)
         out = {"kind": kind, "labelId": saved_label["labelId"] if saved_label else None}
         if saved_label:
             out["counts"] = support_counts(saved_label, b)
@@ -309,6 +403,7 @@ class Service:
         b = self.bundles[a["bundleId"]]
         if payload.get("none"):
             self.store.add_decision({"bundleId": b["bundleId"], "labelerId": lid, "candidateId": None, "kind": "no_missed", "reason": None, "labelId": None})
+            self._touch(a)
             return {"kind": "no_missed"}
         label = self._base_label(b, {
             "aspect": payload.get("aspect"), "question": payload.get("question"), "answer": payload.get("answer"),
@@ -323,6 +418,7 @@ class Service:
             raise ServiceError(self._friendly(str(e)))
         self.store.add_label(saved, lid)
         self.store.add_decision({"bundleId": b["bundleId"], "labelerId": lid, "candidateId": None, "kind": "human", "reason": None, "labelId": saved["labelId"]})
+        self._touch(a)
         return {"kind": "human", "labelId": saved["labelId"], "counts": support_counts(saved, b), "direction": saved["direction"]}
 
     def _default_condition(self, b: dict) -> dict:
@@ -347,13 +443,14 @@ class Service:
             raise ServiceError("놓친 질문이 있는지 한 번 답해주세요 (없으면 '없어요')")
         self.store.upsert_assignment({**a, "status": "done", "_update": True})
         summary = {k: sum(1 for d in decisions if d["kind"] == k) for k in ("accept", "edit", "reject", "human")}
-        nxt = self.assign_next(lid, a["labelerName"])
-        return {"bundleId": bid, "summary": summary, "next": ({"bundleId": nxt["bundleId"], "displayName": self.bundles[nxt["bundleId"]]["displayName"],
-                                                                "reviewCount": len(self.bundles[nxt["bundleId"]]["reviews"])} if nxt else None)}
+        nxt = self.assign_next(lid, a["labelerName"])  # 상한에 닿았으면 None
+        return {"bundleId": bid, "summary": summary, "progress": self.progress(lid),
+                "next": ({"bundleId": nxt["bundleId"], "displayName": self.bundles[nxt["bundleId"]]["displayName"],
+                          "reviewCount": len(self.bundles[nxt["bundleId"]]["reviews"])} if nxt else None)}
 
     def progress(self, lid: str) -> dict:
-        done = [a for a in self.store.assignments() if a["labelerId"] == lid and a["status"] == "done"]
-        return {"doneBundles": len(done)}
+        """doneBundles / maxBundles(0 = 무제한) / limitReached — 화면이 '다음 제품' 대신 감사 문구를 낼지 정한다."""
+        return {"doneBundles": self._done_count(lid), "maxBundles": self.max_bundles, "limitReached": self.limit_reached(lid)}
 
     @staticmethod
     def _friendly(msg: str) -> str:

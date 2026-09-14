@@ -205,10 +205,12 @@ function renderStart(err) {
       ${err ? `<div class="msg err">${esc(err)}</div>` : ''}
       <button class="btn white" id="go">시작 〉</button>
       <div class="note">이름은 누가 어떤 판단을 했는지 기록하는 데만 써요. 다른 참여자에게는 보이지 않아요.</div>
+      <div class="note">같은 브라우저에서 다시 들어오면 이어서 할 수 있어요.</div>
     </div>
     <div class="card wide">
       <p class="big">리뷰가 정말 그렇게 말하는지<br>확인하는 일이에요</p><p class="sub white" style="font-size:17px">제품마다 "구매자가 물을 질문 + 리뷰가 주는 답" 후보가 있어요. 굵게 칠한 리뷰 문장이 그 답을 뒷받침하면 <b>맞아요</b>, 조금 다르면 <b>고칠게요</b>, 아니면 <b>아니에요</b>.</p>
       <div class="tags"><span class="tagc">근거는 굵은 문장</span><span class="tagc">한 번에 결정 하나</span><span class="tagc">중간에 닫아도 이어져요</span></div>
+      <div class="note" style="color:var(--fg70)">제품 1~2개, 하나만 해도 돼요.</div>
       <div class="foot"><span style="color:var(--blue)">시작하면 첫 화면에서 30초 안내가 같이 진행돼요</span></div>
     </div>
   </div>`;
@@ -216,7 +218,8 @@ function renderStart(err) {
   if (saved) $('#name').value = saved.name;
   $('#go').onclick = async () => {
     try {
-      S.me = await api('/api/start', {name: $('#name').value, code: $('#code').value});
+      // 같은 브라우저의 id 를 함께 보낸다 — 이름이 같은 다른 사람과 합쳐지지 않고, 내 배정은 이어진다
+      S.me = await api('/api/start', {name: $('#name').value, code: $('#code').value, labelerId: saved?.labelerId || null});
       localStorage.setItem('labeler', JSON.stringify(S.me));
       await load();
     } catch (e) { renderStart(e.message); }
@@ -273,7 +276,11 @@ function render() {
 }
 function renderNoWork() {
   setHeader(null);
-  $('#main').innerHTML = `<div class="track fade"><h1 class="display white">지금은 볼 제품이 없어요</h1><p class="sub white">모든 제품이 배정됐어요. 고마워요, ${esc(S.me.name)}.</p></div>`;
+  const p = S.view?.progress || {doneBundles:0, maxBundles:0, limitReached:false};
+  // 상한(1인당 제품 수)에 닿았으면 "없다"가 아니라 "여기까지" — 판단은 이미 저장돼 있다
+  $('#main').innerHTML = p.limitReached
+    ? `<div class="track fade"><h1 class="display mint">여기까지예요</h1><p class="sub white">고마워요, ${esc(S.me.name)}. 판단은 모두 저장됐어요. 제품 ${p.doneBundles}개를 봤어요.</p></div>`
+    : `<div class="track fade"><h1 class="display white">지금은 볼 제품이 없어요</h1><p class="sub white">모든 제품이 배정됐어요. 고마워요, ${esc(S.me.name)}.${p.doneBundles ? ` 지금까지 제품 ${p.doneBundles}개.` : ''}</p></div>`;
 }
 
 // ---------- 판정 ----------
@@ -320,6 +327,7 @@ function renderJudge(msg) {
                 ...(c.stanceMigrated ? ['긍정/부정 표시는 자동으로 붙인 값이에요. 문장을 읽고 다르면 고쳐주세요.'] : []),
                 ...c.checks.filter(x=>x.level==='warn').map(x=>x.text)];
   $('#main').innerHTML = `
+  ${resumedMsg()}
   <div class="track fade ${S.editing?'editing':''}" id="cand">
     <div class="pills"><span class="pill blue">질문 후보 ${S.idx+1} / ${S.view.candidates.length}</span><span class="pill">${esc(c.aspect || '주제 없음')}</span></div>
     ${S.editing ? `<div class="field"><label>질문</label><textarea class="big" id="eq">${esc(d.question)}</textarea></div><div class="field"><label>답 — 리뷰가 말하는 것</label><textarea id="ea">${esc(d.answer)}</textarea></div>`
@@ -357,6 +365,8 @@ function renderJudge(msg) {
   document.querySelectorAll('[data-add]').forEach(b => b.onclick = () => { const e = JSON.parse(b.dataset.add); if (!S.editing) { S.editing = true; S.draft = d; } else syncDraft(); S.draft.evidence = S.draft.evidence.filter(x=>x.reviewId!==e.reviewId).concat([e]); renderJudge({cls:'ok', text:'근거에 넣었어요. 저장하면 candidate_edited 로 기록돼요.'}); });
 }
 function syncDraft() { if (S.editing) { const q=$('#eq'), a=$('#ea'); if (q) S.draft.question=q.value; if (a) S.draft.answer=a.value; } }
+// 만료된 배정을 이어받은 번들 — 다른 사람의 판단이 이미 일부 들어 있다
+function resumedMsg() { return S.view?.resumed ? `<div class="msg" style="width:min(1100px,100%);margin:0 auto">이 제품은 다른 사람이 일부 판단한 상태예요. 이미 판단된 후보는 그대로 두고, 남은 것부터 봐주세요.</div>` : ''; }
 function renderCounts(quotes) {
   const authors = new Map(S.view.reviews.map(r=>[r.reviewId, r.author]));
   const u = st => new Set(quotes.filter(q=>q.stance===st).map(q=>authors.get(q.reviewId))).size;
@@ -404,6 +414,7 @@ function renderMissed(msg) {
     return `<span class="sq ${st?('on-'+st):''} ${hit?'hit':''}" data-q='${esc(JSON.stringify({reviewId:r.reviewId, quote:x}))}'>${txt(x)}</span>`; }).join(' ');
   const used = r => [...evKey.keys()].some(k => k.startsWith(r.reviewId + ' '));
   $('#main').innerHTML = `
+  ${resumedMsg()}
   <div class="track fade"><span class="pill blue">마지막 한 가지</span><h1 class="display">후보에 없는 질문이<br>하나 떠오르나요?</h1><p class="sub white">리뷰를 쭉 읽어보고 "이건 왜 안 물어봤지?" 싶은 게 있으면, 근거가 되는 문장을 눌러 모으고 아래 "질문 적기"에 적어주세요. 없으면 없다고 답해도 충분해요. 그것도 기록이에요.</p></div>
   <div class="fade" style="display:flex;flex-direction:column;gap:20px">
     <div class="field" style="padding:0 4px"><label>리뷰 ${v.reviews.length}개 전체 · 자주 나오는 말로 좁혀 볼 수도 있어요</label><div class="chips"><button type="button" class="chip ${H.term?'':'on'}" data-t="">전체<b>${v.reviews.length}</b></button>${hits.map(([a,h]) => `<button type="button" class="chip ${H.term===a?'on':''}" data-t="${esc(a)}">${esc(a)}<b>${h.reviews}</b></button>`).join('')}</div></div>
@@ -458,14 +469,20 @@ async function finish() {
 // ---------- 완료 ----------
 function renderDone() {
   const d = S.doneInfo || { summary:{accept:0,edit:0,reject:0,human:0}, next:null, bundleId:S.view.bundle.bundleId };
-  const s = d.summary; const p = S.view.progress || {doneBundles:0};
+  const s = d.summary;
+  // complete 응답의 progress 가 정확하다(이번 제품이 done 으로 잡힌 뒤 값). 없으면 번들 화면의 값 + 1
+  const p = d.progress || { doneBundles:(S.view.progress?.doneBundles || 0) + 1, maxBundles:S.view.progress?.maxBundles || 0, limitReached:false };
+  const limit = p.limitReached || (!d.next && p.maxBundles > 0 && p.doneBundles >= p.maxBundles);
   $('#main').innerHTML = `
-  <div class="track fade"><span class="pill" style="color:var(--mint);font-weight:700">${esc(S.view.bundle.displayName)}</span><h1 class="display mint">끝났어요</h1><p class="sub white">판단은 모두 자동으로 저장됐어요. 지금까지 제품 ${p.doneBundles + 1}개.</p></div>
+  <div class="track fade"><span class="pill" style="color:var(--mint);font-weight:700">${esc(S.view.bundle.displayName)}</span><h1 class="display mint">${limit ? '여기까지예요' : '끝났어요'}</h1><p class="sub white">${limit ? `고마워요, ${esc(S.me.name)}. 판단은 모두 저장됐어요.` : '판단은 모두 자동으로 저장됐어요.'} 지금까지 제품 ${p.doneBundles}개.</p></div>
   <div class="stats fade"><div class="stat"><b>${s.accept}</b><span>맞아요</span></div><div class="stat"><b>${s.edit}</b><span>고쳤어요</span></div><div class="stat"><b>${s.reject}</b><span>아니에요</span></div><div class="stat hi"><b>${s.human}</b><span>직접 추가</span></div></div>
   <div class="actions fade">
-    ${d.next ? `<button class="btn white" id="next">다음 제품 시작 〉 <small>${esc(d.next.displayName)} · 리뷰 ${d.next.reviewCount}개</small></button>` : `<div class="msg ok">남은 제품이 없어요. 고마워요!</div>`}
-    <button class="btn ghost" id="stop">오늘은 여기까지</button>
-  </div>`;
+    ${limit ? `<div class="msg ok">여기까지예요. 고마워요, ${esc(S.me.name)}. 판단은 모두 저장됐어요.</div>`
+      : d.next ? `<button class="btn white" id="next">다음 제품 시작 〉 <small>${esc(d.next.displayName)} · 리뷰 ${d.next.reviewCount}개</small></button>`
+      : `<div class="msg ok">남은 제품이 없어요. 고마워요!</div>`}
+    <button class="btn ghost" id="stop">${limit ? '닫기' : '오늘은 여기까지'}</button>
+  </div>
+  ${!limit && d.next ? `<div class="note fade" style="padding:0 4px">여기서 그만해도 괜찮아요 — 1개만 해도 충분히 도움이 돼요.</div>` : ''}`;
   $('#next')?.addEventListener('click', () => { S.human=null; load(); });
   $('#stop').onclick = () => { localStorage.setItem('labeler', JSON.stringify(S.me)); $('#main').innerHTML = `<div class="track fade"><h1 class="display white">수고했어요</h1><p class="sub white">다음에 같은 이름으로 들어오면 이어서 할 수 있어요.</p><button class="btn ghost" style="align-self:flex-start" onclick="location.reload()">다시 시작</button></div>`; setHeader(null); };
 }

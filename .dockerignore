@@ -1,0 +1,33 @@
+# 라벨 검수 앱 이미지(apps/label-review/Dockerfile)에 넣지 않는 것. 컨텍스트는 저장소 루트다.
+.git
+.gitignore
+.env
+.env.*
+.venv
+venv
+__pycache__
+*.pyc
+.DS_Store
+.vscode
+.idea
+
+# 재실행하면 다시 생기는 산출물 — 서버는 번들 파일(리뷰 원문 포함)만 읽는다
+data/intermediate
+data/cache
+data/output
+
+# 서버가 읽지 않는 큰 입력 (필요한 건 data/input/skin_codebook.json 하나)
+data/input/reviews_50products.json
+data/input/reviews_50products_report.json
+data/input/reviews_200_normalized.json
+data/input/v4_reviews_500.json
+data/input/skin_codes_probe_result.json
+
+# v4 동결 기준선 · 문서 · 크롤러 · 작업 메모
+legacy
+docs
+crawler
+scripts
+*.md
+!apps/label-review/README.md
+!pipeline/prompts/**

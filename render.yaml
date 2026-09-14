@@ -1,0 +1,30 @@
+# Render 블루프린트 — 라벨 검수 앱 (apps/label-review, PER-178).
+# Render 대시보드 → New → Blueprint 로 이 저장소를 고르면 아래대로 서비스가 생긴다.
+# env: python 이라 빌드 단계가 없다(표준 라이브러리만). 값은 sync: false 라 대시보드에서 직접 넣는다 — .env 는 커밋하지 않는다.
+services:
+  - type: web
+    name: label-review
+    runtime: python
+    plan: free
+    region: singapore
+    branch: main
+    rootDir: .
+    buildCommand: ""
+    startCommand: python3 apps/label-review/server.py --port $PORT
+    healthCheckPath: /
+    autoDeploy: true
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.6"
+      - key: SUPABASE_URL              # Supabase 프로젝트 URL (https://xxxx.supabase.co)
+        sync: false
+      - key: SUPABASE_SERVICE_KEY      # service role 키 — 서버에서만. anon 키가 아니다
+        sync: false
+      - key: LABEL_ACCESS_CODE         # 라벨러에게 줄 접속 코드
+        sync: false
+      - key: LABEL_MAX_BUNDLES         # 한 사람이 받을 수 있는 번들 수 (기본 2, 0 은 무제한)
+        sync: false
+      - key: LABEL_ASSIGNMENT_TTL_HOURS  # 손 놓은 배정을 다른 사람에게 넘기는 시한 (기본 48)
+        sync: false
+      - key: LABEL_ADMIN_KEY           # 관리자 현황 페이지 /admin 열쇠
+        sync: false

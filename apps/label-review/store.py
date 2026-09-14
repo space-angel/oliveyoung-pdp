@@ -10,7 +10,9 @@
 
 레코드
   label        golden_contract 의 라벨 (LABEL_FIELDS)
-  assignment   {bundleId, labelerId, labelerName, status: active|done}
+  assignment   {bundleId, labelerId, labelerName, status: active|done|expired, updatedAt: ISO8601 UTC}
+               — updatedAt 은 저장소가 찍는다(upsert 마다 now). service 가 이 값으로 중간 이탈(TTL) 을 판정한다
+               — expired 는 TTL 을 넘겨 다른 사람이 가져간 배정. 결정·라벨은 그대로 남는다
   decision     {bundleId, labelerId, candidateId|null, kind: accept|edit|reject|no_missed|human, reason|null, labelId|null}
                — 라벨이 되지 못한 기각(후보의 인용이 원문과 달라 계약을 못 통과)도 여기에는 남는다
   labeler      {labelerId, name}
@@ -22,6 +24,7 @@ import os
 import urllib.error
 import urllib.parse
 import urllib.request
+from datetime import datetime, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -42,6 +45,16 @@ def _read_jsonl(path: Path) -> list[dict]:
 def _write_jsonl(path: Path, rows: list[dict]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text("".join(json.dumps(r, ensure_ascii=False) + "\n" for r in rows))
+
+
+def now_iso() -> str:
+    """배정 updatedAt. UTC 고정 — 서버 시간대에 따라 TTL 판정이 흔들리면 안 된다."""
+    return datetime.now(timezone.utc).isoformat(timespec="seconds")
+
+
+def _assignment_row(a: dict) -> dict:
+    # _update 는 store 에 주는 힌트일 뿐 레코드가 아니다. updatedAt 은 저장소가 찍는다
+    return {**{k: v for k, v in a.items() if k != "_update"}, "updatedAt": now_iso()}
 
 
 class LocalStore:
@@ -87,8 +100,16 @@ class LocalStore:
         return [r for r in self._meta() if r.get("_kind") == "assignment"]
 
     def upsert_assignment(self, a: dict) -> None:
-        rows = [r for r in self._meta() if not (r.get("_kind") == "assignment" and r["bundleId"] == a["bundleId"])]
-        rows.append({"_kind": "assignment", **a})
+        # 키는 (bundleId, labelerId) — 만료돼 넘어간 번들은 옛 사람의 expired 행과 새 사람의 active 행이 같이 남는다
+        rows = [r for r in self._meta() if not (r.get("_kind") == "assignment" and r["bundleId"] == a["bundleId"] and r["labelerId"] == a["labelerId"])]
+        rows.append({"_kind": "assignment", **_assignment_row(a)})
+        self._save_meta(rows)
+
+    def take_over_assignment(self, old: dict, new: dict) -> None:
+        """TTL 을 넘긴 active 배정을 다른 사람이 가져간다. 옛 배정은 expired 로 남기고 결정·라벨은 건드리지 않는다."""
+        rows = [r for r in self._meta() if not (r.get("_kind") == "assignment" and r["bundleId"] == old["bundleId"] and r["labelerId"] == old["labelerId"])]
+        rows.append({"_kind": "assignment", **_assignment_row({**old, "status": "expired"})})
+        rows.append({"_kind": "assignment", **_assignment_row(new)})
         self._save_meta(rows)
 
     def decisions(self) -> list[dict]:
@@ -141,13 +162,21 @@ class SupabaseStore:
         self._req("POST", "labelers", body={"labeler_id": labeler["labelerId"], "name": labeler["name"]}, prefer="resolution=merge-duplicates,return=minimal")
 
     def assignments(self) -> list[dict]:
-        return [{"bundleId": r["bundle_id"], "labelerId": r["labeler_id"], "labelerName": r["labeler_name"], "status": r["status"]}
-                for r in self._req("GET", "assignments", params={"select": "bundle_id,labeler_id,labeler_name,status"})]
+        return [{"bundleId": r["bundle_id"], "labelerId": r["labeler_id"], "labelerName": r["labeler_name"], "status": r["status"], "updatedAt": r.get("updated_at")}
+                for r in self._req("GET", "assignments", params={"select": "bundle_id,labeler_id,labeler_name,status,updated_at"})]
+
+    def _assignment_body(self, a: dict) -> dict:
+        return {"bundle_id": a["bundleId"], "labeler_id": a["labelerId"], "labeler_name": a["labelerName"], "status": a["status"], "updated_at": now_iso()}
 
     def upsert_assignment(self, a: dict) -> None:
         # bundle_id 가 PK 다 — 두 사람이 동시에 같은 번들을 잡으면 두 번째 INSERT 가 409 로 실패한다. service 가 다음 번들로 넘어간다
-        self._req("POST", "assignments", body={"bundle_id": a["bundleId"], "labeler_id": a["labelerId"], "labeler_name": a["labelerName"], "status": a["status"]},
+        self._req("POST", "assignments", body=self._assignment_body(a),
                   prefer="resolution=merge-duplicates,return=minimal" if a.get("_update") else "return=minimal")
+
+    def take_over_assignment(self, old: dict, new: dict) -> None:
+        # bundle_id 가 PK 이고 status 체크가 active|done 뿐이라(schema.sql) 옛 배정을 expired 행으로 남길 자리가 없다 —
+        # 행을 새 사람으로 덮어쓴다. 누가 먼저 잡았는지는 decisions.labeler_id 에 남는다
+        self._req("POST", "assignments", body=self._assignment_body(new), prefer="resolution=merge-duplicates,return=minimal")
 
     def decisions(self) -> list[dict]:
         return [r["decision"] for r in self._req("GET", "decisions", params={"select": "decision"})]
