@@ -212,3 +212,44 @@ class ResumeGuardTest(unittest.TestCase):
         self.assertIn("이미 다른 조건으로 돌린 실행", msg)
         self.assertIn("모델A", msg)
         self.assertIn("모델B", msg)
+
+
+class IncompleteChunkTest(unittest.TestCase):
+    """받았지만 쓸 수 없는 청크를 골라낸다 (PER-175).
+
+    재개는 "응답을 받았는지" 만 보기 때문에, 잘린 JSON 이나 리뷰를 빼먹은 결과는
+    영영 다시 불리지 않는다. 그 리뷰들은 태그가 없는 채로 남고, "아무 aspect 도
+    말하지 않은 리뷰" 와 구별되지 않게 된다.
+    """
+
+    def setUp(self) -> None:
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.raw = Path(self.tmp.name) / "raw.jsonl"
+        self.reviews = [review(i, f"본문 {i}") for i in range(1, 5)]  # 청크 2개 × 2건
+
+    def write(self, rows: list[dict]) -> None:
+        self.raw.write_text("".join(json.dumps(r, ensure_ascii=False) + "\n" for r in rows))
+
+    def chunk(self, idx: int, ids: list[int]) -> dict:
+        payload = {"results": [{"reviewId": i, "aspects": []} for i in ids]}
+        return {"chunk": idx, "text": json.dumps(payload, ensure_ascii=False)}
+
+    def test_온전한_청크는_다시_부르지_않는다(self) -> None:
+        self.write([self.chunk(0, [1, 2]), self.chunk(1, [3, 4])])
+        self.assertEqual(tag_compat.incomplete_chunks(self.raw, self.reviews, 2), set())
+
+    def test_잘린_응답은_다시_부를_대상이다(self) -> None:
+        self.write([{"chunk": 0, "text": '{"results": [{"reviewId": 1'}, self.chunk(1, [3, 4])])
+        self.assertEqual(tag_compat.incomplete_chunks(self.raw, self.reviews, 2), {0})
+
+    def test_리뷰를_빼먹은_응답도_다시_부를_대상이다(self) -> None:
+        """파싱은 되지만 입력의 모든 reviewId 가 결과에 있어야 한다는 계약을 어긴다."""
+        self.write([self.chunk(0, [1]), self.chunk(1, [3, 4])])
+        self.assertEqual(tag_compat.incomplete_chunks(self.raw, self.reviews, 2), {0})
+
+    def test_추론_블록이_붙어도_온전하면_다시_부르지_않는다(self) -> None:
+        row = self.chunk(0, [1, 2])
+        row["text"] = "<reasoning>축을 훑는다</reasoning>" + row["text"]
+        self.write([row, self.chunk(1, [3, 4])])
+        self.assertEqual(tag_compat.incomplete_chunks(self.raw, self.reviews, 2), set())

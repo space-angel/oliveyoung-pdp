@@ -102,9 +102,33 @@ def post(base_url: str, key: str, body: dict, timeout: int, tries: int = 5) -> d
     raise SystemExit("재시도 소진")
 
 
+def incomplete_chunks(raw_path: Path, reviews: list[dict], chunk_size: int) -> set[int]:
+    """받은 응답 중 **쓸 수 없는** 청크 번호. 파싱 실패와 리뷰 누락을 같이 본다.
+
+    둘을 가르지 않는 이유는 결과가 같기 때문이다 — 그 리뷰들은 태그가 없는 채로
+    남고, 그러면 "아무 aspect 도 말하지 않은 리뷰" 와 구별되지 않는다 (PER-178).
+    """
+    expected = {idx: {r["reviewId"] for r in batch} for idx, batch in chunks(reviews, chunk_size)}
+    bad: set[int] = set()
+    for line in raw_path.read_text().splitlines():
+        if not line.strip():
+            continue
+        row = json.loads(line)
+        idx = row["chunk"]
+        try:
+            results = parse_text(row["text"])["results"]
+            seen = {r["reviewId"] for r in results}
+        except (json.JSONDecodeError, KeyError, TypeError):
+            bad.add(idx)
+            continue
+        if expected.get(idx, set()) - seen:
+            bad.add(idx)
+    return bad
+
+
 def run(model: str, pilot: bool, label: str | None, base_url: str, env: str,
         concurrency: int, timeout: int, service_tier: str | None = None,
-        chunk_size: int = CHUNK_SIZE) -> None:
+        chunk_size: int = CHUNK_SIZE, retry_failed: bool = False) -> None:
     reviews = load_reviews(pilot)
     input_path = PILOT_SAMPLE_PATH if pilot else REVIEWS_PATH
     label = label or f"{'pilot' if pilot else 'full'}_{model.split('/')[-1].replace('-', '').replace('.', '')}"
@@ -144,6 +168,24 @@ def run(model: str, pilot: bool, label: str | None, base_url: str, env: str,
         for line in raw_path.read_text().splitlines():
             if line.strip():
                 done.add(json.loads(line)["chunk"])
+
+    # 재개는 "응답을 받았는지" 만 본다. 그래서 **응답은 왔는데 내용이 깨진** 청크는
+    # 영영 다시 부르지 않는다 — 잘린 JSON, 리뷰를 빼먹은 결과가 그렇다. 1,250청크
+    # 실행에서 이건 재현율 손실로 조용히 남는다. --retry-failed 로 그것만 골라 비운다.
+    if retry_failed and raw_path.exists():
+        bad = incomplete_chunks(raw_path, reviews, chunk_size)
+        if bad:
+            kept = [
+                line
+                for line in raw_path.read_text().splitlines()
+                if line.strip() and json.loads(line)["chunk"] not in bad
+            ]
+            raw_path.write_text("".join(l + "\n" for l in kept))
+            done -= bad
+            print(f"[run] 내용이 불완전한 청크 {len(bad)}개를 비웠다 — 다시 부른다: "
+                  f"{sorted(bad)[:10]}{' …' if len(bad) > 10 else ''}")
+        else:
+            print("[run] 다시 부를 청크가 없다 (받은 응답이 전부 온전하다)")
 
     todo = [(i, b) for i, b in chunks(reviews, chunk_size) if i not in done]
     print(f"[run] {model} · 리뷰 {len(reviews):,}건 · 청크 {len(todo):,}개 남음 "
@@ -325,6 +367,11 @@ def main() -> None:
         help=f"요청당 리뷰 수 (기본 {CHUNK_SIZE}). 모델 비교는 같은 값으로 재야 한 표에 올라간다",
     )
     r.add_argument(
+        "--retry-failed",
+        action="store_true",
+        help="받았지만 내용이 깨진 청크(파싱 실패·리뷰 누락)를 비우고 다시 부른다",
+    )
+    r.add_argument(
         "--service-tier",
         choices=("default", "flex", "priority"),
         help="Bedrock 서비스 티어. flex 는 지연을 허용하고 할인받는다 (배치가 없는 모델의 대역)",
@@ -336,7 +383,7 @@ def main() -> None:
     a = ap.parse_args()
     if a.cmd == "run":
         run(a.model, a.pilot, a.label, a.base_url, a.env, a.concurrency, a.timeout,
-            a.service_tier, a.chunk_size)
+            a.service_tier, a.chunk_size, a.retry_failed)
     else:
         collect(a.label)
 
