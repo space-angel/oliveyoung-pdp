@@ -253,3 +253,56 @@ class IncompleteChunkTest(unittest.TestCase):
         row["text"] = "<reasoning>축을 훑는다</reasoning>" + row["text"]
         self.write([row, self.chunk(1, [3, 4])])
         self.assertEqual(tag_compat.incomplete_chunks(self.raw, self.reviews, 2), set())
+
+
+class PartitionEquivalenceTest(unittest.TestCase):
+    """빠른 리뷰별 경로와 느린 전역 경로가 같은 판정을 낸다 (PER-175).
+
+    전수 40,565태그에서 전역 경로는 사실상 안 끝난다 — 위반 하나를 뺄 때마다
+    처음부터 다시 세기 때문이다. 리뷰별로 잘라 도는 경로를 쓰되, **판정이 같다**는
+    것을 여기서 고정한다. 규칙이 리뷰를 가로지르게 바뀌면 이 테스트가 먼저 깨진다.
+    """
+
+    def setUp(self) -> None:
+        import tag
+
+        self.tag = tag
+        self.reviews = {
+            r["reviewId"]: r
+            for r in (
+                review(1, "발색은 예쁜데 지속력이 아쉬워요"),
+                review(2, "촉촉함이 오래갑니다"),
+                review(3, "순하고 좋아요 향도 은은해요"),
+            )
+        }
+
+    def partition_both(self, tags: list[dict]):
+        fast = self.tag.partition_by_contract([dict(t) for t in tags], self.reviews)
+        slow = self.tag._partition_scan([dict(t) for t in tags], self.reviews)
+        return fast, slow
+
+    def test_위반이_섞여_있어도_두_경로의_판정이_같다(self) -> None:
+        tags = [
+            {"reviewId": 1, "aspect": "발색", "polarity": "positive", "snippet": "발색은 예쁜데"},
+            {"reviewId": 1, "aspect": "발색", "polarity": "negative", "snippet": "지속력이 아쉬워요"},
+            {"reviewId": 2, "aspect": "보습감", "polarity": "positive", "snippet": "촉촉함이 오래갑니다"},
+            {"reviewId": 3, "aspect": "향", "polarity": "positive", "snippet": "원문에 없는 말"},
+            {"reviewId": 3, "aspect": "트러블/자극", "polarity": "positive", "snippet": "순하고 좋아요"},
+        ]
+        (fast_kept, fast_viol), (slow_kept, slow_viol) = self.partition_both(tags)
+
+        key = lambda ts: sorted((t["reviewId"], t["aspect"], t["polarity"]) for t in ts)  # noqa: E731
+        self.assertEqual(key(fast_kept), key(slow_kept))
+        self.assertEqual(key(fast_viol), key(slow_viol))
+        self.assertEqual(len(fast_viol), 2)
+
+    def test_통과분은_입력_순서를_지킨다(self) -> None:
+        """산출물 순서가 실행마다 달라지면 재현 확인(--check)이 깨진다."""
+        tags = [
+            {"reviewId": 3, "aspect": "향", "polarity": "positive", "snippet": "향도 은은해요"},
+            {"reviewId": 1, "aspect": "발색", "polarity": "positive", "snippet": "발색은 예쁜데"},
+            {"reviewId": 2, "aspect": "보습감", "polarity": "positive", "snippet": "촉촉함이 오래갑니다"},
+        ]
+        kept, violations = self.tag.partition_by_contract(tags, self.reviews)
+        self.assertEqual(violations, [])
+        self.assertEqual([t["reviewId"] for t in kept], [3, 1, 2])

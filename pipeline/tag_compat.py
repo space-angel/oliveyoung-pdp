@@ -266,6 +266,95 @@ def run(model: str, pilot: bool, label: str | None, base_url: str, env: str,
     print(f"[다음]   python3 pipeline/tag_compat.py collect --label {label}")
 
 
+def missing_review_ids(raw_path: Path, reviews: list[dict]) -> list[int]:
+    """받은 응답 어디에도 안 나온 reviewId."""
+    seen: set[int] = set()
+    if raw_path.exists():
+        for line in raw_path.read_text().splitlines():
+            if not line.strip():
+                continue
+            try:
+                for r in parse_text(json.loads(line)["text"])["results"]:
+                    seen.add(r["reviewId"])
+            except (json.JSONDecodeError, KeyError, TypeError):
+                continue
+    return sorted({r["reviewId"] for r in reviews} - seen)
+
+
+def fill(label: str, base_url: str, env: str, size: int, timeout: int) -> None:
+    """청크를 다시 불러도 안 채워지는 리뷰만 **따로 묶어** 다시 묻는다.
+
+    전수 실행에서 같은 7건이 세 번 연속 빠졌다. 온도 0인데 무작위가 아니라,
+    그 20건 묶음 안에서 모델이 그 리뷰를 일관되게 건너뛴다. 묶음을 다시 부르는
+    것으로는 안 되고 **묶음 구성을 바꿔야** 한다.
+
+    묶음 크기는 실행 설정이지 계약이 아니다. 계약이 요구하는 것은 "입력의 모든
+    reviewId 가 결과에 있어야 한다" 이고, 그걸 지키기 위해 크기를 줄이는 것이다.
+    다만 조용히 하지 않는다 — 채운 리뷰와 그때 쓴 묶음 크기가 매니페스트에 남는다.
+    """
+    man_path = RUNS_DIR / f"{label}.json"
+    if not man_path.exists():
+        raise SystemExit(f"모르는 실행: {label}")
+    man = json.loads(man_path.read_text())
+    reviews = load_reviews(man["pilot"])
+    raw_path = ROOT / man["raw"]
+
+    missing = missing_review_ids(raw_path, reviews)
+    if not missing:
+        print("[fill] 빠진 리뷰가 없다.")
+        return
+
+    by_id = {r["reviewId"]: r for r in reviews}
+    key = api_key(env)
+    system = PROMPT_PATH.read_text()
+    print(f"[fill] 빠진 리뷰 {len(missing)}건을 {size}건씩 다시 묻는다: {missing[:20]}")
+
+    fh = raw_path.open("a")
+    filled: list[int] = []
+    for n in range(0, len(missing), size):
+        group = [by_id[i] for i in missing[n : n + size]]
+        body = {
+            "model": man["model"],
+            "messages": [
+                {"role": "system", "content": system},
+                {"role": "user", "content": chunk_payload(group)},
+            ],
+            "max_tokens": MAX_TOKENS,
+            "temperature": 0,
+            "stream": False,
+        }
+        if man.get("serviceTier"):
+            body["service_tier"] = man["serviceTier"]
+        data = post(base_url, key, body, timeout)
+        choice = data["choices"][0]
+        row = {
+            # 묶음 번호 공간을 분리한다 — 정수 청크 번호와 겹치면 재개가 헷갈린다
+            "chunk": f"fill-{n // size}",
+            "text": choice["message"]["content"],
+            "finishReason": choice.get("finish_reason"),
+            "usage": data.get("usage"),
+            "serviceTier": data.get("service_tier"),
+            "fillSize": size,
+        }
+        fh.write(json.dumps(row, ensure_ascii=False) + "\n")
+        fh.flush()
+        filled.extend(r["reviewId"] for r in group)
+    fh.close()
+
+    still = missing_review_ids(raw_path, reviews)
+    man["filled"] = {
+        "requestedReviews": len(missing),
+        "chunkSize": size,
+        "reviewIds": missing,
+        "stillMissing": still,
+        "note": "묶음 크기 20 에서 반복적으로 빠진 리뷰를 작은 묶음으로 다시 물어 채웠다",
+    }
+    man_path.write_text(json.dumps(man, ensure_ascii=False, indent=2) + "\n")
+    print(f"[fill] 다시 물은 리뷰 {len(filled)}건 · 아직 빠진 것 {len(still)}건"
+          + (f" {still}" if still else ""))
+    print(f"[다음]   python3 pipeline/tag_compat.py collect --label {label}")
+
+
 def collect(label: str) -> None:
     man = json.loads((RUNS_DIR / f"{label}.json").read_text())
     reviews = {r["reviewId"]: r for r in load_reviews(man["pilot"])}
@@ -380,7 +469,17 @@ def main() -> None:
     c = sub.add_parser("collect", help="결과 수거 + 계약 검증")
     c.add_argument("--label", required=True)
 
+    f = sub.add_parser("fill", help="묶음을 다시 불러도 안 채워지는 리뷰만 작은 묶음으로 다시 묻는다")
+    f.add_argument("--label", required=True)
+    f.add_argument("--base-url", default=DEFAULT_BASE_URL)
+    f.add_argument("--env", default="NVIDIA_API_KEY")
+    f.add_argument("--size", type=int, default=1, help="한 번에 물을 리뷰 수 (기본 1)")
+    f.add_argument("--timeout", type=int, default=180)
+
     a = ap.parse_args()
+    if a.cmd == "fill":
+        fill(a.label, a.base_url, a.env, a.size, a.timeout)
+        return
     if a.cmd == "run":
         run(a.model, a.pilot, a.label, a.base_url, a.env, a.concurrency, a.timeout,
             a.service_tier, a.chunk_size, a.retry_failed)

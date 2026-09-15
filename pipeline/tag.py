@@ -249,17 +249,14 @@ def parse_text(text: str) -> dict:
     return json.loads(t)
 
 
-def partition_by_contract(tags: list[dict], reviews: dict) -> tuple[list[dict], list[dict]]:
-    """계약 통과분과 위반분을 가른다.
+def _partition_scan(tags: list[dict], reviews: dict) -> tuple[list[dict], list[dict]]:
+    """위반을 하나씩 빼면서 계약을 다시 세운다. 규칙을 여기서 다시 쓰지 않으려는 것이다.
 
-    규칙은 `tag_contract.validate_tags` 가 단독으로 소유한다 — 여기서 검사를 다시 쓰지
-    않는다. 위반 태그를 하나씩 빼면서 계약을 다시 세워, 규칙이 바뀌면 이 진단도 같이 바뀐다.
-    파이프라인 경로(첫 위반에서 정지)는 그대로 두고, **모델을 비교할 때 위반이 몇 건인지**
-    세기 위한 것이다.
+    **전수 규모에서는 이 경로가 사실상 안 끝난다** — 위반 하나를 뺄 때마다 처음부터
+    다시 세기 때문이다. 그래서 평소에는 `partition_by_contract` 의 리뷰별 경로를
+    쓰고, 이건 그 가정이 깨졌을 때의 폴백으로만 남긴다.
     """
     from tag_contract import TagContractError, validate_tags
-
-    import re
 
     kept = list(tags)
     violations: list[dict] = []
@@ -274,6 +271,46 @@ def partition_by_contract(tags: list[dict], reviews: dict) -> tuple[list[dict], 
             idx = int(m.group(1))
             bad = kept.pop(idx)
             violations.append({**bad, "violation": str(exc).split(": ", 1)[-1]})
+
+
+def partition_by_contract(tags: list[dict], reviews: dict) -> tuple[list[dict], list[dict]]:
+    """계약 통과분과 위반분을 가른다.
+
+    규칙은 `tag_contract.validate_tags` 가 단독으로 소유한다 — 여기서 검사를 다시
+    쓰지 않는다. 대신 **리뷰별로 잘라** 같은 함수를 돌린다. 현 계약의 규칙은 전부
+    리뷰 안에서 닫혀 있어서(같은 축 중복·리뷰당 상한·인용 대조 모두 한 리뷰 안의
+    일이다) 잘라 판정해도 결과가 같고, 리뷰당 태그가 몇 개뿐이라 빠르다.
+
+    그 가정은 믿고 넘어가지 않는다 — 마지막에 통과분 전체를 한 번 더 계약에
+    넣어 본다. 리뷰를 가로지르는 규칙이 생겼다면 거기서 드러나고, 그때는 느리지만
+    확실한 `_partition_scan` 으로 되돌아간다.
+
+    파이프라인 경로(첫 위반에서 정지)는 그대로 두고, **모델을 비교할 때 위반이 몇
+    건인지** 세기 위한 것이다.
+    """
+    from tag_contract import TagContractError, validate_tags
+
+    by_review: dict[int, list[dict]] = {}
+    for tag in tags:
+        by_review.setdefault(tag.get("reviewId"), []).append(tag)
+
+    kept: list[dict] = []
+    violations: list[dict] = []
+    for group in by_review.values():
+        g_kept, g_violations = _partition_scan(group, reviews)
+        kept.extend(g_kept)
+        violations.extend(g_violations)
+
+    try:
+        validate_tags(kept, reviews)
+    except TagContractError:
+        # 리뷰 안에서 닫히지 않는 규칙이 생겼다. 가정이 깨졌으니 전역 경로로 다시 가른다.
+        return _partition_scan(tags, reviews)
+
+    # 입력 순서를 돌려준다 — 산출물이 실행마다 달라지면 재현 확인이 깨진다.
+    order = {id(t): i for i, t in enumerate(tags)}
+    kept.sort(key=lambda t: order[id(t)])
+    return kept, violations
 
 
 def collect(label: str) -> None:
