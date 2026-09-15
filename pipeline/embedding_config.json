@@ -1,0 +1,127 @@
+{
+  "issue": "PER-184",
+  "schemaVersion": "embedding-config-v1",
+  "note": "임베딩 모델 선정과 버전 기록 계약의 설정. 모델 ID·revision·임계값을 코드 상수로 박지 않는다 (trust_weights.json 과 같은 규칙). 근거는 docs/DECISION_PER184_EMBEDDING_MODEL.md 와 eval/reports/embedding_probe_per184.json.",
+  "scope": "이번 사이클은 선정과 계약까지다. 벡터 생성·게이트2 부착·전수 임베딩은 사이클 2 (PER-212).",
+  "selected": {
+    "embeddingVersion": "emb-v1",
+    "model": "nlpai-lab/KURE-v1",
+    "revision": "8b418a58414668e75532ed045c22d9ca018ae2b2",
+    "dimension": 1024,
+    "maxSeqLength": 8192,
+    "normalize": true,
+    "queryPrefix": "",
+    "passagePrefix": "",
+    "license": "MIT",
+    "params": 567754752,
+    "source": "https://huggingface.co/nlpai-lab/KURE-v1",
+    "vocabVersion": "aspect-v1",
+    "vocabSource": "pipeline/tag_contract.py ASPECTS (14종, PER-175 동결)",
+    "aspectsSha256": "71663cdf840173b17d1bb39df99c33e54309cde803a25cf879f94425bf10ca59",
+    "goldenVersion": "tags-pilot-gold-v2"
+  },
+  "releases": [
+    {
+      "embeddingVersion": "emb-v1",
+      "vocabVersion": "aspect-v1",
+      "goldenVersion": "tags-pilot-gold-v2",
+      "status": "selected",
+      "note": "선정만 끝났다. 벡터는 아직 만들지 않았다 — 사이클 2 에서 이 조합으로 처음 생성한다"
+    }
+  ],
+  "swapRequirements": [
+    "vectorsRebuilt",
+    "vocabRefixed",
+    "goldenRelabeled"
+  ],
+  "probe": {
+    "topK": [
+      1,
+      5,
+      10,
+      20
+    ],
+    "reportPath": "eval/reports/embedding_probe_per184.json"
+  },
+  "candidates": {
+    "kure": {
+      "model": "nlpai-lab/KURE-v1",
+      "revision": "8b418a58414668e75532ed045c22d9ca018ae2b2",
+      "dimension": 1024,
+      "maxSeqLength": 8192,
+      "params": 567754752,
+      "license": "MIT",
+      "queryPrefix": "",
+      "passagePrefix": "",
+      "source": "https://huggingface.co/nlpai-lab/KURE-v1",
+      "measured": true
+    },
+    "bge-m3": {
+      "model": "BAAI/bge-m3",
+      "revision": "5617a9f61b028005a4858fdac845db406aefb181",
+      "dimension": 1024,
+      "maxSeqLength": 8192,
+      "params": 567754752,
+      "license": "MIT",
+      "queryPrefix": "",
+      "passagePrefix": "",
+      "source": "https://huggingface.co/BAAI/bge-m3",
+      "measured": true,
+      "why": "KURE-v1 의 베이스. 한국어 추가학습분이 우리 데이터에서 실제로 값을 하는지 가른다"
+    },
+    "e5-base": {
+      "model": "intfloat/multilingual-e5-base",
+      "revision": "d128750597153bb5987e10b1c3493a34e5a4502a",
+      "dimension": 768,
+      "maxSeqLength": 512,
+      "params": 278044162,
+      "license": "MIT",
+      "queryPrefix": "query: ",
+      "passagePrefix": "passage: ",
+      "source": "https://huggingface.co/intfloat/multilingual-e5-base",
+      "measured": true,
+      "why": "다국어 중형 기준선. 2배 작은 모델로 충분한지 본다"
+    },
+    "ko-sroberta": {
+      "model": "jhgan/ko-sroberta-multitask",
+      "revision": "8fca7c9c98c26599be0e14b9916b11a756a26f19",
+      "dimension": 768,
+      "maxSeqLength": 128,
+      "params": 110618626,
+      "license": "unstated",
+      "queryPrefix": "",
+      "passagePrefix": "",
+      "source": "https://huggingface.co/jhgan/ko-sroberta-multitask",
+      "measured": true,
+      "why": "ko-sbert 계열 대표. '한국어 전용이니 한국어에 강하다'가 우리 데이터에서도 맞는지 본다"
+    },
+    "arctic-l-ko": {
+      "model": "dragonkue/snowflake-arctic-embed-l-v2.0-ko",
+      "revision": "55ec6e9358a56d56af759bc8372e970caf8c305f",
+      "dimension": 1024,
+      "maxSeqLength": 8192,
+      "params": 567754752,
+      "license": "apache-2.0",
+      "queryPrefix": "query: ",
+      "passagePrefix": "",
+      "source": "https://huggingface.co/dragonkue/snowflake-arctic-embed-l-v2.0-ko",
+      "measured": false,
+      "why": "dragonkue 가 낸 한국어 검색표에서 1위인 모델. 표를 낸 쪽이 자기 모델을 1위에 놓으므로 우리 데이터에서 직접 확인한다",
+      "notMeasuredReason": "가중치를 내려받기 전에 실행이 끊겼다 (머신 종료, 2026-09-15). 직전에 같은 크기의 dragonkue/BGE-m3-ko 가 디스크 부족으로 실패했고 이 후보도 같은 제약에 걸려 있었다. 재지 않은 모델의 성능을 추정해 표에 넣지 않는다 — 측정하면 리포트를 통째로 다시 만든다"
+    },
+    "bge-m3-ko": {
+      "model": "dragonkue/BGE-m3-ko",
+      "revision": "7074d66aa46562342193ca4feb3d89bf9dad71b4",
+      "dimension": 1024,
+      "maxSeqLength": 8192,
+      "params": 567754752,
+      "license": "apache-2.0",
+      "queryPrefix": "",
+      "passagePrefix": "",
+      "source": "https://huggingface.co/dragonkue/BGE-m3-ko",
+      "measured": false,
+      "why": "KURE-v1 과 같은 베이스(bge-m3)에 다른 한국어 학습분. 한국어 파인튜닝 방식 차이를 가른다",
+      "notMeasuredReason": "디스크 여유가 2.5GB 뿐이라 가중치(2.2GB) 내려받기가 실패했다 (No space left on device). 추정해서 표에 넣지 않는다"
+    }
+  }
+}
