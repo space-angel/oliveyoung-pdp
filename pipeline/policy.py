@@ -1,9 +1,10 @@
 """
-리뉴얼 취급 · 리센시 컷 정책 (PER-172 / PRD §3-3 · §9).
+리뉴얼 취급 · 리센시 컷 · 충분성 임계값 정책 (PER-172 · PER-186 / PRD §3-3 · §4-4 · §9).
 
-게이트1(동일성, PER-182)이 소비하는 두 개의 컷을 여기서 정의한다. 카탈로그가
-**어떤 제품인가**를 소유하고(PER-171), 이 모듈은 **그 리뷰를 지금 근거로 쓸 수 있는가**를
-소유한다.
+게이트1(동일성, PER-182)과 게이트4(충분성, PER-186)가 소비하는 **컷의 기준**을 여기서
+정의한다. 카탈로그가 **어떤 제품인가**를 소유하고(PER-171), 이 모듈은 **그 리뷰를 지금
+근거로 쓸 수 있는가**와 **그 근거가 주장을 세울 만큼인가**를 소유한다. 게이트 모듈
+(`gates.py` · `sufficiency.py`)은 이 판정을 묶어 `rejected[]` 행으로 만들 뿐이다.
 
 ## 결정 1 — 리뉴얼은 별개 제품이다 (PRD 권장안 채택)
 
@@ -35,10 +36,18 @@
 24개월(2024-09~2026-08)의 비용은 리뷰 88.8% 잔존, 충분성 게이트를 통과하는
 `productId×skinType` 셀 294→284 (-10, 3.4%) 다.
 
+## 결정 3 — 충분성은 세 조건의 AND 다 (PER-186)
+
+`U ≥ N_min AND U/D ≥ R_min AND S ≥ S_min`. **낮은 쪽이 아니라 높은 쪽을 만족해야
+통과다.** 분모 D 는 주제를 언급한 고유 작성자이고 셀 크기 S 가 아니다 — 말하지 않은
+사람을 어느 쪽 근거로도 세지 않는다는 PER-178 의 결정이 여기 걸린다.
+근거는 `docs/DECISION_PER186_SUFFICIENCY.md`.
+
 ## 컷은 드롭이 아니다
 
-두 컷 모두 리뷰를 삭제하지 않고 `rejected[]` 에 사유를 남긴다(PRD §3-2). 통과한 것만
-남기면 정밀도는 측정되지만 재현율은 영영 측정되지 않는다.
+어느 컷도 대상을 삭제하지 않고 `rejected[]` 에 사유를 남긴다(PRD §3-2). 리센시·리뉴얼은
+리뷰를, 충분성은 주장을 남긴다. 통과한 것만 남기면 정밀도는 측정되지만 재현율은 영영
+측정되지 않는다 — 과소근거로 떨어진 주장의 목록이 곧 커버리지 실험(PER-199)의 분모다.
 """
 from __future__ import annotations
 
@@ -51,9 +60,6 @@ from dataclasses import dataclass
 # 이 값이 낡고, assert_snapshot_current() 가 에러를 낸다.
 SNAPSHOT_LATEST_MONTH = "2026-08"
 RECENCY_WINDOW_MONTHS = 24
-# 충분성 게이트(PER-186)의 절대하한. 컷 비용을 같은 잣대로 재기 위해 여기 둔다.
-SUFFICIENCY_N_MIN = 8
-
 MONTH_PATTERN = re.compile(r"^\d{4}-(0[1-9]|1[0-2])$")
 
 # --- 리뉴얼 정책 어휘 ---
@@ -63,10 +69,37 @@ RENEWAL_SINGLE = "single"
 RENEWAL_UNOBSERVED = "unobserved"
 RENEWAL_POLICIES = (RENEWAL_SEPARATE, RENEWAL_SINGLE, RENEWAL_UNOBSERVED)
 
+# --- 충분성 컷 (PER-186) ---
+#
+# 세 임계값은 **모두** 만족해야 통과다. 낮은 쪽이 아니라 높은 쪽이다 — 단일 임계값
+# (예: "15% 이상")으로 정의하면 소표본에서 무너진다 (PRD §4-4).
+#
+#   N_min  U ≥ 8       방향을 명시한 고유 작성자의 절대 하한
+#   R_min  U/D ≥ 0.10  **언급한 사람** 중 그 방향의 몫. 분모는 셀 전체(S)가 아니다
+#   S_min  S ≥ 8       셀 자체의 최소 관찰 수 — 주장 이전에 셀이 말할 자격이 있는가
+#
+# 분모를 D 로 두는 것이 PER-178 의 결정이다: 주제를 말하지 않은 사람은 긍정도 부정도
+# 아니므로 어느 쪽 근거로도 세지 않는다 (`docs/DECISION_PER178_SILENCE_IS_NOT_EVIDENCE.md`).
+# D 를 S 로 부풀리면 "40명 중 3명이 말했다"가 "40명 중 3명만 불만"으로 둔갑한다.
+SUFFICIENCY_N_MIN = 8
+SUFFICIENCY_R_MIN = 0.10
+SUFFICIENCY_S_MIN = 8
+# 소수 의견 하한. **컷이 아니라 한계 표시다** — 반대 1명을 다수 방향으로 뭉개지 않는다
+# (PER-178 규격 §9 가 기각한 대안). 근거는 docs/DECISION_PER186_SUFFICIENCY.md §4.
+SUFFICIENCY_MINORITY_MIN = 2
+
 # `rejected[]` 사유 코드 / 주장에 남기는 한계 코드
 REJECT_RECENCY = "recency_cut"
 REJECT_RENEWAL = "renewal_cut"
 LIMIT_RENEWAL_UNOBSERVED = "renewal_unobserved"
+
+# 충분성 탈락 사유 (PER-186). 셋 다 PRD 가 말하는 "과소근거" 부류지만 코드는 나눈다 —
+# 무엇이 결속했는지 모르면 임계값을 바꿨을 때 달라진 몫을 귀속시킬 수 없다 (게이트1의
+# `옵션불일치`/`옵션미기재` 와 같은 이유).
+REJECT_INSUFFICIENT = "insufficient_support"    # U < N_min
+REJECT_MINORITY_SHARE = "minority_share"        # U/D < R_min
+REJECT_SEGMENT_TOO_SMALL = "segment_too_small"  # S < S_min
+LIMIT_SINGLE_DISSENT = "single_dissent"
 
 
 class PolicyError(Exception):
@@ -166,4 +199,104 @@ def renewal_gate(product, review_date: str) -> GateDecision:
         return GateDecision(passed=False, reason=REJECT_RENEWAL)
     if product.renewal_to_month is not None and month > product.renewal_to_month:
         return GateDecision(passed=False, reason=REJECT_RENEWAL)
+    return GateDecision(passed=True)
+
+
+# --- 충분성 컷 (PER-186) ---
+
+
+@dataclass(frozen=True)
+class SufficiencyPolicy:
+    """충분성 임계값 묶음. **설정값이고 `meta` 에 기록된다** (PER-186 완료 조건).
+
+    임계값을 인자로 받는 이유는 민감도 때문이다 — 임계값을 바꿨을 때 통과 주장 수가
+    어떻게 변하는지가 PER-199 커버리지 측정의 입력이다
+    (`eval/reports/gate4_sufficiency_per186.json` 의 `sensitivity`).
+
+    기본값을 코드 상수로 두는 것은 리센시 컷(`SNAPSHOT_LATEST_MONTH`)과 같은 취급이다:
+    스냅샷마다 다시 정하는 값이 아니라 **정책**이므로, 바꾸면 커밋 로그에 남아야 한다.
+    """
+    n_min: int = SUFFICIENCY_N_MIN
+    r_min: float = SUFFICIENCY_R_MIN
+    s_min: int = SUFFICIENCY_S_MIN
+    minority_min: int = SUFFICIENCY_MINORITY_MIN
+
+    def __post_init__(self) -> None:
+        if not isinstance(self.n_min, int) or isinstance(self.n_min, bool) or self.n_min < 1:
+            raise PolicyError(f"N_min 은 1 이상의 정수여야 한다: {self.n_min!r}")
+        if not isinstance(self.s_min, int) or isinstance(self.s_min, bool) or self.s_min < 1:
+            raise PolicyError(f"S_min 은 1 이상의 정수여야 한다: {self.s_min!r}")
+        if not isinstance(self.r_min, (int, float)) or isinstance(self.r_min, bool):
+            raise PolicyError(f"R_min 은 수여야 한다: {self.r_min!r}")
+        if not 0.0 < self.r_min <= 1.0:
+            raise PolicyError(f"R_min 은 0 초과 1 이하여야 한다: {self.r_min!r} (0 이면 비율 조건이 꺼진다)")
+        if self.s_min < self.n_min:
+            # U ≤ D ≤ S 이므로 S_min < N_min 이면 세그먼트 조건이 영원히 결속하지 않는다.
+            # "세 조건을 모두 만족해야 통과"가 조용히 두 조건으로 줄어드는 경로다.
+            raise PolicyError(
+                f"S_min({self.s_min}) 이 N_min({self.n_min}) 보다 작다. U ≤ D ≤ S 라 "
+                "이 설정은 세그먼트 조건을 껐다는 뜻이다 — 끄려면 그렇게 적어라"
+            )
+        if not isinstance(self.minority_min, int) or isinstance(self.minority_min, bool) or self.minority_min < 1:
+            raise PolicyError(f"minority_min 은 1 이상의 정수여야 한다: {self.minority_min!r}")
+
+    def as_meta(self) -> dict:
+        """`meta.sufficiency` 에 그대로 실린다. 수치가 어느 정책에서 나왔는지 남는다."""
+        return {
+            "issue": "PER-186",
+            "nMin": self.n_min,
+            "rMin": self.r_min,
+            "sMin": self.s_min,
+            "minorityMin": self.minority_min,
+            "denominator": "spokeAuthors",
+            "note": (
+                "U ≥ N_min AND U/D ≥ R_min AND S ≥ S_min 을 모두 만족해야 통과. "
+                "분모 D 는 주제를 언급한 고유 작성자다 (PER-178 — 침묵은 근거가 아니다)"
+            ),
+        }
+
+
+DEFAULT_SUFFICIENCY = SufficiencyPolicy()
+
+
+def sufficiency_gate(
+    support_authors: int,
+    spoke_authors: int,
+    cell_authors: int,
+    minority_authors: int | None = None,
+    policy: SufficiencyPolicy = DEFAULT_SUFFICIENCY,
+) -> GateDecision:
+    """주장 1건의 충분성 판정. **세 조건을 모두** 만족해야 통과다 (PRD §4-4).
+
+      support_authors  U — 주장의 방향을 명시한 고유 작성자 수
+      spoke_authors    D — 그 주제를 말한 고유 작성자 수 (U0 중립 포함)
+      cell_authors     S — 셀의 유효 고유 작성자 수 (게이트2 통과분)
+      minority_authors 방향이 갈릴 때 적은 쪽의 수. 없으면 `None`
+
+    판정 순서는 넓은 것부터다 — 셀이 말할 자격이 없으면(S) 주장의 근거 수(U)를 물을
+    이유가 없고, 사유가 하나로 정해져야 `rejected[]` 가 재현율의 단서가 된다.
+
+    U ≤ D ≤ S 는 불변식이다. 깨지면 어딘가에서 침묵을 근거로 세었다는 뜻이므로 조용히
+    통과시키지 않고 에러다. 다만 이 함수는 **수만 받으므로** 셀 밖 작성자가 섞인 경우는
+    여기서 잡히지 않는다 — 집합 대조는 `sufficiency.ClaimSupport.as_dict()` 가 한다.
+    """
+    for name, value in (("U", support_authors), ("D", spoke_authors), ("S", cell_authors)):
+        if not isinstance(value, int) or isinstance(value, bool) or value < 0:
+            raise PolicyError(f"{name} 는 0 이상의 정수여야 한다: {value!r}")
+    if not support_authors <= spoke_authors <= cell_authors:
+        raise PolicyError(
+            f"U ≤ D ≤ S 위반: U={support_authors} D={spoke_authors} S={cell_authors}. "
+            "말하지 않은 사람을 근거로 세었거나(PER-178) 셀 밖 작성자가 섞였다"
+        )
+
+    if cell_authors < policy.s_min:
+        return GateDecision(passed=False, reason=REJECT_SEGMENT_TOO_SMALL)
+    if support_authors < policy.n_min:
+        return GateDecision(passed=False, reason=REJECT_INSUFFICIENT)
+    if support_authors / spoke_authors < policy.r_min:
+        return GateDecision(passed=False, reason=REJECT_MINORITY_SHARE)
+
+    # 통과했다고 한계가 없는 것은 아니다 — 게이트1의 `unobserved` 와 같은 자리다.
+    if minority_authors is not None and 0 < minority_authors < policy.minority_min:
+        return GateDecision(passed=True, limitation=LIMIT_SINGLE_DISSENT)
     return GateDecision(passed=True)
