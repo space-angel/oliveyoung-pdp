@@ -69,11 +69,11 @@ from policy import (  # noqa: E402
 # 게이트 이름과 사람이 읽는 표기는 레지스트리가 소유한다 (PER-188).
 from reject_registry import (  # noqa: E402
     GATE_SUFFICIENCY,
+    LIMIT_LABELS as _REGISTRY_LIMIT_LABELS,
     REJECT_LABELS,
     assert_rejectable,
     label_of,
 )
-from reject_registry import LIMIT_LABELS  # noqa: E402,F401  (재수출 — 표기 한 벌)
 
 ISSUE = "PER-186"
 
@@ -86,6 +86,11 @@ SUFFICIENCY_REJECT_LABELS = {
     code: REJECT_LABELS[code]
     for code in (REJECT_INSUFFICIENT, REJECT_MINORITY_SHARE, REJECT_SEGMENT_TOO_SMALL)
 }
+
+# 이 게이트가 **소유한** 한계의 표기만 잘라 온다. 레지스트리 전체(5종)를 그대로 재수출하면
+# 게이트1·3 의 한계까지 여기 이름으로 보이고, 이 표를 훑는 호출부가 자기 게이트와 무관한
+# 꼬리표를 렌더한다. 문자열은 한 벌이되 **범위는 소유자별로 자른다** — 사유 표기와 같은 규칙.
+LIMIT_LABELS = {LIMIT_SINGLE_DISSENT: _REGISTRY_LIMIT_LABELS[LIMIT_SINGLE_DISSENT]}
 
 
 class SufficiencyError(ValueError):
