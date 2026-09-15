@@ -1,0 +1,480 @@
+{
+  "issue": "PER-190",
+  "what": "인용이 그 리뷰의 원문 부분문자열인가. v4 를 v4 방식으로 재현하고, 같은 입력에 v5 규칙을 걸어 규칙 차이를 분리한다",
+  "source": {
+    "concernsV4": {
+      "path": "data/output/concerns_v4.json",
+      "sha256": "7e99adadcde99baee800d10828b06567e059c8bedb79dd4f16bba0959990923b",
+      "concerns": 30
+    },
+    "reviewsV4": {
+      "path": "data/input/reviews_200_normalized.json",
+      "sha256": "88f4fb83b1dab858cc05ae1e1322ba0a05416f248e6eb7ec547b2afaf308008e",
+      "records": 500,
+      "note": "파일명은 200 이지만 500행이다. v4 평가가 쓴 파일 그대로 (legacy/v4/eval/eval_v4.py:REVIEWS_PATH)"
+    },
+    "goldenLabels": {
+      "path": "eval/gold/v5_concern_golden_labels.jsonl",
+      "sha256": "569cc1e9b4c079e30432b0badee37c2785f673d27f47564af1222848084c3e14",
+      "rows": 26
+    },
+    "bundles": {
+      "path": "eval/gold/v5_concern_golden_sample.jsonl",
+      "sha256": "5e4bae0810f7013e44b78daed1e2b22636f10c6dca646c33bf46cf4d0a4acb2e",
+      "rows": 40
+    },
+    "reviewsV5": {
+      "path": "data/intermediate/v5_reviews.jsonl",
+      "sha256": "47a1fc98e93b10b45e1cca178fcdeb603327cacc6111191c55f6cd53f20f1974",
+      "records": 25000
+    },
+    "failureTaxonomyVersion": "failure-taxonomy-v1",
+    "note": "LLM 호출이 없다. 생성기는 PER-191 이고 아직 없다"
+  },
+  "corpora": {
+    "v4Reviews": 500,
+    "v5Snapshot": 25000,
+    "overlap": 66,
+    "note": "겹치지 않으므로 v4 인용을 25,000건에서 다시 재는 것은 의미가 없다. v4 는 v4 코퍼스에서, v5 는 스냅샷에서 잰다 — 코퍼스가 다르다는 사실을 수치 옆에 붙여 읽어야 한다"
+  },
+  "rule": {
+    "pass": "fold_invisible(quote) 가 fold_invisible(그 리뷰 원문)의 부분문자열",
+    "normalize": "tag_contract.fold_invisible — CRLF·\\r → \\n, Zs 공백 → ASCII 공백, 폭 없는 공백(U+200B·U+FEFF) 제거. 글자 수와 띄어쓰기 수는 그대로다",
+    "forbidden": "공백 전체 squeeze. 띄어쓰기를 지운 편집까지 통과시킨다 (CLAUDE.md). v4 는 이것을 통과 기준으로 썼다: re.sub(r\"\\s+\", \"\", text)",
+    "sameAs": "pipeline/claim_contract.assert_quotes_verbatim 과 글자 그대로 같은 기준. pipeline/test_quote_gate.GateMatchesClaimContract 가 양방향으로 고정한다",
+    "statuses": {
+      "verbatim": "원문일치",
+      "linebreak_only": "줄바꿈표기차",
+      "spacing_edited": "띄어쓰기편집",
+      "misattributed": "출처불일치",
+      "fabricated": "재구성",
+      "unknown_review": "리뷰없음"
+    }
+  },
+  "v4": {
+    "axisA_asMeasuredByV4": {
+      "method": "v4 — 근거 리뷰 이어붙이기 + 공백 전체 제거, 인용별 출처 대조 없음",
+      "normalize": "re.sub(r\"\\s+\", \"\", text)",
+      "quotes": 143,
+      "matched": 127,
+      "accuracyPct": 88.8,
+      "mismatches": [
+        {
+          "id": "달바 퍼_04",
+          "polarity": "positive",
+          "quote": "분사력이 정말 좋구요 안개스프레이 형식이라 골고루 자극없이 뿌려져서"
+        },
+        {
+          "id": "파티온 _01",
+          "polarity": "positive",
+          "quote": "피부에 나타나던 트러블들이 눈에 띄게 옅어짐"
+        },
+        {
+          "id": "파티온 _04",
+          "polarity": "positive",
+          "quote": "유분감이 줄어들어서 여드름이 줄고 있음"
+        },
+        {
+          "id": "파티온 _05",
+          "polarity": "positive",
+          "quote": "물처럼 투명하고 흐르는 제형으로 피부에 부드럽게 발림"
+        },
+        {
+          "id": "파티온 _06",
+          "polarity": "positive",
+          "quote": "향은 거의 없어 부담 없음"
+        },
+        {
+          "id": "파티온 _06",
+          "polarity": "positive",
+          "quote": "무향이라 자극많은 피부에 잘 맞음"
+        },
+        {
+          "id": "클리오 _03",
+          "polarity": "positive",
+          "quote": "14시간 넘게 있는데 수정화장 안함"
+        },
+        {
+          "id": "클리오 _03",
+          "polarity": "negative",
+          "quote": "거울보고 기겁했다, 무너짐"
+        },
+        {
+          "id": "클리오 _03",
+          "polarity": "negative",
+          "quote": "진짜 더럽게 무너지네요, 땀나면 화장이 그대로 사라져"
+        },
+        {
+          "id": "클리오 _04",
+          "polarity": "positive",
+          "quote": "입가 건조한데 친구가 대체 뭘 썼길래 안뜨냐고"
+        },
+        {
+          "id": "클리오 _05",
+          "polarity": "negative",
+          "quote": "다크닝이 심해요, 화장실 다녀온사이에 다크닝이와서 흙빛"
+        },
+        {
+          "id": "클리오 _07",
+          "polarity": "positive",
+          "quote": "살짝 새틴광? 결광처럼 보여서"
+        },
+        {
+          "id": "힌스 로_03",
+          "polarity": "positive",
+          "quote": "글로우립인데도 생각보다 지속력이 있음"
+        },
+        {
+          "id": "힌스 로_03",
+          "polarity": "negative",
+          "quote": "지속력이나 용량은 많이 아쉬움"
+        },
+        {
+          "id": "힌스 로_05",
+          "polarity": "positive",
+          "quote": "어느정도 보습감도 있어서 입술이 편했어요"
+        },
+        {
+          "id": "힌스 로_05",
+          "polarity": "positive",
+          "quote": "촉촉+살알짝 꾸덕 제형"
+        }
+      ],
+      "reportedInV4": {
+        "accuracyPct": 88.8,
+        "matched": 127,
+        "quotes": 143,
+        "path": "eval/reports/eval_report_v4.md §5"
+      },
+      "reproduced": true
+    },
+    "axisB_underV5Rule": {
+      "method": "v5 — fold_invisible 부분문자열, 인용이 가리킨 리뷰 기준",
+      "normalize": "tag_contract.fold_invisible (보이지 않는 문자만: CRLF·Zs·폭 없는 공백)",
+      "quotes": 143,
+      "verbatim": 124,
+      "verbatimPct": 86.7,
+      "byStatus": {
+        "verbatim": 124,
+        "linebreak_only": 3,
+        "misattributed": 1,
+        "fabricated": 15
+      },
+      "failures": [
+        {
+          "id": "달바 퍼_02",
+          "polarity": "positive",
+          "quote": "유수분이 비율이 적절해서 그런지 피부결이 좋아져요",
+          "status": "linebreak_only",
+          "statusLabel": "줄바꿈표기차",
+          "matchedReviewId": null
+        },
+        {
+          "id": "달바 퍼_04",
+          "polarity": "positive",
+          "quote": "분사력이 정말 좋구요 안개스프레이 형식이라 골고루 자극없이 뿌려져서",
+          "status": "fabricated",
+          "statusLabel": "재구성",
+          "matchedReviewId": null
+        },
+        {
+          "id": "달바 퍼_05",
+          "polarity": "positive",
+          "quote": "흡수력이 빠르고 끈적임도 없는 마무리감",
+          "status": "linebreak_only",
+          "statusLabel": "줄바꿈표기차",
+          "matchedReviewId": null
+        },
+        {
+          "id": "파티온 _01",
+          "polarity": "positive",
+          "quote": "피부에 나타나던 트러블들이 눈에 띄게 옅어짐",
+          "status": "fabricated",
+          "statusLabel": "재구성",
+          "matchedReviewId": null
+        },
+        {
+          "id": "파티온 _04",
+          "polarity": "positive",
+          "quote": "유분감이 줄어들어서 여드름이 줄고 있음",
+          "status": "fabricated",
+          "statusLabel": "재구성",
+          "matchedReviewId": null
+        },
+        {
+          "id": "파티온 _05",
+          "polarity": "positive",
+          "quote": "물처럼 투명하고 흐르는 제형으로 피부에 부드럽게 발림",
+          "status": "fabricated",
+          "statusLabel": "재구성",
+          "matchedReviewId": null
+        },
+        {
+          "id": "파티온 _06",
+          "polarity": "positive",
+          "quote": "향은 거의 없어 부담 없음",
+          "status": "fabricated",
+          "statusLabel": "재구성",
+          "matchedReviewId": null
+        },
+        {
+          "id": "파티온 _06",
+          "polarity": "positive",
+          "quote": "무향이라 자극많은 피부에 잘 맞음",
+          "status": "fabricated",
+          "statusLabel": "재구성",
+          "matchedReviewId": null
+        },
+        {
+          "id": "클리오 _03",
+          "polarity": "positive",
+          "quote": "14시간 넘게 있는데 수정화장 안함",
+          "status": "fabricated",
+          "statusLabel": "재구성",
+          "matchedReviewId": null
+        },
+        {
+          "id": "클리오 _03",
+          "polarity": "negative",
+          "quote": "거울보고 기겁했다, 무너짐",
+          "status": "fabricated",
+          "statusLabel": "재구성",
+          "matchedReviewId": null
+        },
+        {
+          "id": "클리오 _03",
+          "polarity": "negative",
+          "quote": "진짜 더럽게 무너지네요, 땀나면 화장이 그대로 사라져",
+          "status": "fabricated",
+          "statusLabel": "재구성",
+          "matchedReviewId": null
+        },
+        {
+          "id": "클리오 _04",
+          "polarity": "positive",
+          "quote": "입가 건조한데 친구가 대체 뭘 썼길래 안뜨냐고",
+          "status": "fabricated",
+          "statusLabel": "재구성",
+          "matchedReviewId": null
+        },
+        {
+          "id": "클리오 _05",
+          "polarity": "positive",
+          "quote": "화사하게 톤업되는 느낌",
+          "status": "linebreak_only",
+          "statusLabel": "줄바꿈표기차",
+          "matchedReviewId": null
+        },
+        {
+          "id": "클리오 _05",
+          "polarity": "negative",
+          "quote": "다크닝이 심해요, 화장실 다녀온사이에 다크닝이와서 흙빛",
+          "status": "fabricated",
+          "statusLabel": "재구성",
+          "matchedReviewId": null
+        },
+        {
+          "id": "클리오 _07",
+          "polarity": "positive",
+          "quote": "살짝 새틴광? 결광처럼 보여서",
+          "status": "misattributed",
+          "statusLabel": "출처불일치",
+          "matchedReviewId": 47248041
+        },
+        {
+          "id": "힌스 로_03",
+          "polarity": "positive",
+          "quote": "글로우립인데도 생각보다 지속력이 있음",
+          "status": "fabricated",
+          "statusLabel": "재구성",
+          "matchedReviewId": null
+        },
+        {
+          "id": "힌스 로_03",
+          "polarity": "negative",
+          "quote": "지속력이나 용량은 많이 아쉬움",
+          "status": "fabricated",
+          "statusLabel": "재구성",
+          "matchedReviewId": null
+        },
+        {
+          "id": "힌스 로_05",
+          "polarity": "positive",
+          "quote": "어느정도 보습감도 있어서 입술이 편했어요",
+          "status": "fabricated",
+          "statusLabel": "재구성",
+          "matchedReviewId": null
+        },
+        {
+          "id": "힌스 로_05",
+          "polarity": "positive",
+          "quote": "촉촉+살알짝 꾸덕 제형",
+          "status": "fabricated",
+          "statusLabel": "재구성",
+          "matchedReviewId": null
+        }
+      ]
+    },
+    "divergence": {
+      "v4PassV5Fail": [
+        {
+          "id": "달바 퍼_02",
+          "quote": "유수분이 비율이 적절해서 그런지 피부결이 좋아져요"
+        },
+        {
+          "id": "달바 퍼_05",
+          "quote": "흡수력이 빠르고 끈적임도 없는 마무리감"
+        },
+        {
+          "id": "클리오 _05",
+          "quote": "화사하게 톤업되는 느낌"
+        }
+      ],
+      "v5PassV4Fail": [],
+      "note": "v4 방식이 통과시킨 것 중 v5 규칙이 떨어뜨리는 것 = 공백 전체 squeeze 의 몫이다. 반대 방향(v5 통과·v4 탈락)은 비어 있다 — v5 규칙은 v4 방식보다 순수하게 엄격하다"
+    },
+    "v4ReportCorrection": {
+      "claimInV4Report": "불일치 16건은 '500건 전체 리뷰 원문에서 재검색해도 매칭되는 곳이 없었다' (eval_report_v4.md §5)",
+      "found": [
+        {
+          "id": "클리오 _07",
+          "quote": "살짝 새틴광? 결광처럼 보여서",
+          "matchedReviewId": 47248041
+        }
+      ],
+      "note": "재측정하면 그 중 일부는 코퍼스에 **그대로 있다.** 다만 그 concern 의 supportingReviewIds 에 없는 다른 리뷰의 문장이다. 즉 파라프레이즈가 아니라 misattribution 이고, 고칠 곳이 프롬프트가 아니라 근거 연결이다. v4 가 왜 못 찾았는지는 재검색 절차가 코드로 남아 있지 않아 재구성할 수 없다 — 못 쟀다"
+    }
+  },
+  "v5": {
+    "axisC_goldenLabels": {
+      "method": "v5 — fold_invisible 부분문자열을 evidence[].reviewId 본문에서 찾는다",
+      "quotes": 107,
+      "verbatim": 107,
+      "verbatimPct": 100.0,
+      "byStatus": {
+        "verbatim": 107
+      },
+      "failures": [],
+      "denominator": {
+        "labels": 26,
+        "quotes": 107,
+        "what": "골든셋 라벨 전부의 인용. claim 으로 표현 가능한지와 무관하게 센다"
+      }
+    },
+    "axisD_claimConvertible": {
+      "method": "v5 — fold_invisible 부분문자열을 evidence[].reviewId 본문에서 찾는다",
+      "quotes": 96,
+      "verbatim": 96,
+      "verbatimPct": 100.0,
+      "byStatus": {
+        "verbatim": 96
+      },
+      "failures": [],
+      "denominator": {
+        "labels": 26,
+        "claims": 22,
+        "quotes": 96,
+        "what": "claim 스키마로 표현되는 라벨의 인용만. eval/reports/claim_schema_per189.json 의 96/96 과 같은 분모다",
+        "excluded": {
+          "labels": 4,
+          "quotes": 11,
+          "rows": [
+            {
+              "labelId": "B02-4",
+              "quotes": 1,
+              "error": "[B02-4] aspect 이 비었다"
+            },
+            {
+              "labelId": "B03-5",
+              "quotes": 1,
+              "error": "[B03-5] aspect 이 비었다"
+            },
+            {
+              "labelId": "B04-5",
+              "quotes": 2,
+              "error": "[B04-5] aspect 이 비었다"
+            },
+            {
+              "labelId": "B05-3",
+              "quotes": 7,
+              "error": "[B05-3] aspect 이 비었다"
+            }
+          ],
+          "why": "aspect 가 null 인 라벨 — 택소노미 14종 밖이라 claim 이 될 수 없다 (PER-189 conversion.notExpressible). 인용 자체는 axisC 에서 세어진다"
+        }
+      }
+    },
+    "axisE_underV4Method": {
+      "method": "v4 — 근거 리뷰 이어붙이기 + 공백 전체 제거, 인용별 출처 대조 없음",
+      "normalize": "re.sub(r\"\\s+\", \"\", text)",
+      "quotes": 96,
+      "matched": 96,
+      "accuracyPct": 100.0,
+      "mismatches": [],
+      "note": "v4 와 같은 축에서 보기 위한 것. v4 방식은 출처를 보지 않으므로 우리 판정보다 느슨하고, 이 수가 axisD 보다 높아도 개선이 아니다"
+    }
+  },
+  "gate": {
+    "policy": {
+      "minEvidence": 1,
+      "maxSubstitutions": null
+    },
+    "appliedTo": "v5 claim 변환분",
+    "summary": {
+      "claims": 22,
+      "quotesChecked": 96,
+      "quotesVerbatim": 96,
+      "verbatimPct": 100.0,
+      "byStatus": {
+        "verbatim": 96
+      },
+      "byOutcome": {
+        "clean": 22,
+        "reduced": 0,
+        "substituted": 0,
+        "discarded": 0
+      },
+      "ledgerRows": 0
+    },
+    "registry": {
+      "gate": "quote",
+      "issue": "PER-190",
+      "registered": false,
+      "reasons": [
+        {
+          "code": "no_verbatim_evidence",
+          "gate": "quote",
+          "label": "근거소진",
+          "unit": "claim",
+          "owner": "pipeline/quote_gate.py",
+          "note": "인용을 버리고 대체까지 했는데 min_evidence 를 못 채웠다 — 주장을 버린다"
+        },
+        {
+          "code": "quote_misattributed",
+          "gate": "quote",
+          "label": "출처불일치",
+          "unit": "evidence",
+          "owner": "pipeline/quote_gate.py",
+          "note": "원문이긴 한데 인용이 가리킨 리뷰의 것이 아니다. 인용만 보면 통과하므로 reviewId 와 짝지어 봐야 잡힌다"
+        },
+        {
+          "code": "quote_not_verbatim",
+          "gate": "quote",
+          "label": "인용불일치",
+          "unit": "evidence",
+          "owner": "pipeline/quote_gate.py",
+          "note": "인용이 그 리뷰의 원문 부분문자열이 아니다. 요약·재구성은 인용이 아니다"
+        }
+      ],
+      "note": "pipeline/reject_registry.py 는 PER-190 의 파일 소유 범위 밖이다. 등록 전까지 이 사유들은 quote_gate 의 자기 원장과 로그에만 남는다 — 미등록 사유로 claim.rejected[] 행을 만들면 assert_rejectable 이 멈추고, 그게 맞는 동작이다"
+    },
+    "note": "게이트를 실제로 걸어 본 결과다. 폐기가 0 인 것은 게이트가 잘 막아서가 아니라 **입력이 사람이 만든 라벨이라 막을 것이 없어서**다 — 생성기(PER-191)가 붙어야 게이트의 효과를 잴 수 있다"
+  },
+  "limits": [
+    "**v5 쪽 수치는 생성기 산출물이 아니다.** 생성기는 PER-191 이고 아직 없다. 지금 존재하는 claim 은 사람이 번들 화면을 보고 만든 골든셋 라벨의 변환분이라, 여기의 100% 는 게이트의 효과가 아니라 라벨의 품질이다",
+    "v4 와 v5 는 **코퍼스가 다르다** — v4 500건, v5 25,000건 스냅샷이고 겹치는 리뷰는 66건이다. 두 수치를 그대로 빼서 개선폭이라고 말할 수 없다",
+    "v4 산출물에는 **인용별 reviewId 가 없다.** concern 단위의 supportingReviewIds 만 있어서 v4 축에서는 출처불일치를 '근거 리뷰 목록 안에 있는가' 수준까지만 잴 수 있다. v5 는 인용마다 reviewId 가 있어 misattribution 이 판정된다",
+    "linebreak_only 등급은 통과가 아니다. fold_invisible 을 넓히면 통과시킬 수 있지만 그 함수는 태깅 입력·중복 판정·게이트3 이 함께 쓴다 — 규칙을 한 이슈에서 조용히 넓히지 않는다 (docs/DECISION_PER190_QUOTE_FIDELITY.md §3)",
+    "게이트 사유가 reject_registry(PER-188)에 등록돼 있지 않아 claim.rejected[] 행이 되지 못한다. 지금은 quote_gate 의 자기 원장과 로그에만 남는다 (gate.registry.reasons 에 등록할 항목이 그대로 적혀 있다)"
+  ]
+}
