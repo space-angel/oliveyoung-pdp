@@ -341,6 +341,24 @@ class Invariants(unittest.TestCase):
         with self.assertRaises(PolicyError):
             sufficiency_gate(support_authors=3, spoke_authors=40, cell_authors=8)
 
+    def test_셀_밖_작성자가_섞이면_에러다(self):
+        # 개수만 비교하면 U ≤ D ≤ S 를 만족해 통과한다. 그때 silentAuthors 가
+        # S − D 로 줄어든 채 주장에 실리고, 그 수가 생성·judge 의 일반화 판단 근거다
+        outside = ClaimSupport(ASPECT, positive=frozenset(f"외부{i}" for i in range(9)))
+        with self.assertRaises(SufficiencyError):
+            outside.as_dict(cell(40))
+        with self.assertRaises(SufficiencyError):
+            run_sufficiency_gate([Claim("c1", cell(40), outside)])
+
+    def test_단일_축에_코드_배열을_주면_에러다(self):
+        # 배열은 AND 라 단일 축에서는 만족할 리뷰가 없다. 에러가 아니면 셀이 조용히
+        # 0명이 되고 그 결과가 '세그먼트과소' 탈락으로 둔갑한다
+        with self.assertRaises(SufficiencyError):
+            EvidenceCell.of(ConditionCells.RECORDS, "p001", {"skinType": ["A01", "A02"]})
+        # 다중 축은 여러 코드를 모두 가진 리뷰를 뜻하므로 배열이 정상이다
+        self.assertEqual(
+            EvidenceCell.of(ConditionCells.RECORDS, "p001", {"skinTrouble": ["C01", "C05"]}).size, 1)
+
     def test_한_작성자가_두_방향에_있으면_에러다(self):
         with self.assertRaises(SufficiencyError):
             ClaimSupport(aspect=ASPECT, positive=frozenset({"가"}), negative=frozenset({"가"}))

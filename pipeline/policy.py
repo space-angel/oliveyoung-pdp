@@ -276,8 +276,9 @@ def sufficiency_gate(
     판정 순서는 넓은 것부터다 — 셀이 말할 자격이 없으면(S) 주장의 근거 수(U)를 물을
     이유가 없고, 사유가 하나로 정해져야 `rejected[]` 가 재현율의 단서가 된다.
 
-    U ≤ D ≤ S 는 불변식이다. 깨지면 어딘가에서 침묵을 근거로 세었거나 셀 밖 작성자를
-    끌어왔다는 뜻이므로 조용히 통과시키지 않고 에러다.
+    U ≤ D ≤ S 는 불변식이다. 깨지면 어딘가에서 침묵을 근거로 세었다는 뜻이므로 조용히
+    통과시키지 않고 에러다. 다만 이 함수는 **수만 받으므로** 셀 밖 작성자가 섞인 경우는
+    여기서 잡히지 않는다 — 집합 대조는 `sufficiency.ClaimSupport.as_dict()` 가 한다.
     """
     for name, value in (("U", support_authors), ("D", spoke_authors), ("S", cell_authors)):
         if not isinstance(value, int) or isinstance(value, bool) or value < 0:

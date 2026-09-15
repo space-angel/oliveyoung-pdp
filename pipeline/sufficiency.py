@@ -113,6 +113,15 @@ def matches(record: dict, condition: dict) -> bool:
     for axis, want in condition.items():
         if want is None:
             continue
+        if isinstance(want, (list, tuple)) and axis not in MULTI_AXES:
+            # 코드를 AND 로 묶는 건 한 리뷰가 여러 코드를 갖는 다중 축에서만 뜻이 있다.
+            # 단일 축에 리스트를 주면 만족할 리뷰가 없어 셀이 조용히 0명이 되고,
+            # 그 결과가 '세그먼트과소' 탈락으로 둔갑한다 — 이 모듈이 막으려는 침묵이다
+            raise SufficiencyError(
+                f"단일 조건축 {axis!r} 에 코드 배열 {list(want)!r} 을 줬다. "
+                f"배열은 다중 축 {MULTI_AXES} 에서만 쓴다 — 여러 세그먼트를 합치려면 "
+                "셀을 나눠 각각 판정하라"
+            )
         wants = want if isinstance(want, (list, tuple)) else [want]
         have = segments_of(record, axis)
         if any(w not in have for w in wants):
@@ -232,6 +241,16 @@ class ClaimSupport:
         내는 것이 요점이다: 이 수가 크면 답이 일반화하면 안 된다.
         """
         spoke = self.spoke
+        outside = spoke - cell.authors
+        if outside:
+            # 개수만 비교하면(U ≤ D ≤ S) 이게 안 잡힌다. silentAuthors 가 S − D 로
+            # 계산되므로 셀 밖 작성자 1명이 섞이면 '말하지 않은 사람'이 1명 줄어든 채
+            # 주장에 실린다 — 생성·judge 가 일반화 여부를 판단하는 바로 그 수다
+            raise SufficiencyError(
+                f"[{self.aspect}] 작성자 {sorted(outside)} 가 셀 "
+                f"{cell.product_id}{cell.condition} 밖이다. 조건부 주장의 근거는 그 "
+                "세그먼트 리뷰만이다 (PER-177 §3)"
+            )
         return {
             "aspect": self.aspect,
             "direction": self.direction,
