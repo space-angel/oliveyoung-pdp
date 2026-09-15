@@ -78,7 +78,7 @@ catalog → ingest → tag → gates → claims → judge
 |---|---|---|---|
 | `catalog` | `goodsNo` → `productId`. 제품 동일성 확정 | **구현** | PER-171 |
 | `ingest` | 25K를 원문/조건/파생 3층으로 적재. LLM 없음 | **구현** | PER-173 |
-| `tag` | 전수 aspect/polarity 태깅 (Batch API) | 계약·정답셋 **완료** / 배치 실행 미완 | PER-175 |
+| `tag` | 전수 aspect/polarity 태깅 | **구현** — 25,000건 실행 완료 (`zai.glm-4.7`, 태그 38,251개) | PER-175 |
 | `gates` | 동일성 → 중복 → 방향성 → 충분성 4게이트 + `rejected[]` | **구현** | PER-182~188 |
 | `claims` | 주장 생성 + 인용 원문 부분문자열 강제 + 스키마 검증 | 미구현 | PER-189~195 |
 | `judge` | 루브릭 judge(생성과 다른 모델) + 전수 평가 | 미구현 | PER-196~201 |
@@ -180,7 +180,8 @@ python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
 cp .env.example .env        # ANTHROPIC_API_KEY 입력
 
 .venv/bin/python pipeline/run_v5.py --list   # 단계와 구현 상태
-.venv/bin/python pipeline/run_v5.py          # 구현된 단계까지 (catalog → ingest)
+.venv/bin/python pipeline/run_v5.py          # 구현된 단계까지 (catalog → ingest → tag → gates)
+                                             # tag 는 태깅을 다시 돌리지 않는다 — 정본이 있는지만 확인한다
 bash scripts/verify.sh                       # 계약 테스트 + 데이터 없이 도는 재현 확인
 bash scripts/verify.sh --full                # + 스냅샷 재현 확인 (병합 게이트는 이쪽)
 ```
