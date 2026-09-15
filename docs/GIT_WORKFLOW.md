@@ -24,7 +24,7 @@ Linear가 제안하는 한글 브랜치명(`wonderhy11/per-170-블로커-작성�
 # 이슈 브랜치에서
 git fetch origin
 git rebase origin/main
-bash scripts/verify.sh
+bash scripts/verify.sh --full
 
 # 병합
 git switch main
@@ -48,10 +48,31 @@ git log --grep=PER-171 -p           # 커밋 단위로
 ## 3. 병합 게이트
 
 ```bash
-bash scripts/verify.sh
+bash scripts/verify.sh --full
 ```
 
-계약 테스트 + 생성물 재현 확인(`--check` 2종)을 돌린다. 병합 전과 병합 후 **양쪽에서** 돌린다 — 병합 자체가 생성물과 소스를 어긋나게 만들 수 있다.
+계약 테스트 + 생성물 재현 확인을 돌린다. 병합 전과 병합 후 **양쪽에서** 돌린다 — 병합 자체가 생성물과 소스를 어긋나게 만들 수 있다.
+
+### 2단인 이유
+
+`verify.sh` 는 두 단이고, 가르는 기준은 중요도가 아니라 **gitignore 인 `data/intermediate/` 가 필요한가** 다.
+
+| | 무엇을 도는가 | 누가 쓰나 |
+|---|---|---|
+| `verify.sh` | 계약 테스트 + 데이터 없이 도는 재현 확인 6종 | 클론 직후 · CI · 코드만 고친 사람 |
+| `verify.sh --full` | 위 전부 + 스냅샷 재현 확인 10종 | **병합하는 사람 (필수)** |
+
+전부 한 덩어리로 두면 새로 받은 사람은 두 번째 검사에서 `FAIL: 출력이 없다 (data/intermediate/v5_reviews.jsonl)` 로 멈춘다 — 코드가 깨진 게 아닌데 그렇게 보인다. 반대로 데이터가 필요한 검사를 게이트에서 빼 버리면 그 리포트가 조용히 낡는다. 그래서 **빼지 않고 `--full` 로 민다.**
+
+`--full` 은 먼저 필요한 스냅샷이 있는지 한 번에 확인하고, 없으면 **무엇을 돌려야 하는지와 그 비용**을 알려준다. 비용이 파일마다 다른 것이 요점이다.
+
+| 필요한 것 | 되살리는 법 | 비용 |
+|---|---|---|
+| `v5_reviews.jsonl` | `python3 pipeline/ingest.py` | LLM 없음 · 약 1초 |
+| `v5_tags.jsonl` | `python3 pipeline/run_v5.py --steps tag` | LLM 태깅 · 약 $4 |
+| `tag_runs/full_glm47_raw.jsonl` | 태그를 가진 워크트리에서 복사 | 게이트3 의 `order_chosen` 한계 측정용 |
+
+세 번째가 빠지기 쉽다. 없으면 게이트3 리포트가 **그 한계를 빼고** 만들어져 `--check` 가 *한계가 빠진 리포트*로 실패한다 (PER-185 §5).
 
 ### 생성물은 병합하지 말고 재생성한다
 
