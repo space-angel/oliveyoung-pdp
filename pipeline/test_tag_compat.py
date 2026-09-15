@@ -147,3 +147,35 @@ class CollectTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class ParseTextTest(unittest.TestCase):
+    """추론 모델의 `<reasoning>` 블록 처리 (PER-175).
+
+    gpt-oss 계열은 사고 과정을 별도 필드가 아니라 `content` 안에 섞어 보낸다.
+    실측: 20건 청크에서 출력 4,615토큰 중 reasoning 이 11,312자로 **89%** 를 차지했다.
+    """
+
+    def test_닫힌_reasoning_블록은_걷어낸다(self) -> None:
+        from tag import parse_text
+
+        self.assertEqual(
+            parse_text('<reasoning>먼저 축을 훑는다</reasoning>\n{"results": []}'),
+            {"results": []},
+        )
+
+    def test_reasoning_뒤에_코드펜스가_와도_읽는다(self) -> None:
+        from tag import parse_text
+
+        self.assertEqual(
+            parse_text('<reasoning>x</reasoning>```json\n{"results": [1]}\n```'),
+            {"results": [1]},
+        )
+
+    def test_열린_채_끝난_reasoning_은_파싱_실패로_남긴다(self) -> None:
+        """max_tokens 에 걸려 잘린 응답이다. 조용히 빈 결과로 넘기면 그 청크의
+        리뷰가 '태그 없음'으로 기록돼 재현율 손실이 영원히 안 보인다."""
+        from tag import parse_text
+
+        with self.assertRaises(json.JSONDecodeError):
+            parse_text("<reasoning>축을 하나씩 보면 보습감은")

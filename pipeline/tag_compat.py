@@ -45,6 +45,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent))
 
 from tag import (  # noqa: E402
+    CHUNK_SIZE,
     PILOT_SAMPLE_PATH,
     PROMPT_PATH,
     REVIEWS_PATH,
@@ -101,7 +102,8 @@ def post(base_url: str, key: str, body: dict, timeout: int, tries: int = 5) -> d
 
 
 def run(model: str, pilot: bool, label: str | None, base_url: str, env: str,
-        concurrency: int, timeout: int, service_tier: str | None = None) -> None:
+        concurrency: int, timeout: int, service_tier: str | None = None,
+        chunk_size: int = CHUNK_SIZE) -> None:
     reviews = load_reviews(pilot)
     input_path = PILOT_SAMPLE_PATH if pilot else REVIEWS_PATH
     label = label or f"{'pilot' if pilot else 'full'}_{model.split('/')[-1].replace('-', '').replace('.', '')}"
@@ -118,7 +120,7 @@ def run(model: str, pilot: bool, label: str | None, base_url: str, env: str,
             if line.strip():
                 done.add(json.loads(line)["chunk"])
 
-    todo = [(i, b) for i, b in chunks(reviews) if i not in done]
+    todo = [(i, b) for i, b in chunks(reviews, chunk_size) if i not in done]
     print(f"[run] {model} · 리뷰 {len(reviews):,}건 · 청크 {len(todo):,}개 남음 "
           f"(완료 {len(done):,}) · 동시 {concurrency}")
     if not todo:
@@ -178,7 +180,7 @@ def run(model: str, pilot: bool, label: str | None, base_url: str, env: str,
                 "serviceTier": service_tier,
                 "pilot": pilot,
                 "reviews": len(reviews),
-                "chunkSize": len(reviews) and len(next(chunks(reviews))[1]),
+                "chunkSize": chunk_size,
                 "maxTokens": MAX_TOKENS,
                 "temperature": 0,
                 "raw": str(raw_path.relative_to(ROOT)),
@@ -291,6 +293,12 @@ def main() -> None:
     r.add_argument("--concurrency", type=int, default=4, help="무료 티어는 낮게 잡는다")
     r.add_argument("--timeout", type=int, default=180)
     r.add_argument(
+        "--chunk-size",
+        type=int,
+        default=CHUNK_SIZE,
+        help=f"요청당 리뷰 수 (기본 {CHUNK_SIZE}). 모델 비교는 같은 값으로 재야 한 표에 올라간다",
+    )
+    r.add_argument(
         "--service-tier",
         choices=("default", "flex", "priority"),
         help="Bedrock 서비스 티어. flex 는 지연을 허용하고 할인받는다 (배치가 없는 모델의 대역)",
@@ -301,7 +309,8 @@ def main() -> None:
 
     a = ap.parse_args()
     if a.cmd == "run":
-        run(a.model, a.pilot, a.label, a.base_url, a.env, a.concurrency, a.timeout, a.service_tier)
+        run(a.model, a.pilot, a.label, a.base_url, a.env, a.concurrency, a.timeout,
+            a.service_tier, a.chunk_size)
     else:
         collect(a.label)
 

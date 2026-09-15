@@ -29,6 +29,7 @@ import argparse
 import hashlib
 import json
 import os
+import re
 import sys
 import time
 from pathlib import Path
@@ -209,9 +210,16 @@ def poll(label: str, watch: bool, interval: int = 60) -> None:
 # -------------------------------------------------------------------------- collect
 
 
+# 추론 모델(gpt-oss 계열)은 사고 과정을 별도 필드가 아니라 `content` 안에
+# `<reasoning>…</reasoning>` 로 섞어 보낸다. **닫힌 블록만** 걷어낸다 —
+# 열린 채 끝났다는 건 max_tokens 에 걸려 잘렸다는 뜻이고, 그건 조용히 넘어가면
+# 안 되는 사건이라 파싱 실패로 남겨 failedChunks 에 finish_reason 과 함께 기록한다.
+REASONING_BLOCK = re.compile(r"<reasoning>.*?</reasoning>", re.DOTALL)
+
+
 def parse_text(text: str) -> dict:
-    """모델이 코드펜스를 붙이는 경우가 있다. 그것만 벗기고, 나머지는 그대로 파싱한다."""
-    t = text.strip()
+    """모델이 코드펜스나 추론 블록을 붙이는 경우가 있다. 그것만 벗기고 나머지는 그대로 파싱한다."""
+    t = REASONING_BLOCK.sub("", text).strip()
     if t.startswith("```"):
         t = t.split("\n", 1)[1] if "\n" in t else t
         t = t.rsplit("```", 1)[0]
