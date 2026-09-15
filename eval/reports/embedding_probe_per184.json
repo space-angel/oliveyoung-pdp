@@ -1,0 +1,1944 @@
+{
+  "issue": "PER-184",
+  "scope": "모델 선정까지. 벡터 생성·게이트2 부착·전수 임베딩은 사이클 2 (PER-212)",
+  "source": {
+    "gold": {
+      "path": "eval/gold/v5_tags_pilot_gold.jsonl",
+      "sha256": "16b0d167cd45096b08cfbd468b8ef8ab88df29effcd21969296506cc27b61714",
+      "rows": 432,
+      "reviews": 188
+    },
+    "keywords": {
+      "path": "eval/aspect_keywords.json",
+      "sha256": "03fd3b57a55eb5df0a25d075a7f15774502ae86e985e4807e5c7d393aca4be5e"
+    },
+    "reviews": {
+      "path": "data/intermediate/v5_reviews.jsonl",
+      "sha256": "47a1fc98e93b10b45e1cca178fcdeb603327cacc6111191c55f6cd53f20f1974"
+    },
+    "note": "정답은 사람이 만든 gold 432행만 쓴다 — 태거(LLM) 산출물인 v5_tags.jsonl 은 쓰지 않는다. 모델 산출물로 모델을 고르면 순환이다"
+  },
+  "corpusFit": {
+    "unit": "글자 수 (토큰 아님 — 토큰 수의 하한이다)",
+    "reviews": 25000,
+    "quantiles": {
+      "p50": 90,
+      "p90": 366,
+      "p95": 478,
+      "p99": 881,
+      "max": 1468
+    },
+    "byCandidate": {
+      "arctic-l-ko": {
+        "maxSeqLength": 8192,
+        "reviewsOverLimitPct": 0.0
+      },
+      "bge-m3": {
+        "maxSeqLength": 8192,
+        "reviewsOverLimitPct": 0.0
+      },
+      "bge-m3-ko": {
+        "maxSeqLength": 8192,
+        "reviewsOverLimitPct": 0.0
+      },
+      "e5-base": {
+        "maxSeqLength": 512,
+        "reviewsOverLimitPct": 4.16
+      },
+      "ko-sroberta": {
+        "maxSeqLength": 128,
+        "reviewsOverLimitPct": 41.51
+      },
+      "kure": {
+        "maxSeqLength": 8192,
+        "reviewsOverLimitPct": 0.0
+      }
+    }
+  },
+  "keywordBaseline": {
+    "definition": {
+      "anyMatchRecall": "정답 aspect 의 키워드가 스니펫에 부분문자열로 하나라도 걸리는 행의 비율. 키워드 탐지기 재현율의 천장이다",
+      "argmaxAccuracy": "가장 긴 매칭 키워드를 가진 축으로 분류했을 때의 정답률 (동률은 ASPECTS 순서, 무매칭은 오답). M2 와 같은 과제다"
+    },
+    "rows": 432,
+    "reviews": 188,
+    "blindRows": 174,
+    "blindPct": 40.28,
+    "anyMatchRecallPct": 59.72,
+    "argmaxAccuracyPct": 56.25,
+    "argmaxAccuracyBlindPct": 0.0,
+    "argmaxAccuracyVisiblePct": 94.19,
+    "byAspect": {
+      "보습감": {
+        "rows": 46,
+        "blind": 2,
+        "blindPct": 4.35,
+        "argmaxCorrect": 43,
+        "argmaxAccuracyPct": 93.48
+      },
+      "흡수력": {
+        "rows": 20,
+        "blind": 2,
+        "blindPct": 10.0,
+        "argmaxCorrect": 16,
+        "argmaxAccuracyPct": 80.0
+      },
+      "발림감/텍스처": {
+        "rows": 68,
+        "blind": 27,
+        "blindPct": 39.71,
+        "argmaxCorrect": 39,
+        "argmaxAccuracyPct": 57.35
+      },
+      "지속성": {
+        "rows": 31,
+        "blind": 12,
+        "blindPct": 38.71,
+        "argmaxCorrect": 19,
+        "argmaxAccuracyPct": 61.29
+      },
+      "향": {
+        "rows": 10,
+        "blind": 2,
+        "blindPct": 20.0,
+        "argmaxCorrect": 8,
+        "argmaxAccuracyPct": 80.0
+      },
+      "광택/윤기": {
+        "rows": 18,
+        "blind": 4,
+        "blindPct": 22.22,
+        "argmaxCorrect": 13,
+        "argmaxAccuracyPct": 72.22
+      },
+      "커버력": {
+        "rows": 9,
+        "blind": 0,
+        "blindPct": 0.0,
+        "argmaxCorrect": 8,
+        "argmaxAccuracyPct": 88.89
+      },
+      "발색": {
+        "rows": 51,
+        "blind": 24,
+        "blindPct": 47.06,
+        "argmaxCorrect": 27,
+        "argmaxAccuracyPct": 52.94
+      },
+      "유분/번들거림": {
+        "rows": 21,
+        "blind": 1,
+        "blindPct": 4.76,
+        "argmaxCorrect": 19,
+        "argmaxAccuracyPct": 90.48
+      },
+      "트러블/자극": {
+        "rows": 51,
+        "blind": 24,
+        "blindPct": 47.06,
+        "argmaxCorrect": 26,
+        "argmaxAccuracyPct": 50.98
+      },
+      "탄력/탱탱함": {
+        "rows": 2,
+        "blind": 1,
+        "blindPct": 50.0,
+        "argmaxCorrect": 1,
+        "argmaxAccuracyPct": 50.0
+      },
+      "분사력": {
+        "rows": 10,
+        "blind": 10,
+        "blindPct": 100.0,
+        "argmaxCorrect": 0,
+        "argmaxAccuracyPct": 0.0
+      },
+      "밀착력": {
+        "rows": 24,
+        "blind": 10,
+        "blindPct": 41.67,
+        "argmaxCorrect": 9,
+        "argmaxAccuracyPct": 37.5
+      },
+      "가성비": {
+        "rows": 71,
+        "blind": 55,
+        "blindPct": 77.46,
+        "argmaxCorrect": 15,
+        "argmaxAccuracyPct": 21.13
+      }
+    }
+  },
+  "caseList": {
+    "aspect": "가성비",
+    "note": "이슈 코멘트(2026-09-14)가 든 실패 사례. 정답 라벨이 없으므로 지표가 아니라 사례 목록이다 (n=4). 문장은 원문 부분문자열이다",
+    "cases": [
+      {
+        "reviewId": 25837778,
+        "productId": "p018",
+        "expression": "플미",
+        "sentence": "이걸 왜 플미주면서 사는지 모르겠어요..",
+        "keywordHits": {},
+        "keywordPredicted": null,
+        "blindForCaseAspect": true
+      },
+      {
+        "reviewId": 28077603,
+        "productId": "p010",
+        "expression": "지갑터",
+        "sentence": "10대20대 키티좋아하는 사람들 지갑터는 한정판이네요",
+        "keywordHits": {},
+        "keywordPredicted": null,
+        "blindForCaseAspect": true
+      },
+      {
+        "reviewId": 61572575,
+        "productId": "p035",
+        "expression": "헤프",
+        "sentence": "물타입이라 너무 헤프네요  흡수가 너무빨라요 건성이 사용하기는 부족한듯해요",
+        "keywordHits": {
+          "흡수력": "흡수"
+        },
+        "keywordPredicted": "흡수력",
+        "blindForCaseAspect": true
+      },
+      {
+        "reviewId": 61733979,
+        "productId": "p013",
+        "expression": "날린돈",
+        "sentence": "사용 딱 두번함 그러고 깨짐 심지어 떨어뜨린적 없구요 처음 올때부터  케이스랑 내용물 분리되어 있어서 진짜 조심히 사용하고 살살 눌러서 최대한 고정함 그러고 오늘 밖에 한번 가지고 나왔다가 깨짐 아니 진짜 장난하나 한두푼도 아니고 오프라 하이라이터는 다써서 새로 사는게 아니라 깨져서 새로사요 이렇게 날린돈만 몇번인지 참 걍 이제 여기꺼 안사고 갈아탈랍니다",
+        "keywordHits": {},
+        "keywordPredicted": null,
+        "blindForCaseAspect": true
+      }
+    ]
+  },
+  "probe": {
+    "topK": [
+      1,
+      5,
+      10,
+      20
+    ],
+    "definitions": {
+      "blind": "정답 aspect 의 키워드가 스니펫에 하나도 없는 행",
+      "aspectKnnP1": "같은 reviewId 를 뺀 최근접 1건의 aspect 일치율",
+      "aspectQueryP1": "축 질문 틀 평균을 프로토타입으로 둔 14지 분류 정답률",
+      "recallAtKMacro": "축 프로토타입 정렬 상위 k 안의 그 축 gold 행 비율, 축별로 재서 macro 평균 (축 크기 2~71 편중 때문)",
+      "separation": "같은 축 쌍 평균 코사인 − 다른 축 쌍 평균 코사인 (같은 reviewId 쌍 제외)"
+    },
+    "note": "모델 수치는 이 리포트에 박는다 — 가중치 6GB 다운로드가 필요해 verify.sh --check 대열에 넣지 않는다 (measure_gate3_polarity.py 와 같은 규칙). --check 는 모델 없는 부분만 대조한다"
+  },
+  "models": {
+    "kure": {
+      "model": "nlpai-lab/KURE-v1",
+      "revision": "8b418a58414668e75532ed045c22d9ca018ae2b2",
+      "dimension": 1024,
+      "maxSeqLength": 8192,
+      "queryPrefix": "",
+      "passagePrefix": "",
+      "aspectKnnP1": {
+        "allPct": 70.6,
+        "blindPct": 60.92,
+        "visiblePct": 77.13
+      },
+      "aspectQueryP1": {
+        "allPct": 60.42,
+        "blindPct": 48.28,
+        "visiblePct": 68.6
+      },
+      "recallAtKMacro": {
+        "1": {
+          "allPct": 7.34,
+          "blindPct": 7.83,
+          "blindAspects": 13
+        },
+        "5": {
+          "allPct": 16.71,
+          "blindPct": 8.25,
+          "blindAspects": 13
+        },
+        "10": {
+          "allPct": 26.34,
+          "blindPct": 9.03,
+          "blindAspects": 13
+        },
+        "20": {
+          "allPct": 36.62,
+          "blindPct": 13.79,
+          "blindAspects": 13
+        }
+      },
+      "separation": {
+        "intraAspectCos": 0.5493,
+        "interAspectCos": 0.4985,
+        "marginCos": 0.0508,
+        "pairsIntra": 9769,
+        "pairsInter": 82875
+      },
+      "byAspect": {
+        "보습감": {
+          "rows": 46,
+          "blindRows": 2,
+          "queryP1Pct": 69.57,
+          "queryP1BlindPct": 0.0,
+          "recallAtK": {
+            "1": 2.17,
+            "5": 8.7,
+            "10": 19.57,
+            "20": 32.61
+          },
+          "recallAtKBlind": {
+            "1": 0.0,
+            "5": 0.0,
+            "10": 0.0,
+            "20": 0.0
+          },
+          "recallCeilingAtK": {
+            "1": 2.17,
+            "5": 10.87,
+            "10": 21.74,
+            "20": 43.48
+          }
+        },
+        "흡수력": {
+          "rows": 20,
+          "blindRows": 2,
+          "queryP1Pct": 65.0,
+          "queryP1BlindPct": 0.0,
+          "recallAtK": {
+            "1": 5.0,
+            "5": 25.0,
+            "10": 50.0,
+            "20": 70.0
+          },
+          "recallAtKBlind": {
+            "1": 0.0,
+            "5": 0.0,
+            "10": 0.0,
+            "20": 0.0
+          },
+          "recallCeilingAtK": {
+            "1": 5.0,
+            "5": 25.0,
+            "10": 50.0,
+            "20": 100.0
+          }
+        },
+        "발림감/텍스처": {
+          "rows": 68,
+          "blindRows": 27,
+          "queryP1Pct": 58.82,
+          "queryP1BlindPct": 40.74,
+          "recallAtK": {
+            "1": 1.47,
+            "5": 5.88,
+            "10": 10.29,
+            "20": 23.53
+          },
+          "recallAtKBlind": {
+            "1": 0.0,
+            "5": 0.0,
+            "10": 0.0,
+            "20": 0.0
+          },
+          "recallCeilingAtK": {
+            "1": 1.47,
+            "5": 7.35,
+            "10": 14.71,
+            "20": 29.41
+          }
+        },
+        "지속성": {
+          "rows": 31,
+          "blindRows": 12,
+          "queryP1Pct": 48.39,
+          "queryP1BlindPct": 25.0,
+          "recallAtK": {
+            "1": 3.23,
+            "5": 3.23,
+            "10": 9.68,
+            "20": 22.58
+          },
+          "recallAtKBlind": {
+            "1": 0.0,
+            "5": 0.0,
+            "10": 0.0,
+            "20": 8.33
+          },
+          "recallCeilingAtK": {
+            "1": 3.23,
+            "5": 16.13,
+            "10": 32.26,
+            "20": 64.52
+          }
+        },
+        "향": {
+          "rows": 10,
+          "blindRows": 2,
+          "queryP1Pct": 80.0,
+          "queryP1BlindPct": 0.0,
+          "recallAtK": {
+            "1": 10.0,
+            "5": 50.0,
+            "10": 80.0,
+            "20": 80.0
+          },
+          "recallAtKBlind": {
+            "1": 0.0,
+            "5": 0.0,
+            "10": 0.0,
+            "20": 0.0
+          },
+          "recallCeilingAtK": {
+            "1": 10.0,
+            "5": 50.0,
+            "10": 100.0,
+            "20": 100.0
+          }
+        },
+        "광택/윤기": {
+          "rows": 18,
+          "blindRows": 4,
+          "queryP1Pct": 5.56,
+          "queryP1BlindPct": 0.0,
+          "recallAtK": {
+            "1": 5.56,
+            "5": 22.22,
+            "10": 33.33,
+            "20": 61.11
+          },
+          "recallAtKBlind": {
+            "1": 0.0,
+            "5": 0.0,
+            "10": 0.0,
+            "20": 25.0
+          },
+          "recallCeilingAtK": {
+            "1": 5.56,
+            "5": 27.78,
+            "10": 55.56,
+            "20": 100.0
+          }
+        },
+        "커버력": {
+          "rows": 9,
+          "blindRows": 0,
+          "queryP1Pct": 77.78,
+          "queryP1BlindPct": 0.0,
+          "recallAtK": {
+            "1": 11.11,
+            "5": 22.22,
+            "10": 33.33,
+            "20": 44.44
+          },
+          "recallAtKBlind": {
+            "1": 0.0,
+            "5": 0.0,
+            "10": 0.0,
+            "20": 0.0
+          },
+          "recallCeilingAtK": {
+            "1": 11.11,
+            "5": 55.56,
+            "10": 100.0,
+            "20": 100.0
+          }
+        },
+        "발색": {
+          "rows": 51,
+          "blindRows": 24,
+          "queryP1Pct": 84.31,
+          "queryP1BlindPct": 70.83,
+          "recallAtK": {
+            "1": 1.96,
+            "5": 9.8,
+            "10": 17.65,
+            "20": 37.25
+          },
+          "recallAtKBlind": {
+            "1": 0.0,
+            "5": 0.0,
+            "10": 8.33,
+            "20": 16.67
+          },
+          "recallCeilingAtK": {
+            "1": 1.96,
+            "5": 9.8,
+            "10": 19.61,
+            "20": 39.22
+          }
+        },
+        "유분/번들거림": {
+          "rows": 21,
+          "blindRows": 1,
+          "queryP1Pct": 57.14,
+          "queryP1BlindPct": 0.0,
+          "recallAtK": {
+            "1": 4.76,
+            "5": 9.52,
+            "10": 19.05,
+            "20": 23.81
+          },
+          "recallAtKBlind": {
+            "1": 0.0,
+            "5": 0.0,
+            "10": 0.0,
+            "20": 0.0
+          },
+          "recallCeilingAtK": {
+            "1": 4.76,
+            "5": 23.81,
+            "10": 47.62,
+            "20": 95.24
+          }
+        },
+        "트러블/자극": {
+          "rows": 51,
+          "blindRows": 24,
+          "queryP1Pct": 50.98,
+          "queryP1BlindPct": 41.67,
+          "recallAtK": {
+            "1": 1.96,
+            "5": 7.84,
+            "10": 13.73,
+            "20": 25.49
+          },
+          "recallAtKBlind": {
+            "1": 0.0,
+            "5": 0.0,
+            "10": 0.0,
+            "20": 8.33
+          },
+          "recallCeilingAtK": {
+            "1": 1.96,
+            "5": 9.8,
+            "10": 19.61,
+            "20": 39.22
+          }
+        },
+        "탄력/탱탱함": {
+          "rows": 2,
+          "blindRows": 1,
+          "queryP1Pct": 50.0,
+          "queryP1BlindPct": 100.0,
+          "recallAtK": {
+            "1": 50.0,
+            "5": 50.0,
+            "10": 50.0,
+            "20": 50.0
+          },
+          "recallAtKBlind": {
+            "1": 100.0,
+            "5": 100.0,
+            "10": 100.0,
+            "20": 100.0
+          },
+          "recallCeilingAtK": {
+            "1": 50.0,
+            "5": 100.0,
+            "10": 100.0,
+            "20": 100.0
+          }
+        },
+        "분사력": {
+          "rows": 10,
+          "blindRows": 10,
+          "queryP1Pct": 0.0,
+          "queryP1BlindPct": 0.0,
+          "recallAtK": {
+            "1": 0.0,
+            "5": 0.0,
+            "10": 0.0,
+            "20": 0.0
+          },
+          "recallAtKBlind": {
+            "1": 0.0,
+            "5": 0.0,
+            "10": 0.0,
+            "20": 0.0
+          },
+          "recallCeilingAtK": {
+            "1": 10.0,
+            "5": 50.0,
+            "10": 100.0,
+            "20": 100.0
+          }
+        },
+        "밀착력": {
+          "rows": 24,
+          "blindRows": 10,
+          "queryP1Pct": 29.17,
+          "queryP1BlindPct": 10.0,
+          "recallAtK": {
+            "1": 4.17,
+            "5": 12.5,
+            "10": 20.83,
+            "20": 25.0
+          },
+          "recallAtKBlind": {
+            "1": 0.0,
+            "5": 0.0,
+            "10": 0.0,
+            "20": 10.0
+          },
+          "recallCeilingAtK": {
+            "1": 4.17,
+            "5": 20.83,
+            "10": 41.67,
+            "20": 83.33
+          }
+        },
+        "가성비": {
+          "rows": 71,
+          "blindRows": 55,
+          "queryP1Pct": 78.87,
+          "queryP1BlindPct": 74.55,
+          "recallAtK": {
+            "1": 1.41,
+            "5": 7.04,
+            "10": 11.27,
+            "20": 16.9
+          },
+          "recallAtKBlind": {
+            "1": 1.82,
+            "5": 7.27,
+            "10": 9.09,
+            "20": 10.91
+          },
+          "recallCeilingAtK": {
+            "1": 1.41,
+            "5": 7.04,
+            "10": 14.08,
+            "20": 28.17
+          }
+        }
+      },
+      "caseList": [
+        {
+          "reviewId": 25837778,
+          "expression": "플미",
+          "predictedAspect": "가성비",
+          "caseAspectRank": 1,
+          "caseAspectCos": 0.5432,
+          "topAspectCos": 0.5432
+        },
+        {
+          "reviewId": 28077603,
+          "expression": "지갑터",
+          "predictedAspect": "가성비",
+          "caseAspectRank": 1,
+          "caseAspectCos": 0.541,
+          "topAspectCos": 0.541
+        },
+        {
+          "reviewId": 61572575,
+          "expression": "헤프",
+          "predictedAspect": "흡수력",
+          "caseAspectRank": 2,
+          "caseAspectCos": 0.6277,
+          "topAspectCos": 0.6759
+        },
+        {
+          "reviewId": 61733979,
+          "expression": "날린돈",
+          "predictedAspect": "가성비",
+          "caseAspectRank": 1,
+          "caseAspectCos": 0.6221,
+          "topAspectCos": 0.6221
+        }
+      ],
+      "protoSensitivity": {
+        "note": "프로토타입을 '질문별 인코딩의 평균'(정본) 대신 '질문을 이어붙여 한 번 인코딩'으로 만들었을 때의 같은 지표. 이 선택만으로 순위가 바뀌므로 probe 수치를 절대값으로 읽지 않는다",
+        "meanQueryP1Pct": 60.42,
+        "meanQueryP1BlindPct": 48.28,
+        "concatQueryP1Pct": 48.84,
+        "concatQueryP1BlindPct": 35.06
+      }
+    },
+    "bge-m3": {
+      "model": "BAAI/bge-m3",
+      "revision": "5617a9f61b028005a4858fdac845db406aefb181",
+      "dimension": 1024,
+      "maxSeqLength": 8192,
+      "queryPrefix": "",
+      "passagePrefix": "",
+      "aspectKnnP1": {
+        "allPct": 68.98,
+        "blindPct": 58.62,
+        "visiblePct": 75.97
+      },
+      "aspectQueryP1": {
+        "allPct": 56.94,
+        "blindPct": 50.0,
+        "visiblePct": 61.63
+      },
+      "recallAtKMacro": {
+        "1": {
+          "allPct": 7.11,
+          "blindPct": 7.83,
+          "blindAspects": 13
+        },
+        "5": {
+          "allPct": 18.23,
+          "blindPct": 8.54,
+          "blindAspects": 13
+        },
+        "10": {
+          "allPct": 26.39,
+          "blindPct": 9.32,
+          "blindAspects": 13
+        },
+        "20": {
+          "allPct": 36.8,
+          "blindPct": 13.86,
+          "blindAspects": 13
+        }
+      },
+      "separation": {
+        "intraAspectCos": 0.5504,
+        "interAspectCos": 0.5073,
+        "marginCos": 0.0431,
+        "pairsIntra": 9769,
+        "pairsInter": 82875
+      },
+      "byAspect": {
+        "보습감": {
+          "rows": 46,
+          "blindRows": 2,
+          "queryP1Pct": 58.7,
+          "queryP1BlindPct": 0.0,
+          "recallAtK": {
+            "1": 2.17,
+            "5": 10.87,
+            "10": 19.57,
+            "20": 32.61
+          },
+          "recallAtKBlind": {
+            "1": 0.0,
+            "5": 0.0,
+            "10": 0.0,
+            "20": 0.0
+          },
+          "recallCeilingAtK": {
+            "1": 2.17,
+            "5": 10.87,
+            "10": 21.74,
+            "20": 43.48
+          }
+        },
+        "흡수력": {
+          "rows": 20,
+          "blindRows": 2,
+          "queryP1Pct": 65.0,
+          "queryP1BlindPct": 0.0,
+          "recallAtK": {
+            "1": 5.0,
+            "5": 25.0,
+            "10": 50.0,
+            "20": 70.0
+          },
+          "recallAtKBlind": {
+            "1": 0.0,
+            "5": 0.0,
+            "10": 0.0,
+            "20": 0.0
+          },
+          "recallCeilingAtK": {
+            "1": 5.0,
+            "5": 25.0,
+            "10": 50.0,
+            "20": 100.0
+          }
+        },
+        "발림감/텍스처": {
+          "rows": 68,
+          "blindRows": 27,
+          "queryP1Pct": 64.71,
+          "queryP1BlindPct": 48.15,
+          "recallAtK": {
+            "1": 1.47,
+            "5": 5.88,
+            "10": 10.29,
+            "20": 22.06
+          },
+          "recallAtKBlind": {
+            "1": 0.0,
+            "5": 3.7,
+            "10": 3.7,
+            "20": 7.41
+          },
+          "recallCeilingAtK": {
+            "1": 1.47,
+            "5": 7.35,
+            "10": 14.71,
+            "20": 29.41
+          }
+        },
+        "지속성": {
+          "rows": 31,
+          "blindRows": 12,
+          "queryP1Pct": 35.48,
+          "queryP1BlindPct": 41.67,
+          "recallAtK": {
+            "1": 0.0,
+            "5": 6.45,
+            "10": 12.9,
+            "20": 22.58
+          },
+          "recallAtKBlind": {
+            "1": 0.0,
+            "5": 0.0,
+            "10": 0.0,
+            "20": 0.0
+          },
+          "recallCeilingAtK": {
+            "1": 3.23,
+            "5": 16.13,
+            "10": 32.26,
+            "20": 64.52
+          }
+        },
+        "향": {
+          "rows": 10,
+          "blindRows": 2,
+          "queryP1Pct": 90.0,
+          "queryP1BlindPct": 50.0,
+          "recallAtK": {
+            "1": 10.0,
+            "5": 50.0,
+            "10": 80.0,
+            "20": 80.0
+          },
+          "recallAtKBlind": {
+            "1": 0.0,
+            "5": 0.0,
+            "10": 0.0,
+            "20": 0.0
+          },
+          "recallCeilingAtK": {
+            "1": 10.0,
+            "5": 50.0,
+            "10": 100.0,
+            "20": 100.0
+          }
+        },
+        "광택/윤기": {
+          "rows": 18,
+          "blindRows": 4,
+          "queryP1Pct": 0.0,
+          "queryP1BlindPct": 0.0,
+          "recallAtK": {
+            "1": 5.56,
+            "5": 22.22,
+            "10": 38.89,
+            "20": 55.56
+          },
+          "recallAtKBlind": {
+            "1": 0.0,
+            "5": 0.0,
+            "10": 0.0,
+            "20": 25.0
+          },
+          "recallCeilingAtK": {
+            "1": 5.56,
+            "5": 27.78,
+            "10": 55.56,
+            "20": 100.0
+          }
+        },
+        "커버력": {
+          "rows": 9,
+          "blindRows": 0,
+          "queryP1Pct": 33.33,
+          "queryP1BlindPct": 0.0,
+          "recallAtK": {
+            "1": 11.11,
+            "5": 33.33,
+            "10": 33.33,
+            "20": 55.56
+          },
+          "recallAtKBlind": {
+            "1": 0.0,
+            "5": 0.0,
+            "10": 0.0,
+            "20": 0.0
+          },
+          "recallCeilingAtK": {
+            "1": 11.11,
+            "5": 55.56,
+            "10": 100.0,
+            "20": 100.0
+          }
+        },
+        "발색": {
+          "rows": 51,
+          "blindRows": 24,
+          "queryP1Pct": 80.39,
+          "queryP1BlindPct": 62.5,
+          "recallAtK": {
+            "1": 1.96,
+            "5": 9.8,
+            "10": 17.65,
+            "20": 35.29
+          },
+          "recallAtKBlind": {
+            "1": 0.0,
+            "5": 0.0,
+            "10": 8.33,
+            "20": 16.67
+          },
+          "recallCeilingAtK": {
+            "1": 1.96,
+            "5": 9.8,
+            "10": 19.61,
+            "20": 39.22
+          }
+        },
+        "유분/번들거림": {
+          "rows": 21,
+          "blindRows": 1,
+          "queryP1Pct": 47.62,
+          "queryP1BlindPct": 0.0,
+          "recallAtK": {
+            "1": 4.76,
+            "5": 14.29,
+            "10": 19.05,
+            "20": 28.57
+          },
+          "recallAtKBlind": {
+            "1": 0.0,
+            "5": 0.0,
+            "10": 0.0,
+            "20": 0.0
+          },
+          "recallCeilingAtK": {
+            "1": 4.76,
+            "5": 23.81,
+            "10": 47.62,
+            "20": 95.24
+          }
+        },
+        "트러블/자극": {
+          "rows": 51,
+          "blindRows": 24,
+          "queryP1Pct": 54.9,
+          "queryP1BlindPct": 54.17,
+          "recallAtK": {
+            "1": 1.96,
+            "5": 7.84,
+            "10": 9.8,
+            "20": 19.61
+          },
+          "recallAtKBlind": {
+            "1": 0.0,
+            "5": 0.0,
+            "10": 0.0,
+            "20": 8.33
+          },
+          "recallCeilingAtK": {
+            "1": 1.96,
+            "5": 9.8,
+            "10": 19.61,
+            "20": 39.22
+          }
+        },
+        "탄력/탱탱함": {
+          "rows": 2,
+          "blindRows": 1,
+          "queryP1Pct": 50.0,
+          "queryP1BlindPct": 100.0,
+          "recallAtK": {
+            "1": 50.0,
+            "5": 50.0,
+            "10": 50.0,
+            "20": 50.0
+          },
+          "recallAtKBlind": {
+            "1": 100.0,
+            "5": 100.0,
+            "10": 100.0,
+            "20": 100.0
+          },
+          "recallCeilingAtK": {
+            "1": 50.0,
+            "5": 100.0,
+            "10": 100.0,
+            "20": 100.0
+          }
+        },
+        "분사력": {
+          "rows": 10,
+          "blindRows": 10,
+          "queryP1Pct": 0.0,
+          "queryP1BlindPct": 0.0,
+          "recallAtK": {
+            "1": 0.0,
+            "5": 0.0,
+            "10": 0.0,
+            "20": 0.0
+          },
+          "recallAtKBlind": {
+            "1": 0.0,
+            "5": 0.0,
+            "10": 0.0,
+            "20": 0.0
+          },
+          "recallCeilingAtK": {
+            "1": 10.0,
+            "5": 50.0,
+            "10": 100.0,
+            "20": 100.0
+          }
+        },
+        "밀착력": {
+          "rows": 24,
+          "blindRows": 10,
+          "queryP1Pct": 25.0,
+          "queryP1BlindPct": 10.0,
+          "recallAtK": {
+            "1": 4.17,
+            "5": 12.5,
+            "10": 16.67,
+            "20": 25.0
+          },
+          "recallAtKBlind": {
+            "1": 0.0,
+            "5": 0.0,
+            "10": 0.0,
+            "20": 10.0
+          },
+          "recallCeilingAtK": {
+            "1": 4.17,
+            "5": 20.83,
+            "10": 41.67,
+            "20": 83.33
+          }
+        },
+        "가성비": {
+          "rows": 71,
+          "blindRows": 55,
+          "queryP1Pct": 74.65,
+          "queryP1BlindPct": 69.09,
+          "recallAtK": {
+            "1": 1.41,
+            "5": 7.04,
+            "10": 11.27,
+            "20": 18.31
+          },
+          "recallAtKBlind": {
+            "1": 1.82,
+            "5": 7.27,
+            "10": 9.09,
+            "20": 12.73
+          },
+          "recallCeilingAtK": {
+            "1": 1.41,
+            "5": 7.04,
+            "10": 14.08,
+            "20": 28.17
+          }
+        }
+      },
+      "caseList": [
+        {
+          "reviewId": 25837778,
+          "expression": "플미",
+          "predictedAspect": "가성비",
+          "caseAspectRank": 1,
+          "caseAspectCos": 0.5339,
+          "topAspectCos": 0.5339
+        },
+        {
+          "reviewId": 28077603,
+          "expression": "지갑터",
+          "predictedAspect": "가성비",
+          "caseAspectRank": 1,
+          "caseAspectCos": 0.4969,
+          "topAspectCos": 0.4969
+        },
+        {
+          "reviewId": 61572575,
+          "expression": "헤프",
+          "predictedAspect": "흡수력",
+          "caseAspectRank": 3,
+          "caseAspectCos": 0.6062,
+          "topAspectCos": 0.6849
+        },
+        {
+          "reviewId": 61733979,
+          "expression": "날린돈",
+          "predictedAspect": "가성비",
+          "caseAspectRank": 1,
+          "caseAspectCos": 0.6023,
+          "topAspectCos": 0.6023
+        }
+      ],
+      "protoSensitivity": {
+        "note": "프로토타입을 '질문별 인코딩의 평균'(정본) 대신 '질문을 이어붙여 한 번 인코딩'으로 만들었을 때의 같은 지표. 이 선택만으로 순위가 바뀌므로 probe 수치를 절대값으로 읽지 않는다",
+        "meanQueryP1Pct": 56.94,
+        "meanQueryP1BlindPct": 50.0,
+        "concatQueryP1Pct": 46.06,
+        "concatQueryP1BlindPct": 32.76
+      }
+    },
+    "e5-base": {
+      "model": "intfloat/multilingual-e5-base",
+      "revision": "d128750597153bb5987e10b1c3493a34e5a4502a",
+      "dimension": 768,
+      "maxSeqLength": 512,
+      "queryPrefix": "query: ",
+      "passagePrefix": "passage: ",
+      "aspectKnnP1": {
+        "allPct": 56.71,
+        "blindPct": 52.3,
+        "visiblePct": 59.69
+      },
+      "aspectQueryP1": {
+        "allPct": 44.91,
+        "blindPct": 29.31,
+        "visiblePct": 55.43
+      },
+      "recallAtKMacro": {
+        "1": {
+          "allPct": 6.79,
+          "blindPct": 8.6,
+          "blindAspects": 13
+        },
+        "5": {
+          "allPct": 14.98,
+          "blindPct": 13.01,
+          "blindAspects": 13
+        },
+        "10": {
+          "allPct": 20.62,
+          "blindPct": 14.11,
+          "blindAspects": 13
+        },
+        "20": {
+          "allPct": 27.31,
+          "blindPct": 15.53,
+          "blindAspects": 13
+        }
+      },
+      "separation": {
+        "intraAspectCos": 0.8965,
+        "interAspectCos": 0.8898,
+        "marginCos": 0.0067,
+        "pairsIntra": 9769,
+        "pairsInter": 82875
+      },
+      "byAspect": {
+        "보습감": {
+          "rows": 46,
+          "blindRows": 2,
+          "queryP1Pct": 76.09,
+          "queryP1BlindPct": 50.0,
+          "recallAtK": {
+            "1": 2.17,
+            "5": 4.35,
+            "10": 6.52,
+            "20": 15.22
+          },
+          "recallAtKBlind": {
+            "1": 0.0,
+            "5": 0.0,
+            "10": 0.0,
+            "20": 0.0
+          },
+          "recallCeilingAtK": {
+            "1": 2.17,
+            "5": 10.87,
+            "10": 21.74,
+            "20": 43.48
+          }
+        },
+        "흡수력": {
+          "rows": 20,
+          "blindRows": 2,
+          "queryP1Pct": 45.0,
+          "queryP1BlindPct": 0.0,
+          "recallAtK": {
+            "1": 5.0,
+            "5": 25.0,
+            "10": 35.0,
+            "20": 55.0
+          },
+          "recallAtKBlind": {
+            "1": 0.0,
+            "5": 0.0,
+            "10": 0.0,
+            "20": 0.0
+          },
+          "recallCeilingAtK": {
+            "1": 5.0,
+            "5": 25.0,
+            "10": 50.0,
+            "20": 100.0
+          }
+        },
+        "발림감/텍스처": {
+          "rows": 68,
+          "blindRows": 27,
+          "queryP1Pct": 47.06,
+          "queryP1BlindPct": 22.22,
+          "recallAtK": {
+            "1": 1.47,
+            "5": 5.88,
+            "10": 13.24,
+            "20": 20.59
+          },
+          "recallAtKBlind": {
+            "1": 0.0,
+            "5": 0.0,
+            "10": 0.0,
+            "20": 0.0
+          },
+          "recallCeilingAtK": {
+            "1": 1.47,
+            "5": 7.35,
+            "10": 14.71,
+            "20": 29.41
+          }
+        },
+        "지속성": {
+          "rows": 31,
+          "blindRows": 12,
+          "queryP1Pct": 22.58,
+          "queryP1BlindPct": 25.0,
+          "recallAtK": {
+            "1": 0.0,
+            "5": 6.45,
+            "10": 12.9,
+            "20": 19.35
+          },
+          "recallAtKBlind": {
+            "1": 0.0,
+            "5": 16.67,
+            "10": 25.0,
+            "20": 33.33
+          },
+          "recallCeilingAtK": {
+            "1": 3.23,
+            "5": 16.13,
+            "10": 32.26,
+            "20": 64.52
+          }
+        },
+        "향": {
+          "rows": 10,
+          "blindRows": 2,
+          "queryP1Pct": 50.0,
+          "queryP1BlindPct": 0.0,
+          "recallAtK": {
+            "1": 10.0,
+            "5": 50.0,
+            "10": 70.0,
+            "20": 80.0
+          },
+          "recallAtKBlind": {
+            "1": 0.0,
+            "5": 0.0,
+            "10": 0.0,
+            "20": 0.0
+          },
+          "recallCeilingAtK": {
+            "1": 10.0,
+            "5": 50.0,
+            "10": 100.0,
+            "20": 100.0
+          }
+        },
+        "광택/윤기": {
+          "rows": 18,
+          "blindRows": 4,
+          "queryP1Pct": 0.0,
+          "queryP1BlindPct": 0.0,
+          "recallAtK": {
+            "1": 0.0,
+            "5": 11.11,
+            "10": 16.67,
+            "20": 22.22
+          },
+          "recallAtKBlind": {
+            "1": 0.0,
+            "5": 25.0,
+            "10": 25.0,
+            "20": 25.0
+          },
+          "recallCeilingAtK": {
+            "1": 5.56,
+            "5": 27.78,
+            "10": 55.56,
+            "20": 100.0
+          }
+        },
+        "커버력": {
+          "rows": 9,
+          "blindRows": 0,
+          "queryP1Pct": 11.11,
+          "queryP1BlindPct": 0.0,
+          "recallAtK": {
+            "1": 11.11,
+            "5": 11.11,
+            "10": 11.11,
+            "20": 11.11
+          },
+          "recallAtKBlind": {
+            "1": 0.0,
+            "5": 0.0,
+            "10": 0.0,
+            "20": 0.0
+          },
+          "recallCeilingAtK": {
+            "1": 11.11,
+            "5": 55.56,
+            "10": 100.0,
+            "20": 100.0
+          }
+        },
+        "발색": {
+          "rows": 51,
+          "blindRows": 24,
+          "queryP1Pct": 86.27,
+          "queryP1BlindPct": 70.83,
+          "recallAtK": {
+            "1": 1.96,
+            "5": 7.84,
+            "10": 17.65,
+            "20": 27.45
+          },
+          "recallAtKBlind": {
+            "1": 0.0,
+            "5": 4.17,
+            "10": 4.17,
+            "20": 8.33
+          },
+          "recallCeilingAtK": {
+            "1": 1.96,
+            "5": 9.8,
+            "10": 19.61,
+            "20": 39.22
+          }
+        },
+        "유분/번들거림": {
+          "rows": 21,
+          "blindRows": 1,
+          "queryP1Pct": 23.81,
+          "queryP1BlindPct": 0.0,
+          "recallAtK": {
+            "1": 0.0,
+            "5": 4.76,
+            "10": 19.05,
+            "20": 28.57
+          },
+          "recallAtKBlind": {
+            "1": 0.0,
+            "5": 0.0,
+            "10": 0.0,
+            "20": 0.0
+          },
+          "recallCeilingAtK": {
+            "1": 4.76,
+            "5": 23.81,
+            "10": 47.62,
+            "20": 95.24
+          }
+        },
+        "트러블/자극": {
+          "rows": 51,
+          "blindRows": 24,
+          "queryP1Pct": 50.98,
+          "queryP1BlindPct": 37.5,
+          "recallAtK": {
+            "1": 1.96,
+            "5": 7.84,
+            "10": 9.8,
+            "20": 17.65
+          },
+          "recallAtKBlind": {
+            "1": 0.0,
+            "5": 4.17,
+            "10": 8.33,
+            "20": 12.5
+          },
+          "recallCeilingAtK": {
+            "1": 1.96,
+            "5": 9.8,
+            "10": 19.61,
+            "20": 39.22
+          }
+        },
+        "탄력/탱탱함": {
+          "rows": 2,
+          "blindRows": 1,
+          "queryP1Pct": 0.0,
+          "queryP1BlindPct": 0.0,
+          "recallAtK": {
+            "1": 50.0,
+            "5": 50.0,
+            "10": 50.0,
+            "20": 50.0
+          },
+          "recallAtKBlind": {
+            "1": 100.0,
+            "5": 100.0,
+            "10": 100.0,
+            "20": 100.0
+          },
+          "recallCeilingAtK": {
+            "1": 50.0,
+            "5": 100.0,
+            "10": 100.0,
+            "20": 100.0
+          }
+        },
+        "분사력": {
+          "rows": 10,
+          "blindRows": 10,
+          "queryP1Pct": 0.0,
+          "queryP1BlindPct": 0.0,
+          "recallAtK": {
+            "1": 10.0,
+            "5": 10.0,
+            "10": 10.0,
+            "20": 10.0
+          },
+          "recallAtKBlind": {
+            "1": 10.0,
+            "5": 10.0,
+            "10": 10.0,
+            "20": 10.0
+          },
+          "recallCeilingAtK": {
+            "1": 10.0,
+            "5": 50.0,
+            "10": 100.0,
+            "20": 100.0
+          }
+        },
+        "밀착력": {
+          "rows": 24,
+          "blindRows": 10,
+          "queryP1Pct": 8.33,
+          "queryP1BlindPct": 0.0,
+          "recallAtK": {
+            "1": 0.0,
+            "5": 8.33,
+            "10": 8.33,
+            "20": 12.5
+          },
+          "recallAtKBlind": {
+            "1": 0.0,
+            "5": 0.0,
+            "10": 0.0,
+            "20": 0.0
+          },
+          "recallCeilingAtK": {
+            "1": 4.17,
+            "5": 20.83,
+            "10": 41.67,
+            "20": 83.33
+          }
+        },
+        "가성비": {
+          "rows": 71,
+          "blindRows": 55,
+          "queryP1Pct": 39.44,
+          "queryP1BlindPct": 27.27,
+          "recallAtK": {
+            "1": 1.41,
+            "5": 7.04,
+            "10": 8.45,
+            "20": 12.68
+          },
+          "recallAtKBlind": {
+            "1": 1.82,
+            "5": 9.09,
+            "10": 10.91,
+            "20": 12.73
+          },
+          "recallCeilingAtK": {
+            "1": 1.41,
+            "5": 7.04,
+            "10": 14.08,
+            "20": 28.17
+          }
+        }
+      },
+      "caseList": [
+        {
+          "reviewId": 25837778,
+          "expression": "플미",
+          "predictedAspect": "발색",
+          "caseAspectRank": 8,
+          "caseAspectCos": 0.8268,
+          "topAspectCos": 0.8479
+        },
+        {
+          "reviewId": 28077603,
+          "expression": "지갑터",
+          "predictedAspect": "발색",
+          "caseAspectRank": 2,
+          "caseAspectCos": 0.8393,
+          "topAspectCos": 0.8439
+        },
+        {
+          "reviewId": 61572575,
+          "expression": "헤프",
+          "predictedAspect": "발림감/텍스처",
+          "caseAspectRank": 6,
+          "caseAspectCos": 0.8372,
+          "topAspectCos": 0.8506
+        },
+        {
+          "reviewId": 61733979,
+          "expression": "날린돈",
+          "predictedAspect": "트러블/자극",
+          "caseAspectRank": 4,
+          "caseAspectCos": 0.8342,
+          "topAspectCos": 0.8396
+        }
+      ],
+      "protoSensitivity": {
+        "note": "프로토타입을 '질문별 인코딩의 평균'(정본) 대신 '질문을 이어붙여 한 번 인코딩'으로 만들었을 때의 같은 지표. 이 선택만으로 순위가 바뀌므로 probe 수치를 절대값으로 읽지 않는다",
+        "meanQueryP1Pct": 44.91,
+        "meanQueryP1BlindPct": 29.31,
+        "concatQueryP1Pct": 43.98,
+        "concatQueryP1BlindPct": 24.14
+      }
+    },
+    "ko-sroberta": {
+      "model": "jhgan/ko-sroberta-multitask",
+      "revision": "8fca7c9c98c26599be0e14b9916b11a756a26f19",
+      "dimension": 768,
+      "maxSeqLength": 128,
+      "queryPrefix": "",
+      "passagePrefix": "",
+      "aspectKnnP1": {
+        "allPct": 67.82,
+        "blindPct": 56.32,
+        "visiblePct": 75.58
+      },
+      "aspectQueryP1": {
+        "allPct": 56.94,
+        "blindPct": 45.98,
+        "visiblePct": 64.34
+      },
+      "recallAtKMacro": {
+        "1": {
+          "allPct": 5.94,
+          "blindPct": 7.83,
+          "blindAspects": 13
+        },
+        "5": {
+          "allPct": 14.94,
+          "blindPct": 11.42,
+          "blindAspects": 13
+        },
+        "10": {
+          "allPct": 25.53,
+          "blindPct": 14.45,
+          "blindAspects": 13
+        },
+        "20": {
+          "allPct": 37.14,
+          "blindPct": 18.29,
+          "blindAspects": 13
+        }
+      },
+      "separation": {
+        "intraAspectCos": 0.3723,
+        "interAspectCos": 0.2875,
+        "marginCos": 0.0849,
+        "pairsIntra": 9769,
+        "pairsInter": 82875
+      },
+      "byAspect": {
+        "보습감": {
+          "rows": 46,
+          "blindRows": 2,
+          "queryP1Pct": 86.96,
+          "queryP1BlindPct": 0.0,
+          "recallAtK": {
+            "1": 2.17,
+            "5": 10.87,
+            "10": 19.57,
+            "20": 34.78
+          },
+          "recallAtKBlind": {
+            "1": 0.0,
+            "5": 0.0,
+            "10": 0.0,
+            "20": 0.0
+          },
+          "recallCeilingAtK": {
+            "1": 2.17,
+            "5": 10.87,
+            "10": 21.74,
+            "20": 43.48
+          }
+        },
+        "흡수력": {
+          "rows": 20,
+          "blindRows": 2,
+          "queryP1Pct": 75.0,
+          "queryP1BlindPct": 100.0,
+          "recallAtK": {
+            "1": 5.0,
+            "5": 20.0,
+            "10": 40.0,
+            "20": 70.0
+          },
+          "recallAtKBlind": {
+            "1": 0.0,
+            "5": 0.0,
+            "10": 0.0,
+            "20": 0.0
+          },
+          "recallCeilingAtK": {
+            "1": 5.0,
+            "5": 25.0,
+            "10": 50.0,
+            "20": 100.0
+          }
+        },
+        "발림감/텍스처": {
+          "rows": 68,
+          "blindRows": 27,
+          "queryP1Pct": 63.24,
+          "queryP1BlindPct": 66.67,
+          "recallAtK": {
+            "1": 1.47,
+            "5": 5.88,
+            "10": 10.29,
+            "20": 19.12
+          },
+          "recallAtKBlind": {
+            "1": 0.0,
+            "5": 3.7,
+            "10": 3.7,
+            "20": 7.41
+          },
+          "recallCeilingAtK": {
+            "1": 1.47,
+            "5": 7.35,
+            "10": 14.71,
+            "20": 29.41
+          }
+        },
+        "지속성": {
+          "rows": 31,
+          "blindRows": 12,
+          "queryP1Pct": 9.68,
+          "queryP1BlindPct": 8.33,
+          "recallAtK": {
+            "1": 0.0,
+            "5": 3.23,
+            "10": 6.45,
+            "20": 12.9
+          },
+          "recallAtKBlind": {
+            "1": 0.0,
+            "5": 8.33,
+            "10": 16.67,
+            "20": 16.67
+          },
+          "recallCeilingAtK": {
+            "1": 3.23,
+            "5": 16.13,
+            "10": 32.26,
+            "20": 64.52
+          }
+        },
+        "향": {
+          "rows": 10,
+          "blindRows": 2,
+          "queryP1Pct": 90.0,
+          "queryP1BlindPct": 50.0,
+          "recallAtK": {
+            "1": 10.0,
+            "5": 50.0,
+            "10": 60.0,
+            "20": 80.0
+          },
+          "recallAtKBlind": {
+            "1": 0.0,
+            "5": 0.0,
+            "10": 0.0,
+            "20": 0.0
+          },
+          "recallCeilingAtK": {
+            "1": 10.0,
+            "5": 50.0,
+            "10": 100.0,
+            "20": 100.0
+          }
+        },
+        "광택/윤기": {
+          "rows": 18,
+          "blindRows": 4,
+          "queryP1Pct": 16.67,
+          "queryP1BlindPct": 0.0,
+          "recallAtK": {
+            "1": 0.0,
+            "5": 16.67,
+            "10": 22.22,
+            "20": 22.22
+          },
+          "recallAtKBlind": {
+            "1": 0.0,
+            "5": 25.0,
+            "10": 50.0,
+            "20": 50.0
+          },
+          "recallCeilingAtK": {
+            "1": 5.56,
+            "5": 27.78,
+            "10": 55.56,
+            "20": 100.0
+          }
+        },
+        "커버력": {
+          "rows": 9,
+          "blindRows": 0,
+          "queryP1Pct": 66.67,
+          "queryP1BlindPct": 0.0,
+          "recallAtK": {
+            "1": 11.11,
+            "5": 11.11,
+            "10": 33.33,
+            "20": 55.56
+          },
+          "recallAtKBlind": {
+            "1": 0.0,
+            "5": 0.0,
+            "10": 0.0,
+            "20": 0.0
+          },
+          "recallCeilingAtK": {
+            "1": 11.11,
+            "5": 55.56,
+            "10": 100.0,
+            "20": 100.0
+          }
+        },
+        "발색": {
+          "rows": 51,
+          "blindRows": 24,
+          "queryP1Pct": 68.63,
+          "queryP1BlindPct": 50.0,
+          "recallAtK": {
+            "1": 1.96,
+            "5": 5.88,
+            "10": 13.73,
+            "20": 23.53
+          },
+          "recallAtKBlind": {
+            "1": 0.0,
+            "5": 0.0,
+            "10": 4.17,
+            "20": 12.5
+          },
+          "recallCeilingAtK": {
+            "1": 1.96,
+            "5": 9.8,
+            "10": 19.61,
+            "20": 39.22
+          }
+        },
+        "유분/번들거림": {
+          "rows": 21,
+          "blindRows": 1,
+          "queryP1Pct": 57.14,
+          "queryP1BlindPct": 0.0,
+          "recallAtK": {
+            "1": 0.0,
+            "5": 14.29,
+            "10": 23.81,
+            "20": 38.1
+          },
+          "recallAtKBlind": {
+            "1": 0.0,
+            "5": 0.0,
+            "10": 0.0,
+            "20": 0.0
+          },
+          "recallCeilingAtK": {
+            "1": 4.76,
+            "5": 23.81,
+            "10": 47.62,
+            "20": 95.24
+          }
+        },
+        "트러블/자극": {
+          "rows": 51,
+          "blindRows": 24,
+          "queryP1Pct": 41.18,
+          "queryP1BlindPct": 29.17,
+          "recallAtK": {
+            "1": 0.0,
+            "5": 5.88,
+            "10": 9.8,
+            "20": 21.57
+          },
+          "recallAtKBlind": {
+            "1": 0.0,
+            "5": 4.17,
+            "10": 4.17,
+            "20": 16.67
+          },
+          "recallCeilingAtK": {
+            "1": 1.96,
+            "5": 9.8,
+            "10": 19.61,
+            "20": 39.22
+          }
+        },
+        "탄력/탱탱함": {
+          "rows": 2,
+          "blindRows": 1,
+          "queryP1Pct": 100.0,
+          "queryP1BlindPct": 100.0,
+          "recallAtK": {
+            "1": 50.0,
+            "5": 50.0,
+            "10": 100.0,
+            "20": 100.0
+          },
+          "recallAtKBlind": {
+            "1": 100.0,
+            "5": 100.0,
+            "10": 100.0,
+            "20": 100.0
+          },
+          "recallCeilingAtK": {
+            "1": 50.0,
+            "5": 100.0,
+            "10": 100.0,
+            "20": 100.0
+          }
+        },
+        "분사력": {
+          "rows": 10,
+          "blindRows": 10,
+          "queryP1Pct": 0.0,
+          "queryP1BlindPct": 0.0,
+          "recallAtK": {
+            "1": 0.0,
+            "5": 0.0,
+            "10": 0.0,
+            "20": 10.0
+          },
+          "recallAtKBlind": {
+            "1": 0.0,
+            "5": 0.0,
+            "10": 0.0,
+            "20": 10.0
+          },
+          "recallCeilingAtK": {
+            "1": 10.0,
+            "5": 50.0,
+            "10": 100.0,
+            "20": 100.0
+          }
+        },
+        "밀착력": {
+          "rows": 24,
+          "blindRows": 10,
+          "queryP1Pct": 25.0,
+          "queryP1BlindPct": 30.0,
+          "recallAtK": {
+            "1": 0.0,
+            "5": 8.33,
+            "10": 8.33,
+            "20": 12.5
+          },
+          "recallAtKBlind": {
+            "1": 0.0,
+            "5": 0.0,
+            "10": 0.0,
+            "20": 10.0
+          },
+          "recallCeilingAtK": {
+            "1": 4.17,
+            "5": 20.83,
+            "10": 41.67,
+            "20": 83.33
+          }
+        },
+        "가성비": {
+          "rows": 71,
+          "blindRows": 55,
+          "queryP1Pct": 71.83,
+          "queryP1BlindPct": 63.64,
+          "recallAtK": {
+            "1": 1.41,
+            "5": 7.04,
+            "10": 9.86,
+            "20": 19.72
+          },
+          "recallAtKBlind": {
+            "1": 1.82,
+            "5": 7.27,
+            "10": 9.09,
+            "20": 14.55
+          },
+          "recallCeilingAtK": {
+            "1": 1.41,
+            "5": 7.04,
+            "10": 14.08,
+            "20": 28.17
+          }
+        }
+      },
+      "caseList": [
+        {
+          "reviewId": 25837778,
+          "expression": "플미",
+          "predictedAspect": "유분/번들거림",
+          "caseAspectRank": 2,
+          "caseAspectCos": 0.3153,
+          "topAspectCos": 0.3305
+        },
+        {
+          "reviewId": 28077603,
+          "expression": "지갑터",
+          "predictedAspect": "발색",
+          "caseAspectRank": 8,
+          "caseAspectCos": 0.1204,
+          "topAspectCos": 0.2495
+        },
+        {
+          "reviewId": 61572575,
+          "expression": "헤프",
+          "predictedAspect": "흡수력",
+          "caseAspectRank": 13,
+          "caseAspectCos": 0.3713,
+          "topAspectCos": 0.5693
+        },
+        {
+          "reviewId": 61733979,
+          "expression": "날린돈",
+          "predictedAspect": "트러블/자극",
+          "caseAspectRank": 2,
+          "caseAspectCos": 0.4189,
+          "topAspectCos": 0.4647
+        }
+      ],
+      "protoSensitivity": {
+        "note": "프로토타입을 '질문별 인코딩의 평균'(정본) 대신 '질문을 이어붙여 한 번 인코딩'으로 만들었을 때의 같은 지표. 이 선택만으로 순위가 바뀌므로 probe 수치를 절대값으로 읽지 않는다",
+        "meanQueryP1Pct": 56.94,
+        "meanQueryP1BlindPct": 45.98,
+        "concatQueryP1Pct": 56.71,
+        "concatQueryP1BlindPct": 45.4
+      }
+    }
+  },
+  "selected": {
+    "embeddingVersion": "emb-v1",
+    "model": "nlpai-lab/KURE-v1",
+    "revision": "8b418a58414668e75532ed045c22d9ca018ae2b2",
+    "vocabVersion": "aspect-v1"
+  }
+}
