@@ -79,7 +79,7 @@ catalog → ingest → tag → gates → claims → judge
 | `catalog` | `goodsNo` → `productId`. 제품 동일성 확정 | **구현** | PER-171 |
 | `ingest` | 25K를 원문/조건/파생 3층으로 적재. LLM 없음 | **구현** | PER-173 |
 | `tag` | 전수 aspect/polarity 태깅 (Batch API) | 계약·정답셋 **완료** / 배치 실행 미완 | PER-175 |
-| `gates` | 동일성 → 중복 → 방향성 → 충분성 4게이트 + `rejected[]` | 게이트1~4 **구현** / 조립 미완 | PER-182~188 |
+| `gates` | 동일성 → 중복 → 방향성 → 충분성 4게이트 + `rejected[]` | **구현** | PER-182~188 |
 | `claims` | 주장 생성 + 인용 원문 부분문자열 강제 + 스키마 검증 | 미구현 | PER-189~195 |
 | `judge` | 루브릭 judge(생성과 다른 모델) + 전수 평가 | 미구현 | PER-196~201 |
 
@@ -105,6 +105,8 @@ catalog → ingest → tag → gates → claims → judge
 **침묵은 근거가 아니다.** 주제를 말하지 않은 작성자는 긍정도 부정도 아니므로 비율의 분모에 넣지 않고 `silentAuthors`로 따로 센다 — "40명 중 3명이 언급"을 "40명 중 3명만 불만"으로 바꾸지 않는다.
 
 **살아남은 근거는 순서대로 놓는다 — 5단 배치 (구현).** 게이트 통과분을 `무엇 → 조건 → 근거 → 방향 → 충분성` 자료 구조로 배치한다. 순서를 정하지 않으면 실제로 정해지는 것은 태거의 출력 순서다. 인용 정렬은 신뢰도(PER-174) 내림차순이고, 입력을 20회 섞어도 payload 가 바이트 동일하다. **상한을 걸어도 방향을 지우지 않는다** — `p019 × 트러블/자극`(긍정 309 · 부정 6)에서 신뢰도 상위 8건은 전부 긍정이라, 그냥 자르면 4단이 "부정 6명"인데 3단에 부정 인용이 한 줄도 없다. 2단의 조건축은 `skinType`·`skinTrouble` 뿐이고 **`usagePeriod`·계절은 데이터에 없어 기각**했다 — 뺀 이유가 주석이 아니라 출력(`EXCLUDED_AXES`)에 남는다.
+
+**버린 것도 남긴다 — `rejected[]` 원장 (구현).** 통과한 것만 남기면 정밀도는 측정되지만 **재현율은 영영 측정되지 않는다**(PRD §6). 탈락 사유 어휘는 `pipeline/reject_registry.py` 한 곳이 소유하고(사유 11종 · 한계 5종), **미등록 사유로 탈락시키면 행 생성 시점에 에러**다. 원장 12,593행이 입력을 남김없이 설명한다 — 리뷰 17,672 통과 + 7,328 탈락 = 25,000, 주장 2,395 통과 + 5,265 탈락 = 7,660. **게이트3 행은 0이고 그건 누락이 아니라 결정이다**(부정 근거는 틀린 근거가 아니다 — PER-185). 골든셋 claim 을 게이트로 되짚으면 재현율이 나온다: 26건 중 되짚을 수 있는 22건에서 **16건 생성(0.7273)**, **미스 6건은 전부 `게이트4/과소근거`** 다 (`docs/DECISION_PER188_REJECTED_LEDGER.md`, `eval/reports/rejected_ledger_per188.json`).
 
 ### 출력 스키마 — 평가 가능성을 구조에 박는다
 
@@ -200,6 +202,8 @@ pipeline/    v5 — 작업 대상
   polarity.py              게이트3 방향성 (PER-185). 유일하게 탈락시키지 않는 게이트 — 판정과 플래그만 낸다
   sufficiency.py           게이트4 충분성 (PER-186). 판정 단위가 리뷰가 아니라 주장이라 모듈이 따로다
   context_layout.py        5단 배치 (PER-187). 판정을 다시 하지 않는다 — 순서대로 놓고 게이트3·4가 같은 셀인지 대조한다
+  reject_registry.py       탈락 사유 어휘의 정본 (PER-188). 게이트3은 사유 0개 — 누락이 아니라 결정이다
+  ledger.py                통합 rejected[] 원장 + 골든셋 역추적 (PER-188). 재현율의 유일한 단서
   option_norm.py           옵션 → 색상 키 정규화 (PER-182). LLM 없음
   option_markers.json      판촉 어휘 — 코드가 아니라 여기서 고친다
   build_product_catalog.py 카탈로그 생성기 (--check 로 재현 확인)
@@ -305,6 +309,7 @@ v5가 넘어야 하는 선: **인용 정확도 100%** (생성 시점에 원문 �
 | [`docs/DECISION_PER185_POLARITY_GATE.md`](docs/DECISION_PER185_POLARITY_GATE.md) | 게이트3 방향성 — 탈락 없는 게이트 · 별점 교차검증 3층 · 방향 정의의 소유자 · 태거 잡음 주석 · v4 2건 재확인 |
 | [`docs/DECISION_PER186_SUFFICIENCY.md`](docs/DECISION_PER186_SUFFICIENCY.md) | 게이트4 충분성 — 세 조건 AND · 분모는 언급자(D) · 소수 의견 정책 · 임계값 민감도 |
 | [`docs/DECISION_PER187_CONTEXT_LAYOUT.md`](docs/DECISION_PER187_CONTEXT_LAYOUT.md) | 5단 배치 — 문구가 아니라 자료의 순서 · 사용기간·계절 기각 · 상한이 방향을 지우지 않는다 |
+| [`docs/DECISION_PER188_REJECTED_LEDGER.md`](docs/DECISION_PER188_REJECTED_LEDGER.md) | `rejected[]` 원장 — 사유 레지스트리 · 게이트3 방향불일치 기각 · 골든셋 역추적으로 재현율 |
 | [`docs/DECISION_PER178_GOLDEN_LABELING_SPEC.md`](docs/DECISION_PER178_GOLDEN_LABELING_SPEC.md) | 주장 골든셋 규격 — 라벨 1건의 모양 · 층화 번들 40개 · 블라인드 절차 · v4 15문항 미이관 근거 |
 | [`docs/DECISION_PER178_SILENCE_IS_NOT_EVIDENCE.md`](docs/DECISION_PER178_SILENCE_IS_NOT_EVIDENCE.md) | 침묵은 근거가 아니다 — U+/U−/D/S 보존, 단계별 유지 규칙, 아마존·NN/G·자기선택 편향 사례 |
 | [`eval/gold/README.md`](eval/gold/README.md) | 평가 고정물(표본·정답셋) 규칙과 재현 절차 |
