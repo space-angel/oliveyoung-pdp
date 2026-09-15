@@ -66,21 +66,26 @@ from policy import (  # noqa: E402
     SufficiencyPolicy,
     sufficiency_gate,
 )
+# 게이트 이름과 사람이 읽는 표기는 레지스트리가 소유한다 (PER-188).
+from reject_registry import (  # noqa: E402
+    GATE_SUFFICIENCY,
+    REJECT_LABELS,
+    assert_rejectable,
+    label_of,
+)
+from reject_registry import LIMIT_LABELS  # noqa: E402,F401  (재수출 — 표기 한 벌)
 
-GATE_SUFFICIENCY = "sufficiency"
 ISSUE = "PER-186"
 
 MULTI_AXES = ("skinTrouble",)
 STANCES = ("positive", "negative", "neutral")
 
-# 사람이 읽는 표기. 완료 조건의 "과소근거" 는 절대하한 미달에 붙는다 — 나머지 둘은
-# 같은 부류지만 다른 이유이므로 표기도 나눈다.
+# 완료 조건의 "과소근거" 는 절대하한 미달에 붙는다 — 나머지 둘은 같은 부류지만 다른
+# 이유이므로 표기도 나눈다. 표기 자체는 레지스트리의 한 벌에서 잘라 온다.
 SUFFICIENCY_REJECT_LABELS = {
-    REJECT_INSUFFICIENT: "과소근거",
-    REJECT_MINORITY_SHARE: "소수방향",
-    REJECT_SEGMENT_TOO_SMALL: "세그먼트과소",
+    code: REJECT_LABELS[code]
+    for code in (REJECT_INSUFFICIENT, REJECT_MINORITY_SHARE, REJECT_SEGMENT_TOO_SMALL)
 }
-LIMIT_LABELS = {LIMIT_SINGLE_DISSENT: "반대1명"}
 
 
 class SufficiencyError(ValueError):
@@ -322,12 +327,21 @@ class RejectedClaim:
     support: dict
     detail: str | None = None
 
+    def __post_init__(self) -> None:
+        # 미등록 사유·다른 게이트의 사유로는 주장을 탈락시킬 수 없다 (PER-188).
+        # 게이트1·2 의 `RejectedRow` 와 같은 자리에서 같은 레지스트리에 묻는다.
+        assert_rejectable(GATE_SUFFICIENCY, self.reason)
+
+    @property
+    def label(self) -> str:
+        return label_of(self.reason)
+
     def as_dict(self) -> dict:
         return {
             "claimId": self.claim_id,
             "gate": GATE_SUFFICIENCY,
             "reason": self.reason,
-            "label": SUFFICIENCY_REJECT_LABELS.get(self.reason, self.reason),
+            "label": self.label,
             "detail": self.detail,
             "support": self.support,
         }

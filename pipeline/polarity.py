@@ -115,9 +115,16 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent))
 
 from gates import independent_reviews  # noqa: E402
+# 게이트 이름과 한계 코드는 레지스트리가 소유한다 (PER-188). **이 게이트에는 탈락
+# 사유가 없고, 레지스트리에도 사유 0개로 등록돼 있다** — 등록에서 빠진 것이 아니라
+# 결정이다 (§1 · `reject_registry.GATE_POLARITY_NO_REJECT`).
+from reject_registry import (  # noqa: E402
+    GATE_POLARITY,
+    LIMIT_MINORITY_WITHIN_NOISE,
+    LIMIT_ORDER_CHOSEN_DIRECTION,
+    LIMIT_TAGGER_DIRECTION_ERROR,
+)
 from tag_contract import ASPECTS, POLARITIES  # noqa: E402
-
-GATE_POLARITY = "polarity"
 
 POSITIVE = "positive"
 NEGATIVE = "negative"
@@ -174,13 +181,17 @@ CONFLICT_LABELS = {
 }
 
 # --- 주장에 남기는 한계 코드 ---
-
-LIMIT_TAGGER_DIRECTION_ERROR = "tagger_direction_error"
-LIMIT_ORDER_CHOSEN_DIRECTION = "order_chosen_direction"
-# 갈리긴 갈렸는데 소수가 태거 뒤집힘만으로 설명되는 수준이다. **컷이 아니라 한계다** —
-# 소수는 그대로 세어지고 비율에도 그대로 실린다. 반대 '1명' 자체의 처리는 게이트4 의
-# `single_dissent` 가 따로 소유한다 (PER-186).
-LIMIT_MINORITY_WITHIN_NOISE = "minority_within_tagger_noise"
+#
+# 세 코드 모두 위에서 레지스트리(PER-188)에서 가져왔다. 이 게이트의 산출은 탈락이
+# 아니라 **한계**라서, 게이트1·2 가 `rejected[]` 에 남기는 자리에 이 게이트는 한계를
+# 남긴다.
+#
+#   LIMIT_TAGGER_DIRECTION_ERROR   방향 판정에 언제나 얹히는 태거 오류 (정답셋 6.5%)
+#   LIMIT_ORDER_CHOSEN_DIRECTION   같은 축에 긍·부정을 둘 다 뱉어 출력 순서가 방향을 정했다
+#   LIMIT_MINORITY_WITHIN_NOISE    갈리긴 갈렸는데 소수가 태거 뒤집힘만으로 설명된다.
+#                                  **컷이 아니라 한계다** — 소수는 그대로 세어지고 비율에도
+#                                  그대로 실린다. 반대 '1명' 자체의 처리는 게이트4 의
+#                                  `single_dissent` 가 따로 소유한다 (PER-186)
 
 # --- 혼재 판정 모수 ---
 

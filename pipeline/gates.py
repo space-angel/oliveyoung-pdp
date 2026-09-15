@@ -66,32 +66,25 @@ from policy import (  # noqa: E402
     recency_gate,
     renewal_gate,
 )
+# 사유 코드·게이트 이름·한글 표기는 레지스트리가 소유한다 (PER-188). 이 모듈은
+# **어느 조건에서 그 사유가 붙는가**만 정한다 — 두 벌로 들면 표기를 고칠 때 판정
+# 코드가 같이 흔들리고, 미등록 사유로 탈락시켜도 아무도 못 잡는다.
+from reject_registry import (  # noqa: E402
+    GATE_DUPLICATE,
+    GATE_IDENTITY,
+    REJECT_DUPLICATE_CONTENT,
+    REJECT_LABELS,
+    REJECT_OPTION,
+    REJECT_OPTION_UNSTATED,
+    REJECT_PRODUCT,
+    REJECT_SAME_AUTHOR,
+    assert_rejectable,
+)
 from trust import rank_key  # noqa: E402
 
-GATE_IDENTITY = "identity"
-GATE_DUPLICATE = "duplicate"
-
-# `rejected[]` 사유 코드 — 제품·옵션은 이 모듈이, 세대·시점은 policy.py 가 소유한다.
-REJECT_PRODUCT = "product_mismatch"
-REJECT_OPTION = "option_mismatch"
-REJECT_OPTION_UNSTATED = "option_unstated"
-
-# 게이트2 중복 (PER-183). 두 축은 서로 대체하지 않으므로 사유도 나눠 센다 — 본문 해시가
-# 잡는 건 초과 표의 12.1% 뿐이고(PER-170 §2), 무엇이 어느 축에서 걸렸는지 모르면
-# 의미 유사 클러스터링(PER-184)의 증분을 나중에 귀속시킬 수 없다.
-REJECT_DUPLICATE_CONTENT = "duplicate_content"
-REJECT_SAME_AUTHOR = "same_author"
-
-# 사람이 읽는 표기. PER-182 완료 조건의 '옵션불일치' · '리뉴얼이전' 이 여기 있다.
-REJECT_LABELS = {
-    REJECT_PRODUCT: "제품불일치",
-    REJECT_OPTION: "옵션불일치",
-    REJECT_OPTION_UNSTATED: "옵션미기재",
-    REJECT_RENEWAL: "리뉴얼이전",
-    REJECT_RECENCY: "기간초과",
-    REJECT_DUPLICATE_CONTENT: "중복",
-    REJECT_SAME_AUTHOR: "동일작성자",
-}
+# 게이트2 중복 (PER-183)의 두 축은 서로 대체하지 않으므로 사유도 나눠 센다 — 본문
+# 해시가 잡는 건 초과 표의 12.1% 뿐이고(PER-170 §2), 무엇이 어느 축에서 걸렸는지
+# 모르면 의미 유사 클러스터링(PER-184)의 증분을 나중에 귀속시킬 수 없다.
 
 
 class GateError(ValueError):
@@ -116,18 +109,30 @@ class IdentityScope:
 
 @dataclass(frozen=True)
 class RejectedRow:
-    """`rejected[]` 한 줄 (PER-188). 사유 없이 탈락시키지 않는다."""
+    """`rejected[]` 한 줄 (PER-188). 사유 없이, 또 **미등록 사유로도** 탈락시키지 않는다.
+
+    생성 시점에 레지스트리에 묻는다 — `rejected[]` 가 쌓이고 난 뒤에 검사하면 어느
+    호출부가 만든 행인지 되짚을 수 없다. 사유가 게이트와 1:1 이 아니면 그 행은
+    집계에서 어느 검문소에도 귀속되지 않는다.
+    """
     review_id: int
     gate: str
     reason: str
     detail: str | None = None
+
+    def __post_init__(self) -> None:
+        assert_rejectable(self.gate, self.reason)
+
+    @property
+    def label(self) -> str:
+        return REJECT_LABELS[self.reason]
 
     def as_dict(self) -> dict:
         return {
             "reviewId": self.review_id,
             "gate": self.gate,
             "reason": self.reason,
-            "label": REJECT_LABELS.get(self.reason, self.reason),
+            "label": self.label,
             "detail": self.detail,
         }
 

@@ -52,7 +52,24 @@
 from __future__ import annotations
 
 import re
+import sys
 from dataclasses import dataclass
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).parent))
+
+# 사유·한계 코드는 이 모듈이 소유하지 않는다 — 레지스트리가 소유하고 여기서는 가져다
+# 쓴다 (PER-188). 판정은 여기, 어휘는 거기다. 한 벌로 두지 않으면 미등록 사유로
+# 탈락시켜도 아무도 못 잡는다.
+from reject_registry import (  # noqa: E402
+    LIMIT_RENEWAL_UNOBSERVED,
+    LIMIT_SINGLE_DISSENT,
+    REJECT_INSUFFICIENT,
+    REJECT_MINORITY_SHARE,
+    REJECT_RECENCY,
+    REJECT_RENEWAL,
+    REJECT_SEGMENT_TOO_SMALL,
+)
 
 # --- 리센시 컷 ---
 
@@ -88,18 +105,20 @@ SUFFICIENCY_S_MIN = 8
 # (PER-178 규격 §9 가 기각한 대안). 근거는 docs/DECISION_PER186_SUFFICIENCY.md §4.
 SUFFICIENCY_MINORITY_MIN = 2
 
-# `rejected[]` 사유 코드 / 주장에 남기는 한계 코드
-REJECT_RECENCY = "recency_cut"
-REJECT_RENEWAL = "renewal_cut"
-LIMIT_RENEWAL_UNOBSERVED = "renewal_unobserved"
-
-# 충분성 탈락 사유 (PER-186). 셋 다 PRD 가 말하는 "과소근거" 부류지만 코드는 나눈다 —
-# 무엇이 결속했는지 모르면 임계값을 바꿨을 때 달라진 몫을 귀속시킬 수 없다 (게이트1의
+# `rejected[]` 사유 코드와 한계 코드는 `pipeline/reject_registry.py` 가 소유한다
+# (PER-188). 위에서 임포트해 온 이름들이고, 이 모듈은 **어느 조건에서 그 사유가
+# 붙는가**만 정한다.
+#
+#   REJECT_RECENCY / REJECT_RENEWAL          게이트1 — 시점 · 세대
+#   LIMIT_RENEWAL_UNOBSERVED                 통과하되 세대 미확정이라는 꼬리표
+#   REJECT_INSUFFICIENT   U < N_min          게이트4 — 절대 하한
+#   REJECT_MINORITY_SHARE U/D < R_min        게이트4 — 언급자 중 몫
+#   REJECT_SEGMENT_TOO_SMALL S < S_min       게이트4 — 셀이 말할 자격
+#   LIMIT_SINGLE_DISSENT                     반대 1명 — 컷이 아니라 한계
+#
+# 셋 다 PRD 가 말하는 "과소근거" 부류지만 코드를 나누는 이유는 귀속이다 — 무엇이
+# 결속했는지 모르면 임계값을 바꿨을 때 달라진 몫을 귀속시킬 수 없다 (게이트1의
 # `옵션불일치`/`옵션미기재` 와 같은 이유).
-REJECT_INSUFFICIENT = "insufficient_support"    # U < N_min
-REJECT_MINORITY_SHARE = "minority_share"        # U/D < R_min
-REJECT_SEGMENT_TOO_SMALL = "segment_too_small"  # S < S_min
-LIMIT_SINGLE_DISSENT = "single_dissent"
 
 
 class PolicyError(Exception):
