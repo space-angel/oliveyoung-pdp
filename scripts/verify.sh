@@ -101,6 +101,8 @@ fi
 # 정답셋·키워드 사전이 바뀌면 임베딩 후보 비교의 기준선이 조용히 낡는다 (PER-184)
 # 모델 수치는 가중치 수 GB 가 필요해 대조하지 않는다 — 모델 없는 부분만 본다
 "$PY" eval/measure_embedding_probe.py --check
+# claim 스키마나 골든셋이 바뀌면 "무엇을 담을 수 있는가" 가 조용히 낡는다 (PER-189)
+"$PY" eval/measure_claim_schema.py --check
 
 echo
 echo "verify.sh OK (--full)"

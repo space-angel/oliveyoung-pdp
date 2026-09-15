@@ -80,7 +80,7 @@ catalog → ingest → tag → gates → claims → judge
 | `ingest` | 25K를 원문/조건/파생 3층으로 적재. LLM 없음 | **구현** | PER-173 |
 | `tag` | 전수 aspect/polarity 태깅 | **구현** — 25,000건 실행 완료 (`zai.glm-4.7`, 태그 38,251개) | PER-175 |
 | `gates` | 동일성 → 중복 → 방향성 → 충분성 4게이트 + `rejected[]` | **구현** | PER-182~188 |
-| `claims` | 주장 생성 + 인용 원문 부분문자열 강제 + 스키마 검증 | 미구현 | PER-189~195 |
+| `claims` | 주장 생성 + 인용 원문 부분문자열 강제 + 스키마 검증 | 스키마·검증기 **구현** / 생성기 미구현 | PER-189~195 |
 | `judge` | 루브릭 judge(생성과 다른 모델) + 전수 평가 | 미구현 | PER-196~201 |
 
 ### 근거 선별 — 게이트 4개가 하는 일
@@ -206,6 +206,7 @@ pipeline/    v5 — 작업 대상
   context_layout.py        5단 배치 (PER-187). 판정을 다시 하지 않는다 — 순서대로 놓고 게이트3·4가 같은 셀인지 대조한다
   reject_registry.py       탈락 사유 어휘의 정본 (PER-188). 게이트3은 사유 0개 — 누락이 아니라 결정이다
   ledger.py                통합 rejected[] 원장 + 골든셋 역추적 (PER-188). 재현율의 유일한 단서
+  claim_contract.py        claim 출력 스키마 + 검증기 (PER-189). evidence 가 비면 객체가 안 만들어진다
   embedding_contract.py    임베딩 버전 계약 (PER-184). 모델·어휘 버전은 묶여서만 움직인다 — 부분 교체는 에러
   embedding_config.json    후보·선정 모델·revision — 코드가 아니라 여기서 고친다
   option_norm.py           옵션 → 색상 키 정규화 (PER-182). LLM 없음
@@ -316,6 +317,7 @@ v5가 넘어야 하는 선: **인용 정확도 100%** (생성 시점에 원문 �
 | [`docs/DECISION_PER187_CONTEXT_LAYOUT.md`](docs/DECISION_PER187_CONTEXT_LAYOUT.md) | 5단 배치 — 문구가 아니라 자료의 순서 · 사용기간·계절 기각 · 상한이 방향을 지우지 않는다 |
 | [`docs/DECISION_PER188_REJECTED_LEDGER.md`](docs/DECISION_PER188_REJECTED_LEDGER.md) | `rejected[]` 원장 — 사유 레지스트리 · 게이트3 방향불일치 기각 · 골든셋 역추적으로 재현율 |
 | [`docs/DECISION_PER184_EMBEDDING_MODEL.md`](docs/DECISION_PER184_EMBEDDING_MODEL.md) | 로컬 한국어 임베딩 — 후보 4종 실측 · KURE-v1 선정 · 모델/어휘 버전 동반 이동 계약 |
+| [`docs/DECISION_PER189_CLAIM_SCHEMA.md`](docs/DECISION_PER189_CLAIM_SCHEMA.md) | claim 스키마 — 근거 없으면 객체 미생성 · 모델/코드 필드 분리 · failureReason 이 노출 필터 |
 | [`docs/DECISION_PER178_GOLDEN_LABELING_SPEC.md`](docs/DECISION_PER178_GOLDEN_LABELING_SPEC.md) | 주장 골든셋 규격 — 라벨 1건의 모양 · 층화 번들 40개 · 블라인드 절차 · v4 15문항 미이관 근거 |
 | [`docs/DECISION_PER178_SILENCE_IS_NOT_EVIDENCE.md`](docs/DECISION_PER178_SILENCE_IS_NOT_EVIDENCE.md) | 침묵은 근거가 아니다 — U+/U−/D/S 보존, 단계별 유지 규칙, 아마존·NN/G·자기선택 편향 사례 |
 | [`eval/gold/README.md`](eval/gold/README.md) | 평가 고정물(표본·정답셋) 규칙과 재현 절차 |
