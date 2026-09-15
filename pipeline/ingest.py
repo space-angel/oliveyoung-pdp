@@ -240,6 +240,71 @@ def trust_prior_profile(records: list[dict]) -> dict:
     }
 
 
+class BaseParityError(ContractError):
+    """측정이 다시 만든 레코드가 입수 산출물과 다르다. 조용한 폴백 금지."""
+
+
+def assert_matches_ingest(
+    records: list[dict], output_path: Path = OUTPUT_PATH, who: str = "이 측정"
+) -> None:
+    """다시 만든 레코드가 **입수 산출물과 같은가.** 다르면 에러다.
+
+    measure 스크립트들은 `data/input` 에서 레코드를 다시 만든다 — 그 경로
+    (`build_record` · `score_all`)가 입수와 같은지 측정이 함께 확인하기 위해서다.
+    그런데 **같다는 것을 아무도 확인하지 않고 있었다.** 2026-09-15 에 실제로 갈렸다:
+    `aspect_counts` 를 안 넘겨 `trustPrior` 의 `onTopic` 이 비었고, 게이트2 의 작성자
+    1표 대표가 파이프라인과 달라져 후보 수가 7,660 대 7,689 로 벌어졌다. 리포트는
+    재현됐다 — `--check` 는 "리포트가 재생성되는가"만 보기 때문이다.
+
+    이 함수가 그 구멍을 막는다. 리포트 재현이 아니라 **기반 자체**를 대조한다.
+    첫 불일치의 경로와 양쪽 값을 그대로 보여준다 — "다르다" 만으로는 못 고친다.
+    """
+    if not output_path.exists():
+        raise BaseParityError(
+            f"{who}의 기반을 입수 산출물과 대조할 수 없다 — {output_path} 가 없다.\n"
+            "  → python3 pipeline/ingest.py 를 먼저 돌려라"
+        )
+    committed = [json.loads(line) for line in output_path.read_text().splitlines() if line.strip()]
+    if len(committed) != len(records):
+        raise BaseParityError(
+            f"{who}의 레코드 수가 입수 산출물과 다르다: {len(records)} vs {len(committed)}"
+        )
+
+    def first_diff(a, b, path: str = "") -> str | None:
+        if isinstance(a, dict) and isinstance(b, dict):
+            for key in sorted(set(a) | set(b)):
+                if key not in a:
+                    return f"{path}.{key}: 입수에만 있다 ({b[key]!r})"
+                if key not in b:
+                    return f"{path}.{key}: 측정에만 있다 ({a[key]!r})"
+                found = first_diff(a[key], b[key], f"{path}.{key}")
+                if found:
+                    return found
+            return None
+        if isinstance(a, list) and isinstance(b, list):
+            if len(a) != len(b):
+                return f"{path}: 길이 {len(a)} vs {len(b)}"
+            for i, (x, y) in enumerate(zip(a, b)):
+                found = first_diff(x, y, f"{path}[{i}]")
+                if found:
+                    return found
+            return None
+        return None if a == b else f"{path}: 측정 {a!r} vs 입수 {b!r}"
+
+    for mine, theirs in zip(records, committed):
+        if mine == theirs:
+            continue
+        where = first_diff(mine, theirs) or "(구조는 같은데 값이 다르다)"
+        raise BaseParityError(
+            f"{who}의 기반이 입수 산출물과 다르다 — reviewId {mine.get('reviewId')}\n"
+            f"  {where}\n"
+            "  → 측정이 파이프라인과 다른 것을 재고 있다. 재현되는 리포트가 맞다는 뜻이\n"
+            "     아니다 (2026-09-15 PER-183·186·188 이 그렇게 갈렸다). 레코드를 다시\n"
+            "     만드는 경로를 ingest 와 맞춰라 — score_all 에 aspect_counts 를\n"
+            "     넘겼는지부터 본다"
+        )
+
+
 def write(records: list[dict], meta: dict, prof: dict) -> None:
     OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
     PROFILE_PATH.parent.mkdir(parents=True, exist_ok=True)
