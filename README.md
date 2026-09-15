@@ -90,7 +90,7 @@ catalog → ingest → tag → gates → claims → judge
    ↓
 [게이트]  동일성 → 중복 → 방향성 → 충분성   → 틀린 근거 제거
    ↓
-[정렬]    무엇→조건→근거→방향→충분성 순서   → 판단 순서 강제
+[정렬]    무엇→조건→근거→방향→충분성 순서   → 판단 순서 강제 (구현)
 ```
 
 | 게이트 | 판정 | 실측된 필요성 |
@@ -103,6 +103,8 @@ catalog → ingest → tag → gates → claims → judge
 **반대 근거는 버리지 않는다.** 방향이 갈리면 `혼재`로 표시하고 양쪽 비율을 함께 낸다 — 리뷰가 갈린다는 사실 자체가 구매자에게 유용하다. 반대가 **1명이어도** 다수 방향으로 뭉개지 않고 `single_dissent` 한계로 남긴다 (골든셋 26건 중 8건이 이 경우다).
 
 **침묵은 근거가 아니다.** 주제를 말하지 않은 작성자는 긍정도 부정도 아니므로 비율의 분모에 넣지 않고 `silentAuthors`로 따로 센다 — "40명 중 3명이 언급"을 "40명 중 3명만 불만"으로 바꾸지 않는다.
+
+**살아남은 근거는 순서대로 놓는다 — 5단 배치 (구현).** 게이트 통과분을 `무엇 → 조건 → 근거 → 방향 → 충분성` 자료 구조로 배치한다. 순서를 정하지 않으면 실제로 정해지는 것은 태거의 출력 순서다. 인용 정렬은 신뢰도(PER-174) 내림차순이고, 입력을 20회 섞어도 payload 가 바이트 동일하다. **상한을 걸어도 방향을 지우지 않는다** — `p019 × 트러블/자극`(긍정 309 · 부정 6)에서 신뢰도 상위 8건은 전부 긍정이라, 그냥 자르면 4단이 "부정 6명"인데 3단에 부정 인용이 한 줄도 없다. 2단의 조건축은 `skinType`·`skinTrouble` 뿐이고 **`usagePeriod`·계절은 데이터에 없어 기각**했다 — 뺀 이유가 주석이 아니라 출력(`EXCLUDED_AXES`)에 남는다.
 
 ### 출력 스키마 — 평가 가능성을 구조에 박는다
 
@@ -197,6 +199,7 @@ pipeline/    v5 — 작업 대상
   gates.py                 게이트1 동일성 (PER-182) · 게이트2 중복 (PER-183). 탈락은 드롭이 아니라 rejected[] 행
   polarity.py              게이트3 방향성 (PER-185). 유일하게 탈락시키지 않는 게이트 — 판정과 플래그만 낸다
   sufficiency.py           게이트4 충분성 (PER-186). 판정 단위가 리뷰가 아니라 주장이라 모듈이 따로다
+  context_layout.py        5단 배치 (PER-187). 판정을 다시 하지 않는다 — 순서대로 놓고 게이트3·4가 같은 셀인지 대조한다
   option_norm.py           옵션 → 색상 키 정규화 (PER-182). LLM 없음
   option_markers.json      판촉 어휘 — 코드가 아니라 여기서 고친다
   build_product_catalog.py 카탈로그 생성기 (--check 로 재현 확인)
@@ -301,6 +304,7 @@ v5가 넘어야 하는 선: **인용 정확도 100%** (생성 시점에 원문 �
 | [`docs/DECISION_PER183_DUPLICATE_GATE.md`](docs/DECISION_PER183_DUPLICATE_GATE.md) | 게이트2 중복 — 두 축이 대체하지 않는다는 실측 · 판정/게이트 순서 · `independentReviews` 정의 |
 | [`docs/DECISION_PER185_POLARITY_GATE.md`](docs/DECISION_PER185_POLARITY_GATE.md) | 게이트3 방향성 — 탈락 없는 게이트 · 별점 교차검증 3층 · 방향 정의의 소유자 · 태거 잡음 주석 · v4 2건 재확인 |
 | [`docs/DECISION_PER186_SUFFICIENCY.md`](docs/DECISION_PER186_SUFFICIENCY.md) | 게이트4 충분성 — 세 조건 AND · 분모는 언급자(D) · 소수 의견 정책 · 임계값 민감도 |
+| [`docs/DECISION_PER187_CONTEXT_LAYOUT.md`](docs/DECISION_PER187_CONTEXT_LAYOUT.md) | 5단 배치 — 문구가 아니라 자료의 순서 · 사용기간·계절 기각 · 상한이 방향을 지우지 않는다 |
 | [`docs/DECISION_PER178_GOLDEN_LABELING_SPEC.md`](docs/DECISION_PER178_GOLDEN_LABELING_SPEC.md) | 주장 골든셋 규격 — 라벨 1건의 모양 · 층화 번들 40개 · 블라인드 절차 · v4 15문항 미이관 근거 |
 | [`docs/DECISION_PER178_SILENCE_IS_NOT_EVIDENCE.md`](docs/DECISION_PER178_SILENCE_IS_NOT_EVIDENCE.md) | 침묵은 근거가 아니다 — U+/U−/D/S 보존, 단계별 유지 규칙, 아마존·NN/G·자기선택 편향 사례 |
 | [`eval/gold/README.md`](eval/gold/README.md) | 평가 고정물(표본·정답셋) 규칙과 재현 절차 |
