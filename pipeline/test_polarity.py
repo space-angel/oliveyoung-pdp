@@ -229,8 +229,10 @@ class DirectionDefinitionIsShared(unittest.TestCase):
 
     같은 규칙이 세 곳에 있다: 골든셋(`golden_contract.derive_direction`, PER-178) ·
     게이트4(`sufficiency.ClaimSupport.direction`, PER-186) · 여기. 갈리면 judge
-    일치율이 게이트 성능이 아니라 **방향 정의의 차이**를 재게 된다. 그래서 세 구현이
-    같은 답을 내는지 테스트로 고정한다.
+    일치율이 게이트 성능이 아니라 **방향 정의의 차이**를 재게 된다.
+
+    그래서 표를 베껴 두지 않고 **다른 두 구현을 실제로 불러** 같은 답인지 본다 —
+    베껴 두면 한쪽만 바뀔 때 조용히 갈린다.
     """
 
     CASES = (
@@ -285,11 +287,34 @@ class DirectionDefinitionIsShared(unittest.TestCase):
                     self.assertEqual(support.verdict, want)
                     self.assertIn(support.direction, CANONICAL_DIRECTIONS)
 
-    def test_minority_definition_matches_gate4(self):
-        """소수 수 정의도 게이트4(`ClaimSupport.minority`)와 같아야 한다."""
-        self.assertEqual(self._support(30, 1, 0).minority_authors, 1)
-        self.assertEqual(self._support(1, 30, 0).minority_authors, 1)
-        self.assertIsNone(self._support(30, 0, 0).minority_authors)
+    def test_matches_gate4_implementation(self):
+        """게이트4(`sufficiency.ClaimSupport`)를 직접 불러 같은 답인지 본다.
+
+        게이트3과 게이트4는 같은 태그를 서로 다른 경로로 집계한다 — 여기는 개수로,
+        저기는 작성자 집합으로. 둘이 갈리면 충분성 컷이 게이트3이 보여준 방향과 다른
+        방향을 근거로 걸리게 된다.
+        """
+        from sufficiency import ClaimSupport, EvidenceCell
+
+        for (pos, neg, neu), _ in self.CASES:
+            recs, tags = [], []
+            for polarity, n in (("positive", pos), ("negative", neg), ("neutral", neu)):
+                base = {"positive": 1000, "negative": 2000, "neutral": 3000}[polarity]
+                r, t = bulk(base, n, polarity)
+                recs += r
+                tags += t
+            cell = EvidenceCell(
+                product_id="p001", condition={},
+                authors=frozenset(r["derived"]["authorKey"] for r in recs))
+            theirs = ClaimSupport.of(tags, recs, ABSORB, cell)
+            mine = aspect_support(recs, tags, ABSORB)
+            with self.subTest(pos=pos, neg=neg, neu=neu):
+                self.assertEqual(mine.direction, theirs.direction)
+                self.assertEqual(mine.minority_authors, theirs.minority)
+                self.assertEqual(mine.mentioned_authors, len(theirs.spoke))
+                self.assertEqual(mine.positive_authors, len(theirs.positive))
+                self.assertEqual(mine.negative_authors, len(theirs.negative))
+                self.assertEqual(mine.neutral_authors, len(theirs.neutral))
 
 
 class SilenceIsNotEvidence(unittest.TestCase):
