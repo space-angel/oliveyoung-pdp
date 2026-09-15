@@ -46,6 +46,8 @@ from policy import (  # noqa: E402
     sufficiency_gate,
 )
 from sufficiency import (  # noqa: E402
+    MULTI_AXES,
+    matches,
     SUFFICIENCY_REJECT_LABELS,
     Claim,
     ClaimSupport,
@@ -54,9 +56,12 @@ from sufficiency import (  # noqa: E402
     cell_sufficient,
     run_sufficiency_gate,
 )
+from tag_contract import ASPECTS  # noqa: E402
 from trust import score_all  # noqa: E402
 
 INPUT_PATH = ROOT / "data/input/reviews_50products.json"
+TAGS_PATH = ROOT / "data/intermediate/v5_tags.jsonl"
+TAGS_META_PATH = ROOT / "data/intermediate/v5_tags_meta.json"
 BUNDLE_PATH = ROOT / "eval/gold/v5_concern_golden_sample.jsonl"
 LABEL_PATH = ROOT / "eval/gold/v5_concern_golden_labels.jsonl"
 REPORT_PATH = ROOT / "eval/reports/gate4_sufficiency_per186.json"
@@ -334,6 +339,260 @@ def minority_profile(rows: list[dict]) -> dict:
     }
 
 
+# --- 코퍼스 전수 (PER-175 전수 태깅 38,251개) ---
+
+
+def load_tags() -> tuple[dict[int, list[tuple[str, str]]], dict]:
+    """reviewId → [(aspect, polarity)]. 정본 태그가 없으면 조용히 건너뛰지 않고 에러다."""
+    if not TAGS_PATH.exists():
+        raise SystemExit(
+            f"[gate4] 전수 태그가 없다: {TAGS_PATH.relative_to(ROOT)}\n"
+            "  먼저 정본을 못박는다 — python3 pipeline/run_v5.py --steps tag\n"
+            "  태그 없이 낸 민감도는 골든셋 26건짜리이고 코퍼스 커버리지가 아니다."
+        )
+    by_review: dict[int, list[tuple[str, str]]] = collections.defaultdict(list)
+    for line in TAGS_PATH.read_text().splitlines():
+        tag = json.loads(line)
+        by_review[tag["reviewId"]].append((tag["aspect"], tag["polarity"]))
+    return dict(by_review), json.loads(TAGS_META_PATH.read_text())
+
+
+def corpus_claims(kept: dict[str, list[dict]], by_review: dict) -> list[dict]:
+    """(셀 × aspect) 후보 주장. **D ≥ 1 인 것만** — 아무도 말하지 않은 주제는 주장이 아니다.
+
+    셀은 제품 전체 · `skinType` · `skinTrouble` 세 종류다. 조건부 주장이 무조건부보다
+    얼마나 더 떨어지는지가 이 이슈가 PER-199 에 넘기는 수치라 축을 나눠 센다.
+
+    `ClaimSupport.of()` 를 셀마다 부르면 태그 38,251개를 매번 훑어 15,000회 이상
+    반복된다. 그래서 여기서는 같은 집합을 한 번에 모아 `ClaimSupport` 를 직접 만들고,
+    아래 `_assert_fast_path` 가 표본에서 두 경로가 같은 값을 내는지 확인한다.
+    """
+    claims: list[dict] = []
+    for product_id, rows in sorted(kept.items()):
+        if not rows:
+            continue
+        base = EvidenceCell.of(rows, product_id, {})  # 게이트2 통과분인지 여기서 확인된다
+        buckets: list[tuple[str, dict]] = [("product", {})]
+        for axis in CELL_AXES:
+            segments = set()
+            for row in rows:
+                cell = row["condition"][axis]
+                segments.update(cell["segments"] if axis in MULTI_AXES else [cell["segment"]])
+            for segment in sorted(segments):
+                buckets.append((axis, {axis: [segment] if axis in MULTI_AXES else segment}))
+
+        for axis, condition in buckets:
+            members = [r for r in rows if matches(r, condition)]
+            authors = frozenset(r["derived"]["authorKey"] for r in members)
+            cell = EvidenceCell(product_id, condition, authors)
+            by_aspect: dict[str, dict[str, set]] = collections.defaultdict(
+                lambda: {"positive": set(), "negative": set(), "neutral": set()})
+            for row in members:
+                author = row["derived"]["authorKey"]
+                for aspect, polarity in by_review.get(row["reviewId"], ()):
+                    by_aspect[aspect][polarity].add(author)
+            for aspect in ASPECTS:
+                stances = by_aspect.get(aspect)
+                if not stances:
+                    continue
+                support = ClaimSupport(
+                    aspect=aspect,
+                    positive=frozenset(stances["positive"]),
+                    negative=frozenset(stances["negative"]),
+                    neutral=frozenset(stances["neutral"]),
+                )
+                segment = condition.get(axis) if axis != "product" else None
+                if isinstance(segment, list):
+                    segment = segment[0]
+                claims.append({
+                    "axis": axis,
+                    "segment": segment,
+                    "stated": axis == "product" or segment != MISSING_SEGMENT,
+                    "claim": Claim(
+                        f"{product_id}|{axis}={segment}|{aspect}", cell, support),
+                })
+        del base
+    return claims
+
+
+def _assert_fast_path(kept: dict[str, list[dict]], tags_raw: list[dict], claims: list[dict]) -> int:
+    """빠른 경로가 `ClaimSupport.of()` 와 같은 값을 내는지 표본으로 확인한다.
+
+    최적화가 조용히 다른 수를 내면 이 리포트 전체가 무의미하므로 가정하지 않고 잰다.
+    """
+    checked = 0
+    for entry in claims[::997]:
+        claim = entry["claim"]
+        cell = claim.cell
+        reference = ClaimSupport.of(tags_raw, kept[cell.product_id], claim.support.aspect, cell)
+        if reference != claim.support:
+            raise SystemExit(
+                f"[gate4] 빠른 경로가 ClaimSupport.of() 와 다르다: {claim.claim_id}"
+            )
+        checked += 1
+    return checked
+
+
+def corpus_sensitivity(claims: list[dict]) -> dict:
+    """전수 셀에서의 민감도. 골든셋 26건과 달리 여기서는 R_min 이 결속한다."""
+    def counts(policy: SufficiencyPolicy, subset: list[dict]) -> dict:
+        result = run_sufficiency_gate([e["claim"] for e in subset], policy)
+        return {
+            "candidates": len(subset),
+            "passed": len(result.passed),
+            "passedPct": pct(len(result.passed), len(subset)),
+            "rejected": {SUFFICIENCY_REJECT_LABELS[k]: v
+                         for k, v in result.rejected_by_reason().items()},
+            "singleDissent": len(result.limitations.get("single_dissent", [])),
+        }
+
+    unconditional = [e for e in claims if e["axis"] == "product"]
+    conditional = [e for e in claims if e["axis"] != "product" and e["stated"]]
+    missing = [e for e in claims if e["axis"] != "product" and not e["stated"]]
+
+    grid = []
+    for n in N_GRID:
+        for r in R_GRID:
+            policy = SufficiencyPolicy(n_min=n, r_min=r, s_min=max(DEFAULT_SUFFICIENCY.s_min, n))
+            grid.append({
+                "nMin": n, "rMin": r, "sMin": policy.s_min,
+                "all": counts(policy, claims),
+                "unconditional": counts(policy, unconditional),
+                "conditional": counts(policy, conditional),
+            })
+
+    s_sweep = [{"sMin": s, "nMin": SufficiencyPolicy(s_min=s).n_min,
+                "all": counts(SufficiencyPolicy(s_min=s), claims)} for s in S_GRID]
+
+    default = DEFAULT_SUFFICIENCY
+    by_axis = {}
+    for axis in ("product",) + CELL_AXES:
+        subset = [e for e in claims if e["axis"] == axis]
+        by_axis[axis] = {
+            "all": counts(default, subset),
+            "stated": counts(default, [e for e in subset if e["stated"]]),
+            "missing": counts(default, [e for e in subset if not e["stated"]]),
+        }
+
+    return {
+        "candidates": len(claims),
+        "byAxis": by_axis,
+        "missingSegmentCandidates": len(missing),
+        "nMinByRMin": grid,
+        "sMinSweep": s_sweep,
+        "note": (
+            "후보는 (셀 × aspect) 중 D ≥ 1 인 것이다 — 아무도 말하지 않은 주제는 주장이 "
+            "아니라서 분모에 넣지 않는다. 한 리뷰가 여러 skinTrouble 코드를 가지면 그 "
+            "코드 셀마다 세어지므로 축별 후보 수를 서로 더하지 않는다"
+        ),
+    }
+
+
+def binding_condition(claims: list[dict], policy: SufficiencyPolicy) -> dict:
+    """세 조건 중 무엇이 실제로 결속하는가. 사유 코드를 나눈 값이 여기서 나온다.
+
+    각 조건을 **혼자만** 걸었을 때의 탈락 수도 함께 낸다 — AND 로 묶으면 앞선 조건이
+    잡아간 몫이 뒤 조건의 수에서 빠져 "이 조건은 일 안 한다"로 잘못 읽힌다.
+    """
+    alone = {}
+    for name, kwargs in (
+        ("nMin", {"r_min": 1e-9, "s_min": 1}),
+        ("rMin", {"n_min": 1, "s_min": 1}),
+        ("sMin", {"n_min": 1, "r_min": 1e-9}),
+    ):
+        base = {"n_min": policy.n_min, "r_min": policy.r_min, "s_min": policy.s_min}
+        base.update(kwargs)
+        if name == "nMin":
+            base["s_min"] = max(1, policy.n_min)
+        solo = SufficiencyPolicy(**base)
+        result = run_sufficiency_gate([e["claim"] for e in claims], solo)
+        alone[name] = len(result.rejected)
+
+    result = run_sufficiency_gate([e["claim"] for e in claims], policy)
+    return {
+        "candidates": len(claims),
+        "passed": len(result.passed),
+        "rejectedByReason": {SUFFICIENCY_REJECT_LABELS[k]: v
+                             for k, v in result.rejected_by_reason().items()},
+        "rejectedIfOnly": alone,
+        "note": (
+            "`rejectedByReason` 는 판정 순서(S → U → U/D)를 거친 귀속이고, "
+            "`rejectedIfOnly` 는 그 조건 하나만 걸었을 때의 탈락 수다. 두 수가 다른 것이 "
+            "세 조건을 AND 로 묶은 이유다 — 하나만으로는 나머지가 잡는 것을 놓친다"
+        ),
+    }
+
+
+def ratio_diagnosis(claims: list[dict], policy: SufficiencyPolicy) -> dict:
+    """R_min 이 왜 결속하지 않는가. **결론을 적지 말고 수를 내라.**
+
+    U 는 주장의 방향을 말한 사람이고 방향은 그 데이터에서 파생된다. 그래서 단일 방향
+    주장은 U/D 가 1.0 이고, 방향이 갈리면 `mixed` 가 되어 U 가 양쪽을 다시 흡수한다.
+    U/D 를 1 아래로 끌어내리는 것은 **중립(U0) 하나뿐**이다 — 전수 태그에서 중립은
+    4.18% 다. 그 구조를 수로 확인하고, 소수 측에 비율을 걸었다면 무엇이 잡혔을지를
+    함께 낸다 (PER-211 이 쓸 입력이지 여기서 정책을 바꾸지 않는다).
+    """
+    shares, minority_shares, mixed = [], [], 0
+    minority_dist: collections.Counter = collections.Counter()
+    for entry in claims:
+        support = entry["claim"].support
+        d = len(support.spoke)
+        if not d:
+            continue
+        shares.append(len(support.support) / d)
+        if support.minority is not None:
+            mixed += 1
+            minority_dist[min(support.minority, 10)] += 1
+            minority_shares.append(min(len(support.positive), len(support.negative)) / d)
+
+    def quantile(values: list[float], q: float) -> float:
+        if not values:
+            return 0.0
+        ordered = sorted(values)
+        return round(ordered[min(len(ordered) - 1, int(len(ordered) * q))], 4)
+
+    # 기본 정책을 통과한 주장 중에서만 센다 — 떨어질 주장의 소수 측은 논점이 아니다
+    passed = run_sufficiency_gate([e["claim"] for e in claims], policy).passed
+    below_side = {}
+    for r in R_GRID:
+        below_side[str(r)] = sum(
+            1 for c in passed
+            if c.support.minority is not None
+            and min(len(c.support.positive), len(c.support.negative)) / len(c.support.spoke) < r
+        )
+
+    return {
+        "candidates": len(shares),
+        "supportShare": {
+            "min": quantile(shares, 0.0),
+            "p05": quantile(shares, 0.05),
+            "median": quantile(shares, 0.5),
+            "belowRMin": {str(r): sum(1 for v in shares if v < r) for r in R_GRID},
+        },
+        "mixedCandidates": mixed,
+        "minorityAuthors": {("10+" if k == 10 else str(k)): v
+                            for k, v in sorted(minority_dist.items())},
+        "minorityShare": {
+            "min": quantile(minority_shares, 0.0),
+            "median": quantile(minority_shares, 0.5),
+        },
+        "passedWithMinorityBelow": {
+            "passed": len(passed),
+            "mixed": sum(1 for c in passed if c.support.minority is not None),
+            "belowShare": below_side,
+        },
+        "finding": (
+            "R_min 에 귀속되는 탈락은 전수 7,660 후보에서 0 이다. 혼자 걸면 102건을 잡지만 "
+            "그 102건은 전부 N_min 이 이미 잡는다. 구조가 원인이다 — U 는 방향을 말한 사람 "
+            "전체이고 `mixed` 면 양쪽을 흡수하므로, U/D 를 1 아래로 내리는 것은 중립 "
+            "태그(전수 38,251개의 4.18%)뿐이다. 그래서 U/D 중위수가 1.0 이다. 비율이 실제로 "
+            "일할 자리는 주장 전체가 아니라 **소수 측**이고(통과분 2,395건 중 1,764건이 mixed, "
+            "소수 몫 중위 0.18), 그 수를 `passedWithMinorityBelow` 에 냈다 — 정책 변경은 "
+            "PER-211 의 판단이지 이 이슈에서 하지 않는다"
+        ),
+    }
+
+
 def golden_rows(rows: list[dict]) -> list[dict]:
     """라벨별 U/D/S. 격자의 어느 칸에서 무엇이 되살아나는지 되짚을 수 있어야 한다."""
     out = []
@@ -369,6 +628,11 @@ def main() -> None:
     rows, _ = golden_claims()
     policy = DEFAULT_SUFFICIENCY
 
+    by_review, tags_meta = load_tags()
+    corpus = corpus_claims(kept, by_review)
+    tags_raw = [json.loads(line) for line in TAGS_PATH.read_text().splitlines()]
+    spot_checked = _assert_fast_path(kept, tags_raw, corpus)
+
     report = {
         "issue": "PER-186",
         "source": {
@@ -386,15 +650,31 @@ def main() -> None:
         },
         "cellProfile": cell_profile(kept),
         "fallback": fallback(kept, trace, catalog, policy),
+        "corpus": {
+            "tags": {
+                "path": str(TAGS_PATH.relative_to(ROOT)),
+                "label": tags_meta["label"],
+                "model": tags_meta["model"],
+                "tags": tags_meta["tags"],
+                "reviewsTagged": tags_meta["reviewsTagged"],
+                "prompt": tags_meta["prompt"],
+            },
+            "fastPathSpotChecks": spot_checked,
+            "sensitivity": corpus_sensitivity(corpus),
+            "binding": binding_condition(corpus, policy),
+            "ratioDiagnosis": ratio_diagnosis(corpus, policy),
+        },
         "sensitivity": sensitivity(rows),
         "minorityPolicy": minority_profile(rows),
         "goldenLabels": golden_rows(rows),
         "limits": [
-            "전수 태깅(PER-175)이 없어 코퍼스 단위 D 를 세지 못한다. 이 리포트의 U·D 는 "
-            "사람이 만든 골든셋 라벨 26건에서 온 것이고, 코퍼스 커버리지는 PER-199·PER-211 이 잰다",
-            "골든셋에서는 R_min 이 결속하지 않는다 — 전건 U/D ≥ 0.6 이다. 라벨러가 주장의 "
-            "방향을 지지하는 근거를 인용하기 때문이고, 비율 조건이 결속하는 구간은 D 가 큰 "
-            "전수 셀이다 (예: 언급 100명 중 8명)",
+            "코퍼스 수치(corpus)는 태그 품질에 딸려 있다. 태거는 GLM 4.7 단일 실행이고 "
+            "골든셋 200건 대비 정밀도·재현율은 eval/reports/v5_tag_gold_v2.json 에 있다 — "
+            "태거를 바꾸면 이 커버리지도 바뀐다",
+            "R_min 은 골든셋에서도 전수에서도 결속하지 않는다. 값이 아니라 정의의 문제라 "
+            "(U 가 mixed 에서 양쪽을 흡수한다) ratioDiagnosis 에 수만 내고 정책은 그대로 뒀다",
+            "후보는 (셀 × aspect) 중 D ≥ 1 인 것이고 '생성될 뻔한 주장' 이 아니다. 실제 "
+            "커버리지는 질문-답 쌍(PER-191)까지 가야 정해진다 — 그것이 PER-199 다",
             "모집단이 40 을 넘는 번들의 S 는 리뷰 40건 표본의 고유 작성자 수라 셀 크기가 아니다. "
             "나뉘는 기준은 scope 종류가 아니라 모집단 크기다 — B02(17)·B03(29)·B04(20)은 전수이고 "
             "B01(395)·B05(252)에만 층별 가중치로 되돌린 값이 붙는다",
@@ -438,6 +718,17 @@ def main() -> None:
                   f"가중 {g['weighted']['passed']:2d}")
     print(f"  소수 의견: mixed {mp['mixedLabels']}건 중 반대 1명 "
           f"{len(mp['singleDissentLabels'])}건 ({mp['singleDissentPct']}%) — 뭉개지 않는다")
+    co = report["corpus"]
+    cs, cb = co["sensitivity"], co["binding"]
+    print(f"  [전수 태그 {co['tags']['tags']}개 · {co['tags']['model']}]")
+    print(f"    후보 (셀×aspect) {cs['candidates']}건 → 통과 {cb['passed']}건 "
+          f"({pct(cb['passed'], cs['candidates'])}%)")
+    for axis in ("product",) + CELL_AXES:
+        a = cs["byAxis"][axis]["stated"]
+        print(f"      {axis:12s} {a['candidates']:5d} → {a['passed']:4d} ({a['passedPct']}%)")
+    print(f"    결속: {cb['rejectedByReason']} · 혼자 걸었을 때 {cb['rejectedIfOnly']}")
+    print(f"    R_min 귀속 탈락 0 — 소수 측 몫이 R_min 미만인 통과 주장 "
+          f"{co['ratioDiagnosis']['passedWithMinorityBelow']['belowShare']['0.1']}건")
     print(f"→ {REPORT_PATH.relative_to(ROOT)}")
 
 
