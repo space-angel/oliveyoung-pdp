@@ -9,7 +9,8 @@
   3. `혼재` 판정 시 `support.negativeRatio` 가 함께 산출된다
   4. 반대 근거를 버리지 않는다 — 이 게이트에는 `rejected[]` 가 없다
   5. 침묵은 근거가 아니다 — `silentAuthors` 는 `negativeRatio` 의 분모 밖이다 (PER-178)
-  6. 소수 방향이 태거 잡음과 구별될 때만 `혼재` 다
+  6. 방향 정의는 골든셋(PER-178)의 것이다 — **반대 1명도 `혼재`** 이고,
+     소수를 다수로 뭉개지 않는다. 태거 잡음 여부는 판정이 아니라 주석이다
   7. 입력이 계약을 위반하면 조용히 넘기지 않고 에러다
 
   python3 -m unittest discover -s pipeline -p 'test_*.py'
@@ -22,9 +23,15 @@ sys.path.insert(0, str(Path(__file__).parent))
 
 from gates import GateError  # noqa: E402
 from polarity import (  # noqa: E402
+    CANONICAL_DIRECTIONS,
     CONFLICT_ALL_ASPECTS,
     CONFLICT_MINORITY_ASPECT,
     CONFLICT_SOLE_ASPECT,
+    DIRECTION_MIXED,
+    DIRECTION_NEGATIVE,
+    DIRECTION_NEUTRAL,
+    DIRECTION_POSITIVE,
+    LIMIT_MINORITY_WITHIN_NOISE,
     LIMIT_ORDER_CHOSEN_DIRECTION,
     LIMIT_TAGGER_DIRECTION_ERROR,
     TAGGER_FLIP_RATE,
@@ -111,33 +118,47 @@ class MixedVerdict(unittest.TestCase):
         pos_r, pos_t = bulk(100, 12, "positive")
         neg_r, neg_t = bulk(200, 8, "negative", rating=1)
         support = aspect_support(pos_r + neg_r, pos_t + neg_t, ABSORB)
-        self.assertEqual(support.verdict, VERDICT_MIXED)
+        self.assertEqual(support.direction, DIRECTION_MIXED)
+        self.assertTrue(support.minority_beyond_noise)
         self.assertEqual(support.directional_authors, 20)
         self.assertEqual(support.negative_ratio, 0.4)
         self.assertEqual(support.as_dict()["support"]["negativeRatio"], 0.4)
         self.assertEqual(support.as_dict()["label"], "혼재")
 
-    def test_negative_ratio_is_emitted_even_when_not_mixed(self):
+    def test_negative_ratio_is_emitted_when_one_sided_too(self):
         """판정일 때만 내면 호출부가 판정을 보고 비율을 감출 수 있다."""
         pos_r, pos_t = bulk(100, 40, "positive")
-        neg_r, neg_t = bulk(200, 1, "negative", rating=1)
-        support = aspect_support(pos_r + neg_r, pos_t + neg_t, ABSORB)
-        self.assertEqual(support.verdict, VERDICT_POSITIVE)
-        self.assertIsNotNone(support.negative_ratio)
-        self.assertAlmostEqual(support.negative_ratio, 1 / 41, places=4)
+        support = aspect_support(pos_r, pos_t, ABSORB)
+        self.assertEqual(support.direction, DIRECTION_POSITIVE)
+        self.assertEqual(support.negative_ratio, 0.0)
 
-    def test_lone_minority_is_not_mixed(self):
-        """소수 1건은 태거가 뒤집은 것으로 설명된다 — 갈렸다고 말하지 않는다."""
+    def test_lone_dissent_is_still_mixed(self):
+        """PER-178 §9 가 "반대 1명이면 다수 방향으로" 를 기각했다.
+
+        소수를 다수로 뭉개면 게이트 정책이 옳았는지 나중에 평가할 수 없다.
+        """
         pos_r, pos_t = bulk(100, 30, "positive")
         neg_r, neg_t = bulk(200, 1, "negative", rating=1)
-        self.assertEqual(
-            aspect_support(pos_r + neg_r, pos_t + neg_t, ABSORB).verdict, VERDICT_POSITIVE)
+        support = aspect_support(pos_r + neg_r, pos_t + neg_t, ABSORB)
+        self.assertEqual(support.direction, DIRECTION_MIXED)
+        self.assertEqual(support.minority_authors, 1)
+        self.assertEqual(support.negative_authors, 1)
 
-    def test_threshold_scales_with_sample_size(self):
-        """같은 비율이라도 표본이 크면 갈림이고 작으면 잡음이다.
+    def test_lone_dissent_is_annotated_not_erased(self):
+        """잡음으로 설명되면 한계가 붙을 뿐, 판정도 카운트도 바뀌지 않는다."""
+        pos_r, pos_t = bulk(100, 30, "positive")
+        neg_r, neg_t = bulk(200, 1, "negative", rating=1)
+        support = aspect_support(pos_r + neg_r, pos_t + neg_t, ABSORB)
+        self.assertFalse(support.minority_beyond_noise)
+        self.assertIn(LIMIT_MINORITY_WITHIN_NOISE, support.limitations)
+        self.assertEqual(support.direction, DIRECTION_MIXED)
+        self.assertAlmostEqual(support.negative_ratio, 1 / 31, places=4)
 
-        고정 비율 문턱을 쓰지 않는 이유가 이것이다 — 10% 소수는 n=20 에서 2건이라
-        태거 잡음으로 설명되지만 n=200 에서 20건이면 설명되지 않는다.
+    def test_noise_annotation_scales_with_sample_size(self):
+        """같은 비율이라도 표본이 크면 갈림이 확실하고 작으면 잡음일 수 있다.
+
+        **판정은 둘 다 `mixed` 다.** 달라지는 건 주석뿐이다 — 10% 소수는 n=20 에서
+        2건이라 태거 잡음으로 설명되지만 n=200 에서 20건이면 설명되지 않는다.
         """
         small_r, small_t = bulk(100, 18, "positive")
         small_n, small_nt = bulk(200, 2, "negative", rating=1)
@@ -148,14 +169,17 @@ class MixedVerdict(unittest.TestCase):
         big = aspect_support(big_r + big_n, big_t + big_nt, ABSORB)
 
         self.assertEqual(small.negative_ratio, big.negative_ratio)
-        self.assertEqual(small.verdict, VERDICT_POSITIVE)
-        self.assertEqual(big.verdict, VERDICT_MIXED)
+        self.assertEqual(small.direction, DIRECTION_MIXED)
+        self.assertEqual(big.direction, DIRECTION_MIXED)
+        self.assertFalse(small.minority_beyond_noise)
+        self.assertTrue(big.minority_beyond_noise)
 
-    def test_majority_negative_reads_negative(self):
-        pos_r, pos_t = bulk(100, 1, "positive")
+    def test_negative_only_reads_negative(self):
         neg_r, neg_t = bulk(200, 30, "negative", rating=1)
-        self.assertEqual(
-            aspect_support(pos_r + neg_r, pos_t + neg_t, ABSORB).verdict, VERDICT_NEGATIVE)
+        support = aspect_support(neg_r, neg_t, ABSORB)
+        self.assertEqual(support.direction, DIRECTION_NEGATIVE)
+        self.assertEqual(support.negative_ratio, 1.0)
+        self.assertIsNone(support.minority_authors)
 
     def test_binom_sf_edges(self):
         self.assertEqual(binom_sf(0, 10, 0.033), 1.0)
@@ -185,7 +209,8 @@ class MixedVerdict(unittest.TestCase):
         pos_r, pos_t = bulk(10_000, 900, "positive")
         neg_r, neg_t = bulk(90_000, 700, "negative", rating=1)
         support = aspect_support(pos_r + neg_r, pos_t + neg_t, ABSORB)
-        self.assertEqual(support.verdict, VERDICT_MIXED)
+        self.assertEqual(support.direction, DIRECTION_MIXED)
+        self.assertTrue(support.minority_beyond_noise)
 
     def test_flip_rate_outside_open_unit_interval_is_an_error(self):
         with self.assertRaises(PolarityError):
@@ -197,6 +222,74 @@ class MixedVerdict(unittest.TestCase):
         """점추정(1.29%)이 아니라 95% 상한을 쓴다 — 혼재를 덜 붙이는 쪽이다."""
         self.assertGreater(TAGGER_FLIP_RATE, 0.0129)
         self.assertLess(TAGGER_FLIP_RATE, 0.065)
+
+
+class DirectionDefinitionIsShared(unittest.TestCase):
+    """완료 조건 6 — 방향 정의는 이 모듈이 정하지 않는다.
+
+    같은 규칙이 세 곳에 있다: 골든셋(`golden_contract.derive_direction`, PER-178) ·
+    게이트4(`sufficiency.ClaimSupport.direction`, PER-186) · 여기. 갈리면 judge
+    일치율이 게이트 성능이 아니라 **방향 정의의 차이**를 재게 된다. 그래서 세 구현이
+    같은 답을 내는지 테스트로 고정한다.
+    """
+
+    CASES = (
+        # (pos, neg, neu) → 정본 방향
+        ((3, 0, 0), DIRECTION_POSITIVE),
+        ((0, 3, 0), DIRECTION_NEGATIVE),
+        ((3, 1, 0), DIRECTION_MIXED),      # 반대 1명도 mixed (PER-178 §9)
+        ((1, 3, 0), DIRECTION_MIXED),
+        ((30, 1, 5), DIRECTION_MIXED),     # 잡음 범위여도 mixed
+        ((0, 0, 3), DIRECTION_NEUTRAL),
+        ((0, 0, 0), DIRECTION_NEUTRAL),
+    )
+
+    def _support(self, pos: int, neg: int, neu: int) -> AspectSupport:
+        recs, tags = [], []
+        for polarity, n in (("positive", pos), ("negative", neg), ("neutral", neu)):
+            base = {"positive": 1000, "negative": 2000, "neutral": 3000}[polarity]
+            r, t = bulk(base, n, polarity)
+            recs += r
+            tags += t
+        return aspect_support(recs, tags, ABSORB)
+
+    def test_matches_canonical_table(self):
+        for (pos, neg, neu), want in self.CASES:
+            with self.subTest(pos=pos, neg=neg, neu=neu):
+                self.assertEqual(self._support(pos, neg, neu).direction, want)
+
+    def test_matches_golden_contract_implementation(self):
+        """골든셋 구현을 직접 불러 같은 답인지 본다 — 표가 낡는 것까지 막는다."""
+        from golden_contract import derive_direction
+
+        for (pos, neg, neu), _ in self.CASES:
+            reviews, evidence = [], []
+            for stance, n in (("positive", pos), ("negative", neg), ("neutral", neu)):
+                for i in range(n):
+                    rid = hash((stance, i)) % 10**6
+                    reviews.append({"reviewId": rid,
+                                    "derived": {"authorKey": f"{stance}{i}"}})
+                    evidence.append({"reviewId": rid, "stance": stance})
+            want = derive_direction(evidence, {"reviews": reviews})
+            with self.subTest(pos=pos, neg=neg, neu=neu):
+                self.assertEqual(self._support(pos, neg, neu).direction, want)
+
+    def test_verdict_only_refines_the_neutral_case(self):
+        """표기는 정본 `neutral` 만 둘로 나눈다 — 나머지는 같은 문자열이어야 한다."""
+        for (pos, neg, neu), want in self.CASES:
+            support = self._support(pos, neg, neu)
+            with self.subTest(pos=pos, neg=neg, neu=neu):
+                if want == DIRECTION_NEUTRAL:
+                    self.assertIn(support.verdict, (VERDICT_NEUTRAL_ONLY, VERDICT_SILENT))
+                else:
+                    self.assertEqual(support.verdict, want)
+                    self.assertIn(support.direction, CANONICAL_DIRECTIONS)
+
+    def test_minority_definition_matches_gate4(self):
+        """소수 수 정의도 게이트4(`ClaimSupport.minority`)와 같아야 한다."""
+        self.assertEqual(self._support(30, 1, 0).minority_authors, 1)
+        self.assertEqual(self._support(1, 30, 0).minority_authors, 1)
+        self.assertIsNone(self._support(30, 0, 0).minority_authors)
 
 
 class SilenceIsNotEvidence(unittest.TestCase):
@@ -244,7 +337,7 @@ class RatingCrossCheck(unittest.TestCase):
         recs = [record(i, rating=1) for i in range(1, 21)]
         tags = [tag(i, ABSORB, "positive") for i in range(1, 21)]
         result = polarity_gate(recs, tags, [ABSORB])
-        self.assertEqual(result.by_aspect()[ABSORB].verdict, VERDICT_POSITIVE)
+        self.assertEqual(result.by_aspect()[ABSORB].direction, DIRECTION_POSITIVE)
         self.assertEqual(result.by_aspect()[ABSORB].negative_authors, 0)
         self.assertEqual(len(result.conflicts), 20)
 
@@ -380,11 +473,13 @@ class Vocabulary(unittest.TestCase):
             self.assertNotEqual(code, label)
 
     def test_support_dict_shape(self):
-        d = AspectSupport(ABSORB, 3, 1, 2, 5, VERDICT_POSITIVE, 0.4).as_dict()
+        d = AspectSupport(ABSORB, 3, 1, 2, 5, 0.4).as_dict()
         self.assertEqual(set(d["support"]), {
             "positiveAuthors", "negativeAuthors", "neutralAuthors",
-            "silentAuthors", "directionalAuthors", "negativeRatio",
+            "silentAuthors", "spokeAuthors", "directionalAuthors",
+            "negativeRatio", "minorityAuthors",
         })
+        self.assertEqual(d["direction"], DIRECTION_MIXED)
 
 
 if __name__ == "__main__":

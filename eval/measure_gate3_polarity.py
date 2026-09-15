@@ -41,10 +41,12 @@ from gates import IdentityScope, run_duplicate_gate, run_identity_gate  # noqa: 
 from polarity import (  # noqa: E402
     CONFLICT_LABELS,
     LIMIT_ORDER_CHOSEN_DIRECTION,
-    MIXED_ALPHA,
+    LIMIT_MINORITY_WITHIN_NOISE,
+    NOISE_ALPHA,
     TAGGER_FLIP_RATE,
     TAGGER_FLIP_RATE_SOURCE,
     VERDICT_LABELS,
+    DIRECTION_MIXED,
     VERDICT_MIXED,
     aspect_support,
     binom_sf,
@@ -272,6 +274,7 @@ def cell_profile(passed: dict[str, list[dict]], tags_by_product: dict, catalog,
                     "productId": pid,
                     "displayName": catalog.product(pid).display_name,
                     "aspect": aspect,
+                    "direction": support.direction,
                     "verdict": support.verdict,
                     "label": VERDICT_LABELS[support.verdict],
                     "positiveAuthors": support.positive_authors,
@@ -280,10 +283,13 @@ def cell_profile(passed: dict[str, list[dict]], tags_by_product: dict, catalog,
                     "silentAuthors": support.silent_authors,
                     "directionalAuthors": support.directional_authors,
                     "negativeRatio": support.negative_ratio,
+                    "minorityAuthors": support.minority_authors,
+                    "minorityBeyondNoise": support.minority_beyond_noise,
                     "limitations": sorted(support.limitations),
                 })
     sized = [c for c in cells if c["directionalAuthors"] >= SUFFICIENCY_N_MIN]
-    mixed_sized = [c for c in sized if c["verdict"] == VERDICT_MIXED]
+    mixed_sized = [c for c in sized if c["direction"] == DIRECTION_MIXED]
+    beyond = [c for c in mixed_sized if c["minorityBeyondNoise"]]
     ratios = sorted(c["negativeRatio"] for c in sized)
 
     def q(p: float) -> float:
@@ -296,14 +302,21 @@ def cell_profile(passed: dict[str, list[dict]], tags_by_product: dict, catalog,
                      for v, n in sorted(verdicts.items())},
         "withDirectionalEvidence": len(cells),
         f"withDirectionalAtLeast{SUFFICIENCY_N_MIN}": len(sized),
+        # 정본 정의 — 반대가 1명이어도 mixed 다 (PER-178 §9)
         "mixedCells": len(mixed_sized),
         "mixedPctOfSized": pct(len(mixed_sized), len(sized)),
+        # 그 중 소수가 태거 잡음으로 설명되지 않는 것. **판정이 아니라 주석이다**
+        "mixedBeyondNoiseCells": len(beyond),
+        "mixedBeyondNoisePctOfSized": pct(len(beyond), len(sized)),
+        "mixedWithinNoiseCells": len(mixed_sized) - len(beyond),
         "negativeRatioQuantiles": {
             "min": q(0.0), "p25": q(0.25), "median": q(0.5),
             "p75": q(0.75), "p90": q(0.9), "max": round(ratios[-1], 4) if ratios else 0.0,
         },
         "cellsWithOrderChosenLimitation": sum(
             1 for c in sized if LIMIT_ORDER_CHOSEN_DIRECTION in c["limitations"]),
+        "cellsWithMinorityWithinNoise": sum(
+            1 for c in sized if LIMIT_MINORITY_WITHIN_NOISE in c["limitations"]),
         "note": (
             f"N>={SUFFICIENCY_N_MIN} 은 충분성 게이트(PER-186)의 절대하한이다. "
             "게이트3 은 컷하지 않고 같은 잣대로 읽기 위해 쓴다"
@@ -311,29 +324,35 @@ def cell_profile(passed: dict[str, list[dict]], tags_by_product: dict, catalog,
     }, cells
 
 
-def mixed_sensitivity(cells: list) -> dict:
-    """혼재 판정이 모수에 얼마나 민감한가. 문턱이 자의적이지 않다는 걸 보이려는 것이다."""
+def noise_sensitivity(cells: list) -> dict:
+    """잡음 주석이 모수에 얼마나 민감한가.
+
+    **혼재 판정의 민감도가 아니다** — 혼재는 반대 1명이어도 혼재이므로 모수와 무관하다.
+    여기서 흔들리는 건 "이 갈림을 태거 잡음으로 설명할 수 있는가" 라는 주석뿐이다.
+    """
     sized = [c for c in cells if c["directionalAuthors"] >= SUFFICIENCY_N_MIN]
+    split = [c for c in sized if c["direction"] == DIRECTION_MIXED]
     rows = {}
     for p in (0.013, TAGGER_FLIP_RATE, 0.05, 0.065, 0.08):
-        n = sum(1 for c in sized
+        n = sum(1 for c in split
                 if binom_sf(min(c["positiveAuthors"], c["negativeAuthors"]),
-                            c["directionalAuthors"], p) < MIXED_ALPHA)
-        rows[f"{p:.3f}"] = {"mixedCells": n, "pct": pct(n, len(sized))}
+                            c["directionalAuthors"], p) < NOISE_ALPHA)
+        rows[f"{p:.3f}"] = {"beyondNoiseCells": n, "pctOfSplit": pct(n, len(split))}
     floors = {}
     for n in (8, 10, 20, 50, 100, 200, 400):
         for k in range(n + 1):
-            if binom_sf(k, n, TAGGER_FLIP_RATE) < MIXED_ALPHA:
+            if binom_sf(k, n, TAGGER_FLIP_RATE) < NOISE_ALPHA:
                 floors[str(n)] = {"minMinority": k, "minMinorityPct": round(100 * k / n, 1)}
                 break
     return {
         "sizedCells": len(sized),
+        "splitCells": len(split),
         "byFlipRate": rows,
         "minorityFloorBySampleSize": floors,
         "note": (
-            "문턱은 고정 비율이 아니라 표본 크기에 따라 움직인다. 점추정(1.3%)을 쓰면 "
-            "혼재가 늘고 3종 불일치율(6.5%)을 쓰면 준다 — 상한 3.3% 는 그 사이의 "
-            "보수적 선택이다"
+            "주석의 문턱은 고정 비율이 아니라 표본 크기를 따라 움직인다. 점추정(1.3%)을 "
+            "쓰면 잡음 밖이 늘고 3종 불일치율(6.5%)을 쓰면 준다 — 상한 3.3% 는 그 사이의 "
+            "보수적 선택이다. 어느 값을 써도 **혼재 판정 자체는 바뀌지 않는다**"
         ),
     }
 
@@ -399,19 +418,35 @@ def v4_recheck(passed: dict[str, list[dict]], tags_by_product: dict, catalog,
             continue
         rows = []
         for aspect in case["aspects"]:
-            s = aspect_support(passed[pid], tags_by_product.get(pid, []), aspect,
-                               order_chosen=order_chosen)
+            sup = aspect_support(passed[pid], tags_by_product.get(pid, []), aspect,
+                                 order_chosen=order_chosen)
+            ratio = sup.negative_ratio
+            # 전제된 방향의 몫. 이 수가 작으면 질문이 근거를 앞질러 간 것이다
+            share = (ratio if case["presupposes"] == "negative"
+                     else (1 - ratio) if ratio is not None else None)
             rows.append({
                 "aspect": aspect,
-                "verdict": s.verdict,
-                "label": VERDICT_LABELS[s.verdict],
-                "positiveAuthors": s.positive_authors,
-                "negativeAuthors": s.negative_authors,
-                "silentAuthors": s.silent_authors,
-                "negativeRatio": s.negative_ratio,
-                # 질문이 암시한 방향이 다수 방향인가. 아니면 그 질문은 근거와 어긋난다
-                "supportsPresupposedDirection": s.verdict == case["presupposes"],
+                "direction": sup.direction,
+                "label": VERDICT_LABELS[sup.verdict],
+                "positiveAuthors": sup.positive_authors,
+                "negativeAuthors": sup.negative_authors,
+                "silentAuthors": sup.silent_authors,
+                "negativeRatio": ratio,
+                "minorityBeyondNoise": sup.minority_beyond_noise,
+                "presupposedShare": round(share, 4) if share is not None else None,
+                # 전제된 방향이 **유일한** 방향인가 (한쪽만 보여줘도 되는 경우)
+                "presupposedIsSoleDirection": sup.direction == case["presupposes"],
+                # 전제된 방향이 잡음 밖으로 실재하는가. `mixed` 라도 소수가 잡음
+                # 범위면 그 방향을 단정하는 질문은 근거를 앞지른 것이다
+                "presupposedSurvivesNoise": (
+                    sup.direction == case["presupposes"]
+                    or (sup.mixed and share is not None
+                        and (sup.minority_beyond_noise or share >= 0.5))
+                ),
             })
+        # "잡았다" = v4 판정문이 근거로 든 축에서, 전제된 방향이 근거를 앞질렀다는 게
+        # 게이트 산출물에 드러난다. 첫 축이 그 축이다 (V4_POLARITY_FAILURES 주석 참조)
+        cited = rows[0]
         out.append({
             "concernId": case["concernId"],
             "productId": pid,
@@ -419,17 +454,24 @@ def v4_recheck(passed: dict[str, list[dict]], tags_by_product: dict, catalog,
             "question": case["question"],
             "presupposes": case["presupposes"],
             "found": True,
+            "citedAspect": cited["aspect"],
             "aspects": rows,
-            "caught": not any(r["supportsPresupposedDirection"] for r in rows),
+            "caught": not cited["presupposedSurvivesNoise"],
         })
     return {
         "cases": out,
         "caught": sum(1 for c in out if c.get("caught")),
         "total": len(out),
+        "criterion": (
+            "v4 판정문이 근거로 든 축에서 전제된 방향의 몫(presupposedShare)이 태거 "
+            "잡음 밖으로 실재하지 않으면 '잡았다'. 방향 판정만으로는 못 가른다 — "
+            "반대 1명도 mixed 라 거의 모든 셀이 mixed 이기 때문이다"
+        ),
         "note": (
             "게이트3 은 질문을 검사하지 않는다. 방향과 비율을 **주장보다 먼저** 확정해 "
             "근거가 뒷받침하지 않는 방향을 전제한 주장이 나올 수 없게 만든다. "
-            "`혼재` 도 '질문이 옳았다'가 아니라 '양쪽을 함께 보여야 한다'는 판정이다"
+            "`혼재` 도 '질문이 옳았다'가 아니라 '양쪽을 함께 보여야 한다'는 판정이고, "
+            "그래서 negativeRatio 가 주장에 함께 실린다"
         ),
     }
 
@@ -490,7 +532,11 @@ def build() -> tuple[dict, list]:
             "negativeRatioDenominator": "positive + negative (neutral·silent 제외, PER-178)",
             "taggerFlipRate": TAGGER_FLIP_RATE,
             "taggerFlipRateSource": TAGGER_FLIP_RATE_SOURCE,
-            "mixedAlpha": MIXED_ALPHA,
+            "directionRule": (
+                "golden_contract.derive_direction (PER-178) 와 같은 규칙 — 반대 1명도 mixed. "
+                "소수 처리는 게이트4(PER-186)"
+            ),
+            "noiseAlpha": NOISE_ALPHA,
             "sufficiencyNMin": SUFFICIENCY_N_MIN,
         },
         "gateInput": {
@@ -507,7 +553,7 @@ def build() -> tuple[dict, list]:
         "taggerDirectionError": flip,
         "withinReviewSplit": order_meta,
         "cells": cells_summary,
-        "mixedSensitivity": mixed_sensitivity(cells),
+        "noiseSensitivity": noise_sensitivity(cells),
         "ratingCrossCheck": conflicts_summary,
         "v4PolarityFailures": v4_recheck(passed, tags_by_product, catalog, order_chosen),
     }
@@ -551,12 +597,15 @@ def main() -> None:
     REPORT_PATH.write_text(payload)
     CONFLICTS_PATH.write_text(conflict_lines)
 
-    c, m, r = report["cells"], report["mixedSensitivity"], report["ratingCrossCheck"]
+    c, m, r = report["cells"], report["noiseSensitivity"], report["ratingCrossCheck"]
     g = report["gateInput"]
     print(f"[게이트3] 게이트1·2 통과 {g['afterGate1And2']}건 · 태그 {g['tagsAfterGates']}개 "
           f"→ 판정 {c['withDirectionalEvidence']}셀")
-    print(f"  혼재: N>={SUFFICIENCY_N_MIN} 셀 {m['sizedCells']}개 중 {c['mixedCells']}개 "
-          f"({c['mixedPctOfSized']}%) · 부정비율 중위 {c['negativeRatioQuantiles']['median']}")
+    print(f"  혼재(정본·반대1명도): N>={SUFFICIENCY_N_MIN} 셀 {m['sizedCells']}개 중 "
+          f"{c['mixedCells']}개 ({c['mixedPctOfSized']}%) · 부정비율 중위 "
+          f"{c['negativeRatioQuantiles']['median']}")
+    print(f"    그 중 소수가 잡음 밖 {c['mixedBeyondNoiseCells']}개 "
+          f"({c['mixedBeyondNoisePctOfSized']}%) · 잡음 범위 {c['mixedWithinNoiseCells']}개")
     print(f"  태거 방향 뒤집힘 {report['taggerDirectionError']['opposedPct']}% "
           f"(방향쌍 {report['taggerDirectionError']['directionalPairs']}개) — 모수 {TAGGER_FLIP_RATE}")
     print(f"  별점 불일치 {r['conflicts']}건 / 비교가능 {r['comparable']}건 ({r['conflictPct']}%)")
@@ -572,9 +621,11 @@ def main() -> None:
     print(f"  v4 polarity 불일치 재확인: {v4['caught']}/{v4['total']} 잡음")
     for case in v4["cases"]:
         for row in case.get("aspects", []):
+            mark = "←판정근거" if row["aspect"] == case.get("citedAspect") else ""
             print(f"    {case['concernId']:10s} {row['aspect']:12s} "
                   f"{row['label']:4s} 부정비율 {row['negativeRatio']} "
-                  f"(pos {row['positiveAuthors']} / neg {row['negativeAuthors']})")
+                  f"(pos {row['positiveAuthors']} / neg {row['negativeAuthors']}) "
+                  f"잡음밖={row['minorityBeyondNoise']} {mark}")
     print(f"→ {REPORT_PATH.relative_to(ROOT)}")
     print(f"→ {CONFLICTS_PATH.relative_to(ROOT)}  ({len(conflicts)}건 — #3 평가셋 후보 풀)")
 

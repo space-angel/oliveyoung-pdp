@@ -40,22 +40,43 @@
   `minority_aspect`  일부만 반대다. "좋은데 X는 별로" — **정상일 가능성이 높다.**
                      이걸 앞의 둘과 섞으면 평가셋이 노이즈가 된다
 
-## `혼재` 는 태거 잡음과 구별될 때만 붙인다
+## `혼재` 의 정의는 이 모듈이 정하지 않는다 — 반대가 1명이어도 `혼재` 다
 
-소수 방향이 1건 있다고 "의견이 갈린다"고 말하면 안 된다. 태거의 방향이 틀릴 수
-있기 때문이다. 그래서 귀무가설을 세우고 잰다 — **"이 묶음은 사실 전부 다수 방향이고,
-소수 방향은 태거가 뒤집은 것이다."** 이 가설로 관측된 소수 개수 이상이 나올 확률이
-`MIXED_ALPHA` 미만이면 갈림이 실재한다고 본다.
+방향 계산 규칙은 **골든셋이 소유한다** (`golden_contract.derive_direction`, PER-178).
+긍정 작성자와 부정 작성자가 둘 다 있으면 `mixed` 이고, **반대 1명도 예외가 아니다.**
 
-이 규칙의 좋은 성질은 **문턱이 표본 크기에 따라 자동으로 움직인다**는 것이다.
-고정 비율(예: 20%)을 쓰면 n=8 에서는 너무 헐겁고 n=400 에서는 너무 빡빡하다.
+  U+ 와 U− 가 둘 다 있다  → `mixed`      U+ 만 있다 → `positive`
+  U− 만 있다              → `negative`   방향이 없다 → `neutral`
+
+PER-178 규격 §9 가 "반대 1명이면 다수 방향으로" 를 **명시적으로 기각했다** —
+*골든셋에서 소수 의견을 지우면 게이트 정책을 나중에 평가할 수 없다.* 게이트1·2 의
+"탈락은 드롭이 아니라 `rejected[]` 행" 과 같은 논리다. 소수 의견을 다수로 뭉개는
+순간 그 정책이 옳았는지 영영 못 잰다.
+
+**소수 처리 정책은 게이트4(PER-186)의 것이다** — `U/D ≥ R_min` 과
+`single_dissent` 한계가 거기 있다. 이 모듈이 방향 정의를 따로 세우면 judge 일치율이
+게이트 성능이 아니라 **방향 정의의 차이**를 재게 된다.
+
+## 다만 갈림이 태거 잡음으로 설명되는지는 함께 낸다
+
+`mixed` 라고 다 같은 `mixed` 가 아니다. 부정 3명 / 긍정 94명과 부정 29명 / 긍정 62명은
+같은 판정이지만 다른 상황이다. 앞의 것은 **태거가 방향을 뒤집은 것만으로도 설명된다.**
+
+그래서 판정을 바꾸지 않고 **주석을 단다.** 귀무가설은 *"이 묶음은 사실 전부 다수
+방향이고, 소수는 태거가 뒤집은 것이다"* 이고, 관측된 소수 이상이 나올 확률이
+`NOISE_ALPHA` 미만이면 `minority_beyond_noise=True` 다. 아니면 판정은 그대로 `mixed`
+이면서 `minority_within_tagger_noise` 한계가 붙는다.
+
+문턱이 표본 크기를 따라 움직이는 게 이 주석의 값어치다 — 고정 비율(예: 20%)은
+n=8 에서 너무 헐겁고 n=400 에서 너무 빡빡하다.
 
   n=  8  소수 2건 이상 (25.0%)      n=100  소수  7건 이상 ( 7.0%)
   n= 20  소수 3건 이상 (15.0%)      n=200  소수 12건 이상 ( 6.0%)
   n= 50  소수 5건 이상 (10.0%)      n=400  소수 20건 이상 ( 5.0%)
 
-`negativeRatio` 는 `혼재` 일 때만이 아니라 **항상** 낸다. 판정일 때만 내면 호출부가
-판정을 보고 비율을 감출 수 있고, 그건 이 게이트가 막으려는 바로 그 동작이다.
+**이건 컷이 아니라 한계다.** 잡음 범위의 소수도 `negativeAuthors` 에 그대로 세어지고
+`negativeRatio` 에 그대로 실린다. 비율은 `혼재` 일 때만이 아니라 **항상** 낸다 —
+판정일 때만 내면 호출부가 판정을 보고 비율을 감출 수 있다.
 
 ## 침묵은 근거가 아니다 (PER-178)
 
@@ -68,13 +89,21 @@
 
 ## 통과했다고 한계가 없는 것은 아니다
 
-게이트1의 `renewal_unobserved` 와 같은 규칙이다. 두 가지 한계가 판정에 따라붙는다.
+게이트1의 `renewal_unobserved` 와 같은 규칙이다. 세 가지 한계가 판정에 따라붙는다.
 
-  `tagger_direction_error`   태그 방향 자체가 틀릴 수 있다 (정답셋 200건에서 방향
-                             불일치 6.5%, 방향끼리 뒤집힌 것만 보면 1.3%)
-  `order_chosen_direction`   태거가 한 리뷰의 같은 축에 긍·부정을 **둘 다** 뱉은 경우,
-                             태깅 계약이 먼저 나온 것만 남기고 나머지를 버렸다.
-                             그 축의 방향은 판정된 게 아니라 **출력 순서로 정해졌다**
+  `tagger_direction_error`        태그 방향 자체가 틀릴 수 있다 (정답셋 200건에서 방향
+                                  불일치 6.5%, 방향끼리 뒤집힌 것만 보면 1.3%)
+  `minority_within_tagger_noise`  갈리긴 갈렸는데 소수가 태거 뒤집힘만으로 설명된다.
+                                  **판정은 그대로 `mixed`** 이고 소수도 그대로 세어진다
+  `order_chosen_direction`        태거가 한 리뷰의 같은 축에 긍·부정을 **둘 다** 뱉은 경우,
+                                  태깅 계약이 먼저 나온 것만 남기고 나머지를 버렸다.
+                                  그 축의 방향은 판정된 게 아니라 **출력 순서로 정해졌다**
+
+## 이웃 게이트와의 경계
+
+  방향 정의    골든셋(PER-178)이 소유한다. 이 모듈은 같은 규칙을 쓸 뿐이다
+  소수 처리    게이트4(PER-186) — `U/D ≥ R_min` · `single_dissent`
+  충분성 컷    게이트4. 이 모듈은 N 을 세기만 하고 컷하지 않는다
 """
 from __future__ import annotations
 
@@ -97,9 +126,20 @@ DIRECTIONS = (POSITIVE, NEGATIVE)
 
 # --- 판정 어휘 ---
 
-VERDICT_POSITIVE = "positive"
-VERDICT_NEGATIVE = "negative"
-VERDICT_MIXED = "mixed"
+# 정본 방향 어휘 — `golden_contract.derive_direction` · `sufficiency.ClaimSupport.direction`
+# 과 **같은 문자열이어야 한다.** 세 곳이 갈리면 judge 가 게이트가 아니라 정의 차이를 잰다.
+DIRECTION_POSITIVE = "positive"
+DIRECTION_NEGATIVE = "negative"
+DIRECTION_MIXED = "mixed"
+DIRECTION_NEUTRAL = "neutral"
+CANONICAL_DIRECTIONS = (
+    DIRECTION_POSITIVE, DIRECTION_NEGATIVE, DIRECTION_MIXED, DIRECTION_NEUTRAL)
+
+# 게이트3 표기 — 정본 `neutral` 을 둘로 나눈 것뿐이다. 나머지 셋은 정본과 같은 값이다.
+# 언급했는데 방향이 없는 것과 아무도 말하지 않은 것은 침묵 규칙(PER-178)에서 다르다.
+VERDICT_POSITIVE = DIRECTION_POSITIVE
+VERDICT_NEGATIVE = DIRECTION_NEGATIVE
+VERDICT_MIXED = DIRECTION_MIXED
 VERDICT_NEUTRAL_ONLY = "neutral_only"
 VERDICT_SILENT = "silent"
 VERDICTS = (
@@ -137,6 +177,10 @@ CONFLICT_LABELS = {
 
 LIMIT_TAGGER_DIRECTION_ERROR = "tagger_direction_error"
 LIMIT_ORDER_CHOSEN_DIRECTION = "order_chosen_direction"
+# 갈리긴 갈렸는데 소수가 태거 뒤집힘만으로 설명되는 수준이다. **컷이 아니라 한계다** —
+# 소수는 그대로 세어지고 비율에도 그대로 실린다. 반대 '1명' 자체의 처리는 게이트4 의
+# `single_dissent` 가 따로 소유한다 (PER-186).
+LIMIT_MINORITY_WITHIN_NOISE = "minority_within_tagger_noise"
 
 # --- 혼재 판정 모수 ---
 
@@ -156,7 +200,7 @@ LIMIT_ORDER_CHOSEN_DIRECTION = "order_chosen_direction"
 # 다시 재고 이 상수와 어긋나면 **에러를 낸다** — 조용히 낡지 않게 하려는 것이다.
 TAGGER_FLIP_RATE = 0.033
 TAGGER_FLIP_RATE_SOURCE = "정답셋 200건 · 방향쌍 233 중 반대 3 (1.29%) 의 95% 상한"
-MIXED_ALPHA = 0.05
+NOISE_ALPHA = 0.05
 
 _ASPECTS = frozenset(ASPECTS)
 _POLARITIES = frozenset(POLARITIES)
@@ -216,9 +260,36 @@ class AspectSupport:
     negative_authors: int
     neutral_authors: int
     silent_authors: int
-    verdict: str
     minority_p_value: float
     limitations: frozenset[str] = frozenset()
+
+    @property
+    def direction(self) -> str:
+        """정본 방향. **`golden_contract.derive_direction` 과 같은 규칙이어야 한다.**
+
+        둘 다 있으면 `mixed` 이고 **반대 1명도 예외가 아니다** — PER-178 규격 §9 가
+        "반대 1명이면 다수 방향으로" 를 기각했다. 소수를 다수로 뭉개면 게이트 정책이
+        옳았는지 나중에 평가할 수 없다. 소수 처리는 게이트4(PER-186)의 몫이다.
+        """
+        if self.positive_authors and self.negative_authors:
+            return DIRECTION_MIXED
+        if self.positive_authors:
+            return DIRECTION_POSITIVE
+        if self.negative_authors:
+            return DIRECTION_NEGATIVE
+        return DIRECTION_NEUTRAL
+
+    @property
+    def verdict(self) -> str:
+        """게이트3 표기. 정본 `neutral` 만 둘로 나눈다 — 나머지는 `direction` 그대로다.
+
+        언급했는데 방향이 없는 것(`언급만`)과 아무도 말하지 않은 것(`침묵`)은
+        침묵 규칙(PER-178)에서 다르게 취급된다.
+        """
+        direction = self.direction
+        if direction != DIRECTION_NEUTRAL:
+            return direction
+        return VERDICT_NEUTRAL_ONLY if self.neutral_authors else VERDICT_SILENT
 
     @property
     def directional_authors(self) -> int:
@@ -227,7 +298,24 @@ class AspectSupport:
 
     @property
     def mentioned_authors(self) -> int:
+        """D — 이 주제를 말한 작성자. 중립은 침묵이 아니므로 D 에 들어간다 (PER-186)."""
         return self.directional_authors + self.neutral_authors
+
+    @property
+    def minority_authors(self) -> int | None:
+        """방향이 갈릴 때 적은 쪽의 수. 갈리지 않으면 `None` (게이트4 와 같은 정의)."""
+        if not (self.positive_authors and self.negative_authors):
+            return None
+        return min(self.positive_authors, self.negative_authors)
+
+    @property
+    def minority_beyond_noise(self) -> bool:
+        """소수가 태거 뒤집힘만으로 설명되지 않는가.
+
+        **판정이 아니라 주석이다.** `False` 여도 방향은 그대로 `mixed` 이고 소수는
+        그대로 세어진다 — 이 값은 "이 갈림을 얼마나 믿을 수 있나"를 말할 뿐이다.
+        """
+        return self.minority_authors is not None and self.minority_p_value < NOISE_ALPHA
 
     @property
     def negative_ratio(self) -> float | None:
@@ -239,11 +327,13 @@ class AspectSupport:
 
     @property
     def mixed(self) -> bool:
-        return self.verdict == VERDICT_MIXED
+        return self.direction == DIRECTION_MIXED
 
     def as_dict(self) -> dict:
         return {
             "aspect": self.aspect,
+            # 정본 — 골든셋·게이트4·judge 가 같은 문자열을 본다
+            "direction": self.direction,
             "verdict": self.verdict,
             "label": VERDICT_LABELS[self.verdict],
             "support": {
@@ -252,9 +342,12 @@ class AspectSupport:
                 "neutralAuthors": self.neutral_authors,
                 # 침묵은 근거가 아니다 (PER-178). 세되 비율에는 넣지 않는다
                 "silentAuthors": self.silent_authors,
+                "spokeAuthors": self.mentioned_authors,
                 "directionalAuthors": self.directional_authors,
                 "negativeRatio": self.negative_ratio,
+                "minorityAuthors": self.minority_authors,
             },
+            "minorityBeyondNoise": self.minority_beyond_noise,
             "minorityPValue": round(self.minority_p_value, 6),
             "limitations": sorted(self.limitations),
         }
@@ -423,7 +516,7 @@ def aspect_support(
     aspect: str,
     *,
     flip_rate: float = TAGGER_FLIP_RATE,
-    alpha: float = MIXED_ALPHA,
+    alpha: float = NOISE_ALPHA,
     order_chosen: set[tuple[int, str]] | None = None,
 ) -> AspectSupport:
     """`aspect` 하나의 방향 판정. `records` 는 **게이트2 통과분**이어야 한다.
@@ -474,20 +567,21 @@ def aspect_support(
             limitations.add(LIMIT_ORDER_CHOSEN_DIRECTION)
 
     if directional == 0:
-        verdict = VERDICT_NEUTRAL_ONLY if neu else VERDICT_SILENT
-        return AspectSupport(aspect, pos, neg, neu, silent, verdict, 1.0,
-                             frozenset(limitations))
+        return AspectSupport(aspect, pos, neg, neu, silent, 1.0, frozenset(limitations))
 
-    minority = min(pos, neg)
-    p_value = binom_sf(minority, directional, flip_rate)
-    if p_value < alpha:
-        verdict = VERDICT_MIXED
+    # 방향은 여기서 정하지 않는다 — `AspectSupport.direction` 이 정본 규칙을 쓴다.
+    # 이 함수가 하는 건 세는 것과, 갈렸을 때 그 갈림이 태거 잡음으로 설명되는지
+    # 주석을 다는 것뿐이다.
+    if pos and neg:
+        p_value = binom_sf(min(pos, neg), directional, flip_rate)
+        if p_value >= alpha:
+            # 컷이 아니라 한계다. 소수는 그대로 세어지고 비율에도 그대로 실린다
+            limitations.add(LIMIT_MINORITY_WITHIN_NOISE)
     else:
-        verdict = VERDICT_NEGATIVE if neg > pos else VERDICT_POSITIVE
+        p_value = 1.0
     # 방향 판정에는 언제나 태거의 방향 오류가 얹힌다 (정답셋 200건 기준 6.5%)
     limitations.add(LIMIT_TAGGER_DIRECTION_ERROR)
-    return AspectSupport(aspect, pos, neg, neu, silent, verdict, p_value,
-                         frozenset(limitations))
+    return AspectSupport(aspect, pos, neg, neu, silent, p_value, frozenset(limitations))
 
 
 def polarity_gate(
@@ -496,7 +590,7 @@ def polarity_gate(
     aspects: tuple[str, ...] | list[str] = ASPECTS,
     *,
     flip_rate: float = TAGGER_FLIP_RATE,
-    alpha: float = MIXED_ALPHA,
+    alpha: float = NOISE_ALPHA,
     order_chosen: set[tuple[int, str]] | None = None,
 ) -> PolarityResult:
     """게이트3 — 남은 근거가 한 방향인가. 탈락시키지 않고 판정과 플래그를 낸다.
@@ -519,15 +613,21 @@ def polarity_gate(
 
 
 __all__ = [
+    "CANONICAL_DIRECTIONS",
     "CONFLICT_ALL_ASPECTS",
     "CONFLICT_KINDS",
     "CONFLICT_LABELS",
     "CONFLICT_MINORITY_ASPECT",
     "CONFLICT_SOLE_ASPECT",
     "GATE_POLARITY",
+    "DIRECTION_MIXED",
+    "DIRECTION_NEGATIVE",
+    "DIRECTION_NEUTRAL",
+    "DIRECTION_POSITIVE",
+    "LIMIT_MINORITY_WITHIN_NOISE",
     "LIMIT_ORDER_CHOSEN_DIRECTION",
     "LIMIT_TAGGER_DIRECTION_ERROR",
-    "MIXED_ALPHA",
+    "NOISE_ALPHA",
     "TAGGER_FLIP_RATE",
     "TAGGER_FLIP_RATE_SOURCE",
     "VERDICTS",

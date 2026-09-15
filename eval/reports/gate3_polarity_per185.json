@@ -28,7 +28,8 @@
     "negativeRatioDenominator": "positive + negative (neutral·silent 제외, PER-178)",
     "taggerFlipRate": 0.033,
     "taggerFlipRateSource": "정답셋 200건 · 방향쌍 233 중 반대 3 (1.29%) 의 95% 상한",
-    "mixedAlpha": 0.05,
+    "directionRule": "golden_contract.derive_direction (PER-178) 와 같은 규칙 — 반대 1명도 mixed. 소수 처리는 게이트4(PER-186)",
+    "noiseAlpha": 0.05,
     "sufficiencyNMin": 8
   },
   "gateInput": {
@@ -112,11 +113,11 @@
     "cellsEvaluated": 742,
     "verdicts": {
       "mixed": {
-        "cells": 211,
+        "cells": 378,
         "label": "혼재"
       },
       "negative": {
-        "cells": 16,
+        "cells": 13,
         "label": "부정"
       },
       "neutral_only": {
@@ -124,7 +125,7 @@
         "label": "언급만"
       },
       "positive": {
-        "cells": 325,
+        "cells": 161,
         "label": "긍정"
       },
       "silent": {
@@ -134,8 +135,11 @@
     },
     "withDirectionalEvidence": 552,
     "withDirectionalAtLeast8": 395,
-    "mixedCells": 202,
-    "mixedPctOfSized": 51.14,
+    "mixedCells": 343,
+    "mixedPctOfSized": 86.84,
+    "mixedBeyondNoiseCells": 202,
+    "mixedBeyondNoisePctOfSized": 51.14,
+    "mixedWithinNoiseCells": 141,
     "negativeRatioQuantiles": {
       "min": 0.0,
       "p25": 0.037,
@@ -145,30 +149,32 @@
       "max": 0.875
     },
     "cellsWithOrderChosenLimitation": 84,
+    "cellsWithMinorityWithinNoise": 141,
     "note": "N>=8 은 충분성 게이트(PER-186)의 절대하한이다. 게이트3 은 컷하지 않고 같은 잣대로 읽기 위해 쓴다"
   },
-  "mixedSensitivity": {
+  "noiseSensitivity": {
     "sizedCells": 395,
+    "splitCells": 343,
     "byFlipRate": {
       "0.013": {
-        "mixedCells": 257,
-        "pct": 65.06
+        "beyondNoiseCells": 257,
+        "pctOfSplit": 74.93
       },
       "0.033": {
-        "mixedCells": 202,
-        "pct": 51.14
+        "beyondNoiseCells": 202,
+        "pctOfSplit": 58.89
       },
       "0.050": {
-        "mixedCells": 173,
-        "pct": 43.8
+        "beyondNoiseCells": 173,
+        "pctOfSplit": 50.44
       },
       "0.065": {
-        "mixedCells": 145,
-        "pct": 36.71
+        "beyondNoiseCells": 145,
+        "pctOfSplit": 42.27
       },
       "0.080": {
-        "mixedCells": 121,
-        "pct": 30.63
+        "beyondNoiseCells": 121,
+        "pctOfSplit": 35.28
       }
     },
     "minorityFloorBySampleSize": {
@@ -201,7 +207,7 @@
         "minMinorityPct": 5.0
       }
     },
-    "note": "문턱은 고정 비율이 아니라 표본 크기에 따라 움직인다. 점추정(1.3%)을 쓰면 혼재가 늘고 3종 불일치율(6.5%)을 쓰면 준다 — 상한 3.3% 는 그 사이의 보수적 선택이다"
+    "note": "주석의 문턱은 고정 비율이 아니라 표본 크기를 따라 움직인다. 점추정(1.3%)을 쓰면 잡음 밖이 늘고 3종 불일치율(6.5%)을 쓰면 준다 — 상한 3.3% 는 그 사이의 보수적 선택이다. 어느 값을 써도 **혼재 판정 자체는 바뀌지 않는다**"
   },
   "ratingCrossCheck": {
     "directionalTags": 24978,
@@ -255,26 +261,33 @@
         "question": "제형이 너무 물 같아서 양 조절이 어렵지 않을까요?",
         "presupposes": "negative",
         "found": true,
+        "citedAspect": "발림감/텍스처",
         "aspects": [
           {
             "aspect": "발림감/텍스처",
-            "verdict": "positive",
-            "label": "긍정",
+            "direction": "mixed",
+            "label": "혼재",
             "positiveAuthors": 94,
             "negativeAuthors": 3,
             "silentAuthors": 318,
             "negativeRatio": 0.0309,
-            "supportsPresupposedDirection": false
+            "minorityBeyondNoise": false,
+            "presupposedShare": 0.0309,
+            "presupposedIsSoleDirection": false,
+            "presupposedSurvivesNoise": false
           },
           {
             "aspect": "흡수력",
-            "verdict": "positive",
-            "label": "긍정",
+            "direction": "mixed",
+            "label": "혼재",
             "positiveAuthors": 105,
             "negativeAuthors": 2,
             "silentAuthors": 315,
             "negativeRatio": 0.0187,
-            "supportsPresupposedDirection": false
+            "minorityBeyondNoise": false,
+            "presupposedShare": 0.0187,
+            "presupposedIsSoleDirection": false,
+            "presupposedSurvivesNoise": false
           }
         ],
         "caught": true
@@ -286,26 +299,33 @@
         "question": "광택감이 오래 유지되지 않는 편인가요?",
         "presupposes": "negative",
         "found": true,
+        "citedAspect": "광택/윤기",
         "aspects": [
           {
             "aspect": "광택/윤기",
-            "verdict": "positive",
-            "label": "긍정",
+            "direction": "mixed",
+            "label": "혼재",
             "positiveAuthors": 71,
             "negativeAuthors": 4,
             "silentAuthors": 344,
             "negativeRatio": 0.0533,
-            "supportsPresupposedDirection": false
+            "minorityBeyondNoise": false,
+            "presupposedShare": 0.0533,
+            "presupposedIsSoleDirection": false,
+            "presupposedSurvivesNoise": false
           },
           {
             "aspect": "지속성",
-            "verdict": "mixed",
+            "direction": "mixed",
             "label": "혼재",
             "positiveAuthors": 62,
             "negativeAuthors": 29,
             "silentAuthors": 322,
             "negativeRatio": 0.3187,
-            "supportsPresupposedDirection": false
+            "minorityBeyondNoise": true,
+            "presupposedShare": 0.3187,
+            "presupposedIsSoleDirection": false,
+            "presupposedSurvivesNoise": true
           }
         ],
         "caught": true
@@ -313,6 +333,7 @@
     ],
     "caught": 2,
     "total": 2,
-    "note": "게이트3 은 질문을 검사하지 않는다. 방향과 비율을 **주장보다 먼저** 확정해 근거가 뒷받침하지 않는 방향을 전제한 주장이 나올 수 없게 만든다. `혼재` 도 '질문이 옳았다'가 아니라 '양쪽을 함께 보여야 한다'는 판정이다"
+    "criterion": "v4 판정문이 근거로 든 축에서 전제된 방향의 몫(presupposedShare)이 태거 잡음 밖으로 실재하지 않으면 '잡았다'. 방향 판정만으로는 못 가른다 — 반대 1명도 mixed 라 거의 모든 셀이 mixed 이기 때문이다",
+    "note": "게이트3 은 질문을 검사하지 않는다. 방향과 비율을 **주장보다 먼저** 확정해 근거가 뒷받침하지 않는 방향을 전제한 주장이 나올 수 없게 만든다. `혼재` 도 '질문이 옳았다'가 아니라 '양쪽을 함께 보여야 한다'는 판정이고, 그래서 negativeRatio 가 주장에 함께 실린다"
   }
 }
