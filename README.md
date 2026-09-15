@@ -181,7 +181,8 @@ cp .env.example .env        # ANTHROPIC_API_KEY 입력
 
 .venv/bin/python pipeline/run_v5.py --list   # 단계와 구현 상태
 .venv/bin/python pipeline/run_v5.py          # 구현된 단계까지 (catalog → ingest)
-bash scripts/verify.sh                       # 계약 테스트 + 생성물 재현 확인
+bash scripts/verify.sh                       # 계약 테스트 + 데이터 없이 도는 재현 확인
+bash scripts/verify.sh --full                # + 스냅샷 재현 확인 (병합 게이트는 이쪽)
 ```
 
 ```bash
@@ -234,7 +235,7 @@ PRD §5-2가 "같은 입력 → 같은 출력"을 요구한다. 이게 안 되�
 - 생성물에 **시각을 기록하지 않고** 입력 sha256을 기록한다 → 재실행 시 바이트가 같다
 - 모든 출력의 `meta`에 프롬프트 버전·모델 ID·임계값·시드·입력 스냅샷 해시를 남긴다
 - 완료 조건("에러를 낸다")은 **테스트로 고정**한다 — `python3 -m unittest discover -s pipeline -p 'test_*.py'`
-- 병합 게이트 `bash scripts/verify.sh`를 병합 전·후 양쪽에서 돌린다
+- 병합 게이트 `bash scripts/verify.sh --full`을 병합 전·후 양쪽에서 돌린다. 인자 없이 돌리면 `data/intermediate/`가 필요한 검사 10종을 건너뛴다 — 클론 직후용이다
 - 브랜치·커밋 규약은 [`docs/GIT_WORKFLOW.md`](docs/GIT_WORKFLOW.md) — 커밋에 `기각:`/`원인:`/`재발방지:` 트레일러를 남겨 **하지 않기로 한 판단도 기록한다**
 
 ---
