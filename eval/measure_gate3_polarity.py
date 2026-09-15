@@ -23,6 +23,10 @@ PER-185 근거 측정 — 게이트3 방향성(별점 교차검증 · 혼재 처
   .venv/bin/python eval/measure_gate3_polarity.py
   → eval/reports/gate3_polarity_per185.json
   → eval/reports/gate3_rating_conflicts.jsonl   (#3 평가셋 후보 풀)
+
+`order_chosen` 집합(모수 4)은 gitignore 대상이라 없으면 **자동으로 다시 만든다** —
+결정론적 로컬 파싱이고 API 를 부르지 않는다. `--build-order-chosen` 은 그걸 따로
+돌리고 싶을 때만 쓴다.
 """
 from __future__ import annotations
 
@@ -179,17 +183,26 @@ def load_order_chosen() -> tuple[set[tuple[int, str]], dict]:
     사라지는 게 아니라 **방향이 출력 순서로 굳는다.** 그 사실이 판정의 한계로
     따라나가야 한다.
 
-    파일이 없으면 빈 집합을 돌려주되 **그 사실을 리포트에 적는다** — 한계가 조용히
-    빠지는 것과 한계가 없는 것은 다르다.
+    파일이 없으면 **원문 응답에서 다시 만든다.** 결정론적이고 API 를 부르지 않는
+    로컬 파싱이라 그래도 된다 — 그리고 그래야 한다. 이 집합은 gitignore 대상인데
+    커밋된 리포트가 여기 의존하므로, 자동으로 만들지 않으면 같은 태그를 가진
+    다른 워크트리에서 `--check` 가 **한계가 빠진 리포트로 조용히 실패한다.**
+
+    원문 응답조차 없으면 그때는 빈 집합을 돌려주되 **그 사실을 리포트에 적는다** —
+    한계가 조용히 빠지는 것과 한계가 없는 것은 다르다.
     """
     if not ORDER_CHOSEN_PATH.exists():
-        return set(), {
-            "available": False,
-            "note": (
-                f"{ORDER_CHOSEN_PATH.relative_to(ROOT)} 가 없다 — "
-                f"`order_chosen` 한계를 재지 못했다. build_order_chosen 으로 만든다"
-            ),
-        }
+        manifest = ROOT / "data/intermediate/tag_runs/full_glm47.json"
+        if not manifest.exists() or not (ROOT / json.loads(manifest.read_text())["raw"]).exists():
+            return set(), {
+                "available": False,
+                "note": (
+                    f"{ORDER_CHOSEN_PATH.relative_to(ROOT)} 도 태깅 원문 응답도 없다 — "
+                    "`order_chosen` 한계를 재지 못했다. 이 리포트는 그만큼 낙관적이다"
+                ),
+            }
+        print(f"[order_chosen] {ORDER_CHOSEN_PATH.relative_to(ROOT)} 가 없어 원문에서 다시 만든다")
+        build_order_chosen()
     payload = json.loads(ORDER_CHOSEN_PATH.read_text())
     pairs = {(int(r["reviewId"]), r["aspect"]) for r in payload["pairs"]}
     return pairs, {"available": True, **{k: v for k, v in payload.items() if k != "pairs"}}

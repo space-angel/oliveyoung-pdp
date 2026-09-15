@@ -203,7 +203,7 @@ N≥8이면서 방향이 갈린 셀 343개 기준:
 2. 그 308쌍의 방향은 판정된 게 아니므로 **한계로 따라나간다** — `order_chosen_direction`. N≥8 셀 395개 중 **84개**가 이 한계를 달고 있다
 3. 되살릴지는 태깅 층의 결정이다(PER-213). **이 게이트는 그 결정에 의존하지 않는다** — `aspect_support(order_chosen=...)`는 선택 인자이고, 넘기지 않으면 한계가 붙지 않을 뿐 판정은 같다
 
-집합은 `eval/measure_gate3_polarity.py --build-order-chosen`이 원문 응답에서 다시 세어 `data/intermediate/v5_tags_order_chosen.json`에 남긴다(실행 매니페스트는 위반 표본 50건만 들고 있어 전수는 원문에서 다시 세야 한다).
+집합은 `data/intermediate/v5_tags_order_chosen.json`에 남는다. 실행 매니페스트는 위반 표본 50건만 들고 있어 전수는 태깅 **원문 응답**에서 다시 세야 한다 — 측정 스크립트가 파일이 없으면 **자동으로 다시 만든다**(결정론적 로컬 파싱, API 호출 없음). 자동 생성이 아니면 이 파일이 gitignore라서, 같은 태그를 가진 다른 워크트리에서 `--check`가 *한계가 빠진 리포트*로 조용히 실패한다. 원문 응답조차 없으면 빈 집합으로 가되 `withinReviewSplit.available=false`로 그 사실을 리포트에 적는다.
 
 ---
 
