@@ -96,7 +96,7 @@ catalog → ingest → tag → gates → claims → judge
 | 게이트 | 판정 | 실측된 필요성 |
 |---|---|---|
 | 1 동일성 **(구현)** | 정규화 제품 ID 일치, 옵션 질문이면 같은 옵션만, 리뉴얼 세대 + 리센시 컷 | `goodsNo` 153개 → `productId` 53개(계보 50). 옵션 문자열 798개는 색상 **452개**라, 정규화 없이는 색상 질문의 근거가 잘게 쪼개진다 |
-| 2 중복 **(구현)** | 본문 해시 + **동일 작성자 1표** + 의미 유사 클러스터(PER-184) | 안 걸면 카운트가 **22.4% 부푼다**. 25,000건은 독립 근거 **19,392건**이고, 해시가 잡는 몫은 제거량의 12.4%뿐이다 |
+| 2 중복 **(구현)** | 본문 해시 + **동일 작성자 1표** + 의미 유사 클러스터(PER-184 — **모델만 선정, 미적용**) | 안 걸면 카운트가 **22.4% 부푼다**. 25,000건은 독립 근거 **19,392건**이고, 해시가 잡는 몫은 제거량의 12.4%뿐이다 |
 | 3 방향성 **(구현)** | polarity를 `(리뷰 × 주제)` 단위로. 별점과 교차 검증, 불일치는 플래그. **탈락 없음** | 한 리뷰가 "발색은 좋은데 지속력은 별로"라고 말한다. N≥8 셀 395개 중 **343개(86.8%)가 `혼재`**(반대 1명도 혼재 — PER-178 §9)이고 그 중 **202개는 소수가 태거 잡음 밖**이다. 별점 불일치 2,289건의 **56.4%가 "좋은데 X는 별로"** — 별점으로 방향을 정하면 그만큼이 사라진다 |
 | 4 충분성 **(구현)** | `U ≥ N_min` **AND** `U/D ≥ R_min` **AND** `S ≥ S_min` — 낮은 쪽이 아니라 높은 쪽. 분모 D 는 **주제를 언급한 작성자**다 | 전수 태그 기준 (셀×aspect) 후보 7,660건 중 통과 2,395건. **무조건부 71.4% vs 조건부 22.6%** — 조건부가 1/3 비율로 살아남는다 |
 
@@ -204,6 +204,8 @@ pipeline/    v5 — 작업 대상
   context_layout.py        5단 배치 (PER-187). 판정을 다시 하지 않는다 — 순서대로 놓고 게이트3·4가 같은 셀인지 대조한다
   reject_registry.py       탈락 사유 어휘의 정본 (PER-188). 게이트3은 사유 0개 — 누락이 아니라 결정이다
   ledger.py                통합 rejected[] 원장 + 골든셋 역추적 (PER-188). 재현율의 유일한 단서
+  embedding_contract.py    임베딩 버전 계약 (PER-184). 모델·어휘 버전은 묶여서만 움직인다 — 부분 교체는 에러
+  embedding_config.json    후보·선정 모델·revision — 코드가 아니라 여기서 고친다
   option_norm.py           옵션 → 색상 키 정규화 (PER-182). LLM 없음
   option_markers.json      판촉 어휘 — 코드가 아니라 여기서 고친다
   build_product_catalog.py 카탈로그 생성기 (--check 로 재현 확인)
@@ -310,6 +312,7 @@ v5가 넘어야 하는 선: **인용 정확도 100%** (생성 시점에 원문 �
 | [`docs/DECISION_PER186_SUFFICIENCY.md`](docs/DECISION_PER186_SUFFICIENCY.md) | 게이트4 충분성 — 세 조건 AND · 분모는 언급자(D) · 소수 의견 정책 · 임계값 민감도 |
 | [`docs/DECISION_PER187_CONTEXT_LAYOUT.md`](docs/DECISION_PER187_CONTEXT_LAYOUT.md) | 5단 배치 — 문구가 아니라 자료의 순서 · 사용기간·계절 기각 · 상한이 방향을 지우지 않는다 |
 | [`docs/DECISION_PER188_REJECTED_LEDGER.md`](docs/DECISION_PER188_REJECTED_LEDGER.md) | `rejected[]` 원장 — 사유 레지스트리 · 게이트3 방향불일치 기각 · 골든셋 역추적으로 재현율 |
+| [`docs/DECISION_PER184_EMBEDDING_MODEL.md`](docs/DECISION_PER184_EMBEDDING_MODEL.md) | 로컬 한국어 임베딩 — 후보 4종 실측 · KURE-v1 선정 · 모델/어휘 버전 동반 이동 계약 |
 | [`docs/DECISION_PER178_GOLDEN_LABELING_SPEC.md`](docs/DECISION_PER178_GOLDEN_LABELING_SPEC.md) | 주장 골든셋 규격 — 라벨 1건의 모양 · 층화 번들 40개 · 블라인드 절차 · v4 15문항 미이관 근거 |
 | [`docs/DECISION_PER178_SILENCE_IS_NOT_EVIDENCE.md`](docs/DECISION_PER178_SILENCE_IS_NOT_EVIDENCE.md) | 침묵은 근거가 아니다 — U+/U−/D/S 보존, 단계별 유지 규칙, 아마존·NN/G·자기선택 편향 사례 |
 | [`eval/gold/README.md`](eval/gold/README.md) | 평가 고정물(표본·정답셋) 규칙과 재현 절차 |
