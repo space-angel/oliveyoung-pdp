@@ -33,6 +33,7 @@ sys.path.insert(0, str(ROOT / "pipeline"))
 
 from catalog import load_catalog  # noqa: E402
 from contracts import build_record  # noqa: E402
+from ingest import load_aspect_counts  # noqa: E402
 from gates import (  # noqa: E402
     REJECT_DUPLICATE_CONTENT,
     REJECT_LABELS,
@@ -51,26 +52,29 @@ from policy import (  # noqa: E402
 from trust import rank_key, score_all  # noqa: E402
 
 INPUT_PATH = ROOT / "data/input/reviews_50products.json"
+# 전수 태그 정본. trustPrior 의 onTopic 입력이라 없으면 대표 선택이 입수와 갈린다 (PER-174)
+TAGS_PATH = ROOT / "data/intermediate/v5_tags.jsonl"
 REPORT_PATH = ROOT / "eval/reports/gate2_duplicate_per183.json"
 
 
 def load_records(path: Path) -> tuple[list[dict], object]:
-    """입수(PER-173)와 같은 경로로 레코드를 만든다.
+    """    입수(PER-173)와 같은 경로로 레코드를 만든다.
 
-    `data/intermediate/v5_reviews.jsonl` 을 읽지 않는 이유는 그 산출물이 gitignore 라
-    이 측정이 클론 직후에도 재현돼야 하기 때문이다. 대신 같은 함수(`build_record` ·
-    `score_all`)를 부르므로 파생층(작성자 키 · 본문 해시 · 신뢰도 점수)은 입수와 같다.
+    `data/intermediate/v5_reviews.jsonl` 을 읽지 않고 `data/input` 에서 다시 만드는 이유는
+    그 경로 자체(`build_record` · `score_all`)가 입수와 같은지 이 측정이 함께 확인하기
+    때문이다. 대신 **`aspect_counts` 를 반드시 넘긴다** — 넘기지 않으면 `trustPrior` 의
+    `onTopic` 이 `unavailable` 로 남아 입수 산출물과 파생층이 갈리고, 게이트2 의 작성자
+    1표 대표가 달라진다 (PER-174 · PER-188 인계).
     """
     catalog = load_catalog()
     records = []
     for row in json.loads(path.read_text()):
         product_id = catalog.resolve_goods_no(row["goodsNo"], row["reviewDate"])
         records.append(build_record(row, product_id).to_dict())
-    priors = score_all(records)
+    priors = score_all(records, aspect_counts=load_aspect_counts(TAGS_PATH))
     for record in records:
         record["derived"]["trustPrior"] = priors[record["reviewId"]]
     return records, catalog
-
 
 def by_product(records: list[dict]) -> dict[str, list[dict]]:
     grouped: dict[str, list[dict]] = collections.defaultdict(list)

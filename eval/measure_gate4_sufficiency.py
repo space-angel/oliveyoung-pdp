@@ -37,6 +37,7 @@ sys.path.insert(0, str(ROOT / "pipeline"))
 
 from catalog import load_catalog  # noqa: E402
 from contracts import MISSING_SEGMENT, build_record  # noqa: E402
+from ingest import load_aspect_counts  # noqa: E402
 from gates import IdentityScope, run_duplicate_gate, run_identity_gate  # noqa: E402
 from golden_contract import validate_labels  # noqa: E402
 from policy import (  # noqa: E402
@@ -77,17 +78,23 @@ def pct(part: int, whole: int) -> float:
 
 
 def load_records() -> tuple[list[dict], object]:
-    """입수(PER-173)와 같은 경로로 레코드를 만든다 — 중간 산출물이 gitignore 라서."""
+    """    입수(PER-173)와 같은 경로로 레코드를 만든다.
+
+    `data/intermediate/v5_reviews.jsonl` 을 읽지 않고 `data/input` 에서 다시 만드는 이유는
+    그 경로 자체(`build_record` · `score_all`)가 입수와 같은지 이 측정이 함께 확인하기
+    때문이다. 대신 **`aspect_counts` 를 반드시 넘긴다** — 넘기지 않으면 `trustPrior` 의
+    `onTopic` 이 `unavailable` 로 남아 입수 산출물과 파생층이 갈리고, 게이트2 의 작성자
+    1표 대표가 달라진다 (PER-174 · PER-188 인계).
+    """
     catalog = load_catalog()
     records = []
     for row in json.loads(INPUT_PATH.read_text()):
         product_id = catalog.resolve_goods_no(row["goodsNo"], row["reviewDate"])
         records.append(build_record(row, product_id).to_dict())
-    priors = score_all(records)
+    priors = score_all(records, aspect_counts=load_aspect_counts(TAGS_PATH))
     for record in records:
         record["derived"]["trustPrior"] = priors[record["reviewId"]]
     return records, catalog
-
 
 def through_gates(records: list[dict], catalog) -> tuple[dict[str, list[dict]], dict[str, dict]]:
     """게이트1 → 게이트2. 순서가 규격이다 (PER-183 `gateOrder`)."""
@@ -561,6 +568,9 @@ def ratio_diagnosis(claims: list[dict], policy: SufficiencyPolicy) -> dict:
             and min(len(c.support.positive), len(c.support.negative)) / len(c.support.spoke) < r
         )
 
+    # 문장에 수를 손으로 박지 않는다 — 옆 칸의 계산값과 조용히 갈린다 (2026-09-15 실제로 갈렸다)
+    rmin_only = sum(1 for v in shares if v < policy.r_min)
+
     return {
         "candidates": len(shares),
         "supportShare": {
@@ -582,13 +592,14 @@ def ratio_diagnosis(claims: list[dict], policy: SufficiencyPolicy) -> dict:
             "belowShare": below_side,
         },
         "finding": (
-            "R_min 에 귀속되는 탈락은 전수 7,660 후보에서 0 이다. 혼자 걸면 102건을 잡지만 "
-            "그 102건은 전부 N_min 이 이미 잡는다. 구조가 원인이다 — U 는 방향을 말한 사람 "
-            "전체이고 `mixed` 면 양쪽을 흡수하므로, U/D 를 1 아래로 내리는 것은 중립 "
-            "태그(전수 38,251개의 4.18%)뿐이다. 그래서 U/D 중위수가 1.0 이다. 비율이 실제로 "
-            "일할 자리는 주장 전체가 아니라 **소수 측**이고(통과분 2,395건 중 1,764건이 mixed, "
-            "소수 몫 중위 0.18), 그 수를 `passedWithMinorityBelow` 에 냈다 — 정책 변경은 "
-            "PER-211 의 판단이지 이 이슈에서 하지 않는다"
+            f"R_min 에 귀속되는 탈락은 전수 {len(shares):,} 후보에서 0 이다. 혼자 걸면 "
+            f"{rmin_only:,}건을 잡지만 그 {rmin_only:,}건은 전부 N_min 이 이미 잡는다. "
+            "구조가 원인이다 — U 는 방향을 말한 사람 전체이고 `mixed` 면 양쪽을 흡수하므로, "
+            "U/D 를 1 아래로 내리는 것은 중립 태그뿐이다. 그래서 U/D 중위수가 1.0 이다. "
+            "비율이 실제로 일할 자리는 주장 전체가 아니라 **소수 측**이고(통과분 "
+            f"{len(passed):,}건 중 {sum(1 for c in passed if c.support.minority is not None):,}건이 "
+            "mixed), 그 수를 `passedWithMinorityBelow` 에 냈다 — 정책 변경은 PER-211 의 "
+            "판단이지 이 이슈에서 하지 않는다"
         ),
     }
 

@@ -60,7 +60,7 @@
       "atLeast": {
         "8": 486,
         "10": 444,
-        "15": 397,
+        "15": 396,
         "20": 344,
         "30": 240,
         "50": 156
@@ -68,7 +68,7 @@
       "atLeastStated": {
         "8": 436,
         "10": 394,
-        "15": 348,
+        "15": 347,
         "20": 295,
         "30": 191,
         "50": 107
@@ -138,28 +138,28 @@
     },
     "fastPathSpotChecks": 8,
     "sensitivity": {
-      "candidates": 7660,
+      "candidates": 7689,
       "byAxis": {
         "product": {
           "all": {
-            "candidates": 552,
-            "passed": 394,
-            "passedPct": 71.38,
+            "candidates": 553,
+            "passed": 395,
+            "passedPct": 71.43,
             "rejected": {
               "과소근거": 152,
               "세그먼트과소": 6
             },
-            "singleDissent": 60
+            "singleDissent": 61
           },
           "stated": {
-            "candidates": 552,
-            "passed": 394,
-            "passedPct": 71.38,
+            "candidates": 553,
+            "passed": 395,
+            "passedPct": 71.43,
             "rejected": {
               "과소근거": 152,
               "세그먼트과소": 6
             },
-            "singleDissent": 60
+            "singleDissent": 61
           },
           "missing": {
             "candidates": 0,
@@ -171,31 +171,31 @@
         },
         "skinType": {
           "all": {
-            "candidates": 2688,
-            "passed": 801,
-            "passedPct": 29.8,
+            "candidates": 2695,
+            "passed": 809,
+            "passedPct": 30.02,
             "rejected": {
-              "과소근거": 1519,
-              "세그먼트과소": 368
+              "과소근거": 1515,
+              "세그먼트과소": 371
             },
-            "singleDissent": 179
+            "singleDissent": 181
           },
           "stated": {
-            "candidates": 2165,
-            "passed": 493,
-            "passedPct": 22.77,
+            "candidates": 2171,
+            "passed": 501,
+            "passedPct": 23.08,
             "rejected": {
-              "과소근거": 1306,
-              "세그먼트과소": 366
+              "과소근거": 1301,
+              "세그먼트과소": 369
             },
-            "singleDissent": 131
+            "singleDissent": 133
           },
           "missing": {
-            "candidates": 523,
+            "candidates": 524,
             "passed": 308,
-            "passedPct": 58.89,
+            "passedPct": 58.78,
             "rejected": {
-              "과소근거": 213,
+              "과소근거": 214,
               "세그먼트과소": 2
             },
             "singleDissent": 48
@@ -203,72 +203,72 @@
         },
         "skinTrouble": {
           "all": {
-            "candidates": 4420,
-            "passed": 1200,
-            "passedPct": 27.15,
+            "candidates": 4441,
+            "passed": 1216,
+            "passedPct": 27.38,
             "rejected": {
-              "과소근거": 2602,
-              "세그먼트과소": 618
+              "과소근거": 2600,
+              "세그먼트과소": 625
             },
-            "singleDissent": 259
+            "singleDissent": 266
           },
           "stated": {
-            "candidates": 3895,
-            "passed": 878,
-            "passedPct": 22.54,
+            "candidates": 3915,
+            "passed": 894,
+            "passedPct": 22.84,
             "rejected": {
-              "과소근거": 2401,
-              "세그먼트과소": 616
+              "과소근거": 2398,
+              "세그먼트과소": 623
             },
-            "singleDissent": 212
+            "singleDissent": 219
           },
           "missing": {
-            "candidates": 525,
+            "candidates": 526,
             "passed": 322,
-            "passedPct": 61.33,
+            "passedPct": 61.22,
             "rejected": {
-              "과소근거": 201,
+              "과소근거": 202,
               "세그먼트과소": 2
             },
             "singleDissent": 47
           }
         }
       },
-      "missingSegmentCandidates": 1048,
+      "missingSegmentCandidates": 1050,
       "nMinByRMin": [
         {
           "nMin": 3,
           "rMin": 0.05,
           "sMin": 8,
           "all": {
-            "candidates": 7660,
-            "passed": 4430,
-            "passedPct": 57.83,
+            "candidates": 7689,
+            "passed": 4461,
+            "passedPct": 58.02,
             "rejected": {
-              "과소근거": 2238,
-              "세그먼트과소": 992
+              "과소근거": 2226,
+              "세그먼트과소": 1002
             },
-            "singleDissent": 1091
+            "singleDissent": 1115
           },
           "unconditional": {
-            "candidates": 552,
+            "candidates": 553,
             "passed": 461,
-            "passedPct": 83.51,
+            "passedPct": 83.36,
             "rejected": {
-              "과소근거": 85,
+              "과소근거": 86,
               "세그먼트과소": 6
             },
-            "singleDissent": 78
+            "singleDissent": 79
           },
           "conditional": {
-            "candidates": 6060,
-            "passed": 3117,
-            "passedPct": 51.44,
+            "candidates": 6086,
+            "passed": 3147,
+            "passedPct": 51.71,
             "rejected": {
-              "과소근거": 1961,
-              "세그먼트과소": 982
+              "과소근거": 1947,
+              "세그먼트과소": 992
             },
-            "singleDissent": 853
+            "singleDissent": 876
           }
         },
         {
@@ -276,34 +276,34 @@
           "rMin": 0.1,
           "sMin": 8,
           "all": {
-            "candidates": 7660,
-            "passed": 4430,
-            "passedPct": 57.83,
+            "candidates": 7689,
+            "passed": 4461,
+            "passedPct": 58.02,
             "rejected": {
-              "과소근거": 2238,
-              "세그먼트과소": 992
+              "과소근거": 2226,
+              "세그먼트과소": 1002
             },
-            "singleDissent": 1091
+            "singleDissent": 1115
           },
           "unconditional": {
-            "candidates": 552,
+            "candidates": 553,
             "passed": 461,
-            "passedPct": 83.51,
+            "passedPct": 83.36,
             "rejected": {
-              "과소근거": 85,
+              "과소근거": 86,
               "세그먼트과소": 6
             },
-            "singleDissent": 78
+            "singleDissent": 79
           },
           "conditional": {
-            "candidates": 6060,
-            "passed": 3117,
-            "passedPct": 51.44,
+            "candidates": 6086,
+            "passed": 3147,
+            "passedPct": 51.71,
             "rejected": {
-              "과소근거": 1961,
-              "세그먼트과소": 982
+              "과소근거": 1947,
+              "세그먼트과소": 992
             },
-            "singleDissent": 853
+            "singleDissent": 876
           }
         },
         {
@@ -311,34 +311,34 @@
           "rMin": 0.2,
           "sMin": 8,
           "all": {
-            "candidates": 7660,
-            "passed": 4430,
-            "passedPct": 57.83,
+            "candidates": 7689,
+            "passed": 4461,
+            "passedPct": 58.02,
             "rejected": {
-              "과소근거": 2238,
-              "세그먼트과소": 992
+              "과소근거": 2226,
+              "세그먼트과소": 1002
             },
-            "singleDissent": 1091
+            "singleDissent": 1115
           },
           "unconditional": {
-            "candidates": 552,
+            "candidates": 553,
             "passed": 461,
-            "passedPct": 83.51,
+            "passedPct": 83.36,
             "rejected": {
-              "과소근거": 85,
+              "과소근거": 86,
               "세그먼트과소": 6
             },
-            "singleDissent": 78
+            "singleDissent": 79
           },
           "conditional": {
-            "candidates": 6060,
-            "passed": 3117,
-            "passedPct": 51.44,
+            "candidates": 6086,
+            "passed": 3147,
+            "passedPct": 51.71,
             "rejected": {
-              "과소근거": 1961,
-              "세그먼트과소": 982
+              "과소근거": 1947,
+              "세그먼트과소": 992
             },
-            "singleDissent": 853
+            "singleDissent": 876
           }
         },
         {
@@ -346,34 +346,34 @@
           "rMin": 0.3,
           "sMin": 8,
           "all": {
-            "candidates": 7660,
-            "passed": 4430,
-            "passedPct": 57.83,
+            "candidates": 7689,
+            "passed": 4461,
+            "passedPct": 58.02,
             "rejected": {
-              "과소근거": 2238,
-              "세그먼트과소": 992
+              "과소근거": 2226,
+              "세그먼트과소": 1002
             },
-            "singleDissent": 1091
+            "singleDissent": 1115
           },
           "unconditional": {
-            "candidates": 552,
+            "candidates": 553,
             "passed": 461,
-            "passedPct": 83.51,
+            "passedPct": 83.36,
             "rejected": {
-              "과소근거": 85,
+              "과소근거": 86,
               "세그먼트과소": 6
             },
-            "singleDissent": 78
+            "singleDissent": 79
           },
           "conditional": {
-            "candidates": 6060,
-            "passed": 3117,
-            "passedPct": 51.44,
+            "candidates": 6086,
+            "passed": 3147,
+            "passedPct": 51.71,
             "rejected": {
-              "과소근거": 1961,
-              "세그먼트과소": 982
+              "과소근거": 1947,
+              "세그먼트과소": 992
             },
-            "singleDissent": 853
+            "singleDissent": 876
           }
         },
         {
@@ -381,34 +381,34 @@
           "rMin": 0.05,
           "sMin": 8,
           "all": {
-            "candidates": 7660,
-            "passed": 3371,
-            "passedPct": 44.01,
+            "candidates": 7689,
+            "passed": 3397,
+            "passedPct": 44.18,
             "rejected": {
-              "과소근거": 3297,
-              "세그먼트과소": 992
+              "과소근거": 3290,
+              "세그먼트과소": 1002
             },
-            "singleDissent": 758
+            "singleDissent": 774
           },
           "unconditional": {
-            "candidates": 552,
-            "passed": 436,
-            "passedPct": 78.99,
+            "candidates": 553,
+            "passed": 437,
+            "passedPct": 79.02,
             "rejected": {
               "과소근거": 110,
               "세그먼트과소": 6
             },
-            "singleDissent": 69
+            "singleDissent": 70
           },
           "conditional": {
-            "candidates": 6060,
-            "passed": 2180,
-            "passedPct": 35.97,
+            "candidates": 6086,
+            "passed": 2204,
+            "passedPct": 36.21,
             "rejected": {
-              "과소근거": 2898,
-              "세그먼트과소": 982
+              "과소근거": 2890,
+              "세그먼트과소": 992
             },
-            "singleDissent": 555
+            "singleDissent": 569
           }
         },
         {
@@ -416,34 +416,34 @@
           "rMin": 0.1,
           "sMin": 8,
           "all": {
-            "candidates": 7660,
-            "passed": 3371,
-            "passedPct": 44.01,
+            "candidates": 7689,
+            "passed": 3397,
+            "passedPct": 44.18,
             "rejected": {
-              "과소근거": 3297,
-              "세그먼트과소": 992
+              "과소근거": 3290,
+              "세그먼트과소": 1002
             },
-            "singleDissent": 758
+            "singleDissent": 774
           },
           "unconditional": {
-            "candidates": 552,
-            "passed": 436,
-            "passedPct": 78.99,
+            "candidates": 553,
+            "passed": 437,
+            "passedPct": 79.02,
             "rejected": {
               "과소근거": 110,
               "세그먼트과소": 6
             },
-            "singleDissent": 69
+            "singleDissent": 70
           },
           "conditional": {
-            "candidates": 6060,
-            "passed": 2180,
-            "passedPct": 35.97,
+            "candidates": 6086,
+            "passed": 2204,
+            "passedPct": 36.21,
             "rejected": {
-              "과소근거": 2898,
-              "세그먼트과소": 982
+              "과소근거": 2890,
+              "세그먼트과소": 992
             },
-            "singleDissent": 555
+            "singleDissent": 569
           }
         },
         {
@@ -451,34 +451,34 @@
           "rMin": 0.2,
           "sMin": 8,
           "all": {
-            "candidates": 7660,
-            "passed": 3371,
-            "passedPct": 44.01,
+            "candidates": 7689,
+            "passed": 3397,
+            "passedPct": 44.18,
             "rejected": {
-              "과소근거": 3297,
-              "세그먼트과소": 992
+              "과소근거": 3290,
+              "세그먼트과소": 1002
             },
-            "singleDissent": 758
+            "singleDissent": 774
           },
           "unconditional": {
-            "candidates": 552,
-            "passed": 436,
-            "passedPct": 78.99,
+            "candidates": 553,
+            "passed": 437,
+            "passedPct": 79.02,
             "rejected": {
               "과소근거": 110,
               "세그먼트과소": 6
             },
-            "singleDissent": 69
+            "singleDissent": 70
           },
           "conditional": {
-            "candidates": 6060,
-            "passed": 2180,
-            "passedPct": 35.97,
+            "candidates": 6086,
+            "passed": 2204,
+            "passedPct": 36.21,
             "rejected": {
-              "과소근거": 2898,
-              "세그먼트과소": 982
+              "과소근거": 2890,
+              "세그먼트과소": 992
             },
-            "singleDissent": 555
+            "singleDissent": 569
           }
         },
         {
@@ -486,34 +486,34 @@
           "rMin": 0.3,
           "sMin": 8,
           "all": {
-            "candidates": 7660,
-            "passed": 3371,
-            "passedPct": 44.01,
+            "candidates": 7689,
+            "passed": 3397,
+            "passedPct": 44.18,
             "rejected": {
-              "과소근거": 3297,
-              "세그먼트과소": 992
+              "과소근거": 3290,
+              "세그먼트과소": 1002
             },
-            "singleDissent": 758
+            "singleDissent": 774
           },
           "unconditional": {
-            "candidates": 552,
-            "passed": 436,
-            "passedPct": 78.99,
+            "candidates": 553,
+            "passed": 437,
+            "passedPct": 79.02,
             "rejected": {
               "과소근거": 110,
               "세그먼트과소": 6
             },
-            "singleDissent": 69
+            "singleDissent": 70
           },
           "conditional": {
-            "candidates": 6060,
-            "passed": 2180,
-            "passedPct": 35.97,
+            "candidates": 6086,
+            "passed": 2204,
+            "passedPct": 36.21,
             "rejected": {
-              "과소근거": 2898,
-              "세그먼트과소": 982
+              "과소근거": 2890,
+              "세그먼트과소": 992
             },
-            "singleDissent": 555
+            "singleDissent": 569
           }
         },
         {
@@ -521,34 +521,34 @@
           "rMin": 0.05,
           "sMin": 8,
           "all": {
-            "candidates": 7660,
-            "passed": 2395,
-            "passedPct": 31.27,
+            "candidates": 7689,
+            "passed": 2420,
+            "passedPct": 31.47,
             "rejected": {
-              "과소근거": 4273,
-              "세그먼트과소": 992
+              "과소근거": 4267,
+              "세그먼트과소": 1002
             },
-            "singleDissent": 498
+            "singleDissent": 508
           },
           "unconditional": {
-            "candidates": 552,
-            "passed": 394,
-            "passedPct": 71.38,
+            "candidates": 553,
+            "passed": 395,
+            "passedPct": 71.43,
             "rejected": {
               "과소근거": 152,
               "세그먼트과소": 6
             },
-            "singleDissent": 60
+            "singleDissent": 61
           },
           "conditional": {
-            "candidates": 6060,
-            "passed": 1371,
-            "passedPct": 22.62,
+            "candidates": 6086,
+            "passed": 1395,
+            "passedPct": 22.92,
             "rejected": {
-              "과소근거": 3707,
-              "세그먼트과소": 982
+              "과소근거": 3699,
+              "세그먼트과소": 992
             },
-            "singleDissent": 343
+            "singleDissent": 352
           }
         },
         {
@@ -556,34 +556,34 @@
           "rMin": 0.1,
           "sMin": 8,
           "all": {
-            "candidates": 7660,
-            "passed": 2395,
-            "passedPct": 31.27,
+            "candidates": 7689,
+            "passed": 2420,
+            "passedPct": 31.47,
             "rejected": {
-              "과소근거": 4273,
-              "세그먼트과소": 992
+              "과소근거": 4267,
+              "세그먼트과소": 1002
             },
-            "singleDissent": 498
+            "singleDissent": 508
           },
           "unconditional": {
-            "candidates": 552,
-            "passed": 394,
-            "passedPct": 71.38,
+            "candidates": 553,
+            "passed": 395,
+            "passedPct": 71.43,
             "rejected": {
               "과소근거": 152,
               "세그먼트과소": 6
             },
-            "singleDissent": 60
+            "singleDissent": 61
           },
           "conditional": {
-            "candidates": 6060,
-            "passed": 1371,
-            "passedPct": 22.62,
+            "candidates": 6086,
+            "passed": 1395,
+            "passedPct": 22.92,
             "rejected": {
-              "과소근거": 3707,
-              "세그먼트과소": 982
+              "과소근거": 3699,
+              "세그먼트과소": 992
             },
-            "singleDissent": 343
+            "singleDissent": 352
           }
         },
         {
@@ -591,34 +591,34 @@
           "rMin": 0.2,
           "sMin": 8,
           "all": {
-            "candidates": 7660,
-            "passed": 2395,
-            "passedPct": 31.27,
+            "candidates": 7689,
+            "passed": 2420,
+            "passedPct": 31.47,
             "rejected": {
-              "과소근거": 4273,
-              "세그먼트과소": 992
+              "과소근거": 4267,
+              "세그먼트과소": 1002
             },
-            "singleDissent": 498
+            "singleDissent": 508
           },
           "unconditional": {
-            "candidates": 552,
-            "passed": 394,
-            "passedPct": 71.38,
+            "candidates": 553,
+            "passed": 395,
+            "passedPct": 71.43,
             "rejected": {
               "과소근거": 152,
               "세그먼트과소": 6
             },
-            "singleDissent": 60
+            "singleDissent": 61
           },
           "conditional": {
-            "candidates": 6060,
-            "passed": 1371,
-            "passedPct": 22.62,
+            "candidates": 6086,
+            "passed": 1395,
+            "passedPct": 22.92,
             "rejected": {
-              "과소근거": 3707,
-              "세그먼트과소": 982
+              "과소근거": 3699,
+              "세그먼트과소": 992
             },
-            "singleDissent": 343
+            "singleDissent": 352
           }
         },
         {
@@ -626,34 +626,34 @@
           "rMin": 0.3,
           "sMin": 8,
           "all": {
-            "candidates": 7660,
-            "passed": 2395,
-            "passedPct": 31.27,
+            "candidates": 7689,
+            "passed": 2420,
+            "passedPct": 31.47,
             "rejected": {
-              "과소근거": 4273,
-              "세그먼트과소": 992
+              "과소근거": 4267,
+              "세그먼트과소": 1002
             },
-            "singleDissent": 498
+            "singleDissent": 508
           },
           "unconditional": {
-            "candidates": 552,
-            "passed": 394,
-            "passedPct": 71.38,
+            "candidates": 553,
+            "passed": 395,
+            "passedPct": 71.43,
             "rejected": {
               "과소근거": 152,
               "세그먼트과소": 6
             },
-            "singleDissent": 60
+            "singleDissent": 61
           },
           "conditional": {
-            "candidates": 6060,
-            "passed": 1371,
-            "passedPct": 22.62,
+            "candidates": 6086,
+            "passed": 1395,
+            "passedPct": 22.92,
             "rejected": {
-              "과소근거": 3707,
-              "세그먼트과소": 982
+              "과소근거": 3699,
+              "세그먼트과소": 992
             },
-            "singleDissent": 343
+            "singleDissent": 352
           }
         },
         {
@@ -661,34 +661,34 @@
           "rMin": 0.05,
           "sMin": 12,
           "all": {
-            "candidates": 7660,
-            "passed": 1690,
-            "passedPct": 22.06,
+            "candidates": 7689,
+            "passed": 1704,
+            "passedPct": 22.16,
             "rejected": {
-              "과소근거": 4475,
-              "세그먼트과소": 1495
+              "과소근거": 4477,
+              "세그먼트과소": 1508
             },
-            "singleDissent": 302
+            "singleDissent": 310
           },
           "unconditional": {
-            "candidates": 552,
-            "passed": 351,
-            "passedPct": 63.59,
+            "candidates": 553,
+            "passed": 353,
+            "passedPct": 63.83,
             "rejected": {
-              "과소근거": 195,
+              "과소근거": 194,
               "세그먼트과소": 6
             },
-            "singleDissent": 49
+            "singleDissent": 50
           },
           "conditional": {
-            "candidates": 6060,
-            "passed": 825,
-            "passedPct": 13.61,
+            "candidates": 6086,
+            "passed": 836,
+            "passedPct": 13.74,
             "rejected": {
-              "과소근거": 3760,
-              "세그먼트과소": 1475
+              "과소근거": 3762,
+              "세그먼트과소": 1488
             },
-            "singleDissent": 185
+            "singleDissent": 192
           }
         },
         {
@@ -696,34 +696,34 @@
           "rMin": 0.1,
           "sMin": 12,
           "all": {
-            "candidates": 7660,
-            "passed": 1690,
-            "passedPct": 22.06,
+            "candidates": 7689,
+            "passed": 1704,
+            "passedPct": 22.16,
             "rejected": {
-              "과소근거": 4475,
-              "세그먼트과소": 1495
+              "과소근거": 4477,
+              "세그먼트과소": 1508
             },
-            "singleDissent": 302
+            "singleDissent": 310
           },
           "unconditional": {
-            "candidates": 552,
-            "passed": 351,
-            "passedPct": 63.59,
+            "candidates": 553,
+            "passed": 353,
+            "passedPct": 63.83,
             "rejected": {
-              "과소근거": 195,
+              "과소근거": 194,
               "세그먼트과소": 6
             },
-            "singleDissent": 49
+            "singleDissent": 50
           },
           "conditional": {
-            "candidates": 6060,
-            "passed": 825,
-            "passedPct": 13.61,
+            "candidates": 6086,
+            "passed": 836,
+            "passedPct": 13.74,
             "rejected": {
-              "과소근거": 3760,
-              "세그먼트과소": 1475
+              "과소근거": 3762,
+              "세그먼트과소": 1488
             },
-            "singleDissent": 185
+            "singleDissent": 192
           }
         },
         {
@@ -731,34 +731,34 @@
           "rMin": 0.2,
           "sMin": 12,
           "all": {
-            "candidates": 7660,
-            "passed": 1690,
-            "passedPct": 22.06,
+            "candidates": 7689,
+            "passed": 1704,
+            "passedPct": 22.16,
             "rejected": {
-              "과소근거": 4475,
-              "세그먼트과소": 1495
+              "과소근거": 4477,
+              "세그먼트과소": 1508
             },
-            "singleDissent": 302
+            "singleDissent": 310
           },
           "unconditional": {
-            "candidates": 552,
-            "passed": 351,
-            "passedPct": 63.59,
+            "candidates": 553,
+            "passed": 353,
+            "passedPct": 63.83,
             "rejected": {
-              "과소근거": 195,
+              "과소근거": 194,
               "세그먼트과소": 6
             },
-            "singleDissent": 49
+            "singleDissent": 50
           },
           "conditional": {
-            "candidates": 6060,
-            "passed": 825,
-            "passedPct": 13.61,
+            "candidates": 6086,
+            "passed": 836,
+            "passedPct": 13.74,
             "rejected": {
-              "과소근거": 3760,
-              "세그먼트과소": 1475
+              "과소근거": 3762,
+              "세그먼트과소": 1488
             },
-            "singleDissent": 185
+            "singleDissent": 192
           }
         },
         {
@@ -766,34 +766,34 @@
           "rMin": 0.3,
           "sMin": 12,
           "all": {
-            "candidates": 7660,
-            "passed": 1690,
-            "passedPct": 22.06,
+            "candidates": 7689,
+            "passed": 1704,
+            "passedPct": 22.16,
             "rejected": {
-              "과소근거": 4475,
-              "세그먼트과소": 1495
+              "과소근거": 4477,
+              "세그먼트과소": 1508
             },
-            "singleDissent": 302
+            "singleDissent": 310
           },
           "unconditional": {
-            "candidates": 552,
-            "passed": 351,
-            "passedPct": 63.59,
+            "candidates": 553,
+            "passed": 353,
+            "passedPct": 63.83,
             "rejected": {
-              "과소근거": 195,
+              "과소근거": 194,
               "세그먼트과소": 6
             },
-            "singleDissent": 49
+            "singleDissent": 50
           },
           "conditional": {
-            "candidates": 6060,
-            "passed": 825,
-            "passedPct": 13.61,
+            "candidates": 6086,
+            "passed": 836,
+            "passedPct": 13.74,
             "rejected": {
-              "과소근거": 3760,
-              "세그먼트과소": 1475
+              "과소근거": 3762,
+              "세그먼트과소": 1488
             },
-            "singleDissent": 185
+            "singleDissent": 192
           }
         },
         {
@@ -801,34 +801,34 @@
           "rMin": 0.05,
           "sMin": 15,
           "all": {
-            "candidates": 7660,
-            "passed": 1381,
-            "passedPct": 18.03,
+            "candidates": 7689,
+            "passed": 1399,
+            "passedPct": 18.19,
             "rejected": {
-              "과소근거": 4519,
-              "세그먼트과소": 1760
+              "과소근거": 4508,
+              "세그먼트과소": 1782
             },
-            "singleDissent": 224
+            "singleDissent": 231
           },
           "unconditional": {
-            "candidates": 552,
+            "candidates": 553,
             "passed": 328,
-            "passedPct": 59.42,
+            "passedPct": 59.31,
             "rejected": {
-              "과소근거": 218,
+              "과소근거": 219,
               "세그먼트과소": 6
             },
-            "singleDissent": 40
+            "singleDissent": 41
           },
           "conditional": {
-            "candidates": 6060,
-            "passed": 589,
-            "passedPct": 9.72,
+            "candidates": 6086,
+            "passed": 605,
+            "passedPct": 9.94,
             "rejected": {
-              "과소근거": 3731,
-              "세그먼트과소": 1740
+              "과소근거": 3719,
+              "세그먼트과소": 1762
             },
-            "singleDissent": 126
+            "singleDissent": 131
           }
         },
         {
@@ -836,34 +836,34 @@
           "rMin": 0.1,
           "sMin": 15,
           "all": {
-            "candidates": 7660,
-            "passed": 1381,
-            "passedPct": 18.03,
+            "candidates": 7689,
+            "passed": 1399,
+            "passedPct": 18.19,
             "rejected": {
-              "과소근거": 4519,
-              "세그먼트과소": 1760
+              "과소근거": 4508,
+              "세그먼트과소": 1782
             },
-            "singleDissent": 224
+            "singleDissent": 231
           },
           "unconditional": {
-            "candidates": 552,
+            "candidates": 553,
             "passed": 328,
-            "passedPct": 59.42,
+            "passedPct": 59.31,
             "rejected": {
-              "과소근거": 218,
+              "과소근거": 219,
               "세그먼트과소": 6
             },
-            "singleDissent": 40
+            "singleDissent": 41
           },
           "conditional": {
-            "candidates": 6060,
-            "passed": 589,
-            "passedPct": 9.72,
+            "candidates": 6086,
+            "passed": 605,
+            "passedPct": 9.94,
             "rejected": {
-              "과소근거": 3731,
-              "세그먼트과소": 1740
+              "과소근거": 3719,
+              "세그먼트과소": 1762
             },
-            "singleDissent": 126
+            "singleDissent": 131
           }
         },
         {
@@ -871,34 +871,34 @@
           "rMin": 0.2,
           "sMin": 15,
           "all": {
-            "candidates": 7660,
-            "passed": 1381,
-            "passedPct": 18.03,
+            "candidates": 7689,
+            "passed": 1399,
+            "passedPct": 18.19,
             "rejected": {
-              "과소근거": 4519,
-              "세그먼트과소": 1760
+              "과소근거": 4508,
+              "세그먼트과소": 1782
             },
-            "singleDissent": 224
+            "singleDissent": 231
           },
           "unconditional": {
-            "candidates": 552,
+            "candidates": 553,
             "passed": 328,
-            "passedPct": 59.42,
+            "passedPct": 59.31,
             "rejected": {
-              "과소근거": 218,
+              "과소근거": 219,
               "세그먼트과소": 6
             },
-            "singleDissent": 40
+            "singleDissent": 41
           },
           "conditional": {
-            "candidates": 6060,
-            "passed": 589,
-            "passedPct": 9.72,
+            "candidates": 6086,
+            "passed": 605,
+            "passedPct": 9.94,
             "rejected": {
-              "과소근거": 3731,
-              "세그먼트과소": 1740
+              "과소근거": 3719,
+              "세그먼트과소": 1762
             },
-            "singleDissent": 126
+            "singleDissent": 131
           }
         },
         {
@@ -906,34 +906,34 @@
           "rMin": 0.3,
           "sMin": 15,
           "all": {
-            "candidates": 7660,
-            "passed": 1381,
-            "passedPct": 18.03,
+            "candidates": 7689,
+            "passed": 1399,
+            "passedPct": 18.19,
             "rejected": {
-              "과소근거": 4519,
-              "세그먼트과소": 1760
+              "과소근거": 4508,
+              "세그먼트과소": 1782
             },
-            "singleDissent": 224
+            "singleDissent": 231
           },
           "unconditional": {
-            "candidates": 552,
+            "candidates": 553,
             "passed": 328,
-            "passedPct": 59.42,
+            "passedPct": 59.31,
             "rejected": {
-              "과소근거": 218,
+              "과소근거": 219,
               "세그먼트과소": 6
             },
-            "singleDissent": 40
+            "singleDissent": 41
           },
           "conditional": {
-            "candidates": 6060,
-            "passed": 589,
-            "passedPct": 9.72,
+            "candidates": 6086,
+            "passed": 605,
+            "passedPct": 9.94,
             "rejected": {
-              "과소근거": 3731,
-              "세그먼트과소": 1740
+              "과소근거": 3719,
+              "세그먼트과소": 1762
             },
-            "singleDissent": 126
+            "singleDissent": 131
           }
         }
       ],
@@ -942,144 +942,144 @@
           "sMin": 8,
           "nMin": 8,
           "all": {
-            "candidates": 7660,
-            "passed": 2395,
-            "passedPct": 31.27,
+            "candidates": 7689,
+            "passed": 2420,
+            "passedPct": 31.47,
             "rejected": {
-              "과소근거": 4273,
-              "세그먼트과소": 992
+              "과소근거": 4267,
+              "세그먼트과소": 1002
             },
-            "singleDissent": 498
+            "singleDissent": 508
           }
         },
         {
           "sMin": 10,
           "nMin": 8,
           "all": {
-            "candidates": 7660,
-            "passed": 2394,
-            "passedPct": 31.25,
+            "candidates": 7689,
+            "passed": 2419,
+            "passedPct": 31.46,
             "rejected": {
-              "과소근거": 3997,
-              "세그먼트과소": 1269
+              "과소근거": 3989,
+              "세그먼트과소": 1281
             },
-            "singleDissent": 498
+            "singleDissent": 508
           }
         },
         {
           "sMin": 15,
           "nMin": 8,
           "all": {
-            "candidates": 7660,
-            "passed": 2378,
-            "passedPct": 31.04,
+            "candidates": 7689,
+            "passed": 2401,
+            "passedPct": 31.23,
             "rejected": {
-              "과소근거": 3522,
-              "세그먼트과소": 1760
+              "과소근거": 3506,
+              "세그먼트과소": 1782
             },
-            "singleDissent": 495
+            "singleDissent": 505
           }
         },
         {
           "sMin": 20,
           "nMin": 8,
           "all": {
-            "candidates": 7660,
-            "passed": 2314,
-            "passedPct": 30.21,
+            "candidates": 7689,
+            "passed": 2336,
+            "passedPct": 30.38,
             "rejected": {
-              "과소근거": 2984,
-              "세그먼트과소": 2362
+              "과소근거": 2975,
+              "세그먼트과소": 2378
             },
-            "singleDissent": 472
+            "singleDissent": 481
           }
         },
         {
           "sMin": 30,
           "nMin": 8,
           "all": {
-            "candidates": 7660,
-            "passed": 2097,
-            "passedPct": 27.38,
+            "candidates": 7689,
+            "passed": 2111,
+            "passedPct": 27.45,
             "rejected": {
-              "과소근거": 2063,
-              "세그먼트과소": 3500
+              "과소근거": 2057,
+              "세그먼트과소": 3521
             },
-            "singleDissent": 418
+            "singleDissent": 423
           }
         },
         {
           "sMin": 50,
           "nMin": 8,
           "all": {
-            "candidates": 7660,
-            "passed": 1741,
-            "passedPct": 22.73,
+            "candidates": 7689,
+            "passed": 1747,
+            "passedPct": 22.72,
             "rejected": {
-              "과소근거": 1325,
-              "세그먼트과소": 4594
+              "과소근거": 1324,
+              "세그먼트과소": 4618
             },
-            "singleDissent": 319
+            "singleDissent": 322
           }
         }
       ],
       "note": "후보는 (셀 × aspect) 중 D ≥ 1 인 것이다 — 아무도 말하지 않은 주제는 주장이 아니라서 분모에 넣지 않는다. 한 리뷰가 여러 skinTrouble 코드를 가지면 그 코드 셀마다 세어지므로 축별 후보 수를 서로 더하지 않는다"
     },
     "binding": {
-      "candidates": 7660,
-      "passed": 2395,
+      "candidates": 7689,
+      "passed": 2420,
       "rejectedByReason": {
-        "과소근거": 4273,
-        "세그먼트과소": 992
+        "과소근거": 4267,
+        "세그먼트과소": 1002
       },
       "rejectedIfOnly": {
-        "nMin": 5265,
-        "rMin": 102,
-        "sMin": 1066
+        "nMin": 5269,
+        "rMin": 104,
+        "sMin": 1076
       },
       "note": "`rejectedByReason` 는 판정 순서(S → U → U/D)를 거친 귀속이고, `rejectedIfOnly` 는 그 조건 하나만 걸었을 때의 탈락 수다. 두 수가 다른 것이 세 조건을 AND 로 묶은 이유다 — 하나만으로는 나머지가 잡는 것을 놓친다"
     },
     "ratioDiagnosis": {
-      "candidates": 7660,
+      "candidates": 7689,
       "supportShare": {
         "min": 0.0,
         "p05": 0.7143,
         "median": 1.0,
         "belowRMin": {
-          "0.05": 102,
-          "0.1": 102,
-          "0.2": 103,
-          "0.3": 104
+          "0.05": 104,
+          "0.1": 104,
+          "0.2": 105,
+          "0.3": 106
         }
       },
-      "mixedCandidates": 2846,
+      "mixedCandidates": 2880,
       "minorityAuthors": {
-        "1": 1343,
-        "2": 528,
-        "3": 276,
-        "4": 170,
-        "5": 134,
-        "6": 82,
-        "7": 67,
+        "1": 1368,
+        "2": 527,
+        "3": 279,
+        "4": 172,
+        "5": 132,
+        "6": 86,
+        "7": 68,
         "8": 40,
-        "9": 32,
-        "10+": 174
+        "9": 29,
+        "10+": 179
       },
       "minorityShare": {
         "min": 0.0061,
         "median": 0.1818
       },
       "passedWithMinorityBelow": {
-        "passed": 2395,
-        "mixed": 1764,
+        "passed": 2420,
+        "mixed": 1787,
         "belowShare": {
-          "0.05": 237,
-          "0.1": 678,
-          "0.2": 1287,
-          "0.3": 1516
+          "0.05": 241,
+          "0.1": 695,
+          "0.2": 1306,
+          "0.3": 1539
         }
       },
-      "finding": "R_min 에 귀속되는 탈락은 전수 7,660 후보에서 0 이다. 혼자 걸면 102건을 잡지만 그 102건은 전부 N_min 이 이미 잡는다. 구조가 원인이다 — U 는 방향을 말한 사람 전체이고 `mixed` 면 양쪽을 흡수하므로, U/D 를 1 아래로 내리는 것은 중립 태그(전수 38,251개의 4.18%)뿐이다. 그래서 U/D 중위수가 1.0 이다. 비율이 실제로 일할 자리는 주장 전체가 아니라 **소수 측**이고(통과분 2,395건 중 1,764건이 mixed, 소수 몫 중위 0.18), 그 수를 `passedWithMinorityBelow` 에 냈다 — 정책 변경은 PER-211 의 판단이지 이 이슈에서 하지 않는다"
+      "finding": "R_min 에 귀속되는 탈락은 전수 7,689 후보에서 0 이다. 혼자 걸면 104건을 잡지만 그 104건은 전부 N_min 이 이미 잡는다. 구조가 원인이다 — U 는 방향을 말한 사람 전체이고 `mixed` 면 양쪽을 흡수하므로, U/D 를 1 아래로 내리는 것은 중립 태그뿐이다. 그래서 U/D 중위수가 1.0 이다. 비율이 실제로 일할 자리는 주장 전체가 아니라 **소수 측**이고(통과분 2,420건 중 1,787건이 mixed), 그 수를 `passedWithMinorityBelow` 에 냈다 — 정책 변경은 PER-211 의 판단이지 이 이슈에서 하지 않는다"
     }
   },
   "sensitivity": {

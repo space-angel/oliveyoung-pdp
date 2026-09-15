@@ -22,11 +22,15 @@ PER-188 근거 측정 — 통합 `rejected[]` 원장과 골든셋 역추적.
 
 ## 입력 기반은 다른 measure 스크립트와 같다
 
-`data/input/reviews_50products.json` 에서 레코드를 다시 만든다 — 입수 산출물
-(`data/intermediate/v5_reviews.jsonl`)은 gitignore 라 클론 직후에 없고, 그래야
-`eval/reports/gate1_identity_per182.json` · `gate4_sufficiency_per186.json` 과 같은
-기반 위에서 수를 비교할 수 있다. **이 기반은 실제 파이프라인과 미세하게 다르다** —
-`limits` 에 그 차이를 적었다.
+`data/input/reviews_50products.json` 에서 레코드를 다시 만든다 — 그 경로 자체
+(`build_record` · `score_all`)가 입수와 같은지 이 측정이 함께 확인하기 때문이고,
+`eval/reports/gate2_duplicate_per183.json` · `gate4_sufficiency_per186.json` 과 같은
+기반 위에서 수를 비교할 수 있기 때문이다.
+
+**`score_all` 에 전수 태그의 `aspect_counts` 를 반드시 넘긴다.** 넘기지 않으면
+`trustPrior` 의 `onTopic` 이 `unavailable` 로 남아 입수 산출물과 파생층이 갈리고,
+게이트2 의 작성자 1표 대표가 달라져 수가 통째로 어긋난다 (2026-09-15 실제로 어긋나
+있었다 — 후보 7,660 · 통과 2,395).
 
 사용:
   .venv/bin/python eval/measure_rejected_ledger.py
@@ -46,6 +50,7 @@ sys.path.insert(0, str(ROOT / "pipeline"))
 import reject_registry as registry  # noqa: E402
 from catalog import load_catalog  # noqa: E402
 from contracts import build_record  # noqa: E402
+from ingest import load_aspect_counts  # noqa: E402
 from golden_contract import validate_labels  # noqa: E402
 from ledger import (  # noqa: E402
     OUTCOME_PRODUCED,
@@ -82,17 +87,23 @@ def pct(part: int, whole: int) -> float:
 
 
 def load_records() -> tuple[list[dict], object]:
-    """다른 measure 스크립트와 같은 경로로 레코드를 만든다 (모듈 문서 참조)."""
+    """    입수(PER-173)와 같은 경로로 레코드를 만든다.
+
+    `data/intermediate/v5_reviews.jsonl` 을 읽지 않고 `data/input` 에서 다시 만드는 이유는
+    그 경로 자체(`build_record` · `score_all`)가 입수와 같은지 이 측정이 함께 확인하기
+    때문이다. 대신 **`aspect_counts` 를 반드시 넘긴다** — 넘기지 않으면 `trustPrior` 의
+    `onTopic` 이 `unavailable` 로 남아 입수 산출물과 파생층이 갈리고, 게이트2 의 작성자
+    1표 대표가 달라진다 (PER-174 · PER-188 인계).
+    """
     catalog = load_catalog()
     records = []
     for row in json.loads(INPUT_PATH.read_text()):
         product_id = catalog.resolve_goods_no(row["goodsNo"], row["reviewDate"])
         records.append(build_record(row, product_id).to_dict())
-    priors = score_all(records)
+    priors = score_all(records, aspect_counts=load_aspect_counts(TAGS_PATH))
     for record in records:
         record["derived"]["trustPrior"] = priors[record["reviewId"]]
     return records, catalog
-
 
 def load_tags() -> tuple[list[dict], dict[int, list[tuple[str, str]]], dict]:
     """전수 태그. 없으면 조용히 건너뛰지 않고 멈춘다 — 태그 없이는 게이트4 후보가 0이다."""
@@ -454,12 +465,10 @@ def main() -> None:
             "v5 로 옮기지 않기로 했기 때문이다 (PER-178, "
             "eval/reports/v4_golden_migration_per178.json). 이 이슈가 자동화한 것은 "
             "그 2건의 사후 추적이 아니라 **앞으로의 미스 추적 경로**다",
-            "입력 기반이 실제 파이프라인과 미세하게 다르다. 이 스크립트는 다른 measure "
-            "스크립트와 같이 data/input 에서 레코드를 다시 만들고, 그 경로에는 태그가 "
-            "없어 trustPrior 의 onTopic 신호가 unavailable 이다. 입수 산출물"
-            "(v5_reviews.jsonl)로 돌리면 게이트2 대표가 달라져 후보 7,689 · 통과 2,420 "
-            "이 된다 (python3 pipeline/run_v5.py --steps gates). 게이트1·2 통과 수는 "
-            "양쪽 17,672 로 같고 달라지는 것은 사유 귀속과 대표 선택이다",
+            "입력 기반은 실제 파이프라인과 같다. 레코드는 data/input 에서 다시 만들되 "
+            "score_all 에 전수 태그의 aspect_counts 를 넘기므로 trustPrior 의 onTopic 이 "
+            "입수 산출물과 같은 값을 갖는다 — 2026-09-15 이전에는 이걸 안 넘겨 게이트2 "
+            "대표가 갈렸고 후보 7,660 · 통과 2,395 라는 다른 수가 나왔다",
         ],
     }
 
