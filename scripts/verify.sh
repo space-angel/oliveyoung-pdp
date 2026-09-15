@@ -105,6 +105,8 @@ fi
 "$PY" eval/measure_embedding_probe.py --check
 # claim 스키마나 골든셋이 바뀌면 "무엇을 담을 수 있는가" 가 조용히 낡는다 (PER-189)
 "$PY" eval/measure_claim_schema.py --check
+# 정규화 규칙·게이트·골든셋이 바뀌면 인용 원문성 수치가 조용히 낡는다 (PER-190)
+"$PY" eval/measure_quote_fidelity.py --check
 
 echo
 echo "verify.sh OK (--full)"
