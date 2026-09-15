@@ -24,6 +24,8 @@ echo "== 생성물 재현 확인 =="
 "$PY" eval/measure_gate1_identity.py --check
 # 중복 판정 규칙·신뢰도 가중치가 바뀌면 "리뷰 N건"의 근거가 조용히 낡는다 (PER-183)
 "$PY" eval/measure_gate2_duplicate.py --check
+# 충분성 임계값이 바뀌면 통과 주장 수의 민감도가 조용히 낡는다 (PER-186 → PER-199 입력)
+"$PY" eval/measure_gate4_sufficiency.py --check
 # 모델 후보의 계약 표시가 현재 규칙과 같은지 — 규칙이 바뀌면 표시가 조용히 낡는다 (PER-178)
 "$PY" eval/concern_candidates.py recheck --check
 # 태거 후보 채점 — 계약 규칙·정답셋이 바뀌면 모델 비교표가 조용히 낡는다 (PER-175)

@@ -26,6 +26,7 @@
 | **미기재** | 조건 없음이 아니라 **별도 세그먼트** `미기재` | `contracts.MISSING_SEGMENT` | `segment` 는 절대 null 이 아니다 |
 | **리센시 컷** | 스냅샷 최신 월 기준 24개월 (`2024-09`~) | `policy.recency_gate()` | `rejected[]` 행 (드롭 아님) |
 | **리뉴얼 컷** | 세대는 별개 `productId` + 같은 `lineageId` | `policy.renewal_gate()` | `rejected[]` 행 / `limitation` |
+| **충분성 컷** | `U ≥ 8` AND `U/D ≥ 0.10` AND `S ≥ 8` — 셋 다. 분모 D 는 **주제를 언급한 작성자** (PER-186) | `policy.sufficiency_gate()` · `sufficiency.run_sufficiency_gate()` | `rejected[]` 행 (`과소근거`/`소수방향`/`세그먼트과소`) / `U ≤ D ≤ S` 위반은 `PolicyError` |
 | **스냅샷 스키마** | 계약이 아는 25필드와 **정확히** 일치 | `contracts.assert_row_schema()` | `ContractError` |
 | **비목표** | `usagePeriod` 조건축 (§5), `skinTone` 조건축 (§4) | — | — |
 

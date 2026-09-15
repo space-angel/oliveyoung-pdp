@@ -1,0 +1,1127 @@
+{
+  "issue": "PER-186",
+  "source": {
+    "path": "data/input/reviews_50products.json",
+    "sha256": "04e089d078d5482855f04481b7144661834b391d55b3cec0033431454903a773",
+    "reviews": 25000,
+    "products": 53,
+    "afterGate1And2": 17672,
+    "goldenLabels": "eval/gold/v5_concern_golden_labels.jsonl"
+  },
+  "policy": {
+    "issue": "PER-186",
+    "nMin": 8,
+    "rMin": 0.1,
+    "sMin": 8,
+    "minorityMin": 2,
+    "denominator": "spokeAuthors",
+    "note": "U ≥ N_min AND U/D ≥ R_min AND S ≥ S_min 을 모두 만족해야 통과. 분모 D 는 주제를 언급한 고유 작성자다 (PER-178 — 침묵은 근거가 아니다)",
+    "snapshotLatestMonth": "2026-08",
+    "recencyCutoffMonth": "2024-09"
+  },
+  "cellProfile": {
+    "product": {
+      "cells": 51,
+      "min": 7,
+      "median": 370,
+      "max": 464,
+      "atLeast": {
+        "8": 50,
+        "10": 50,
+        "15": 50,
+        "20": 50,
+        "30": 49,
+        "50": 49
+      }
+    },
+    "skinType": {
+      "cells": 394,
+      "statedCells": 343,
+      "atLeast": {
+        "8": 283,
+        "10": 271,
+        "15": 237,
+        "20": 205,
+        "30": 161,
+        "50": 110
+      },
+      "atLeastStated": {
+        "8": 233,
+        "10": 221,
+        "15": 188,
+        "20": 156,
+        "30": 112,
+        "50": 63
+      }
+    },
+    "skinTrouble": {
+      "cells": 677,
+      "statedCells": 626,
+      "atLeast": {
+        "8": 486,
+        "10": 444,
+        "15": 397,
+        "20": 344,
+        "30": 240,
+        "50": 156
+      },
+      "atLeastStated": {
+        "8": 436,
+        "10": 394,
+        "15": 348,
+        "20": 295,
+        "30": 191,
+        "50": 107
+      }
+    },
+    "note": "S 는 셀의 고유 작성자 수다 (게이트2 통과분이라 리뷰 1건 = 작성자 1명). 미기재는 '조건 없음'이 아니라 별도 세그먼트이므로 따로 센다"
+  },
+  "fallback": {
+    "sMin": 8,
+    "products": 53,
+    "silentProducts": [
+      {
+        "productId": "p051",
+        "displayName": "컬러그램 누디 블러 틴트 (기존 용기)",
+        "reviews": 7,
+        "cellAuthors": 7,
+        "reason": "고유 작성자 7명 < S_min=8",
+        "gate1Rejected": {}
+      },
+      {
+        "productId": "p052",
+        "displayName": "에스쁘아 비벨벳 커버쿠션 (2025 리뉴얼 이전)",
+        "reviews": 4,
+        "cellAuthors": 0,
+        "reason": "게이트1·2 통과 리뷰 0건",
+        "gate1Rejected": {
+          "recency_cut": 4
+        }
+      },
+      {
+        "productId": "p053",
+        "displayName": "헤라 블랙 쿠션 (2024 리뉴얼 이전)",
+        "reviews": 159,
+        "cellAuthors": 0,
+        "reason": "게이트1·2 통과 리뷰 0건",
+        "gate1Rejected": {
+          "recency_cut": 159
+        }
+      }
+    ],
+    "speakingProducts": 50,
+    "conditionCells": {
+      "skinType": {
+        "statedCells": 343,
+        "silentCells": 110,
+        "silentPct": 32.07
+      },
+      "skinTrouble": {
+        "statedCells": 626,
+        "silentCells": 190,
+        "silentPct": 30.35
+      }
+    },
+    "note": "침묵은 실패가 아니라 §5-3 의 기본 폴백이다. 셀이 작으면 주장을 만들기 전에 멈춘다 — 생성 비용을 쓰고 나서 거르면 '적게 낸다'가 성립하지 않는다"
+  },
+  "sensitivity": {
+    "labels": 26,
+    "conditionalLabels": 20,
+    "nMinByRMin": [
+      {
+        "nMin": 3,
+        "rMin": 0.05,
+        "sMin": 8,
+        "raw": {
+          "passed": 16,
+          "rejected": {
+            "과소근거": 10
+          }
+        },
+        "weighted": {
+          "passed": 17,
+          "rejected": {
+            "과소근거": 9
+          }
+        }
+      },
+      {
+        "nMin": 3,
+        "rMin": 0.1,
+        "sMin": 8,
+        "raw": {
+          "passed": 16,
+          "rejected": {
+            "과소근거": 10
+          }
+        },
+        "weighted": {
+          "passed": 17,
+          "rejected": {
+            "과소근거": 9
+          }
+        }
+      },
+      {
+        "nMin": 3,
+        "rMin": 0.2,
+        "sMin": 8,
+        "raw": {
+          "passed": 16,
+          "rejected": {
+            "과소근거": 10
+          }
+        },
+        "weighted": {
+          "passed": 17,
+          "rejected": {
+            "과소근거": 9
+          }
+        }
+      },
+      {
+        "nMin": 3,
+        "rMin": 0.3,
+        "sMin": 8,
+        "raw": {
+          "passed": 16,
+          "rejected": {
+            "과소근거": 10
+          }
+        },
+        "weighted": {
+          "passed": 17,
+          "rejected": {
+            "과소근거": 9
+          }
+        }
+      },
+      {
+        "nMin": 5,
+        "rMin": 0.05,
+        "sMin": 8,
+        "raw": {
+          "passed": 9,
+          "rejected": {
+            "과소근거": 17
+          }
+        },
+        "weighted": {
+          "passed": 13,
+          "rejected": {
+            "과소근거": 13
+          }
+        }
+      },
+      {
+        "nMin": 5,
+        "rMin": 0.1,
+        "sMin": 8,
+        "raw": {
+          "passed": 9,
+          "rejected": {
+            "과소근거": 17
+          }
+        },
+        "weighted": {
+          "passed": 13,
+          "rejected": {
+            "과소근거": 13
+          }
+        }
+      },
+      {
+        "nMin": 5,
+        "rMin": 0.2,
+        "sMin": 8,
+        "raw": {
+          "passed": 9,
+          "rejected": {
+            "과소근거": 17
+          }
+        },
+        "weighted": {
+          "passed": 13,
+          "rejected": {
+            "과소근거": 13
+          }
+        }
+      },
+      {
+        "nMin": 5,
+        "rMin": 0.3,
+        "sMin": 8,
+        "raw": {
+          "passed": 9,
+          "rejected": {
+            "과소근거": 17
+          }
+        },
+        "weighted": {
+          "passed": 13,
+          "rejected": {
+            "과소근거": 13
+          }
+        }
+      },
+      {
+        "nMin": 8,
+        "rMin": 0.05,
+        "sMin": 8,
+        "raw": {
+          "passed": 3,
+          "rejected": {
+            "과소근거": 23
+          }
+        },
+        "weighted": {
+          "passed": 10,
+          "rejected": {
+            "과소근거": 16
+          }
+        }
+      },
+      {
+        "nMin": 8,
+        "rMin": 0.1,
+        "sMin": 8,
+        "raw": {
+          "passed": 3,
+          "rejected": {
+            "과소근거": 23
+          }
+        },
+        "weighted": {
+          "passed": 10,
+          "rejected": {
+            "과소근거": 16
+          }
+        }
+      },
+      {
+        "nMin": 8,
+        "rMin": 0.2,
+        "sMin": 8,
+        "raw": {
+          "passed": 3,
+          "rejected": {
+            "과소근거": 23
+          }
+        },
+        "weighted": {
+          "passed": 10,
+          "rejected": {
+            "과소근거": 16
+          }
+        }
+      },
+      {
+        "nMin": 8,
+        "rMin": 0.3,
+        "sMin": 8,
+        "raw": {
+          "passed": 3,
+          "rejected": {
+            "과소근거": 23
+          }
+        },
+        "weighted": {
+          "passed": 10,
+          "rejected": {
+            "과소근거": 16
+          }
+        }
+      },
+      {
+        "nMin": 12,
+        "rMin": 0.05,
+        "sMin": 12,
+        "raw": {
+          "passed": 0,
+          "rejected": {
+            "과소근거": 26
+          }
+        },
+        "weighted": {
+          "passed": 7,
+          "rejected": {
+            "과소근거": 19
+          }
+        }
+      },
+      {
+        "nMin": 12,
+        "rMin": 0.1,
+        "sMin": 12,
+        "raw": {
+          "passed": 0,
+          "rejected": {
+            "과소근거": 26
+          }
+        },
+        "weighted": {
+          "passed": 7,
+          "rejected": {
+            "과소근거": 19
+          }
+        }
+      },
+      {
+        "nMin": 12,
+        "rMin": 0.2,
+        "sMin": 12,
+        "raw": {
+          "passed": 0,
+          "rejected": {
+            "과소근거": 26
+          }
+        },
+        "weighted": {
+          "passed": 7,
+          "rejected": {
+            "과소근거": 19
+          }
+        }
+      },
+      {
+        "nMin": 12,
+        "rMin": 0.3,
+        "sMin": 12,
+        "raw": {
+          "passed": 0,
+          "rejected": {
+            "과소근거": 26
+          }
+        },
+        "weighted": {
+          "passed": 7,
+          "rejected": {
+            "과소근거": 19
+          }
+        }
+      },
+      {
+        "nMin": 15,
+        "rMin": 0.05,
+        "sMin": 15,
+        "raw": {
+          "passed": 0,
+          "rejected": {
+            "과소근거": 26
+          }
+        },
+        "weighted": {
+          "passed": 7,
+          "rejected": {
+            "과소근거": 19
+          }
+        }
+      },
+      {
+        "nMin": 15,
+        "rMin": 0.1,
+        "sMin": 15,
+        "raw": {
+          "passed": 0,
+          "rejected": {
+            "과소근거": 26
+          }
+        },
+        "weighted": {
+          "passed": 7,
+          "rejected": {
+            "과소근거": 19
+          }
+        }
+      },
+      {
+        "nMin": 15,
+        "rMin": 0.2,
+        "sMin": 15,
+        "raw": {
+          "passed": 0,
+          "rejected": {
+            "과소근거": 26
+          }
+        },
+        "weighted": {
+          "passed": 7,
+          "rejected": {
+            "과소근거": 19
+          }
+        }
+      },
+      {
+        "nMin": 15,
+        "rMin": 0.3,
+        "sMin": 15,
+        "raw": {
+          "passed": 0,
+          "rejected": {
+            "과소근거": 26
+          }
+        },
+        "weighted": {
+          "passed": 7,
+          "rejected": {
+            "과소근거": 19
+          }
+        }
+      }
+    ],
+    "sMinSweep": [
+      {
+        "sMin": 8,
+        "nMin": 8,
+        "raw": {
+          "passed": 3,
+          "rejected": {
+            "과소근거": 23
+          }
+        },
+        "weighted": {
+          "passed": 10,
+          "rejected": {
+            "과소근거": 16
+          }
+        }
+      },
+      {
+        "sMin": 10,
+        "nMin": 8,
+        "raw": {
+          "passed": 3,
+          "rejected": {
+            "과소근거": 23
+          }
+        },
+        "weighted": {
+          "passed": 10,
+          "rejected": {
+            "과소근거": 16
+          }
+        }
+      },
+      {
+        "sMin": 15,
+        "nMin": 8,
+        "raw": {
+          "passed": 3,
+          "rejected": {
+            "과소근거": 23
+          }
+        },
+        "weighted": {
+          "passed": 10,
+          "rejected": {
+            "과소근거": 16
+          }
+        }
+      },
+      {
+        "sMin": 20,
+        "nMin": 8,
+        "raw": {
+          "passed": 3,
+          "rejected": {
+            "과소근거": 19,
+            "세그먼트과소": 4
+          }
+        },
+        "weighted": {
+          "passed": 10,
+          "rejected": {
+            "과소근거": 12,
+            "세그먼트과소": 4
+          }
+        }
+      },
+      {
+        "sMin": 30,
+        "nMin": 8,
+        "raw": {
+          "passed": 2,
+          "rejected": {
+            "과소근거": 9,
+            "세그먼트과소": 15
+          }
+        },
+        "weighted": {
+          "passed": 9,
+          "rejected": {
+            "과소근거": 2,
+            "세그먼트과소": 15
+          }
+        }
+      },
+      {
+        "sMin": 50,
+        "nMin": 8,
+        "raw": {
+          "passed": 0,
+          "rejected": {
+            "세그먼트과소": 26
+          }
+        },
+        "weighted": {
+          "passed": 9,
+          "rejected": {
+            "과소근거": 2,
+            "세그먼트과소": 15
+          }
+        }
+      }
+    ],
+    "note": "N_min 을 올리면 S_min 도 함께 올린다 — U ≤ D ≤ S 라 S_min < N_min 은 세그먼트 조건을 끄는 설정이고 정책이 에러를 낸다"
+  },
+  "minorityPolicy": {
+    "labels": 26,
+    "mixedLabels": 12,
+    "minorityDistribution": {
+      "1": 8,
+      "2": 2,
+      "3": 1,
+      "4": 1
+    },
+    "singleDissentLabels": [
+      "B01-1",
+      "B01-3",
+      "B01-6",
+      "B03-2",
+      "B03-3",
+      "B04-5",
+      "B04-6",
+      "B05-4"
+    ],
+    "singleDissentPct": 30.77,
+    "decision": "반대 1명도 mixed 를 유지하고 limitation='single_dissent' 로 표기한다. 다수 방향으로 뭉개면 이 26건 중 8건에서 반대 의견이 화면에서 사라진다 (PER-178 규격 §9 가 기각한 대안)"
+  },
+  "goldenLabels": [
+    {
+      "labelId": "B01-1",
+      "scope": "product",
+      "conditional": false,
+      "population": 395,
+      "direction": "mixed",
+      "positiveAuthors": 1,
+      "negativeAuthors": 7,
+      "neutralAuthors": 0,
+      "supportAuthors": 8,
+      "spokeAuthors": 8,
+      "silentAuthors": 32,
+      "cellAuthors": 40,
+      "supportShare": 1.0,
+      "weighted": {
+        "supportAuthors": 36,
+        "spokeAuthors": 36,
+        "cellAuthors": 395
+      }
+    },
+    {
+      "labelId": "B01-2",
+      "scope": "product",
+      "conditional": false,
+      "population": 395,
+      "direction": "negative",
+      "positiveAuthors": 0,
+      "negativeAuthors": 3,
+      "neutralAuthors": 0,
+      "supportAuthors": 3,
+      "spokeAuthors": 3,
+      "silentAuthors": 37,
+      "cellAuthors": 40,
+      "supportShare": 1.0,
+      "weighted": {
+        "supportAuthors": 10,
+        "spokeAuthors": 10,
+        "cellAuthors": 395
+      }
+    },
+    {
+      "labelId": "B01-3",
+      "scope": "product",
+      "conditional": false,
+      "population": 395,
+      "direction": "mixed",
+      "positiveAuthors": 1,
+      "negativeAuthors": 3,
+      "neutralAuthors": 0,
+      "supportAuthors": 4,
+      "spokeAuthors": 4,
+      "silentAuthors": 36,
+      "cellAuthors": 40,
+      "supportShare": 1.0,
+      "weighted": {
+        "supportAuthors": 41,
+        "spokeAuthors": 41,
+        "cellAuthors": 395
+      }
+    },
+    {
+      "labelId": "B01-4",
+      "scope": "product",
+      "conditional": false,
+      "population": 395,
+      "direction": "negative",
+      "positiveAuthors": 0,
+      "negativeAuthors": 4,
+      "neutralAuthors": 0,
+      "supportAuthors": 4,
+      "spokeAuthors": 4,
+      "silentAuthors": 36,
+      "cellAuthors": 40,
+      "supportShare": 1.0,
+      "weighted": {
+        "supportAuthors": 7,
+        "spokeAuthors": 7,
+        "cellAuthors": 395
+      }
+    },
+    {
+      "labelId": "B01-5",
+      "scope": "product",
+      "conditional": false,
+      "population": 395,
+      "direction": "negative",
+      "positiveAuthors": 0,
+      "negativeAuthors": 2,
+      "neutralAuthors": 0,
+      "supportAuthors": 2,
+      "spokeAuthors": 2,
+      "silentAuthors": 38,
+      "cellAuthors": 40,
+      "supportShare": 1.0,
+      "weighted": {
+        "supportAuthors": 9,
+        "spokeAuthors": 9,
+        "cellAuthors": 395
+      }
+    },
+    {
+      "labelId": "B01-6",
+      "scope": "product",
+      "conditional": false,
+      "population": 395,
+      "direction": "mixed",
+      "positiveAuthors": 1,
+      "negativeAuthors": 4,
+      "neutralAuthors": 0,
+      "supportAuthors": 5,
+      "spokeAuthors": 5,
+      "silentAuthors": 35,
+      "cellAuthors": 40,
+      "supportShare": 1.0,
+      "weighted": {
+        "supportAuthors": 33,
+        "spokeAuthors": 33,
+        "cellAuthors": 395
+      }
+    },
+    {
+      "labelId": "B02-1",
+      "scope": "skinType",
+      "conditional": true,
+      "population": 17,
+      "direction": "mixed",
+      "positiveAuthors": 3,
+      "negativeAuthors": 2,
+      "neutralAuthors": 0,
+      "supportAuthors": 5,
+      "spokeAuthors": 5,
+      "silentAuthors": 12,
+      "cellAuthors": 17,
+      "supportShare": 1.0,
+      "weighted": {
+        "supportAuthors": 5,
+        "spokeAuthors": 5,
+        "cellAuthors": 17
+      }
+    },
+    {
+      "labelId": "B02-2",
+      "scope": "skinType",
+      "conditional": true,
+      "population": 17,
+      "direction": "positive",
+      "positiveAuthors": 4,
+      "negativeAuthors": 0,
+      "neutralAuthors": 0,
+      "supportAuthors": 4,
+      "spokeAuthors": 4,
+      "silentAuthors": 13,
+      "cellAuthors": 17,
+      "supportShare": 1.0,
+      "weighted": {
+        "supportAuthors": 4,
+        "spokeAuthors": 4,
+        "cellAuthors": 17
+      }
+    },
+    {
+      "labelId": "B02-3",
+      "scope": "skinType",
+      "conditional": true,
+      "population": 17,
+      "direction": "positive",
+      "positiveAuthors": 2,
+      "negativeAuthors": 0,
+      "neutralAuthors": 0,
+      "supportAuthors": 2,
+      "spokeAuthors": 2,
+      "silentAuthors": 15,
+      "cellAuthors": 17,
+      "supportShare": 1.0,
+      "weighted": {
+        "supportAuthors": 2,
+        "spokeAuthors": 2,
+        "cellAuthors": 17
+      }
+    },
+    {
+      "labelId": "B02-4",
+      "scope": "skinType",
+      "conditional": true,
+      "population": 17,
+      "direction": "negative",
+      "positiveAuthors": 0,
+      "negativeAuthors": 1,
+      "neutralAuthors": 0,
+      "supportAuthors": 1,
+      "spokeAuthors": 1,
+      "silentAuthors": 16,
+      "cellAuthors": 17,
+      "supportShare": 1.0,
+      "weighted": {
+        "supportAuthors": 1,
+        "spokeAuthors": 1,
+        "cellAuthors": 17
+      }
+    },
+    {
+      "labelId": "B03-1",
+      "scope": "option",
+      "conditional": true,
+      "population": 29,
+      "direction": "positive",
+      "positiveAuthors": 8,
+      "negativeAuthors": 0,
+      "neutralAuthors": 0,
+      "supportAuthors": 8,
+      "spokeAuthors": 8,
+      "silentAuthors": 21,
+      "cellAuthors": 29,
+      "supportShare": 1.0,
+      "weighted": {
+        "supportAuthors": 8,
+        "spokeAuthors": 8,
+        "cellAuthors": 29
+      }
+    },
+    {
+      "labelId": "B03-2",
+      "scope": "option",
+      "conditional": true,
+      "population": 29,
+      "direction": "mixed",
+      "positiveAuthors": 4,
+      "negativeAuthors": 1,
+      "neutralAuthors": 0,
+      "supportAuthors": 5,
+      "spokeAuthors": 5,
+      "silentAuthors": 24,
+      "cellAuthors": 29,
+      "supportShare": 1.0,
+      "weighted": {
+        "supportAuthors": 5,
+        "spokeAuthors": 5,
+        "cellAuthors": 29
+      }
+    },
+    {
+      "labelId": "B03-3",
+      "scope": "option",
+      "conditional": true,
+      "population": 29,
+      "direction": "mixed",
+      "positiveAuthors": 1,
+      "negativeAuthors": 1,
+      "neutralAuthors": 1,
+      "supportAuthors": 2,
+      "spokeAuthors": 3,
+      "silentAuthors": 26,
+      "cellAuthors": 29,
+      "supportShare": 0.6667,
+      "weighted": {
+        "supportAuthors": 2,
+        "spokeAuthors": 3,
+        "cellAuthors": 29
+      }
+    },
+    {
+      "labelId": "B03-4",
+      "scope": "option",
+      "conditional": true,
+      "population": 29,
+      "direction": "negative",
+      "positiveAuthors": 0,
+      "negativeAuthors": 3,
+      "neutralAuthors": 2,
+      "supportAuthors": 3,
+      "spokeAuthors": 5,
+      "silentAuthors": 24,
+      "cellAuthors": 29,
+      "supportShare": 0.6,
+      "weighted": {
+        "supportAuthors": 3,
+        "spokeAuthors": 5,
+        "cellAuthors": 29
+      }
+    },
+    {
+      "labelId": "B03-5",
+      "scope": "option",
+      "conditional": true,
+      "population": 29,
+      "direction": "negative",
+      "positiveAuthors": 0,
+      "negativeAuthors": 1,
+      "neutralAuthors": 0,
+      "supportAuthors": 1,
+      "spokeAuthors": 1,
+      "silentAuthors": 28,
+      "cellAuthors": 29,
+      "supportShare": 1.0,
+      "weighted": {
+        "supportAuthors": 1,
+        "spokeAuthors": 1,
+        "cellAuthors": 29
+      }
+    },
+    {
+      "labelId": "B04-1",
+      "scope": "skinTrouble",
+      "conditional": true,
+      "population": 20,
+      "direction": "positive",
+      "positiveAuthors": 4,
+      "negativeAuthors": 0,
+      "neutralAuthors": 0,
+      "supportAuthors": 4,
+      "spokeAuthors": 4,
+      "silentAuthors": 16,
+      "cellAuthors": 20,
+      "supportShare": 1.0,
+      "weighted": {
+        "supportAuthors": 4,
+        "spokeAuthors": 4,
+        "cellAuthors": 20
+      }
+    },
+    {
+      "labelId": "B04-2",
+      "scope": "skinTrouble",
+      "conditional": true,
+      "population": 20,
+      "direction": "positive",
+      "positiveAuthors": 3,
+      "negativeAuthors": 0,
+      "neutralAuthors": 0,
+      "supportAuthors": 3,
+      "spokeAuthors": 3,
+      "silentAuthors": 17,
+      "cellAuthors": 20,
+      "supportShare": 1.0,
+      "weighted": {
+        "supportAuthors": 3,
+        "spokeAuthors": 3,
+        "cellAuthors": 20
+      }
+    },
+    {
+      "labelId": "B04-3",
+      "scope": "skinTrouble",
+      "conditional": true,
+      "population": 20,
+      "direction": "positive",
+      "positiveAuthors": 2,
+      "negativeAuthors": 0,
+      "neutralAuthors": 0,
+      "supportAuthors": 2,
+      "spokeAuthors": 2,
+      "silentAuthors": 18,
+      "cellAuthors": 20,
+      "supportShare": 1.0,
+      "weighted": {
+        "supportAuthors": 2,
+        "spokeAuthors": 2,
+        "cellAuthors": 20
+      }
+    },
+    {
+      "labelId": "B04-4",
+      "scope": "skinTrouble",
+      "conditional": true,
+      "population": 20,
+      "direction": "negative",
+      "positiveAuthors": 0,
+      "negativeAuthors": 2,
+      "neutralAuthors": 0,
+      "supportAuthors": 2,
+      "spokeAuthors": 2,
+      "silentAuthors": 18,
+      "cellAuthors": 20,
+      "supportShare": 1.0,
+      "weighted": {
+        "supportAuthors": 2,
+        "spokeAuthors": 2,
+        "cellAuthors": 20
+      }
+    },
+    {
+      "labelId": "B04-5",
+      "scope": "skinTrouble",
+      "conditional": true,
+      "population": 20,
+      "direction": "mixed",
+      "positiveAuthors": 1,
+      "negativeAuthors": 1,
+      "neutralAuthors": 0,
+      "supportAuthors": 2,
+      "spokeAuthors": 2,
+      "silentAuthors": 18,
+      "cellAuthors": 20,
+      "supportShare": 1.0,
+      "weighted": {
+        "supportAuthors": 2,
+        "spokeAuthors": 2,
+        "cellAuthors": 20
+      }
+    },
+    {
+      "labelId": "B04-6",
+      "scope": "skinTrouble",
+      "conditional": true,
+      "population": 20,
+      "direction": "mixed",
+      "positiveAuthors": 1,
+      "negativeAuthors": 1,
+      "neutralAuthors": 0,
+      "supportAuthors": 2,
+      "spokeAuthors": 2,
+      "silentAuthors": 18,
+      "cellAuthors": 20,
+      "supportShare": 1.0,
+      "weighted": {
+        "supportAuthors": 2,
+        "spokeAuthors": 2,
+        "cellAuthors": 20
+      }
+    },
+    {
+      "labelId": "B05-1",
+      "scope": "missing",
+      "conditional": true,
+      "population": 252,
+      "direction": "mixed",
+      "positiveAuthors": 4,
+      "negativeAuthors": 4,
+      "neutralAuthors": 1,
+      "supportAuthors": 8,
+      "spokeAuthors": 9,
+      "silentAuthors": 31,
+      "cellAuthors": 40,
+      "supportShare": 0.8889,
+      "weighted": {
+        "supportAuthors": 61,
+        "spokeAuthors": 62,
+        "cellAuthors": 252
+      }
+    },
+    {
+      "labelId": "B05-2",
+      "scope": "missing",
+      "conditional": true,
+      "population": 252,
+      "direction": "mixed",
+      "positiveAuthors": 4,
+      "negativeAuthors": 3,
+      "neutralAuthors": 0,
+      "supportAuthors": 7,
+      "spokeAuthors": 7,
+      "silentAuthors": 33,
+      "cellAuthors": 40,
+      "supportShare": 1.0,
+      "weighted": {
+        "supportAuthors": 76,
+        "spokeAuthors": 76,
+        "cellAuthors": 252
+      }
+    },
+    {
+      "labelId": "B05-3",
+      "scope": "missing",
+      "conditional": true,
+      "population": 252,
+      "direction": "mixed",
+      "positiveAuthors": 3,
+      "negativeAuthors": 2,
+      "neutralAuthors": 2,
+      "supportAuthors": 5,
+      "spokeAuthors": 7,
+      "silentAuthors": 33,
+      "cellAuthors": 40,
+      "supportShare": 0.7143,
+      "weighted": {
+        "supportAuthors": 23,
+        "spokeAuthors": 25,
+        "cellAuthors": 252
+      }
+    },
+    {
+      "labelId": "B05-4",
+      "scope": "missing",
+      "conditional": true,
+      "population": 252,
+      "direction": "mixed",
+      "positiveAuthors": 6,
+      "negativeAuthors": 1,
+      "neutralAuthors": 0,
+      "supportAuthors": 7,
+      "spokeAuthors": 7,
+      "silentAuthors": 33,
+      "cellAuthors": 40,
+      "supportShare": 1.0,
+      "weighted": {
+        "supportAuthors": 94,
+        "spokeAuthors": 94,
+        "cellAuthors": 252
+      }
+    },
+    {
+      "labelId": "B05-5",
+      "scope": "missing",
+      "conditional": true,
+      "population": 252,
+      "direction": "positive",
+      "positiveAuthors": 2,
+      "negativeAuthors": 0,
+      "neutralAuthors": 0,
+      "supportAuthors": 2,
+      "spokeAuthors": 2,
+      "silentAuthors": 38,
+      "cellAuthors": 40,
+      "supportShare": 1.0,
+      "weighted": {
+        "supportAuthors": 2,
+        "spokeAuthors": 2,
+        "cellAuthors": 252
+      }
+    }
+  ],
+  "limits": [
+    "전수 태깅(PER-175)이 없어 코퍼스 단위 D 를 세지 못한다. 이 리포트의 U·D 는 사람이 만든 골든셋 라벨 26건에서 온 것이고, 코퍼스 커버리지는 PER-199·PER-211 이 잰다",
+    "골든셋에서는 R_min 이 결속하지 않는다 — 전건 U/D ≥ 0.6 이다. 라벨러가 주장의 방향을 지지하는 근거를 인용하기 때문이고, 비율 조건이 결속하는 구간은 D 가 큰 전수 셀이다 (예: 언급 100명 중 8명)",
+    "번들의 S 는 리뷰 40건 표본의 고유 작성자 수라 셀 크기가 아니다. 모집단이 40 이하인 셀 번들(B02~B04)만 전수이고, 제품 번들(B01·B05)의 S 는 층별 가중치로 되돌린 값을 함께 낸다",
+    "번들은 1~2★ 을 과표집했다. 가중분과 원수치가 다르면 가중분이 코퍼스에 가깝다"
+  ]
+}
