@@ -115,43 +115,43 @@
   },
   "summary": {
     "all": {
-      "reports": 33,
+      "reports": 34,
       "byField": {
         "promptVersion": {
           "present": 17,
-          "missing": 16
+          "missing": 17
         },
         "modelId": {
           "present": 8,
-          "missing": 25
+          "missing": 26
         },
         "policy": {
-          "present": 7,
+          "present": 8,
           "missing": 26
         },
         "seed": {
           "present": 14,
-          "missing": 19
+          "missing": 20
         },
         "inputs": {
-          "present": 27,
+          "present": 28,
           "missing": 6
         },
         "failureTaxonomyVersion": {
-          "present": 1,
+          "present": 2,
           "missing": 32
         },
         "embeddingModel": {
           "present": 0,
-          "missing": 33
+          "missing": 34
         },
         "embeddingVersion": {
           "present": 1,
-          "missing": 32
+          "missing": 33
         },
         "vocabVersion": {
           "present": 1,
-          "missing": 32
+          "missing": 33
         }
       },
       "fullySatisfying": 0,
@@ -159,49 +159,49 @@
         "0": 5,
         "1": 4,
         "2": 5,
-        "3": 15,
+        "3": 16,
         "4": 3,
         "5": 1
       }
     },
     "issueReports": {
-      "reports": 13,
+      "reports": 14,
       "byField": {
         "promptVersion": {
           "present": 3,
-          "missing": 10
+          "missing": 11
         },
         "modelId": {
           "present": 5,
-          "missing": 8
+          "missing": 9
         },
         "policy": {
-          "present": 7,
+          "present": 8,
           "missing": 6
         },
         "seed": {
           "present": 2,
-          "missing": 11
+          "missing": 12
         },
         "inputs": {
-          "present": 12,
+          "present": 13,
           "missing": 1
         },
         "failureTaxonomyVersion": {
-          "present": 1,
+          "present": 2,
           "missing": 12
         },
         "embeddingModel": {
           "present": 0,
-          "missing": 13
+          "missing": 14
         },
         "embeddingVersion": {
           "present": 1,
-          "missing": 12
+          "missing": 13
         },
         "vocabVersion": {
           "present": 1,
-          "missing": 12
+          "missing": 13
         }
       },
       "fullySatisfying": 0,
@@ -209,7 +209,7 @@
         "0": 1,
         "1": 2,
         "2": 5,
-        "3": 1,
+        "3": 2,
         "4": 3,
         "5": 1
       }
@@ -473,6 +473,29 @@
       "satisfied": 1,
       "foundAt": {
         "inputs": "$.sources[0].sha256"
+      }
+    },
+    {
+      "report": "eval/reports/quote_fidelity_per190.json",
+      "isIssueReport": true,
+      "present": [
+        "policy",
+        "inputs",
+        "failureTaxonomyVersion"
+      ],
+      "missing": [
+        "promptVersion",
+        "modelId",
+        "seed",
+        "embeddingModel",
+        "embeddingVersion",
+        "vocabVersion"
+      ],
+      "satisfied": 3,
+      "foundAt": {
+        "policy": "$.gate.policy",
+        "inputs": "$.source.bundles.sha256",
+        "failureTaxonomyVersion": "$.source.failureTaxonomyVersion"
       }
     },
     {
@@ -1017,6 +1040,14 @@
         "seed",
         "inputs",
         "failureTaxonomyVersion",
+        "embeddingModel",
+        "embeddingVersion",
+        "vocabVersion"
+      ],
+      "eval/reports/quote_fidelity_per190.json": [
+        "promptVersion",
+        "modelId",
+        "seed",
         "embeddingModel",
         "embeddingVersion",
         "vocabVersion"
