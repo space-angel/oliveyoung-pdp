@@ -1,0 +1,95 @@
+{
+  "results": [
+    {
+      "reviewId": 63793798,
+      "aspects": [
+        {
+          "aspect": "발림감/텍스처",
+          "polarity": "negative",
+          "snippet": "발림성도 안좋고",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "발색",
+          "polarity": "negative",
+          "snippet": "색상도 잘 안나와요",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "트러블/자극",
+          "polarity": "negative",
+          "snippet": "계속 바르면 아파요",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "가성비",
+          "polarity": "negative",
+          "snippet": "돈 날린것 같네요",
+          "skinTypeHint": null
+        }
+      ]
+    },
+    {
+      "reviewId": 63795354,
+      "aspects": [
+        {
+          "aspect": "발색",
+          "polarity": "positive",
+          "snippet": "색은 너무 예뻐요",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "가성비",
+          "polarity": "positive",
+          "snippet": "비싸지만 비싼이유가 있음",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "광택/윤기",
+          "polarity": "positive",
+          "snippet": "발광력도 너무 좋고",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "발림감/텍스처",
+          "polarity": "positive",
+          "snippet": "뭉침없이 고르게 발림",
+          "skinTypeHint": null
+        }
+      ]
+    },
+    {
+      "reviewId": 63798160,
+      "aspects": [
+        {
+          "aspect": "트러블/자극",
+          "polarity": "negative",
+          "snippet": "이거 쓸 때마다 눈이 넘 아파서 못 쓰고 있습니다",
+          "skinTypeHint": null
+        }
+      ]
+    },
+    {
+      "reviewId": 63800153,
+      "aspects": [
+        {
+          "aspect": "발림감/텍스처",
+          "polarity": "negative",
+          "snippet": "너무 무거움",
+          "skinTypeHint": null
+        }
+      ]
+    },
+    {
+      "reviewId": 63807271,
+      "aspects": [
+        {
+          "aspect": "발색",
+          "polarity": "positive",
+          "snippet": "봄웜 메이크업 할때 찰떡입니다",
+          "skinTypeHint": null
+        }
+      ]
+    }
+  ]
+}

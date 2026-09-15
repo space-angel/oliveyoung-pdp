@@ -1,0 +1,123 @@
+{
+  "results": [
+    {
+      "reviewId": 63330446,
+      "aspects": [
+        {
+          "aspect": "보습감",
+          "polarity": "positive",
+          "snippet": "수분감 채워주기에는 적당함",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "발림감/텍스처",
+          "polarity": "negative",
+          "snippet": "제형 끈적거려서 불쾌하고",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "향",
+          "polarity": "negative",
+          "snippet": "냄새도 향료 때문이지 별로고",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "분사력",
+          "polarity": "negative",
+          "snippet": "끝에 남아있는거 못 끌어 당겨서 빡침",
+          "skinTypeHint": null
+        }
+      ]
+    },
+    {
+      "reviewId": 63333151,
+      "aspects": [
+        {
+          "aspect": "커버력",
+          "polarity": "negative",
+          "snippet": "커버력개구리고",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "지속성",
+          "polarity": "negative",
+          "snippet": "다크닝개쩔고바로무너짐",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "가성비",
+          "polarity": "negative",
+          "snippet": "내가산쿠샨중에제일별로다",
+          "skinTypeHint": null
+        }
+      ]
+    },
+    {
+      "reviewId": 63358864,
+      "aspects": [
+        {
+          "aspect": "지속성",
+          "polarity": "positive",
+          "snippet": "지속력이랑 발색력 좋은 제품이에요",
+          "skinTypeHint": null
+        }
+      ]
+    },
+    {
+      "reviewId": 63366883,
+      "aspects": [
+        {
+          "aspect": "트러블/자극",
+          "polarity": "positive",
+          "snippet": "자그적이지앓고 좋아요",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "가성비",
+          "polarity": "positive",
+          "snippet": "가성비가 좋아요",
+          "skinTypeHint": null
+        }
+      ]
+    },
+    {
+      "reviewId": 63408519,
+      "aspects": [
+        {
+          "aspect": "발색",
+          "polarity": "negative",
+          "snippet": "색도 안예쁘고",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "보습감",
+          "polarity": "negative",
+          "snippet": "촉촉하지도 않고",
+          "skinTypeHint": null
+        }
+      ]
+    }
+  ],
+  "reviewNotes": [
+    {
+      "reviewId": 63330446,
+      "note": "스포이드가 끝에 남은 내용물을 못 끌어오는 직접 토출 실패. 모공 축 추가 금지."
+    },
+    {
+      "reviewId": 63333151,
+      "note": "구매한 쿠션 중 최악이라는 구매 후회 회수. 회장돗을 화장독으로 임의 교정해 트러블 태그를 만들지 않음."
+    },
+    {
+      "reviewId": 63358864,
+      "note": "발색력 긍정과 노란 색 불만이 발색 한 축에 공존하여 제외."
+    },
+    {
+      "reviewId": 63366883,
+      "note": "자그적이지앓고 오타 그대로 인용. 모공 호평을 커버/탄력으로 전이하지 않음."
+    },
+    {
+      "reviewId": 63408519,
+      "note": "14축 재검토 완료. 추가로 확정할 축 없음. 1차 태그 유지."
+    }
+  ]
+}

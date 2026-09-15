@@ -1,0 +1,82 @@
+{
+  "results": [
+    {
+      "reviewId": 62970627,
+      "aspects": [
+        {
+          "aspect": "발색",
+          "polarity": "negative",
+          "snippet": "나는 23호 수준이라 발라도 크게 티 안남",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "발림감/텍스처",
+          "polarity": "positive",
+          "snippet": "발림성 및 수분감 광채는 이뻐서",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "보습감",
+          "polarity": "positive",
+          "snippet": "발림성 및 수분감 광채는 이뻐서",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "광택/윤기",
+          "polarity": "positive",
+          "snippet": "발림성 및 수분감 광채는 이뻐서",
+          "skinTypeHint": null
+        }
+      ]
+    },
+    {
+      "reviewId": 62993704,
+      "aspects": [
+        {
+          "aspect": "보습감",
+          "polarity": "positive",
+          "snippet": "바르면 촉촉하게 스며들고",
+          "skinTypeHint": "A03"
+        },
+        {
+          "aspect": "흡수력",
+          "polarity": "positive",
+          "snippet": "바르면 촉촉하게 스며들고",
+          "skinTypeHint": "A03"
+        },
+        {
+          "aspect": "유분/번들거림",
+          "polarity": "positive",
+          "snippet": "유분기도 어느정도 잡히는 느낌입니다",
+          "skinTypeHint": "A03"
+        }
+      ]
+    },
+    {
+      "reviewId": 63020111,
+      "aspects": [
+        {
+          "aspect": "발림감/텍스처",
+          "polarity": "negative",
+          "snippet": "발림성이 팔짝 끈적임이 있어",
+          "skinTypeHint": null
+        }
+      ]
+    },
+    {
+      "reviewId": 63029904,
+      "aspects": []
+    },
+    {
+      "reviewId": 63039630,
+      "aspects": [
+        {
+          "aspect": "발색",
+          "polarity": "positive",
+          "snippet": "화끼도는 핑크라서 ㄴㅁ 이쁘고",
+          "skinTypeHint": null
+        }
+      ]
+    }
+  ]
+}

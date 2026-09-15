@@ -1,0 +1,83 @@
+{
+  "results": [
+    {
+      "reviewId": 63949248,
+      "aspects": [
+        {
+          "aspect": "발색",
+          "polarity": "negative",
+          "snippet": "제가 생각하고 산 색깔보대 훨씬 밝고 코랄 빛이여서",
+          "skinTypeHint": null
+        }
+      ]
+    },
+    {
+      "reviewId": 63949630,
+      "aspects": [
+        {
+          "aspect": "광택/윤기",
+          "polarity": "positive",
+          "snippet": "글로시하면서 멀멀한 느낌으로 괜찬네요",
+          "skinTypeHint": null
+        }
+      ]
+    },
+    {
+      "reviewId": 63979483,
+      "aspects": [
+        {
+          "aspect": "발림감/텍스처",
+          "polarity": "positive",
+          "snippet": "제형이 무겁지 않고",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "보습감",
+          "polarity": "positive",
+          "snippet": "촉촉하게 마무리돼서 건조함도 덜했고",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "흡수력",
+          "polarity": "positive",
+          "snippet": "흡수도 빠른 편이라 만족스러웠어요",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "트러블/자극",
+          "polarity": "positive",
+          "snippet": "피부에 자극적인 느낌 없이 편안하게 사용할 수 있었습니다",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "가성비",
+          "polarity": "positive",
+          "snippet": "넉넉하게 사용할 수 있는 점도 마음에 들어요",
+          "skinTypeHint": null
+        }
+      ]
+    },
+    {
+      "reviewId": 63982690,
+      "aspects": [
+        {
+          "aspect": "발림감/텍스처",
+          "polarity": "negative",
+          "snippet": "산뜻할줄알았는데은근지성피부에게는부담스러움",
+          "skinTypeHint": null
+        }
+      ]
+    },
+    {
+      "reviewId": 64005851,
+      "aspects": [
+        {
+          "aspect": "가성비",
+          "polarity": "positive",
+          "snippet": "왜 이제서야 구매했는지",
+          "skinTypeHint": null
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,117 @@
+{
+  "results": [
+    {
+      "reviewId": 63456706,
+      "aspects": [
+        {
+          "aspect": "보습감",
+          "polarity": "positive",
+          "snippet": "촉촉하게 발리면서도",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "밀착력",
+          "polarity": "positive",
+          "snippet": "피부에 얇고 균일하게 밀착돼",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "커버력",
+          "polarity": "positive",
+          "snippet": "붉은기와 잡티를 자연스럽게 가려주고",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "지속성",
+          "polarity": "positive",
+          "snippet": "시간이 지나도 다크닝이 심하지 않고 무너짐도 예쁘게 유지돼",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "가성비",
+          "polarity": "positive",
+          "snippet": "가격 대비 만족도가 높아",
+          "skinTypeHint": null
+        }
+      ]
+    },
+    {
+      "reviewId": 63458429,
+      "aspects": [
+        {
+          "aspect": "흡수력",
+          "polarity": "positive",
+          "snippet": "흡수도 잘 돼고",
+          "skinTypeHint": null
+        }
+      ]
+    },
+    {
+      "reviewId": 63462862,
+      "aspects": [
+        {
+          "aspect": "발색",
+          "polarity": "negative",
+          "snippet": "공홈보다 뮤트하고 흰끼돌아서 당황했습니다",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "가성비",
+          "polarity": "negative",
+          "snippet": "재구매는 굳이 안 할 듯해요",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "광택/윤기",
+          "polarity": "negative",
+          "snippet": "글리터껴있는 색상이 대부분 자주쓰는 색상이라 조금 아쉬웠습니다",
+          "skinTypeHint": null
+        }
+      ]
+    },
+    {
+      "reviewId": 63487343,
+      "aspects": [
+        {
+          "aspect": "분사력",
+          "polarity": "negative",
+          "snippet": "바르려고 하면 부러지고",
+          "skinTypeHint": null
+        }
+      ]
+    },
+    {
+      "reviewId": 63488559,
+      "aspects": [
+        {
+          "aspect": "가성비",
+          "polarity": "negative",
+          "snippet": "질감 대비 가격이 비싼 느낌",
+          "skinTypeHint": null
+        }
+      ]
+    }
+  ],
+  "reviewNotes": [
+    {
+      "reviewId": 63456706,
+      "note": "광채와 가벼운 텍스처도 명확하나 리뷰당 5개 상한 때문에 추가하지 않음."
+    },
+    {
+      "reviewId": 63458429,
+      "note": "시원함은 14축 밖. 모공 수축을 탄력으로 추정하지 않음."
+    },
+    {
+      "reviewId": 63462862,
+      "note": "자주 쓰는 색상에 글리터가 포함된 광택 불만 회수."
+    },
+    {
+      "reviewId": 63487343,
+      "note": "짧게 꺼내도 부러져 도포 불가능하다는 스틱 토출 성능 실패. 비교 제품 가격을 대상 가격으로 전이 안 함."
+    },
+    {
+      "reviewId": 63488559,
+      "note": "질감 대비 가격 불만일 뿐 질감 자체의 좋고 나쁨은 확정 못 함."
+    }
+  ]
+}

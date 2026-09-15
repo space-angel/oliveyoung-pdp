@@ -1,0 +1,64 @@
+{
+  "results": [
+    {
+      "reviewId": 62176049,
+      "aspects": [
+        {
+          "aspect": "유분/번들거림",
+          "polarity": "negative",
+          "snippet": "너무 기름져서",
+          "skinTypeHint": null
+        }
+      ]
+    },
+    {
+      "reviewId": 62195813,
+      "aspects": []
+    },
+    {
+      "reviewId": 62228241,
+      "aspects": [
+        {
+          "aspect": "발색",
+          "polarity": "negative",
+          "snippet": "살구는 굳이..?",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "가성비",
+          "polarity": "negative",
+          "snippet": "그냥 바비브라운 문스톤 어반디케이 스페이스카우보이 쓰고말지",
+          "skinTypeHint": null
+        }
+      ]
+    },
+    {
+      "reviewId": 62231062,
+      "aspects": [
+        {
+          "aspect": "발색",
+          "polarity": "positive",
+          "snippet": "엄청 예뻐요",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "발림감/텍스처",
+          "polarity": "neutral",
+          "snippet": "맨오른쪽은 ㅎㄹㅋ 젤테일이랑 비슷한 제형이에요",
+          "skinTypeHint": null
+        }
+      ]
+    },
+    {
+      "reviewId": 62235031,
+      "aspects": [
+        {
+          "aspect": "발림감/텍스처",
+          "polarity": "positive",
+          "snippet": "쫀쫀한 느낌이 나면서 끈적임 없어서 좋네요",
+          "skinTypeHint": null
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,83 @@
+{
+  "results": [
+    {
+      "reviewId": 61538415,
+      "aspects": [
+        {
+          "aspect": "유분/번들거림",
+          "polarity": "negative",
+          "snippet": "피지연화앰플? 이름만 그럴싸하게 지어놓고 효능은 없습니다",
+          "skinTypeHint": null
+        }
+      ]
+    },
+    {
+      "reviewId": 61572575,
+      "aspects": [
+        {
+          "aspect": "발림감/텍스처",
+          "polarity": "neutral",
+          "snippet": "물타입이라",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "가성비",
+          "polarity": "negative",
+          "snippet": "너무 헤프네요",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "흡수력",
+          "polarity": "negative",
+          "snippet": "흡수가 너무빨라요",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "보습감",
+          "polarity": "negative",
+          "snippet": "건성이 사용하기는 부족한듯해요",
+          "skinTypeHint": null
+        }
+      ]
+    },
+    {
+      "reviewId": 61579473,
+      "aspects": [
+        {
+          "aspect": "트러블/자극",
+          "polarity": "positive",
+          "snippet": "피부 붉음증 때문에 에스트라 스킨부터 썬 까지 다 쓰고 있어여  너무 줗아여",
+          "skinTypeHint": null
+        }
+      ]
+    },
+    {
+      "reviewId": 61639725,
+      "aspects": [
+        {
+          "aspect": "발림감/텍스처",
+          "polarity": "negative",
+          "snippet": "저에겐 무겁고해서",
+          "skinTypeHint": null
+        }
+      ]
+    },
+    {
+      "reviewId": 61639905,
+      "aspects": [
+        {
+          "aspect": "보습감",
+          "polarity": "positive",
+          "snippet": "얼굴 건조함은 사라졋어요",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "향",
+          "polarity": "positive",
+          "snippet": "냄새는 전 조앗서요",
+          "skinTypeHint": null
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,159 @@
+{
+  "results": [
+    {
+      "reviewId": 4119503,
+      "aspects": [
+        {
+          "aspect": "지속성",
+          "polarity": "negative",
+          "snippet": "금새 날라가는 느낌이에요",
+          "skinTypeHint": "A02"
+        },
+        {
+          "aspect": "트러블/자극",
+          "polarity": "positive",
+          "snippet": "순하고 촉촉하네요",
+          "skinTypeHint": "A02"
+        }
+      ]
+    },
+    {
+      "reviewId": 6318384,
+      "aspects": [
+        {
+          "aspect": "가성비",
+          "polarity": "positive",
+          "snippet": "이번이 3번째 구매입니다",
+          "skinTypeHint": null
+        }
+      ]
+    },
+    {
+      "reviewId": 7800110,
+      "aspects": [
+        {
+          "aspect": "보습감",
+          "polarity": "positive",
+          "snippet": "보습력이 좋아서 촉촉하고",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "유분/번들거림",
+          "polarity": "positive",
+          "snippet": "번들거림도 없구",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "흡수력",
+          "polarity": "positive",
+          "snippet": "흡수력도 좋아서",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "트러블/자극",
+          "polarity": "positive",
+          "snippet": "제품 자체도 자극감이 없고 순해서",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "가성비",
+          "polarity": "positive",
+          "snippet": "다 쓰기전에 쟁여놓으려고 구매했어요",
+          "skinTypeHint": null
+        }
+      ]
+    },
+    {
+      "reviewId": 8653077,
+      "aspects": [
+        {
+          "aspect": "보습감",
+          "polarity": "positive",
+          "snippet": "유수분감은 아주 충만하고",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "트러블/자극",
+          "polarity": "positive",
+          "snippet": "자극도 없습니다",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "발림감/텍스처",
+          "polarity": "positive",
+          "snippet": "발림성은 부드럽고",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "흡수력",
+          "polarity": "positive",
+          "snippet": "흡수도 빠른편이네요",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "향",
+          "polarity": "negative",
+          "snippet": "유일하게 생각하는 단점은 향",
+          "skinTypeHint": null
+        }
+      ]
+    },
+    {
+      "reviewId": 10151614,
+      "aspects": [
+        {
+          "aspect": "보습감",
+          "polarity": "positive",
+          "snippet": "빠른 흡수력에 비해 얼굴 당김이 없어요",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "흡수력",
+          "polarity": "positive",
+          "snippet": "빠른 흡수력",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "유분/번들거림",
+          "polarity": "positive",
+          "snippet": "유분기는 0으로 느껴지고",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "발림감/텍스처",
+          "polarity": "positive",
+          "snippet": "점도, 끈적임도 거의 0이에요",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "향",
+          "polarity": "positive",
+          "snippet": "무색무취 입니다",
+          "skinTypeHint": null
+        }
+      ]
+    }
+  ],
+  "reviewNotes": [
+    {
+      "reviewId": 4119503,
+      "note": "촉촉함 긍정과 속보습 부정이 같은 축 안에 공존해 보습감 제외. 금방 사라짐은 지속성 부정으로 유지."
+    },
+    {
+      "reviewId": 6318384,
+      "note": "14축 재검토 완료. 추가로 확정할 축 없음. 1차 태그 유지."
+    },
+    {
+      "reviewId": 7800110,
+      "note": "14축 재검토 완료. 추가로 확정할 축 없음. 1차 태그 유지."
+    },
+    {
+      "reviewId": 8653077,
+      "note": "양 조절 편리함(분사력 긍정), 기획 구성, 유분감도 검토했으나 최대 5개 상한. 주름 효과는 기대/구매 동기로 실제 탄력 변화 아님."
+    },
+    {
+      "reviewId": 10151614,
+      "note": "밀착력(화장이 잘 먹음), 분사력(스포이드 편의), 재구매 의사도 확인했으나 최대 5개 상한. 복합성/지성/민감성 복수 자기소개여서 힌트 단일 코드 선택 보류."
+    }
+  ]
+}

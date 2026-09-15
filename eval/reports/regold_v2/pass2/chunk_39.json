@@ -1,0 +1,105 @@
+{
+  "results": [
+    {
+      "reviewId": 63949248,
+      "aspects": [
+        {
+          "aspect": "발색",
+          "polarity": "negative",
+          "snippet": "제가 생각하고 산 색깔보대 훨씬 밝고 코랄 빛이여서",
+          "skinTypeHint": null
+        }
+      ]
+    },
+    {
+      "reviewId": 63949630,
+      "aspects": [
+        {
+          "aspect": "광택/윤기",
+          "polarity": "positive",
+          "snippet": "글로시하면서 멀멀한 느낌으로 괜찬네요",
+          "skinTypeHint": null
+        }
+      ]
+    },
+    {
+      "reviewId": 63979483,
+      "aspects": [
+        {
+          "aspect": "발림감/텍스처",
+          "polarity": "positive",
+          "snippet": "제형이 무겁지 않고",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "보습감",
+          "polarity": "positive",
+          "snippet": "촉촉하게 마무리돼서 건조함도 덜했고",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "흡수력",
+          "polarity": "positive",
+          "snippet": "흡수도 빠른 편이라 만족스러웠어요",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "트러블/자극",
+          "polarity": "positive",
+          "snippet": "피부에 자극적인 느낌 없이 편안하게 사용할 수 있었습니다",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "가성비",
+          "polarity": "positive",
+          "snippet": "넉넉하게 사용할 수 있는 점도 마음에 들어요",
+          "skinTypeHint": null
+        }
+      ]
+    },
+    {
+      "reviewId": 63982690,
+      "aspects": [
+        {
+          "aspect": "발림감/텍스처",
+          "polarity": "negative",
+          "snippet": "산뜻할줄알았는데은근지성피부에게는부담스러움",
+          "skinTypeHint": null
+        }
+      ]
+    },
+    {
+      "reviewId": 64005851,
+      "aspects": [
+        {
+          "aspect": "가성비",
+          "polarity": "positive",
+          "snippet": "왜 이제서야 구매했는지",
+          "skinTypeHint": null
+        }
+      ]
+    }
+  ],
+  "reviewNotes": [
+    {
+      "reviewId": 63949248,
+      "note": "14축 재검토 완료. 추가로 확정할 축 없음. 1차 태그 유지."
+    },
+    {
+      "reviewId": 63949630,
+      "note": "멀멀함은 연한 색인지 맛/제형인지 모호해 추가 축 없음."
+    },
+    {
+      "reviewId": 63979483,
+      "note": "잡티 개선은 커버력 아님. 다음 단계 밀림 적음은 이미 채택한 흡수력의 보강 근거."
+    },
+    {
+      "reviewId": 63982690,
+      "note": "산뜻함 기대 대비 부담스러운 사용감은 텍스처 부정. 지성은 본인 명시 여부 불확실해 힌트 없음."
+    },
+    {
+      "reviewId": 64005851,
+      "note": "구매 만족에 따른 긍정이며 가격이 싸다는 주장은 아님. 가성비 확장 프롬프트 편향 사례."
+    }
+  ]
+}

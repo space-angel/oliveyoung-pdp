@@ -1,0 +1,270 @@
+{
+  "sampleSha256": "d42af53d59937caaa9767664f052bab293d6ad76415223388dcf22c72bdcf298",
+  "promptSha256": "52a442282f09281e5925a12d260c58f5b9d5fbb5b1c65e9d8a14dbb1a4aed594",
+  "reviewCountPerPass": 200,
+  "chunkSize": 5,
+  "chunksPerPass": 40,
+  "pass1Tags": 423,
+  "pass2Tags": 432,
+  "pass1Violations": [
+    {
+      "index": 177,
+      "tag": {
+        "reviewId": 61579473,
+        "aspect": "트러블/자극",
+        "polarity": "positive",
+        "snippet": "피부 붉음증 때문에 에스트라 스킨부터 썬 까지 다 쓰고 있어여  너무 줗아여",
+        "skinTypeHint": null
+      },
+      "reasons": [
+        "snippet 길이 42 > 40"
+      ]
+    }
+  ],
+  "pass2Violations": [],
+  "added": [
+    {
+      "reviewId": 21808809,
+      "aspect": "보습감",
+      "polarity": "positive",
+      "snippet": "그럴때마다 잘 썻습니다",
+      "skinTypeHint": null
+    },
+    {
+      "reviewId": 22159121,
+      "aspect": "지속성",
+      "polarity": "positive",
+      "snippet": "낮에 내내 기름도 안올라오고 매끈한 느낌이라 좋았고",
+      "skinTypeHint": null
+    },
+    {
+      "reviewId": 24113860,
+      "aspect": "분사력",
+      "polarity": "positive",
+      "snippet": "쿠션퍼프가 매우 좋고 쿠션과 궁합력도 좋기 때문에",
+      "skinTypeHint": "A01"
+    },
+    {
+      "reviewId": 24154192,
+      "aspect": "가성비",
+      "polarity": "negative",
+      "snippet": "현재는 웰라쥬만 사용하고",
+      "skinTypeHint": null
+    },
+    {
+      "reviewId": 29593705,
+      "aspect": "발림감/텍스처",
+      "polarity": "negative",
+      "snippet": "기름 낀 거처럼 끈적끈적한?",
+      "skinTypeHint": null
+    },
+    {
+      "reviewId": 39821218,
+      "aspect": "광택/윤기",
+      "polarity": "neutral",
+      "snippet": "매트립치곤",
+      "skinTypeHint": null
+    },
+    {
+      "reviewId": 49583986,
+      "aspect": "보습감",
+      "polarity": "positive",
+      "snippet": "이 제품 쓴 후 피부 당김이나 트러블 없어서",
+      "skinTypeHint": "A02"
+    },
+    {
+      "reviewId": 49816619,
+      "aspect": "광택/윤기",
+      "polarity": "negative",
+      "snippet": "엄청 매트한 느낌",
+      "skinTypeHint": null
+    },
+    {
+      "reviewId": 51686715,
+      "aspect": "지속성",
+      "polarity": "neutral",
+      "snippet": "한 5분 정도 지나면 날라갑니다",
+      "skinTypeHint": null
+    },
+    {
+      "reviewId": 61639725,
+      "aspect": "밀착력",
+      "polarity": "positive",
+      "snippet": "메이크업전에화잘먹크림으로 바르거나",
+      "skinTypeHint": null
+    },
+    {
+      "reviewId": 62434536,
+      "aspect": "광택/윤기",
+      "polarity": "neutral",
+      "snippet": "매트립이고",
+      "skinTypeHint": null
+    },
+    {
+      "reviewId": 63029904,
+      "aspect": "분사력",
+      "polarity": "positive",
+      "snippet": "쓰고 있는 세미매트 쿠션이랑 잘 맞아서 좋아용",
+      "skinTypeHint": null
+    },
+    {
+      "reviewId": 63163701,
+      "aspect": "발림감/텍스처",
+      "polarity": "positive",
+      "snippet": "미니퍼프가 좀 찰진 퍼프여야 발색도 잘 올라가고 바르기 쉬워요",
+      "skinTypeHint": null
+    },
+    {
+      "reviewId": 63246995,
+      "aspect": "가성비",
+      "polarity": "positive",
+      "snippet": "이번에 드디어 구매하게 되어 정말 만족스럽습니다",
+      "skinTypeHint": null
+    },
+    {
+      "reviewId": 63333151,
+      "aspect": "가성비",
+      "polarity": "negative",
+      "snippet": "내가산쿠샨중에제일별로다",
+      "skinTypeHint": null
+    },
+    {
+      "reviewId": 63462862,
+      "aspect": "광택/윤기",
+      "polarity": "negative",
+      "snippet": "글리터껴있는 색상이 대부분 자주쓰는 색상이라 조금 아쉬웠습니다",
+      "skinTypeHint": null
+    }
+  ],
+  "removed": [
+    {
+      "reviewId": 4119503,
+      "aspect": "보습감",
+      "polarity": "negative",
+      "snippet": "속보습은 못 느꼈어요",
+      "skinTypeHint": "A02"
+    },
+    {
+      "reviewId": 24113860,
+      "aspect": "발림감/텍스처",
+      "polarity": "positive",
+      "snippet": "블렌딩도 쉽고 수정도 용이하단 장점",
+      "skinTypeHint": "A01"
+    },
+    {
+      "reviewId": 49583986,
+      "aspect": "분사력",
+      "polarity": "positive",
+      "snippet": "유리용기+스포이드형이라 위생적으로 사용하기 좋아요",
+      "skinTypeHint": "A02"
+    },
+    {
+      "reviewId": 58459899,
+      "aspect": "트러블/자극",
+      "polarity": "negative",
+      "snippet": "그 다음날 피부 다 뒤집어지고",
+      "skinTypeHint": null
+    },
+    {
+      "reviewId": 62656203,
+      "aspect": "발색",
+      "polarity": "positive",
+      "snippet": "잘 밝혀줌",
+      "skinTypeHint": null
+    },
+    {
+      "reviewId": 63244086,
+      "aspect": "발색",
+      "polarity": "positive",
+      "snippet": "진짜너무예뻐요",
+      "skinTypeHint": null
+    },
+    {
+      "reviewId": 63663744,
+      "aspect": "발림감/텍스처",
+      "polarity": "negative",
+      "snippet": "그냥 물 그 자체",
+      "skinTypeHint": null
+    }
+  ],
+  "changed": [
+    {
+      "old": {
+        "reviewId": 29597131,
+        "aspect": "유분/번들거림",
+        "polarity": "negative",
+        "snippet": "너무기름진느낌이었어요",
+        "skinTypeHint": "A02"
+      },
+      "new": {
+        "reviewId": 29597131,
+        "aspect": "유분/번들거림",
+        "polarity": "negative",
+        "snippet": "너무기름진느낌이었어요",
+        "skinTypeHint": null
+      }
+    },
+    {
+      "old": {
+        "reviewId": 61579473,
+        "aspect": "트러블/자극",
+        "polarity": "positive",
+        "snippet": "피부 붉음증 때문에 에스트라 스킨부터 썬 까지 다 쓰고 있어여  너무 줗아여",
+        "skinTypeHint": null
+      },
+      "new": {
+        "reviewId": 61579473,
+        "aspect": "트러블/자극",
+        "polarity": "positive",
+        "snippet": "붉음증 때문에 에스트라 스킨부터 썬 까지 다 쓰고 있어여  너무 줗아여",
+        "skinTypeHint": null
+      }
+    },
+    {
+      "old": {
+        "reviewId": 61847286,
+        "aspect": "트러블/자극",
+        "polarity": "positive",
+        "snippet": "순한 성분으로 만들어진거",
+        "skinTypeHint": null
+      },
+      "new": {
+        "reviewId": 61847286,
+        "aspect": "트러블/자극",
+        "polarity": "positive",
+        "snippet": "이었는데 저는 전혀 없었어요.순한 성분으로 만들어진거",
+        "skinTypeHint": null
+      }
+    },
+    {
+      "old": {
+        "reviewId": 63269359,
+        "aspect": "발림감/텍스처",
+        "polarity": "negative",
+        "snippet": "가루날림은 좀 있지만",
+        "skinTypeHint": null
+      },
+      "new": {
+        "reviewId": 63269359,
+        "aspect": "발림감/텍스처",
+        "polarity": "positive",
+        "snippet": "가루날림은 좀 있지만 크게 신경쓰이지않습니당",
+        "skinTypeHint": null
+      }
+    }
+  ],
+  "silentReviewIds": [
+    25651605,
+    54190893,
+    58801651,
+    58943382,
+    61479701,
+    61840539,
+    62195813,
+    63079996,
+    63219261,
+    63283705,
+    63739906,
+    63816271
+  ]
+}

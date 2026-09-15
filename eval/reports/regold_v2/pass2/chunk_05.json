@@ -1,0 +1,111 @@
+{
+  "results": [
+    {
+      "reviewId": 29934025,
+      "aspects": [
+        {
+          "aspect": "트러블/자극",
+          "polarity": "positive",
+          "snippet": "피부 뒤집어짐 없이 결케어의 효과를 봤어",
+          "skinTypeHint": "A02"
+        }
+      ]
+    },
+    {
+      "reviewId": 32320525,
+      "aspects": [
+        {
+          "aspect": "보습감",
+          "polarity": "positive",
+          "snippet": "피부에 수분 공급되는 느낌?",
+          "skinTypeHint": "A03"
+        },
+        {
+          "aspect": "향",
+          "polarity": "positive",
+          "snippet": "향도 쌔지않고",
+          "skinTypeHint": "A03"
+        }
+      ]
+    },
+    {
+      "reviewId": 34521596,
+      "aspects": [
+        {
+          "aspect": "보습감",
+          "polarity": "positive",
+          "snippet": "그냥 촉촉한 세럼",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "가성비",
+          "polarity": "negative",
+          "snippet": "1+1을 대단한 혜택을 주는 것처럼 생각하지 말아주세요!",
+          "skinTypeHint": null
+        }
+      ]
+    },
+    {
+      "reviewId": 34686144,
+      "aspects": [
+        {
+          "aspect": "보습감",
+          "polarity": "positive",
+          "snippet": "촉촉한 수딩크림이라 괜찮은 것 같아요",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "가성비",
+          "polarity": "positive",
+          "snippet": "기획세트로 저렴하게 잘 구매한 듯",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "발림감/텍스처",
+          "polarity": "positive",
+          "snippet": "발림성은 괜찮은데",
+          "skinTypeHint": null
+        }
+      ]
+    },
+    {
+      "reviewId": 35543688,
+      "aspects": [
+        {
+          "aspect": "발림감/텍스처",
+          "polarity": "positive",
+          "snippet": "발림성은 끈적이지 않아서 좋은데",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "트러블/자극",
+          "polarity": "negative",
+          "snippet": "이거 쓰고 좁쌀파티 열렸어요",
+          "skinTypeHint": null
+        }
+      ]
+    }
+  ],
+  "reviewNotes": [
+    {
+      "reviewId": 29934025,
+      "note": "결 개선은 제형이나 탄력의 명시적 변화가 아님. 다른 크림의 두껍게 바르는 사용법은 대상 제형 아님."
+    },
+    {
+      "reviewId": 32320525,
+      "note": "무거움/유분은 선호와 다른 세럼 내용이므로 대상 제품에 전이하지 않음."
+    },
+    {
+      "reviewId": 34521596,
+      "note": "흔적 개선 부재는 색조의 커버력과 구분."
+    },
+    {
+      "reviewId": 34686144,
+      "note": "14축 재검토 완료. 추가로 확정할 축 없음. 1차 태그 유지."
+    },
+    {
+      "reviewId": 35543688,
+      "note": "회복에 오래 걸림은 제품 지속력이 아니라 부작용 경과."
+    }
+  ]
+}

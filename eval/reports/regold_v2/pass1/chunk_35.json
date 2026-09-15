@@ -1,0 +1,70 @@
+{
+  "results": [
+    {
+      "reviewId": 63731163,
+      "aspects": [
+        {
+          "aspect": "발색",
+          "polarity": "positive",
+          "snippet": "색 발림성 다 맘에드는데",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "발림감/텍스처",
+          "polarity": "positive",
+          "snippet": "색 발림성 다 맘에드는데",
+          "skinTypeHint": null
+        }
+      ]
+    },
+    {
+      "reviewId": 63731697,
+      "aspects": [
+        {
+          "aspect": "향",
+          "polarity": "positive",
+          "snippet": "냄새가 좋네용",
+          "skinTypeHint": null
+        }
+      ]
+    },
+    {
+      "reviewId": 63739906,
+      "aspects": []
+    },
+    {
+      "reviewId": 63768651,
+      "aspects": [
+        {
+          "aspect": "보습감",
+          "polarity": "negative",
+          "snippet": "뭔가 쓰니까 건조하고",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "발림감/텍스처",
+          "polarity": "negative",
+          "snippet": "퍽퍽한 거 같아요",
+          "skinTypeHint": null
+        }
+      ]
+    },
+    {
+      "reviewId": 63776133,
+      "aspects": [
+        {
+          "aspect": "보습감",
+          "polarity": "negative",
+          "snippet": "살짝 건조하지만",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "트러블/자극",
+          "polarity": "positive",
+          "snippet": "진정에 좋은 것 같아서",
+          "skinTypeHint": null
+        }
+      ]
+    }
+  ]
+}

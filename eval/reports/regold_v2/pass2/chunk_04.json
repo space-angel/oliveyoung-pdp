@@ -1,0 +1,153 @@
+{
+  "results": [
+    {
+      "reviewId": 26843518,
+      "aspects": [
+        {
+          "aspect": "발림감/텍스처",
+          "polarity": "negative",
+          "snippet": "생각보다 너무 가벼운 제품이라",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "보습감",
+          "polarity": "negative",
+          "snippet": "건조를 잡아주지 못했어요",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "지속성",
+          "polarity": "negative",
+          "snippet": "금세 다시 건조해집니다",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "흡수력",
+          "polarity": "negative",
+          "snippet": "밀림 현상이 심해서 사용중단 했습니다",
+          "skinTypeHint": null
+        }
+      ]
+    },
+    {
+      "reviewId": 28077603,
+      "aspects": [
+        {
+          "aspect": "분사력",
+          "polarity": "negative",
+          "snippet": "모양자체도  벌어져서 섬세히 바를수도 없고",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "발림감/텍스처",
+          "polarity": "negative",
+          "snippet": "자칫 잘못바르면. 뭉치니",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "가성비",
+          "polarity": "negative",
+          "snippet": "지갑터는 한정판이네요",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "발색",
+          "polarity": "negative",
+          "snippet": "허옇고 두껍고",
+          "skinTypeHint": null
+        }
+      ]
+    },
+    {
+      "reviewId": 28810511,
+      "aspects": [
+        {
+          "aspect": "가성비",
+          "polarity": "positive",
+          "snippet": "일단 구성은 훌륭합니다",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "보습감",
+          "polarity": "positive",
+          "snippet": "촉촉하고",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "흡수력",
+          "polarity": "positive",
+          "snippet": "잘 흡수되네요",
+          "skinTypeHint": null
+        }
+      ]
+    },
+    {
+      "reviewId": 29593705,
+      "aspects": [
+        {
+          "aspect": "커버력",
+          "polarity": "negative",
+          "snippet": "일단 커버력도 낮고",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "유분/번들거림",
+          "polarity": "negative",
+          "snippet": "기름 낀 거처럼 끈적끈적한?",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "지속성",
+          "polarity": "negative",
+          "snippet": "3~4시간 지나면 얼굴 테두리 부분만 뭔가 기름 낀 거처럼",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "발색",
+          "polarity": "negative",
+          "snippet": "색상도 누런 느낌이 강해서",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "발림감/텍스처",
+          "polarity": "negative",
+          "snippet": "기름 낀 거처럼 끈적끈적한?",
+          "skinTypeHint": null
+        }
+      ]
+    },
+    {
+      "reviewId": 29597131,
+      "aspects": [
+        {
+          "aspect": "유분/번들거림",
+          "polarity": "negative",
+          "snippet": "너무기름진느낌이었어요",
+          "skinTypeHint": null
+        }
+      ]
+    }
+  ],
+  "reviewNotes": [
+    {
+      "reviewId": 26843518,
+      "note": "14축 재검토 완료. 추가로 확정할 축 없음. 1차 태그 유지."
+    },
+    {
+      "reviewId": 28077603,
+      "note": "14축 재검토 완료. 추가로 확정할 축 없음. 1차 태그 유지."
+    },
+    {
+      "reviewId": 28810511,
+      "note": "브랜드의 일반 가격과 이번 기획 구성의 가치 구분. 이번 구성은 명시적 긍정. 주름/미백은 기대."
+    },
+    {
+      "reviewId": 29593705,
+      "note": "시간 경과·유분 외에 끈적한 텍스처 불만도 회수. 지성+복합성 자기소개는 단일 힌트 선택 보류."
+    },
+    {
+      "reviewId": 29597131,
+      "note": "건성이라 좋다는 추천을 전한 것인지 자신의 피부인지 불명확하여 A02 제거."
+    }
+  ]
+}

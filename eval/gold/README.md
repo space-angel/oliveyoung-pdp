@@ -44,7 +44,8 @@ python3 eval/label_concern_golden.py validate         # 게이트
 |---|---|
 | `v5_tag_pilot_sample.jsonl` | 표본 200건 전문. 시드 20260904 층화 추출의 **고정물** |
 | `v5_tag_pilot_meta.json` | 시드·층별 가중치·입력 스냅샷 sha256 |
-| `v5_tags_pilot_gold.jsonl` | 손으로 만든 태그 365개. **채점 기준** |
+| `v5_tags_pilot_gold.jsonl` | 태그 **432개 (v2, 현 정본)**. **채점 기준** — 재작성 경위는 `eval/reports/v5_tag_gold_v2.md` |
+| `v5_tags_pilot_gold_v1.jsonl` | 태그 365개 (v1, 보존). 2026-09-14 이전 채점 수치의 근거. **v2 수치와 나란히 놓지 않는다** |
 
 ### 키는 `reviewId` 뿐이다
 

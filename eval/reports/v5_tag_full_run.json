@@ -1,0 +1,127 @@
+{
+  "issue": "PER-175",
+  "run": {
+    "label": "full_glm47",
+    "model": "zai.glm-4.7",
+    "provider": "openai-compatible",
+    "baseUrl": "https://bedrock-runtime.us-east-1.amazonaws.com/openai/v1",
+    "serviceTier": "flex",
+    "chunkSize": 20,
+    "maxTokens": 8000,
+    "temperature": 0,
+    "prompt": {
+      "path": "pipeline/prompts/tag/v1.md",
+      "sha256": "a8cc2a7d4cb7eb3583df4b2a7c80ca7336e8dface0d7ec9d1175abd9c23079eb"
+    },
+    "input": {
+      "path": "data/intermediate/v5_reviews.jsonl",
+      "sha256": "bc3033cb5b0225f58c95ac2a5896545d9e97303de9dfff01fe2198dfeb69537c",
+      "taggingSha256": "d6ff7b5e0ca595351811a6d5b67fce8542ec38eba2ac9728b1ef0ebdfbf0bf94"
+    },
+    "requests": 1254,
+    "filled": {
+      "requestedReviews": 4,
+      "chunkSize": 1,
+      "reviewIds": [
+        32004446,
+        61459390,
+        61918393,
+        63255955
+      ],
+      "stillMissing": [],
+      "note": "묶음 크기 20 에서 반복적으로 빠진 리뷰를 작은 묶음으로 다시 물어 채웠다"
+    }
+  },
+  "coverage": {
+    "reviews": 25000,
+    "reviewsInResult": 25000,
+    "reviewsWithTag": 19557,
+    "reviewsWithoutTag": 5443,
+    "pctReviewsWithTag": 78.2,
+    "truncatedChunks": 0,
+    "failedChunks": 0
+  },
+  "tags": {
+    "emitted": 40583,
+    "passed": 38251,
+    "violations": 2332,
+    "violationPct": 5.7,
+    "violationKinds": {
+      "같은 축 두 번": 1644,
+      "인용 원문 아님": 604,
+      "리뷰당 상한 초과": 66,
+      "택소노미 밖": 18
+    },
+    "perReview": 1.53,
+    "polarity": {
+      "negative": 4222,
+      "positive": 32429,
+      "neutral": 1600
+    },
+    "aspects": {
+      "보습감": 6075,
+      "발림감/텍스처": 5701,
+      "트러블/자극": 4891,
+      "발색": 4269,
+      "지속성": 3267,
+      "유분/번들거림": 3201,
+      "흡수력": 2480,
+      "밀착력": 2130,
+      "가성비": 1690,
+      "광택/윤기": 1216,
+      "커버력": 1151,
+      "탄력/탱탱함": 1027,
+      "향": 1002,
+      "분사력": 151
+    },
+    "unusedOfTaxonomy": [],
+    "withSkinTypeHint": 5095
+  },
+  "tokens": {
+    "input": 5315897,
+    "output": 2288891,
+    "cacheRead": 1139696,
+    "chunks": 1254,
+    "perReviewIn": 213,
+    "perReviewOut": 92,
+    "usd": {
+      "standard": 8.23,
+      "flex": 4.11,
+      "note": "캐시 읽기 단가를 확인하지 못해 할인 없이 계산했다. 실제 청구는 이보다 낮다"
+    }
+  },
+  "goldComparison": {
+    "scope": "정답셋 표본 200건 (전수 25,000건 안에 포함돼 있다)",
+    "full": {
+      "precision": 84.4,
+      "recall": 57.4,
+      "polarityAgreementOnOverlap": 93.5,
+      "candidatePairs": 294,
+      "goldPairs": 432,
+      "overlap": 248
+    },
+    "bench200": {
+      "precision": 88.0,
+      "recall": 59.5,
+      "polarityAgreementOnOverlap": 92.2,
+      "candidatePairs": 292
+    },
+    "delta": {
+      "precision": -3.6,
+      "recall": -2.1,
+      "polarityAgreement": 1.3
+    },
+    "sampleChunkSpread": {
+      "chunksInFullRun": 188,
+      "chunksInBench": 10,
+      "note": "같은 200건이 전수에서는 서로 다른 이웃과 묶였다. 묶음 구성이 결과를 바꾸므로 **파일럿 점수를 전수 점수로 쓰면 안 된다**"
+    }
+  },
+  "trustPrior": {
+    "issue": "PER-174",
+    "unavailableSignals": [],
+    "distinctScores": 1089,
+    "onTopicTrue": 19557,
+    "note": "태그가 들어와 onTopic 이 unavailable 에서 빠졌다. PER-174 인계분 완료 판정"
+  }
+}

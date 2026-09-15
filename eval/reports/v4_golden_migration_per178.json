@@ -8,7 +8,7 @@
     },
     "reviews": {
       "path": "data/intermediate/v5_reviews.jsonl",
-      "sha256": "bc3033cb5b0225f58c95ac2a5896545d9e97303de9dfff01fe2198dfeb69537c"
+      "sha256": "47a1fc98e93b10b45e1cca178fcdeb603327cacc6111191c55f6cd53f20f1974"
     },
     "catalog": {
       "path": "data/input/product_catalog.json",

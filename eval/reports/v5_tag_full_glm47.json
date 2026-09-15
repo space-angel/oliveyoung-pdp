@@ -1,0 +1,365 @@
+{
+  "issue": "PER-175",
+  "label": "full_glm47_sample200",
+  "tagger": "zai.glm-4.7",
+  "prompt": {
+    "path": "pipeline/prompts/tag/v1.md",
+    "sha256": "a8cc2a7d4cb7eb3583df4b2a7c80ca7336e8dface0d7ec9d1175abd9c23079eb",
+    "schemaVersion": "tag-v1"
+  },
+  "sample": {
+    "path": "eval/gold/v5_tag_pilot_sample.jsonl",
+    "sha256": "bc3033cb5b0225f58c95ac2a5896545d9e97303de9dfff01fe2198dfeb69537c",
+    "seed": 20260904,
+    "strata": [
+      {
+        "name": "rating_1_2",
+        "population": 407,
+        "sampled": 60,
+        "skinTypeStated": 30,
+        "skinTypeMissing": 30,
+        "weight": 6.7833
+      },
+      {
+        "name": "rating_3",
+        "population": 828,
+        "sampled": 40,
+        "skinTypeStated": 20,
+        "skinTypeMissing": 20,
+        "weight": 20.7
+      },
+      {
+        "name": "rating_4",
+        "population": 2403,
+        "sampled": 40,
+        "skinTypeStated": 20,
+        "skinTypeMissing": 20,
+        "weight": 60.075
+      },
+      {
+        "name": "rating_5",
+        "population": 21362,
+        "sampled": 60,
+        "skinTypeStated": 30,
+        "skinTypeMissing": 30,
+        "weight": 356.0333
+      }
+    ]
+  },
+  "profile": {
+    "reviews": 200,
+    "tags": 294,
+    "tagsPerReview": 1.47,
+    "coverage": {
+      "reviewsWithTag": 161,
+      "pctReviewsWithTag": 80.5,
+      "silentReviews": 39
+    },
+    "snippet": {
+      "verbatimStrict": 294,
+      "pctVerbatimStrict": 100.0,
+      "verbatimAfterWhitespaceFold": 294,
+      "maxLen": 38,
+      "note": "v4 는 88.8% 였다. 계약은 100% 를 요구한다 — 미달이면 validate_tags 가 이미 세운다"
+    },
+    "polarity": {
+      "positive": 163,
+      "negative": 112,
+      "neutral": 19
+    },
+    "ratingDisagreement": {
+      "count": 35,
+      "pct": 11.9,
+      "note": "오류가 아니라 게이트3 플래그. 5점 리뷰의 불만을 잡았다는 뜻"
+    },
+    "mixedDirectionReviews": {
+      "count": 32,
+      "pct": 16.0,
+      "note": "리뷰 단위 감성으로는 표현 불가능한 몫. (리뷰 × 주제) 단위의 근거"
+    },
+    "aspects": {
+      "distinct": 13,
+      "unusedOfTaxonomy": [
+        "분사력"
+      ],
+      "top6Share": 75.9,
+      "counts": {
+        "보습감": 43,
+        "발림감/텍스처": 43,
+        "트러블/자극": 43,
+        "발색": 38,
+        "유분/번들거림": 29,
+        "지속성": 27,
+        "흡수력": 18,
+        "밀착력": 16,
+        "가성비": 11,
+        "향": 10,
+        "커버력": 8,
+        "탄력/탱탱함": 4,
+        "광택/윤기": 4
+      }
+    },
+    "skinTypeHint": {
+      "tagsWithHint": 60,
+      "reviewsWithHint": 36,
+      "onMissingCondition": 12,
+      "conflictWithCondition": [
+        {
+          "reviewId": 61446147,
+          "condition": "A02",
+          "hint": "A07"
+        },
+        {
+          "reviewId": 32320525,
+          "condition": "A02",
+          "hint": "A03"
+        },
+        {
+          "reviewId": 10551325,
+          "condition": "A03",
+          "hint": "A01"
+        },
+        {
+          "reviewId": 63636001,
+          "condition": "A04",
+          "hint": "A01"
+        },
+        {
+          "reviewId": 63327651,
+          "condition": "A06",
+          "hint": "A01"
+        },
+        {
+          "reviewId": 61639725,
+          "condition": "A01",
+          "hint": "A03"
+        },
+        {
+          "reviewId": 7800110,
+          "condition": "A03",
+          "hint": "A04"
+        },
+        {
+          "reviewId": 39732419,
+          "condition": "A02",
+          "hint": "A03"
+        },
+        {
+          "reviewId": 24113860,
+          "condition": "A01",
+          "hint": "A03"
+        },
+        {
+          "reviewId": 29934025,
+          "condition": "A05",
+          "hint": "A02"
+        },
+        {
+          "reviewId": 24154192,
+          "condition": "A05",
+          "hint": "A04"
+        },
+        {
+          "reviewId": 38248029,
+          "condition": "A03",
+          "hint": "A05"
+        },
+        {
+          "reviewId": 29593705,
+          "condition": "A01",
+          "hint": "A03"
+        },
+        {
+          "reviewId": 46412276,
+          "condition": "A01",
+          "hint": "A05"
+        }
+      ],
+      "note": "onMissingCondition 이 조건축을 실제로 늘린 몫이다 (v4 는 이 값을 집계에서 잃었다)"
+    },
+    "perStratum": {
+      "rating_1_2": {
+        "reviews": 60,
+        "tagged": 49,
+        "tags": 77,
+        "tagsPerReview": 1.28,
+        "polarity": {
+          "positive": 12,
+          "negative": 60,
+          "neutral": 5
+        }
+      },
+      "rating_3": {
+        "reviews": 40,
+        "tagged": 31,
+        "tags": 55,
+        "tagsPerReview": 1.38,
+        "polarity": {
+          "positive": 18,
+          "negative": 29,
+          "neutral": 8
+        }
+      },
+      "rating_4": {
+        "reviews": 40,
+        "tagged": 32,
+        "tags": 56,
+        "tagsPerReview": 1.4,
+        "polarity": {
+          "positive": 41,
+          "negative": 10,
+          "neutral": 5
+        }
+      },
+      "rating_5": {
+        "reviews": 60,
+        "tagged": 49,
+        "tags": 106,
+        "tagsPerReview": 1.77,
+        "polarity": {
+          "positive": 92,
+          "negative": 13,
+          "neutral": 1
+        }
+      }
+    }
+  },
+  "corpusEstimate": {
+    "corpusReviews": 25000,
+    "estTags": 42765,
+    "estTagsPerReview": 1.71,
+    "estNegativeShare": 14.6,
+    "sampleNegativeShare": 38.1,
+    "perStratum": {
+      "rating_1_2": {
+        "sampleTags": 77,
+        "weight": 6.7833,
+        "estCorpusTags": 522
+      },
+      "rating_3": {
+        "sampleTags": 55,
+        "weight": 20.7,
+        "estCorpusTags": 1138
+      },
+      "rating_4": {
+        "sampleTags": 56,
+        "weight": 60.075,
+        "estCorpusTags": 3364
+      },
+      "rating_5": {
+        "sampleTags": 106,
+        "weight": 356.0333,
+        "estCorpusTags": 37740
+      }
+    },
+    "note": "표본은 희소 클래스를 과표집했다. 코퍼스 수치는 가중치로 되돌린 추정이고 표본 수치와 다르다"
+  },
+  "comparison": {
+    "goldPairs": 432,
+    "candidatePairs": 294,
+    "overlap": 248,
+    "precision": 84.4,
+    "recall": 57.4,
+    "polarityAgreementOnOverlap": 93.5,
+    "missedByCandidate": [
+      "10151614:발림감/텍스처",
+      "10551325:가성비",
+      "11516742:가성비",
+      "11886119:가성비",
+      "21808809:가성비",
+      "21808809:보습감",
+      "22159121:지속성",
+      "22159121:트러블/자극",
+      "23309143:가성비",
+      "23309143:지속성",
+      "24113860:가성비",
+      "24113860:발색",
+      "24113860:분사력",
+      "24154192:가성비",
+      "24154192:광택/윤기",
+      "24154192:흡수력",
+      "24833075:가성비",
+      "24833075:발색",
+      "25495639:가성비",
+      "25495639:밀착력",
+      "25837778:가성비",
+      "26552632:발림감/텍스처",
+      "26843518:흡수력",
+      "28077603:가성비",
+      "28077603:발림감/텍스처",
+      "28077603:발색",
+      "28077603:분사력",
+      "28810511:보습감",
+      "29593705:발림감/텍스처",
+      "29593705:발색",
+      "29593705:지속성",
+      "29934025:트러블/자극",
+      "34521596:가성비",
+      "34686144:가성비",
+      "35543688:발림감/텍스처",
+      "36204872:발림감/텍스처",
+      "37409582:가성비",
+      "37635624:가성비",
+      "37635624:광택/윤기",
+      "37635624:발림감/텍스처",
+      "37761237:가성비",
+      "37761237:발림감/텍스처",
+      "38248029:발림감/텍스처",
+      "39732419:가성비",
+      "39732419:발림감/텍스처",
+      "39732419:유분/번들거림",
+      "39732419:트러블/자극",
+      "39821218:광택/윤기",
+      "39821218:밀착력",
+      "4119503:트러블/자극"
+    ],
+    "extraInCandidate": [
+      "10151614:밀착력",
+      "11516742:탄력/탱탱함",
+      "11886119:보습감",
+      "11886119:흡수력",
+      "24113860:발림감/텍스처",
+      "24113860:유분/번들거림",
+      "24154192:유분/번들거림",
+      "25495639:발색",
+      "25837778:발색",
+      "29934025:탄력/탱탱함",
+      "35543688:유분/번들거림",
+      "35565215:발림감/텍스처",
+      "36204872:유분/번들거림",
+      "37409582:트러블/자극",
+      "37635624:밀착력",
+      "39732419:지속성",
+      "4119503:보습감",
+      "43728338:발림감/텍스처",
+      "43728338:지속성",
+      "54190893:탄력/탱탱함",
+      "58459899:트러블/자극",
+      "58943382:발림감/텍스처",
+      "61313541:지속성",
+      "61446147:흡수력",
+      "61639725:유분/번들거림",
+      "61876298:지속성",
+      "62235031:유분/번들거림",
+      "62434536:발색",
+      "62892619:밀착력",
+      "62892619:유분/번들거림",
+      "63020111:유분/번들거림",
+      "63163701:발색",
+      "63244086:발색",
+      "63269359:밀착력",
+      "63358864:발색",
+      "63435402:유분/번들거림",
+      "63456706:광택/윤기",
+      "63491955:트러블/자극",
+      "63502965:발림감/텍스처",
+      "63605823:발색",
+      "63624404:발림감/텍스처",
+      "63684376:보습감",
+      "63731163:밀착력",
+      "63949630:발색",
+      "63979483:밀착력",
+      "63982690:유분/번들거림"
+    ]
+  }
+}

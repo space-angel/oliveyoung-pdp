@@ -1,0 +1,95 @@
+{
+  "results": [
+    {
+      "reviewId": 63550141,
+      "aspects": [
+        {
+          "aspect": "발색",
+          "polarity": "negative",
+          "snippet": "제가 생각한 느낌은 아니여서 좀 아쉬웠어요",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "지속성",
+          "polarity": "positive",
+          "snippet": "뭐 먹거나 하지 않는 이상 지속력이 꽤 좋은 것 같아요",
+          "skinTypeHint": null
+        }
+      ]
+    },
+    {
+      "reviewId": 63584214,
+      "aspects": [
+        {
+          "aspect": "발림감/텍스처",
+          "polarity": "neutral",
+          "snippet": "엄청 가벼워서",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "보습감",
+          "polarity": "negative",
+          "snippet": "건성분들은 다른 수분세럼 쓰시길",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "유분/번들거림",
+          "polarity": "negative",
+          "snippet": "한달간 꾸준히 써본 결과 전혀 모르겠습니다",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "분사력",
+          "polarity": "positive",
+          "snippet": "펌프형식으로 되어있어서 막 바르기 편했어요",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "가성비",
+          "polarity": "negative",
+          "snippet": "재구매는 안 할 예정입니다",
+          "skinTypeHint": null
+        }
+      ]
+    },
+    {
+      "reviewId": 63586147,
+      "aspects": [
+        {
+          "aspect": "발림감/텍스처",
+          "polarity": "negative",
+          "snippet": "가루날림 개 심해요",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "발색",
+          "polarity": "positive",
+          "snippet": "발색이나 색은 괜찮은데",
+          "skinTypeHint": null
+        }
+      ]
+    },
+    {
+      "reviewId": 63605823,
+      "aspects": [
+        {
+          "aspect": "발림감/텍스처",
+          "polarity": "negative",
+          "snippet": "약간 묽어서 조금 떡지긴 하지만",
+          "skinTypeHint": null
+        }
+      ]
+    },
+    {
+      "reviewId": 63614548,
+      "aspects": [
+        {
+          "aspect": "가성비",
+          "polarity": "positive",
+          "snippet": "몇 개째 사용 중인지 모르겠는 찐템",
+          "skinTypeHint": null
+        }
+      ]
+    }
+  ]
+}

@@ -56,13 +56,26 @@ INPUT_PATH = ROOT / "data/input/reviews_50products.json"
 OUTPUT_PATH = ROOT / "data/intermediate/v5_reviews.jsonl"
 META_PATH = ROOT / "data/intermediate/v5_reviews_meta.json"
 PROFILE_PATH = ROOT / "eval/reports/v5_ingest_profile.json"
+# 전수 태깅 정본 (PER-175 `tag` 단계 산출). 있으면 trustPrior 의 `onTopic` 이 살아난다.
+TAGS_PATH = ROOT / "data/intermediate/v5_tags.jsonl"
 
 
 def sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def ingest(input_path: Path = INPUT_PATH) -> tuple[list[dict], dict, dict]:
+def load_aspect_counts(tags_path: Path) -> dict[int, int]:
+    """reviewId → aspect 태그 수. `trustPrior` 의 `onTopic` 입력이다 (PER-174 인계)."""
+    counts: dict[int, int] = collections.Counter()
+    for line in tags_path.read_text().splitlines():
+        if line.strip():
+            counts[json.loads(line)["reviewId"]] += 1
+    return dict(counts)
+
+
+def ingest(
+    input_path: Path = INPUT_PATH, tags_path: Path | None = None
+) -> tuple[list[dict], dict, dict]:
     catalog = load_catalog()
     rows = json.loads(input_path.read_text())
     # 새 수집분이 들어왔는데 리센시 컷 기준을 안 고치면 24개월 윈도우가 조용히
@@ -90,8 +103,20 @@ def ingest(input_path: Path = INPUT_PATH) -> tuple[list[dict], dict, dict]:
     # 신뢰도 사전 점수 (PER-174). 중복 본문 그룹 크기와 제품별 좋아요 백분위는 리뷰
     # 1건만 봐서는 알 수 없어 두 번째 패스로 매긴다. **필터가 아니라 가중치다** —
     # 점수가 낮아도 여기서 버리지 않는다. 버리는 판단은 게이트(PER-182~188)에서만 한다.
+    # `onTopic` 은 aspect 태깅 결과가 있어야 판정된다 (PER-175). 없으면 0점으로 깔지
+    # 않고 `unavailable` 에 남긴다 — 신호가 없는 것과 신호가 0인 것은 다르다.
+    aspect_counts = load_aspect_counts(tags_path) if tags_path else None
+    if aspect_counts is not None:
+        unknown = set(aspect_counts) - {r["reviewId"] for r in records}
+        if unknown:
+            raise ContractError(
+                f"태그 파일에 입력에 없는 reviewId 가 {len(unknown)}건 있다 "
+                f"(예: {sorted(unknown)[:3]}) — 다른 스냅샷으로 만든 태그다. "
+                "pipeline/run_v5.py --steps tag 이 정본을 다시 고른다"
+            )
+
     weights = TrustWeights.load()
-    context = ScoringContext.from_records(records)
+    context = ScoringContext.from_records(records, aspect_counts)
     for record in records:
         record["derived"]["trustPrior"] = trust_prior(record, context, weights)
 
@@ -108,6 +133,16 @@ def ingest(input_path: Path = INPUT_PATH) -> tuple[list[dict], dict, dict]:
         "conditionAxes": list(CONDITION_AXES),
         "droppedFields": DROPPED_FIELDS,
         "trustPrior": weights.as_dict(),
+        # 어느 태그로 재점수했는지. 없으면 `onTopic` 이 unavailable 로 남는다는 사실 자체를 남긴다.
+        "tags": (
+            {
+                "path": str(tags_path.relative_to(ROOT)),
+                "sha256": sha256(tags_path),
+                "taggedReviews": len(aspect_counts),
+            }
+            if tags_path
+            else None
+        ),
         # 이 실행이 실제로 강제한 계약. 어떤 규칙 아래 나온 산출물인지 산출물만 보고 알 수 있게 한다.
         "contract": {
             "doc": "docs/INPUT_CONTRACT.md",
@@ -217,10 +252,24 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--input", type=Path, default=INPUT_PATH)
     ap.add_argument("--check", action="store_true", help="재실행 결과가 기존 출력과 같은지만 확인")
+    ap.add_argument(
+        "--tags",
+        type=Path,
+        help=f"전수 태그 jsonl. 생략하면 {TAGS_PATH.relative_to(ROOT)} 가 있을 때만 쓴다",
+    )
+    ap.add_argument(
+        "--no-tags",
+        action="store_true",
+        help="태그가 있어도 무시하고 입수 시점 점수만 낸다 (onTopic 은 unavailable)",
+    )
     args = ap.parse_args()
 
+    tags_path = None if args.no_tags else (args.tags or (TAGS_PATH if TAGS_PATH.exists() else None))
+    if tags_path is not None and not tags_path.exists():
+        raise SystemExit(f"[입수 중단] 태그 파일이 없다: {tags_path}")
+
     try:
-        records, meta, prof = ingest(args.input)
+        records, meta, prof = ingest(args.input, tags_path)
     except (ContractError, CatalogError, PolicyError) as e:
         # 계약 위반은 버그가 아니라 판정이다. 스택트레이스 대신 무엇을 정해야 하는지 낸다.
         raise SystemExit(f"[입수 중단] 입력이 계약을 위반했다 (docs/INPUT_CONTRACT.md)\n  {e}")

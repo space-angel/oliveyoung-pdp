@@ -1,0 +1,99 @@
+{
+  "results": [
+    {
+      "reviewId": 63663744,
+      "aspects": [
+        {
+          "aspect": "가성비",
+          "polarity": "negative",
+          "snippet": "돈 낭비 제대로해서 맘이 아파요",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "트러블/자극",
+          "polarity": "negative",
+          "snippet": "트러블 발생",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "유분/번들거림",
+          "polarity": "negative",
+          "snippet": "이거만쓰면 개기름 계속나고",
+          "skinTypeHint": null
+        }
+      ]
+    },
+    {
+      "reviewId": 63668502,
+      "aspects": [
+        {
+          "aspect": "밀착력",
+          "polarity": "positive",
+          "snippet": "이거 바르면 화장 잘먹어서",
+          "skinTypeHint": null
+        }
+      ]
+    },
+    {
+      "reviewId": 63669675,
+      "aspects": [
+        {
+          "aspect": "가성비",
+          "polarity": "positive",
+          "snippet": "너무 좋아서 투명버전도 사봤어요",
+          "skinTypeHint": null
+        }
+      ]
+    },
+    {
+      "reviewId": 63682983,
+      "aspects": [
+        {
+          "aspect": "트러블/자극",
+          "polarity": "positive",
+          "snippet": "이건 안간지러워서 좋아요",
+          "skinTypeHint": null
+        },
+        {
+          "aspect": "발색",
+          "polarity": "negative",
+          "snippet": "발색은 그냥 입술색이랑 똑같아서 기대는 안하셔야할듯",
+          "skinTypeHint": null
+        }
+      ]
+    },
+    {
+      "reviewId": 63684376,
+      "aspects": [
+        {
+          "aspect": "밀착력",
+          "polarity": "positive",
+          "snippet": "딱히 건조함때문에 뜨는건 없는데",
+          "skinTypeHint": "A01"
+        }
+      ]
+    }
+  ],
+  "reviewNotes": [
+    {
+      "reviewId": 63663744,
+      "note": "그냥 물 그 자체는 제형 묘사인지 효능 없다는 비유인지 불명확하여 텍스처 태그 제외."
+    },
+    {
+      "reviewId": 63668502,
+      "note": "성분에 대한 거부감은 실제 피부 자극을 의미하지 않음."
+    },
+    {
+      "reviewId": 63669675,
+      "note": "투명/블랙은 버전 설명이지 현재 제품 발색 평가 아님. 다른 버전 추가 구매 만족 유지."
+    },
+    {
+      "reviewId": 63682983,
+      "note": "민감성 추천은 본인 민감성 명시와 구분."
+    },
+    {
+      "reviewId": 63684376,
+      "note": "건조해서 안 뜬다는 말은 밀착 호평이지 별도 보습 효과 확정 아님."
+    }
+  ]
+}

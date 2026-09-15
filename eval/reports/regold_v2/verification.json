@@ -1,0 +1,61 @@
+{
+  "hashes": {
+    "eval/gold/v5_tag_pilot_sample.jsonl": "d42af53d59937caaa9767664f052bab293d6ad76415223388dcf22c72bdcf298",
+    "eval/gold/v5_tag_pilot_meta.json": "7895771b1a164af2f2c2a1723c7b8214a5246de84b5ece7d17bd3843b770208e",
+    "eval/gold/v5_tags_pilot_gold.jsonl": "68f9fab206d18b1bdbeb58e462143132b57a094cc6c025f550ad71c874f5c180",
+    "eval/gold/v5_tags_pilot_gold_v2.jsonl": "16b0d167cd45096b08cfbd468b8ef8ab88df29effcd21969296506cc27b61714",
+    "eval/gold/regold_prompt_v1.md": "52a442282f09281e5925a12d260c58f5b9d5fbb5b1c65e9d8a14dbb1a4aed594"
+  },
+  "unchanged": [
+    {
+      "path": "eval/gold/v5_tag_pilot_sample.jsonl",
+      "unchanged": true
+    },
+    {
+      "path": "eval/gold/v5_tag_pilot_meta.json",
+      "unchanged": true
+    },
+    {
+      "path": "eval/gold/v5_tags_pilot_gold.jsonl",
+      "unchanged": true
+    }
+  ],
+  "checkedAt": "2026-09-14",
+  "checks": [
+    {
+      "command": "python3 eval/regold_audit.py --check-pass 2",
+      "exitCode": 0,
+      "tags": 432,
+      "violations": 0
+    },
+    {
+      "command": "python3 pipeline/sample_tag_pilot.py --check",
+      "exitCode": 0,
+      "result": "OK: 표본 재현 확인 (200건)"
+    },
+    {
+      "command": "python3 eval/validate_tags.py --tags eval/gold/v5_tags_pilot_gold_v2.jsonl --label gold_v2 --tagger 'Codex (GPT-6; runtime model ID/settings not exposed)' --prompt eval/gold/regold_prompt_v1.md --out eval/reports/v5_tag_gold_v2.json",
+      "exitCode": 0
+    },
+    {
+      "command": "python3 eval/diff_tags.py --old eval/gold/v5_tags_pilot_gold.jsonl --new eval/gold/v5_tags_pilot_gold_v2.jsonl --context 1000000 --out eval/reports/gold_v1_v2_diff.md",
+      "exitCode": 0,
+      "added": 116,
+      "removed": 49,
+      "polarityChanged": 8,
+      "snippetChanged": 94,
+      "hintChanged": 22
+    },
+    {
+      "command": "python3 -m unittest discover -s pipeline -p 'test_*.py'",
+      "exitCode": 0,
+      "tests": 306,
+      "result": "OK",
+      "warnings": "ResourceWarning from existing HTTP error-response tests"
+    },
+    {
+      "command": "git diff --check",
+      "exitCode": 0
+    }
+  ]
+}

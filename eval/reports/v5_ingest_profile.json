@@ -28,15 +28,13 @@
   "skinTroubleSegments": 14,
   "trustPrior": {
     "issue": "PER-174",
-    "min": 0.1315,
-    "p25": 0.5288,
-    "median": 0.623,
-    "p75": 0.7598,
-    "p95": 0.9853,
+    "min": 0.0877,
+    "p25": 0.6592,
+    "median": 0.7311,
+    "p75": 0.8355,
+    "p95": 0.9893,
     "max": 1.0,
-    "distinctScores": 757,
-    "unavailableSignals": [
-      "onTopic"
-    ]
+    "distinctScores": 1089,
+    "unavailableSignals": []
   }
 }

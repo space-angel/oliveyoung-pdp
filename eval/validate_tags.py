@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import argparse
 import collections
+import hashlib
 import json
 import sys
 from pathlib import Path
@@ -191,6 +192,7 @@ def main() -> None:
     ap.add_argument("--meta", default="eval/gold/v5_tag_pilot_meta.json")
     ap.add_argument("--label", required=True, help="누가 만든 태그인지 (예: pilot_gold, batch_haiku45)")
     ap.add_argument("--tagger", default="", help="모델 ID 또는 실행 주체. meta 에 그대로 남는다")
+    ap.add_argument("--prompt", help="실제 사용한 프롬프트 경로. 생략하면 프로덕션 프롬프트")
     ap.add_argument("--against", help="정답셋 jsonl. 주면 일치율을 낸다")
     ap.add_argument("--out", required=True)
     args = ap.parse_args()
@@ -208,11 +210,20 @@ def main() -> None:
     raw_tags = read_jsonl(ROOT / args.tags)
     tags = validate_tags(raw_tags, reviews)  # 위반이 있으면 여기서 선다
 
+    actual_prompt = prompt_version()
+    if args.prompt:
+        path = ROOT / args.prompt
+        actual_prompt = {
+            **actual_prompt,
+            "path": args.prompt,
+            "sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
+        }
+
     report = {
         "issue": "PER-175",
         "label": args.label,
         "tagger": args.tagger,
-        "prompt": prompt_version(),
+        "prompt": actual_prompt,
         "sample": {
             "path": args.sample,
             "sha256": sample_meta["source"]["sha256"],
