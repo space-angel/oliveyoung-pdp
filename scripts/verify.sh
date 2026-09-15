@@ -107,6 +107,9 @@ fi
 "$PY" eval/measure_claim_schema.py --check
 # 정규화 규칙·게이트·골든셋이 바뀌면 인용 원문성 수치가 조용히 낡는다 (PER-190)
 "$PY" eval/measure_quote_fidelity.py --check
+# 표기 규칙·충분성 임계값·태그가 바뀌면 조건 갈림의 근거가 조용히 낡는다 (PER-192)
+# 순열 200회 × 4단계라 약 60초 걸린다 — 이 대열에서 가장 느리다
+"$PY" eval/measure_condition_split.py --check
 
 echo
 echo "verify.sh OK (--full)"
