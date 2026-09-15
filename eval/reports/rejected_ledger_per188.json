@@ -234,11 +234,11 @@
     "reviewsIn": 25000,
     "afterGate1": 22194,
     "afterGate2": 17672,
-    "claimCandidates": 7660,
-    "claimsPassed": 2395,
-    "rows": 12593,
+    "claimCandidates": 7689,
+    "claimsPassed": 2420,
+    "rows": 12597,
     "reviewRows": 7328,
-    "claimRows": 5265,
+    "claimRows": 5269,
     "byGateReason": {
       "identity": {
         "기간초과": {
@@ -250,25 +250,25 @@
       "duplicate": {
         "중복": {
           "reason": "duplicate_content",
-          "count": 378,
-          "pct": 1.51
+          "count": 387,
+          "pct": 1.55
         },
         "동일작성자": {
           "reason": "same_author",
-          "count": 4144,
-          "pct": 16.58
+          "count": 4135,
+          "pct": 16.54
         }
       },
       "sufficiency": {
         "과소근거": {
           "reason": "insufficient_support",
-          "count": 4273,
-          "pct": 55.78
+          "count": 4267,
+          "pct": 55.49
         },
         "세그먼트과소": {
           "reason": "segment_too_small",
-          "count": 992,
-          "pct": 12.95
+          "count": 1002,
+          "pct": 13.03
         }
       }
     },
@@ -279,12 +279,12 @@
       },
       "single_dissent": {
         "unit": "claim",
-        "count": 498
+        "count": 508
       }
     },
     "accounted": {
       "reviews": "17672 통과 + 7328 탈락 = 25000",
-      "claims": "2395 통과 + 5265 탈락 = 7660"
+      "claims": "2420 통과 + 5269 탈락 = 7689"
     },
     "polarityRows": 0,
     "note": "게이트3 행은 0이다 — 부정 근거는 틀린 근거가 아니다 (PER-185 §1). 리뷰 행과 주장 행은 단위가 달라 서로 더하지 않는다"
@@ -292,24 +292,24 @@
   "crossCheck": {
     "against": "eval/reports/gate4_sufficiency_per186.json",
     "ledger": {
-      "candidates": 7660,
-      "passed": 2395,
+      "candidates": 7689,
+      "passed": 2420,
       "rejectedByReason": {
-        "과소근거": 4273,
-        "세그먼트과소": 992
+        "과소근거": 4267,
+        "세그먼트과소": 1002
       }
     },
     "committed": {
-      "candidates": 7660,
-      "passed": 2395,
+      "candidates": 7689,
+      "passed": 2420,
       "rejectedByReason": {
-        "과소근거": 4273,
-        "세그먼트과소": 992
+        "과소근거": 4267,
+        "세그먼트과소": 1002
       },
       "rejectedIfOnly": {
-        "nMin": 5265,
-        "rMin": 102,
-        "sMin": 1066
+        "nMin": 5269,
+        "rMin": 104,
+        "sMin": 1076
       },
       "note": "`rejectedByReason` 는 판정 순서(S → U → U/D)를 거친 귀속이고, `rejectedIfOnly` 는 그 조건 하나만 걸었을 때의 탈락 수다. 두 수가 다른 것이 세 조건을 AND 로 묶은 이유다 — 하나만으로는 나머지가 잡는 것을 놓친다"
     },
@@ -464,14 +464,14 @@
         "support": {
           "aspect": "보습감",
           "direction": "mixed",
-          "positiveAuthors": 67,
+          "positiveAuthors": 68,
           "negativeAuthors": 10,
           "neutralAuthors": 1,
-          "spokeAuthors": 78,
-          "silentAuthors": 317,
+          "spokeAuthors": 79,
+          "silentAuthors": 316,
           "cellAuthors": 395,
-          "supportAuthors": 77,
-          "supportShare": 0.9872,
+          "supportAuthors": 78,
+          "supportShare": 0.9873,
           "minorityAuthors": 10
         },
         "evidenceReviews": 3,
@@ -599,14 +599,14 @@
         "support": {
           "aspect": "발림감/텍스처",
           "direction": "mixed",
-          "positiveAuthors": 54,
+          "positiveAuthors": 55,
           "negativeAuthors": 5,
           "neutralAuthors": 2,
-          "spokeAuthors": 61,
-          "silentAuthors": 334,
+          "spokeAuthors": 62,
+          "silentAuthors": 333,
           "cellAuthors": 395,
-          "supportAuthors": 59,
-          "supportShare": 0.9672,
+          "supportAuthors": 60,
+          "supportShare": 0.9677,
           "minorityAuthors": 5
         },
         "evidenceReviews": 4,
@@ -670,14 +670,14 @@
         "support": {
           "aspect": "발색",
           "direction": "mixed",
-          "positiveAuthors": 187,
+          "positiveAuthors": 190,
           "negativeAuthors": 29,
-          "neutralAuthors": 16,
-          "spokeAuthors": 232,
-          "silentAuthors": 163,
+          "neutralAuthors": 18,
+          "spokeAuthors": 237,
+          "silentAuthors": 158,
           "cellAuthors": 395,
-          "supportAuthors": 216,
-          "supportShare": 0.931,
+          "supportAuthors": 219,
+          "supportShare": 0.9241,
           "minorityAuthors": 29
         },
         "evidenceReviews": 2,
@@ -727,14 +727,14 @@
         "support": {
           "aspect": "발색",
           "direction": "mixed",
-          "positiveAuthors": 187,
+          "positiveAuthors": 190,
           "negativeAuthors": 29,
-          "neutralAuthors": 16,
-          "spokeAuthors": 232,
-          "silentAuthors": 163,
+          "neutralAuthors": 18,
+          "spokeAuthors": 237,
+          "silentAuthors": 158,
           "cellAuthors": 395,
-          "supportAuthors": 216,
-          "supportShare": 0.931,
+          "supportAuthors": 219,
+          "supportShare": 0.9241,
           "minorityAuthors": 29
         },
         "evidenceReviews": 5,
@@ -1287,20 +1287,20 @@
         "detail": null,
         "claimId": "p001|product=None|발색",
         "goldenDirection": "negative",
-        "pipelineDirection": "positive",
+        "pipelineDirection": "mixed",
         "directionMatch": false,
         "support": {
           "aspect": "발색",
-          "direction": "positive",
+          "direction": "mixed",
           "positiveAuthors": 18,
-          "negativeAuthors": 0,
+          "negativeAuthors": 1,
           "neutralAuthors": 2,
-          "spokeAuthors": 20,
-          "silentAuthors": 11,
+          "spokeAuthors": 21,
+          "silentAuthors": 10,
           "cellAuthors": 31,
-          "supportAuthors": 18,
-          "supportShare": 0.9,
-          "minorityAuthors": null
+          "supportAuthors": 19,
+          "supportShare": 0.9048,
+          "minorityAuthors": 1
         },
         "evidenceReviews": 5,
         "evidenceLost": 0,
@@ -1342,7 +1342,9 @@
           }
         ],
         "limitations": [
+          "minority_within_tagger_noise",
           "renewal_unobserved",
+          "single_dissent",
           "tagger_direction_error"
         ]
       },
@@ -2213,13 +2215,11 @@
     "mismatch": 6,
     "mismatchPct": 37.5,
     "mismatchKind": {
-      "flipped": 1,
-      "widened_to_mixed": 5
+      "widened_to_mixed": 6
     },
     "pairs": {
       "mixed→mixed": 6,
-      "negative→mixed": 3,
-      "negative→positive": 1,
+      "negative→mixed": 4,
       "positive→mixed": 2,
       "positive→positive": 4
     },
@@ -2229,7 +2229,7 @@
         "golden": "negative",
         "pipeline": "mixed",
         "kind": "widened_to_mixed",
-        "positiveAuthors": 67,
+        "positiveAuthors": 68,
         "negativeAuthors": 10,
         "neutralAuthors": 1,
         "cellAuthors": 395
@@ -2239,7 +2239,7 @@
         "golden": "negative",
         "pipeline": "mixed",
         "kind": "widened_to_mixed",
-        "positiveAuthors": 54,
+        "positiveAuthors": 55,
         "negativeAuthors": 5,
         "neutralAuthors": 2,
         "cellAuthors": 395
@@ -2249,9 +2249,9 @@
         "golden": "negative",
         "pipeline": "mixed",
         "kind": "widened_to_mixed",
-        "positiveAuthors": 187,
+        "positiveAuthors": 190,
         "negativeAuthors": 29,
-        "neutralAuthors": 16,
+        "neutralAuthors": 18,
         "cellAuthors": 395
       },
       {
@@ -2267,10 +2267,10 @@
       {
         "labelId": "B03-4",
         "golden": "negative",
-        "pipeline": "positive",
-        "kind": "flipped",
+        "pipeline": "mixed",
+        "kind": "widened_to_mixed",
         "positiveAuthors": 18,
-        "negativeAuthors": 0,
+        "negativeAuthors": 1,
         "neutralAuthors": 2,
         "cellAuthors": 31
       },
@@ -2441,6 +2441,6 @@
     "aspect 가 null 인 라벨 4건은 (셀 × aspect) 키가 없어 되짚을 수 없다 (`untraceable`). 분모에서 빼되 수를 남겼다 — 택소노미 14종이 동결이라 (PER-175) 이 4건은 임계값을 바꿔도 되살아나지 않는다",
     "게이트2 의 `의미중복`(PER-184)은 미적용이다. 지금 원장의 중복 사유는 본문 완전일치와 동일작성자 두 축뿐이고, 의미가 같은 다른 문장은 독립 근거로 남아 있다. 레지스트리에 코드를 reserved 로 열어 뒀을 뿐 탈락은 0건이다",
     "v4 의 Golden Set 미스 2건은 이 원장으로 되짚지 못한다 — v4 골든셋 15문항을 v5 로 옮기지 않기로 했기 때문이다 (PER-178, eval/reports/v4_golden_migration_per178.json). 이 이슈가 자동화한 것은 그 2건의 사후 추적이 아니라 **앞으로의 미스 추적 경로**다",
-    "입력 기반이 실제 파이프라인과 미세하게 다르다. 이 스크립트는 다른 measure 스크립트와 같이 data/input 에서 레코드를 다시 만들고, 그 경로에는 태그가 없어 trustPrior 의 onTopic 신호가 unavailable 이다. 입수 산출물(v5_reviews.jsonl)로 돌리면 게이트2 대표가 달라져 후보 7,689 · 통과 2,420 이 된다 (python3 pipeline/run_v5.py --steps gates). 게이트1·2 통과 수는 양쪽 17,672 로 같고 달라지는 것은 사유 귀속과 대표 선택이다"
+    "입력 기반은 실제 파이프라인과 같다. 레코드는 data/input 에서 다시 만들되 score_all 에 전수 태그의 aspect_counts 를 넘기므로 trustPrior 의 onTopic 이 입수 산출물과 같은 값을 갖는다 — 2026-09-15 이전에는 이걸 안 넘겨 게이트2 대표가 갈렸고 후보 7,660 · 통과 2,395 라는 다른 수가 나왔다"
   ]
 }

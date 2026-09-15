@@ -38,13 +38,13 @@
     "independentReviews": 19392,
     "rejected": {
       "duplicate_content": {
-        "reviews": 416,
-        "pct": 1.66,
+        "reviews": 429,
+        "pct": 1.72,
         "label": "중복"
       },
       "same_author": {
-        "reviews": 5192,
-        "pct": 20.77,
+        "reviews": 5179,
+        "pct": 20.72,
         "label": "동일작성자"
       }
     },
@@ -125,8 +125,8 @@
         "independentReviews": 363,
         "inflation": 1.3774,
         "rejected": {
-          "duplicate_content": 7,
-          "same_author": 130
+          "duplicate_content": 9,
+          "same_author": 128
         }
       },
       "p009": {
@@ -135,8 +135,8 @@
         "independentReviews": 460,
         "inflation": 1.087,
         "rejected": {
-          "duplicate_content": 3,
-          "same_author": 37
+          "duplicate_content": 4,
+          "same_author": 36
         }
       },
       "p010": {
@@ -225,7 +225,8 @@
         "independentReviews": 380,
         "inflation": 1.3158,
         "rejected": {
-          "same_author": 120
+          "duplicate_content": 1,
+          "same_author": 119
         }
       },
       "p019": {
@@ -254,8 +255,8 @@
         "independentReviews": 387,
         "inflation": 1.292,
         "rejected": {
-          "duplicate_content": 14,
-          "same_author": 99
+          "duplicate_content": 15,
+          "same_author": 98
         }
       },
       "p022": {
@@ -294,8 +295,8 @@
         "independentReviews": 328,
         "inflation": 1.5244,
         "rejected": {
-          "duplicate_content": 29,
-          "same_author": 143
+          "duplicate_content": 32,
+          "same_author": 140
         }
       },
       "p026": {
@@ -334,8 +335,8 @@
         "independentReviews": 376,
         "inflation": 1.3298,
         "rejected": {
-          "duplicate_content": 11,
-          "same_author": 113
+          "duplicate_content": 12,
+          "same_author": 112
         }
       },
       "p030": {
@@ -394,8 +395,8 @@
         "independentReviews": 344,
         "inflation": 1.4535,
         "rejected": {
-          "duplicate_content": 9,
-          "same_author": 147
+          "duplicate_content": 10,
+          "same_author": 146
         }
       },
       "p036": {
@@ -404,8 +405,8 @@
         "independentReviews": 301,
         "inflation": 1.6611,
         "rejected": {
-          "duplicate_content": 9,
-          "same_author": 190
+          "duplicate_content": 12,
+          "same_author": 187
         }
       },
       "p037": {
@@ -578,7 +579,7 @@
     "removedByContentHashOnly": 695,
     "removedByAuthorOnly": 5599,
     "removedByBoth": 5608,
-    "rejectedAsDuplicateContentInGate": 416,
+    "rejectedAsDuplicateContentInGate": 429,
     "residualIfContentHashOnly": 4913,
     "residualIfContentHashOnlyPct": 19.65,
     "residualIfAuthorOnly": 9,
@@ -588,21 +589,21 @@
     "samePassedSet": true,
     "reasonCounts": {
       "contentFirst": {
-        "duplicate_content": 416,
-        "same_author": 5192
+        "duplicate_content": 429,
+        "same_author": 5179
       },
       "authorFirst": {
         "duplicate_content": 11,
         "same_author": 5597
       }
     },
-    "reviewsWithDifferentReason": 405,
+    "reviewsWithDifferentReason": 418,
     "note": "통과 집합은 순서와 무관하고 사유 귀속만 달라진다. 좁은 판정(본문 완전일치)을 먼저 붙이는 쪽을 택했다 — '왜 빠졌나'가 읽기 쉽다"
   },
   "gateOrder": {
     "independentReviewsGate1Then2": 17672,
-    "independentReviewsGate2Then1": 17585,
-    "evidenceLostIfFlipped": 87,
+    "independentReviewsGate2Then1": 17587,
+    "evidenceLostIfFlipped": 85,
     "productsAffected": 15,
     "note": "뒤집으면 컷된 리뷰가 1표를 가져가고, 그 1표가 게이트1에서 탈락하면서 살아 있던 같은 작성자의 리뷰까지 함께 사라진다"
   },
@@ -610,7 +611,7 @@
     "nMin": 8,
     "cells": 407,
     "atLeastNminRaw": 314,
-    "atLeastNminAfterGate2": 296,
+    "atLeastNminAfterGate2": 295,
     "atLeastNminAfterGate1And2": 283,
     "reviewsAfterGate1And2": 17672,
     "note": "셀 크기는 게이트2 통과 수다. 줄어든 셀은 손실이 아니라 원래 없던 근거다. 입수 프로파일(v5_ingest_profile.json)의 297·284 는 작성자 축만 건 수치라 본문 해시 축이 더해진 여기서 각각 1 셀씩 낮다"
