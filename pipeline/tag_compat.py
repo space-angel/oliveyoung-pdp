@@ -11,10 +11,22 @@ Batch API 가 없으므로 클라이언트가 동시성·재시도·재개를 �
 
   본문에 보내는 것은 `reviewId` · `content` · `rating` 뿐이다 — `userName` 은 보내지 않는다.
 
+AWS Bedrock 도 이 경로다 — Bedrock 은 OpenAI 호환 `/openai/v1` 을 같이 연다.
+**MiniMax M2.5 는 Bedrock 배치 추론 지원 목록에 없다** (M2·M2.1 만 있다). 그래서 배치가
+아니라 동기 호출 + `service_tier="flex"` (지연 허용 할인) 로 돌린다. 재개가 배치의 대역이다.
+
 사용:
+  # NVIDIA NIM
   export NVIDIA_API_KEY=nvapi-...
   python3 pipeline/tag_compat.py run --model moonshotai/kimi-k3 --pilot
-  python3 pipeline/tag_compat.py collect --label pilot_kimik3
+
+  # AWS Bedrock (Flex 티어)
+  echo 'AWS_BEARER_TOKEN_BEDROCK=...' >> .env
+  python3 pipeline/tag_compat.py run --model minimax.minimax-m2.5 --pilot \
+      --base-url https://bedrock-runtime.us-east-1.amazonaws.com/openai/v1 \
+      --env AWS_BEARER_TOKEN_BEDROCK --service-tier flex
+
+  python3 pipeline/tag_compat.py collect --label pilot_minimaxm25
 """
 from __future__ import annotations
 
@@ -33,13 +45,16 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent))
 
 from tag import (  # noqa: E402
+    PILOT_SAMPLE_PATH,
     PROMPT_PATH,
+    REVIEWS_PATH,
     RUNS_DIR,
     ROOT,
     chunk_payload,
     chunks,
     load_reviews,
     parse_text,
+    partition_by_contract,
     sha256,
 )
 
@@ -86,9 +101,10 @@ def post(base_url: str, key: str, body: dict, timeout: int, tries: int = 5) -> d
 
 
 def run(model: str, pilot: bool, label: str | None, base_url: str, env: str,
-        concurrency: int, timeout: int) -> None:
+        concurrency: int, timeout: int, service_tier: str | None = None) -> None:
     reviews = load_reviews(pilot)
-    label = label or f"{'pilot' if pilot else 'full'}_{model.split('/')[-1].replace('-', '')}"
+    input_path = PILOT_SAMPLE_PATH if pilot else REVIEWS_PATH
+    label = label or f"{'pilot' if pilot else 'full'}_{model.split('/')[-1].replace('-', '').replace('.', '')}"
     key = api_key(env)
     system = PROMPT_PATH.read_text()
 
@@ -125,10 +141,23 @@ def run(model: str, pilot: bool, label: str | None, base_url: str, env: str,
             "temperature": 0,   # 같은 입력 → 같은 출력 (§5-2)
             "stream": False,
         }
+        if service_tier:
+            body["service_tier"] = service_tier
         data = post(base_url, key, body, timeout)
-        text = data["choices"][0]["message"]["content"]
+        choice = data["choices"][0]
+        text = choice["message"]["content"]
+        # 토큰 사용량은 청크마다 남긴다 — 비용을 추정이 아니라 실측으로 적기 위해서다.
+        # finish_reason 도 같이 남긴다: 추론 모델이 max_tokens 에 걸려 잘리면 JSON 이
+        # 깨지는데, 그때 "모델이 못 한다"와 "상한이 낮다"를 구별할 수 있어야 한다.
+        row = {
+            "chunk": idx,
+            "text": text,
+            "finishReason": choice.get("finish_reason"),
+            "usage": data.get("usage"),
+            "serviceTier": data.get("service_tier"),
+        }
         with lock:
-            fh.write(json.dumps({"chunk": idx, "text": text}, ensure_ascii=False) + "\n")
+            fh.write(json.dumps(row, ensure_ascii=False) + "\n")
             fh.flush()
             counter["n"] += 1
             if counter["n"] % 10 == 0 or counter["n"] == len(todo):
@@ -146,6 +175,7 @@ def run(model: str, pilot: bool, label: str | None, base_url: str, env: str,
                 "provider": "openai-compatible",
                 "baseUrl": base_url,
                 "model": model,
+                "serviceTier": service_tier,
                 "pilot": pilot,
                 "reviews": len(reviews),
                 "chunkSize": len(reviews) and len(next(chunks(reviews))[1]),
@@ -153,6 +183,10 @@ def run(model: str, pilot: bool, label: str | None, base_url: str, env: str,
                 "temperature": 0,
                 "raw": str(raw_path.relative_to(ROOT)),
                 "prompt": {"path": str(PROMPT_PATH.relative_to(ROOT)), "sha256": sha256(PROMPT_PATH)},
+                "input": {
+                    "path": str(input_path.relative_to(ROOT)),
+                    "sha256": sha256(input_path),
+                },
             },
             ensure_ascii=False,
             indent=2,
@@ -163,46 +197,80 @@ def run(model: str, pilot: bool, label: str | None, base_url: str, env: str,
 
 
 def collect(label: str) -> None:
-    from tag_contract import validate_tags
-
     man = json.loads((RUNS_DIR / f"{label}.json").read_text())
     reviews = {r["reviewId"]: r for r in load_reviews(man["pilot"])}
 
     tags, seen, failed = [], set(), []
+    usage = {"input": 0, "output": 0, "cacheRead": 0, "chunks": 0}
+    finish_reasons: dict[str, int] = {}
     for line in (ROOT / man["raw"]).read_text().splitlines():
         if not line.strip():
             continue
         row = json.loads(line)
+        u = row.get("usage") or {}
+        if u:
+            usage["chunks"] += 1
+            usage["input"] += u.get("prompt_tokens", 0)
+            usage["output"] += u.get("completion_tokens", 0)
+            details = u.get("prompt_tokens_details") or {}
+            usage["cacheRead"] += details.get("cached_tokens", 0)
+        if row.get("finishReason"):
+            finish_reasons[row["finishReason"]] = finish_reasons.get(row["finishReason"], 0) + 1
         try:
             payload = parse_text(row["text"])
             results = payload["results"]
         except (json.JSONDecodeError, KeyError, TypeError) as exc:
-            failed.append({"chunk": row["chunk"], "error": str(exc)})
+            # 잘린 응답인지 모델이 형식을 어긴 것인지 구별할 수 있게 finish_reason 을 같이 남긴다
+            failed.append(
+                {"chunk": row["chunk"], "error": str(exc), "finishReason": row.get("finishReason")}
+            )
             continue
         for r in results:
             seen.add(r["reviewId"])
             for a in r.get("aspects") or []:
                 tags.append({"reviewId": r["reviewId"], **a})
 
-    validate_tags(tags, reviews)
+    # 원문 산출물은 무조건 남긴다 — 계약에서 떨어져도 "무엇이 떨어졌나"가 근거다 (tag.py 와 같은 규칙).
+    raw_out = ROOT / f"data/intermediate/v5_tags_{label}_raw.jsonl"
+    raw_out.write_text("".join(json.dumps(t, ensure_ascii=False) + "\n" for t in tags))
+
+    # 계약 통과분만 파이프라인으로 보낸다. 위반 하나에 수거 전체가 멈추면 25,000건을 다시 부른다.
+    kept, violations = partition_by_contract(tags, reviews)
 
     out = ROOT / f"data/intermediate/v5_tags_{label}.jsonl"
-    out.write_text("".join(json.dumps(t, ensure_ascii=False) + "\n" for t in tags))
+    out.write_text("".join(json.dumps(t, ensure_ascii=False) + "\n" for t in kept))
     missing = sorted(set(reviews) - seen)
     man["output"] = {
         "path": str(out.relative_to(ROOT)),
-        "tags": len(tags),
+        "rawPath": str(raw_out.relative_to(ROOT)),
+        "tagsRaw": len(tags),
+        "tags": len(kept),
+        "contractViolations": len(violations),
+        "violations": violations[:50],
         "reviewsTagged": len(seen),
         "missingCount": len(missing),
+        "missingReviewIds": missing[:50],
         "failedChunks": failed,
+        "usage": usage,
+        "finishReasons": finish_reasons,
     }
     (RUNS_DIR / f"{label}.json").write_text(json.dumps(man, ensure_ascii=False, indent=2) + "\n")
 
-    print(f"[collect] 태그 {len(tags):,}개 · 리뷰 {len(seen):,}/{len(reviews):,} → {out.relative_to(ROOT)}")
+    print(f"[collect] 태그 {len(tags):,}개 생성 · 계약 통과 {len(kept):,} · 위반 {len(violations):,}")
+    print(f"[collect] 리뷰 {len(seen):,}/{len(reviews):,} → {out.relative_to(ROOT)}")
+    if usage["chunks"]:
+        print(
+            f"[collect] 토큰 실측 입력 {usage['input']:,} · 출력 {usage['output']:,}"
+            f" · 캐시읽기 {usage['cacheRead']:,} ({usage['chunks']:,}청크)"
+        )
+    if finish_reasons:
+        print("[collect] finish_reason " + " · ".join(f"{k} {v}" for k, v in sorted(finish_reasons.items())))
+    for v in violations[:10]:
+        print(f"           - reviewId={v['reviewId']} {v['aspect']}: {v['violation']}")
     if failed:
-        print(f"[collect] 파싱 실패 청크 {len(failed)}개")
+        print(f"[collect] 파싱 실패 청크 {len(failed)}개 — 매니페스트의 failedChunks 참조")
     if missing:
-        print(f"[collect] 결과에 없는 리뷰 {len(missing)}건")
+        print(f"[collect] 결과에 없는 리뷰 {len(missing)}건 — 재실행 대상")
     print(
         f"[다음]   .venv/bin/python3 eval/validate_tags.py --tags {out.relative_to(ROOT)} "
         f"--label {label} --tagger {man['model']} "
@@ -222,13 +290,18 @@ def main() -> None:
     r.add_argument("--env", default="NVIDIA_API_KEY", help="API 키 환경변수 이름")
     r.add_argument("--concurrency", type=int, default=4, help="무료 티어는 낮게 잡는다")
     r.add_argument("--timeout", type=int, default=180)
+    r.add_argument(
+        "--service-tier",
+        choices=("default", "flex", "priority"),
+        help="Bedrock 서비스 티어. flex 는 지연을 허용하고 할인받는다 (배치가 없는 모델의 대역)",
+    )
 
     c = sub.add_parser("collect", help="결과 수거 + 계약 검증")
     c.add_argument("--label", required=True)
 
     a = ap.parse_args()
     if a.cmd == "run":
-        run(a.model, a.pilot, a.label, a.base_url, a.env, a.concurrency, a.timeout)
+        run(a.model, a.pilot, a.label, a.base_url, a.env, a.concurrency, a.timeout, a.service_tier)
     else:
         collect(a.label)
 
