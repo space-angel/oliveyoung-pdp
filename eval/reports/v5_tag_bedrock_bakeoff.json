@@ -13,6 +13,35 @@
   "limitation": "표본 200건이다. 정답셋은 Opus 5 가 만들었고(eval/reports/v5_tag_gold_v2.md), 재현율의 상한은 정답셋의 품질이다 — 100% 는 의미 없는 목표다",
   "models": [
     {
+      "model": "moonshotai.kimi-k2.5",
+      "label": "bench_kimik25",
+      "precision": 82.4,
+      "recall": 66.2,
+      "polarityAgreement": 92.7,
+      "tagsPassed": 347,
+      "goldTags": 432,
+      "overlap": 286,
+      "reviewsWithTag": 182,
+      "tokens": {
+        "in": 41951,
+        "out": 22258,
+        "cacheRead": 0
+      },
+      "tokensPerReview": {
+        "in": 210,
+        "out": 111
+      },
+      "reviewsTagged": 200,
+      "truncatedChunks": 0,
+      "failedChunks": 0,
+      "price": {
+        "inPerMTok": 0.6,
+        "outPerMTok": 2.5
+      },
+      "cost25kStandard": 10.1,
+      "cost25kFlex": 5.05
+    },
+    {
       "model": "zai.glm-4.7",
       "label": "bench_glm47",
       "precision": 88.0,
@@ -213,9 +242,9 @@
   ],
   "finding": {
     "bestRecall": {
-      "model": "zai.glm-4.7",
-      "recall": 59.5,
-      "precision": 88.0
+      "model": "moonshotai.kimi-k2.5",
+      "recall": 66.2,
+      "precision": 82.4
     },
     "reviewCoverageFailures": [
       {

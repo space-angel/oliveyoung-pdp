@@ -41,6 +41,9 @@ PRICES = {
 
 # 실행 매니페스트에서 옮긴 실측치. 200건 · 청크 20 · 프롬프트 v1 · service_tier=flex.
 MEASURED: dict[str, dict] = {
+    "moonshotai.kimi-k2.5": {"label": "bench_kimik25", "in": 41951, "out": 22258,
+                             "cacheRead": 0, "reviewsTagged": 200, "truncated": 0,
+                             "failedChunks": 0},
     "zai.glm-4.7": {"label": "bench_glm47", "in": 40609, "out": 16832, "cacheRead": 2016,
                     "reviewsTagged": 200, "truncated": 0, "failedChunks": 0},
     "minimax.minimax-m2.5": {"label": "bench_minimaxm25", "in": 30349, "out": 42903,
