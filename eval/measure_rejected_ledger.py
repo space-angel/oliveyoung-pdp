@@ -50,7 +50,7 @@ sys.path.insert(0, str(ROOT / "pipeline"))
 import reject_registry as registry  # noqa: E402
 from catalog import load_catalog  # noqa: E402
 from contracts import build_record  # noqa: E402
-from ingest import load_aspect_counts  # noqa: E402
+from ingest import assert_matches_ingest, load_aspect_counts  # noqa: E402
 from golden_contract import validate_labels  # noqa: E402
 from ledger import (  # noqa: E402
     OUTCOME_PRODUCED,
@@ -103,6 +103,9 @@ def load_records() -> tuple[list[dict], object]:
     priors = score_all(records, aspect_counts=load_aspect_counts(TAGS_PATH))
     for record in records:
         record["derived"]["trustPrior"] = priors[record["reviewId"]]
+    # 다시 만든 것이 입수 산출물과 **정말로** 같은가. 리포트가 재현된다고 기반이
+    # 같은 것은 아니다 — 2026-09-15 에 갈린 채로 재현되고 있었다.
+    assert_matches_ingest(records, who="원장 측정")
     return records, catalog
 
 def load_tags() -> tuple[list[dict], dict[int, list[tuple[str, str]]], dict]:

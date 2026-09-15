@@ -211,7 +211,8 @@ pipeline/    v5 — 작업 대상
   option_norm.py           옵션 → 색상 키 정규화 (PER-182). LLM 없음
   option_markers.json      판촉 어휘 — 코드가 아니라 여기서 고친다
   build_product_catalog.py 카탈로그 생성기 (--check 로 재현 확인)
-  ingest.py                25K → v5 레코드 (LLM 없음, 재실행 일치)
+  ingest.py                25K → v5 레코드 (LLM 없음, 재실행 일치). assert_matches_ingest 가
+                           측정 스크립트의 기반이 이 산출물과 같은지 대조한다 — 다르면 에러
   trust.py                 신뢰도 사전 점수 (PER-174). 필터가 아니라 가중치
   trust_weights.json       신호별 가중치 — 코드가 아니라 여기서 고친다
   run_v5.py                단계 레지스트리
