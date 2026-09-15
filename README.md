@@ -79,7 +79,7 @@ catalog → ingest → tag → gates → claims → judge
 | `catalog` | `goodsNo` → `productId`. 제품 동일성 확정 | **구현** | PER-171 |
 | `ingest` | 25K를 원문/조건/파생 3층으로 적재. LLM 없음 | **구현** | PER-173 |
 | `tag` | 전수 aspect/polarity 태깅 (Batch API) | 계약·정답셋 **완료** / 배치 실행 미완 | PER-175 |
-| `gates` | 동일성 → 중복 → 방향성 → 충분성 4게이트 + `rejected[]` | 게이트1·2·4 **구현** / 3 미구현 | PER-182~188 |
+| `gates` | 동일성 → 중복 → 방향성 → 충분성 4게이트 + `rejected[]` | 게이트1~4 **구현** / 조립 미완 | PER-182~188 |
 | `claims` | 주장 생성 + 인용 원문 부분문자열 강제 + 스키마 검증 | 미구현 | PER-189~195 |
 | `judge` | 루브릭 judge(생성과 다른 모델) + 전수 평가 | 미구현 | PER-196~201 |
 
@@ -97,7 +97,7 @@ catalog → ingest → tag → gates → claims → judge
 |---|---|---|
 | 1 동일성 **(구현)** | 정규화 제품 ID 일치, 옵션 질문이면 같은 옵션만, 리뉴얼 세대 + 리센시 컷 | `goodsNo` 153개 → `productId` 53개(계보 50). 옵션 문자열 798개는 색상 **452개**라, 정규화 없이는 색상 질문의 근거가 잘게 쪼개진다 |
 | 2 중복 **(구현)** | 본문 해시 + **동일 작성자 1표** + 의미 유사 클러스터(PER-184) | 안 걸면 카운트가 **22.4% 부푼다**. 25,000건은 독립 근거 **19,392건**이고, 해시가 잡는 몫은 제거량의 12.4%뿐이다 |
-| 3 방향성 | polarity를 `(리뷰 × 주제)` 단위로. 별점과 교차 검증, 불일치는 플래그 | 한 리뷰가 "발색은 좋은데 지속력은 별로"라고 말한다 |
+| 3 방향성 **(구현)** | polarity를 `(리뷰 × 주제)` 단위로. 별점과 교차 검증, 불일치는 플래그. **탈락 없음** | 한 리뷰가 "발색은 좋은데 지속력은 별로"라고 말한다. N≥8 셀 395개 중 **343개(86.8%)가 `혼재`**(반대 1명도 혼재 — PER-178 §9)이고 그 중 **202개는 소수가 태거 잡음 밖**이다. 별점 불일치 2,289건의 **56.4%가 "좋은데 X는 별로"** — 별점으로 방향을 정하면 그만큼이 사라진다 |
 | 4 충분성 **(구현)** | `U ≥ N_min` **AND** `U/D ≥ R_min` **AND** `S ≥ S_min` — 낮은 쪽이 아니라 높은 쪽. 분모 D 는 **주제를 언급한 작성자**다 | 전수 태그 기준 (셀×aspect) 후보 7,660건 중 통과 2,395건. **무조건부 71.4% vs 조건부 22.6%** — 조건부가 1/3 비율로 살아남는다 |
 
 **반대 근거는 버리지 않는다.** 방향이 갈리면 `혼재`로 표시하고 양쪽 비율을 함께 낸다 — 리뷰가 갈린다는 사실 자체가 구매자에게 유용하다. 반대가 **1명이어도** 다수 방향으로 뭉개지 않고 `single_dissent` 한계로 남긴다 (골든셋 26건 중 8건이 이 경우다).
@@ -195,6 +195,7 @@ pipeline/    v5 — 작업 대상
   catalog.py               goodsNo → productId. 미등록은 에러. 세대는 (goodsNo, 날짜)로 가른다
   policy.py                리뉴얼 취급 · 리센시 컷 (PER-172) · 충분성 임계값 (PER-186). 게이트가 소비한다
   gates.py                 게이트1 동일성 (PER-182) · 게이트2 중복 (PER-183). 탈락은 드롭이 아니라 rejected[] 행
+  polarity.py              게이트3 방향성 (PER-185). 유일하게 탈락시키지 않는 게이트 — 판정과 플래그만 낸다
   sufficiency.py           게이트4 충분성 (PER-186). 판정 단위가 리뷰가 아니라 주장이라 모듈이 따로다
   option_norm.py           옵션 → 색상 키 정규화 (PER-182). LLM 없음
   option_markers.json      판촉 어휘 — 코드가 아니라 여기서 고친다
@@ -203,7 +204,7 @@ pipeline/    v5 — 작업 대상
   trust.py                 신뢰도 사전 점수 (PER-174). 필터가 아니라 가중치
   trust_weights.json       신호별 가중치 — 코드가 아니라 여기서 고친다
   run_v5.py                단계 레지스트리
-  test_*.py                계약 테스트 (catalog·policy·ingest·tag·trust·option_norm·gates·sufficiency)
+  test_*.py                계약 테스트 (catalog·policy·ingest·tag·trust·option_norm·gates·polarity·sufficiency)
 legacy/v4/   v4 동결 — 비교 기준선. 고치지 않는다
 crawler/     올리브영 cursor API 크롤러 (상품당 최대 500건)
 eval/        평가 스크립트 + 리포트 (커밋됨 — 수치의 1차 근거)
@@ -298,6 +299,7 @@ v5가 넘어야 하는 선: **인용 정확도 100%** (생성 시점에 원문 �
 | [`docs/DECISION_PER174_TRUST_PRIOR.md`](docs/DECISION_PER174_TRUST_PRIOR.md) | 신뢰도 사전 점수 — 6개 신호 실측 · 가중치 근거 · `usefulPoint` 기각 |
 | [`docs/DECISION_PER182_OPTION_IDENTITY.md`](docs/DECISION_PER182_OPTION_IDENTITY.md) | 게이트1 동일성 — 옵션 정규화 규칙 · 과대병합 회귀 사례 · 컷 비용 |
 | [`docs/DECISION_PER183_DUPLICATE_GATE.md`](docs/DECISION_PER183_DUPLICATE_GATE.md) | 게이트2 중복 — 두 축이 대체하지 않는다는 실측 · 판정/게이트 순서 · `independentReviews` 정의 |
+| [`docs/DECISION_PER185_POLARITY_GATE.md`](docs/DECISION_PER185_POLARITY_GATE.md) | 게이트3 방향성 — 탈락 없는 게이트 · 별점 교차검증 3층 · 방향 정의의 소유자 · 태거 잡음 주석 · v4 2건 재확인 |
 | [`docs/DECISION_PER186_SUFFICIENCY.md`](docs/DECISION_PER186_SUFFICIENCY.md) | 게이트4 충분성 — 세 조건 AND · 분모는 언급자(D) · 소수 의견 정책 · 임계값 민감도 |
 | [`docs/DECISION_PER178_GOLDEN_LABELING_SPEC.md`](docs/DECISION_PER178_GOLDEN_LABELING_SPEC.md) | 주장 골든셋 규격 — 라벨 1건의 모양 · 층화 번들 40개 · 블라인드 절차 · v4 15문항 미이관 근거 |
 | [`docs/DECISION_PER178_SILENCE_IS_NOT_EVIDENCE.md`](docs/DECISION_PER178_SILENCE_IS_NOT_EVIDENCE.md) | 침묵은 근거가 아니다 — U+/U−/D/S 보존, 단계별 유지 규칙, 아마존·NN/G·자기선택 편향 사례 |
