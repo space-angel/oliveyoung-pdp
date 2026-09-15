@@ -63,6 +63,27 @@ def sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+def tagging_input_hash(reviews: list[dict]) -> str:
+    """**태거가 실제로 본 것**의 해시 — `reviewId` · 접힌 본문 · 별점뿐이다.
+
+    파일 해시를 쓰면 파생층만 바뀌어도 태그가 낡은 것으로 판정된다. 특히
+    `trustPrior` 재점수(PER-174 인계)는 태그 수를 읽어 레코드를 고치므로,
+    파일 해시로 묶으면 **재점수 → 태그 무효 → 재태깅**이라는 순환이 생긴다.
+    태깅 투입물이 같으면 태그는 유효하다 — 그 사실만 해시로 고정한다.
+    """
+    from tag_contract import tagging_text
+
+    h = hashlib.sha256()
+    for r in reviews:
+        h.update(str(r["reviewId"]).encode())
+        h.update(b"\x1f")
+        h.update(tagging_text(r["raw"]["content"]).encode())
+        h.update(b"\x1f")
+        h.update(str(r["raw"]["rating"]).encode())
+        h.update(b"\x1e")
+    return h.hexdigest()
+
+
 def read_jsonl(path: Path) -> list[dict]:
     return [json.loads(line) for line in path.read_text().splitlines() if line.strip()]
 
@@ -169,6 +190,8 @@ def submit(model: str, pilot: bool, label: str | None) -> None:
         "input": {
             "path": str((PILOT_SAMPLE_PATH if pilot else REVIEWS_PATH).relative_to(ROOT)),
             "sha256": sha256(PILOT_SAMPLE_PATH if pilot else REVIEWS_PATH),
+            # 파생층(trustPrior 재점수 등)이 바뀌어도 태그가 낡지 않게 하는 축
+            "taggingSha256": tagging_input_hash(reviews),
         },
         "createdAt": batch.created_at.isoformat(),
     }
@@ -320,6 +343,100 @@ def collect(label: str) -> None:
         f"--label {label} --tagger {man['model']} --against {gold} "
         f"--out eval/reports/v5_tag_{label}.json"
     )
+
+
+CANONICAL_TAGS_PATH = ROOT / "data/intermediate/v5_tags.jsonl"
+CANONICAL_META_PATH = ROOT / "data/intermediate/v5_tags_meta.json"
+
+
+def ensure_current() -> None:
+    """러너(`run_v5.py --steps tag`)용 진입점.
+
+    **이 단계는 태깅을 대신 돌리지 않는다.** 외부 API 호출이고 실비가 들어서,
+    러너가 알아서 재실행하면 안 되는 종류의 일이다. 여기서 하는 일은 하나다 —
+    *지금 입력으로 만든 전수 태그가 있는가.* 없거나 낡았으면 **멈추고** 무엇을
+    돌려야 하는지 알려준다 (미구현 단계와 같은 규칙).
+
+    통과하면 실행 하나를 정본으로 못박아 `data/intermediate/v5_tags.jsonl` 로
+    복사한다. 뒤 단계(게이트3 방향성)는 이 경로만 본다 — 어느 실행을 썼는지는
+    `v5_tags_meta.json` 에 남는다.
+    """
+    if not REVIEWS_PATH.exists():
+        raise SystemExit(
+            f"입수 산출물이 없다: {REVIEWS_PATH.relative_to(ROOT)}\n"
+            "  먼저 입수를 돌린다 — .venv/bin/python3 pipeline/run_v5.py --steps ingest"
+        )
+    input_hash = tagging_input_hash(read_jsonl(REVIEWS_PATH))
+
+    manifests = []
+    if RUNS_DIR.exists():
+        for path in sorted(RUNS_DIR.glob("*.json")):
+            man = json.loads(path.read_text())
+            if not man.get("pilot") and man.get("output"):
+                manifests.append(man)
+
+    current = [
+        m for m in manifests if (m.get("input") or {}).get("taggingSha256") == input_hash
+    ]
+    if not current:
+        stale = [m["label"] for m in manifests]
+        hint = f"\n  입력이 바뀐 실행: {', '.join(stale)} — 스냅샷이 달라졌으면 재태깅이다" if stale else ""
+        raise SystemExit(
+            "[tag] 지금 입력으로 만든 전수 태그가 없다 (PER-175)\n"
+            f"  입력 {REVIEWS_PATH.relative_to(ROOT)} sha256={input_hash[:12]}…{hint}\n"
+            "  태깅을 먼저 돌린다 —\n"
+            "    .venv/bin/python3 pipeline/tag.py submit --model claude-haiku-4-5\n"
+            "    .venv/bin/python3 pipeline/tag.py collect --label full_haiku45\n"
+            "  태그 없이 게이트3(방향성)을 돌리면 근거 없는 결과가 나온다."
+        )
+    if len(current) > 1:
+        raise SystemExit(
+            "[tag] 지금 입력에 해당하는 전수 실행이 여러 개다 — 어느 것이 정본인지 정해야 한다\n"
+            + "".join(f"    {m['label']:<24} {m['model']}\n" for m in current)
+            + "  쓰지 않을 실행의 매니페스트를 data/intermediate/tag_runs/ 에서 치운다."
+        )
+
+    man = current[0]
+    out = man["output"]
+    # 부분 수거를 정본으로 삼으면 태깅 안 된 리뷰가 '아무 aspect도 말하지 않은 리뷰'와
+    # 구별되지 않는다. 침묵은 근거가 아니라는 규칙(PER-178)이 여기서 무너진다.
+    if out.get("missingCount") or out.get("failedChunks"):
+        raise SystemExit(
+            f"[tag] 실행 '{man['label']}' 이 부분 수거다 — 정본으로 쓸 수 없다\n"
+            f"  결과에 없는 리뷰 {out.get('missingCount', 0)}건 · 실패 청크 "
+            f"{len(out.get('failedChunks') or [])}개\n"
+            "  같은 label 로 다시 돌리면 끝난 청크는 건너뛰고 빠진 것만 채운다."
+        )
+
+    tags_path = ROOT / out["path"]
+    if not tags_path.exists():
+        raise SystemExit(f"[tag] 태그 파일이 없다: {out['path']} — collect 를 다시 돌린다")
+
+    CANONICAL_TAGS_PATH.write_text(tags_path.read_text())
+    CANONICAL_META_PATH.write_text(
+        json.dumps(
+            {
+                "issue": "PER-175",
+                "label": man["label"],
+                "model": man["model"],
+                "prompt": man["prompt"],
+                "input": man["input"],
+                "tags": out["tags"],
+                "tagsRaw": out.get("tagsRaw"),
+                "contractViolations": out.get("contractViolations"),
+                "reviewsTagged": out["reviewsTagged"],
+                "source": out["path"],
+            },
+            ensure_ascii=False,
+            indent=2,
+        )
+        + "\n"
+    )
+    print(
+        f"[tag] 정본 = '{man['label']}' ({man['model']}) · 태그 {out['tags']:,}개 · "
+        f"리뷰 {out['reviewsTagged']:,}건"
+    )
+    print(f"       → {CANONICAL_TAGS_PATH.relative_to(ROOT)}")
 
 
 def runs() -> None:

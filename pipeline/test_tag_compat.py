@@ -179,3 +179,36 @@ class ParseTextTest(unittest.TestCase):
 
         with self.assertRaises(json.JSONDecodeError):
             parse_text("<reasoning>축을 하나씩 보면 보습감은")
+
+
+class ResumeGuardTest(unittest.TestCase):
+    """같은 label 을 다른 모델로 다시 돌리면 멈춘다 (PER-175).
+
+    재개는 `<label>_raw.jsonl` 을 label 로만 찾는다. 가드가 없으면 다른 모델이
+    남의 태그를 수거해 그 모델의 성적표가 된다 — 벤치에서 실제로 났던 사고다
+    (`minimax-m2.5` · `kimi-k2.5` 가 같은 label 로 접혔다).
+    """
+
+    def setUp(self) -> None:
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.root = Path(self.tmp.name)
+        self.runs = self.root / "runs"
+        self.runs.mkdir(parents=True)
+        for p in (
+            mock.patch.object(tag_compat, "ROOT", self.root),
+            mock.patch.object(tag_compat, "RUNS_DIR", self.runs),
+            mock.patch.object(tag_compat, "load_reviews", lambda pilot: [review(1, "촉촉해요")]),
+            mock.patch.object(tag_compat, "api_key", lambda env: "k"),
+        ):
+            p.start()
+            self.addCleanup(p.stop)
+        (self.runs / "reuse.json").write_text(json.dumps({"label": "reuse", "model": "모델A"}))
+
+    def test_다른_모델로_같은_label_을_쓰면_멈춘다(self) -> None:
+        with self.assertRaises(SystemExit) as cm:
+            tag_compat.run("모델B", True, "reuse", "http://x", "E", 1, 10)
+        msg = str(cm.exception)
+        self.assertIn("이미 다른 조건으로 돌린 실행", msg)
+        self.assertIn("모델A", msg)
+        self.assertIn("모델B", msg)

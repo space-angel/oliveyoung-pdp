@@ -1,0 +1,233 @@
+{
+  "issue": "PER-175",
+  "conditions": {
+    "sample": "eval/gold/v5_tag_pilot_sample.jsonl (200건, 시드 고정 층화)",
+    "gold": "eval/gold/v5_tags_pilot_gold.jsonl (432태그, v2)",
+    "prompt": "pipeline/prompts/tag/v1.md",
+    "chunkSize": 20,
+    "serviceTier": "flex",
+    "region": "us-east-1",
+    "note": "Haiku·Sonnet 과 같은 조건이어야 한 표에 올라간다. 청크·프롬프트가 다르면 분리한다"
+  },
+  "priceSource": "https://aws.amazon.com/bedrock/pricing/ (2026-09-15 확인)",
+  "limitation": "표본 200건이다. 정답셋은 Opus 5 가 만들었고(eval/reports/v5_tag_gold_v2.md), 재현율의 상한은 정답셋의 품질이다 — 100% 는 의미 없는 목표다",
+  "models": [
+    {
+      "model": "zai.glm-4.7",
+      "label": "bench_glm47",
+      "precision": 88.0,
+      "recall": 59.5,
+      "polarityAgreement": 92.2,
+      "tagsPassed": 292,
+      "goldTags": 432,
+      "overlap": 257,
+      "reviewsWithTag": 158,
+      "tokens": {
+        "in": 40609,
+        "out": 16832,
+        "cacheRead": 2016
+      },
+      "tokensPerReview": {
+        "in": 203,
+        "out": 84
+      },
+      "reviewsTagged": 200,
+      "truncatedChunks": 0,
+      "failedChunks": 0,
+      "price": {
+        "inPerMTok": 0.6,
+        "outPerMTok": 2.2
+      },
+      "cost25kStandard": 7.67,
+      "cost25kFlex": 3.84
+    },
+    {
+      "model": "minimax.minimax-m2.5",
+      "label": "bench_minimaxm25",
+      "precision": 79.9,
+      "recall": 58.8,
+      "polarityAgreement": 95.7,
+      "tagsPassed": 318,
+      "goldTags": 432,
+      "overlap": 254,
+      "reviewsWithTag": 171,
+      "tokens": {
+        "in": 30349,
+        "out": 42903,
+        "cacheRead": 2400
+      },
+      "tokensPerReview": {
+        "in": 152,
+        "out": 215
+      },
+      "reviewsTagged": 200,
+      "truncatedChunks": 0,
+      "failedChunks": 0,
+      "price": {
+        "inPerMTok": 0.3,
+        "outPerMTok": 1.2
+      },
+      "cost25kStandard": 7.57,
+      "cost25kFlex": 3.79
+    },
+    {
+      "model": "qwen.qwen3-next-80b-a3b",
+      "label": "bench_qwen3next80b",
+      "precision": 74.6,
+      "recall": 58.3,
+      "polarityAgreement": 90.9,
+      "tagsPassed": 338,
+      "goldTags": 432,
+      "overlap": 252,
+      "reviewsWithTag": 181,
+      "tokens": {
+        "in": 35699,
+        "out": 21893,
+        "cacheRead": 0
+      },
+      "tokensPerReview": {
+        "in": 178,
+        "out": 109
+      },
+      "reviewsTagged": 200,
+      "truncatedChunks": 0,
+      "failedChunks": 0,
+      "price": {
+        "inPerMTok": 0.15,
+        "outPerMTok": 1.2
+      },
+      "cost25kStandard": 3.95,
+      "cost25kFlex": 1.98
+    },
+    {
+      "model": "claude-sonnet-5",
+      "label": "pilot_sonnet5",
+      "precision": 85.5,
+      "recall": 55.8,
+      "polarityAgreement": 94.2,
+      "tagsPassed": 282,
+      "goldTags": 432,
+      "overlap": 241,
+      "reviewsWithTag": 163,
+      "note": "Anthropic API 경로 기존 파일럿 (비용 미측정)"
+    },
+    {
+      "model": "claude-haiku-4-5",
+      "label": "pilot_haiku45",
+      "precision": 84.3,
+      "recall": 49.5,
+      "polarityAgreement": 97.7,
+      "tagsPassed": 254,
+      "goldTags": 432,
+      "overlap": 214,
+      "reviewsWithTag": 157,
+      "note": "Anthropic API 경로 기존 파일럿 (비용 미측정)"
+    },
+    {
+      "model": "zai.glm-4.7-flash",
+      "label": "bench_glm47flash",
+      "precision": 66.3,
+      "recall": 47.0,
+      "polarityAgreement": 91.1,
+      "tagsPassed": 306,
+      "goldTags": 432,
+      "overlap": 203,
+      "reviewsWithTag": 184,
+      "tokens": {
+        "in": 40545,
+        "out": 24509,
+        "cacheRead": 4992
+      },
+      "tokensPerReview": {
+        "in": 203,
+        "out": 123
+      },
+      "reviewsTagged": 200,
+      "truncatedChunks": 0,
+      "failedChunks": 0,
+      "price": {
+        "inPerMTok": 0.07,
+        "outPerMTok": 0.4
+      },
+      "cost25kStandard": 1.58,
+      "cost25kFlex": 0.79
+    },
+    {
+      "model": "openai.gpt-oss-120b-1:0",
+      "label": "bench_gptoss120b",
+      "precision": 84.6,
+      "recall": 45.8,
+      "polarityAgreement": 96.0,
+      "tagsPassed": 234,
+      "goldTags": 432,
+      "overlap": 198,
+      "reviewsWithTag": 142,
+      "tokens": {
+        "in": 32351,
+        "out": 59882,
+        "cacheRead": 0
+      },
+      "tokensPerReview": {
+        "in": 162,
+        "out": 299
+      },
+      "reviewsTagged": 180,
+      "truncatedChunks": 1,
+      "failedChunks": 1,
+      "price": {
+        "inPerMTok": 0.15,
+        "outPerMTok": 0.62
+      },
+      "cost25kStandard": 5.25,
+      "cost25kFlex": 2.62
+    },
+    {
+      "model": "openai.gpt-oss-20b-1:0",
+      "label": "bench_gptoss20b",
+      "precision": 80.1,
+      "recall": 29.9,
+      "polarityAgreement": 93.0,
+      "tagsPassed": 161,
+      "goldTags": 432,
+      "overlap": 129,
+      "reviewsWithTag": 95,
+      "tokens": {
+        "in": 32351,
+        "out": 67413,
+        "cacheRead": 0
+      },
+      "tokensPerReview": {
+        "in": 162,
+        "out": 337
+      },
+      "reviewsTagged": 120,
+      "truncatedChunks": 4,
+      "failedChunks": 4,
+      "price": {
+        "inPerMTok": 0.07,
+        "outPerMTok": 0.2
+      },
+      "cost25kStandard": 1.97,
+      "cost25kFlex": 0.98
+    }
+  ],
+  "finding": {
+    "bestRecall": {
+      "model": "zai.glm-4.7",
+      "recall": 59.5,
+      "precision": 88.0
+    },
+    "reviewCoverageFailures": [
+      {
+        "model": "openai.gpt-oss-120b-1:0",
+        "reviewsTagged": 180,
+        "truncatedChunks": 1
+      },
+      {
+        "model": "openai.gpt-oss-20b-1:0",
+        "reviewsTagged": 120,
+        "truncatedChunks": 4
+      }
+    ]
+  }
+}

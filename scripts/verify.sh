@@ -26,6 +26,9 @@ echo "== 생성물 재현 확인 =="
 "$PY" eval/measure_gate2_duplicate.py --check
 # 모델 후보의 계약 표시가 현재 규칙과 같은지 — 규칙이 바뀌면 표시가 조용히 낡는다 (PER-178)
 "$PY" eval/concern_candidates.py recheck --check
+# 태거 후보 채점 — 계약 규칙·정답셋이 바뀌면 모델 비교표가 조용히 낡는다 (PER-175)
+"$PY" eval/measure_quote_probe.py --check
+"$PY" eval/measure_bedrock_bakeoff.py --check
 
 echo
 echo "== 입력 계약 강제 (PER-176) =="

@@ -57,6 +57,7 @@ from tag import (  # noqa: E402
     parse_text,
     partition_by_contract,
     sha256,
+    tagging_input_hash,
 )
 
 MAX_TOKENS = 8000
@@ -112,6 +113,30 @@ def run(model: str, pilot: bool, label: str | None, base_url: str, env: str,
 
     RUNS_DIR.mkdir(parents=True, exist_ok=True)
     raw_path = RUNS_DIR / f"{label}_raw.jsonl"
+
+    # 재개는 label 로만 찾는다. 같은 label 을 다른 모델·프롬프트·입력으로 다시 돌리면
+    # **남의 결과를 주워 재개**하고, 그게 조용히 그 모델의 성적표가 된다. 실제로 났던 사고다
+    # (`minimax-m2.5` 와 `kimi-k2.5` 가 같은 label 로 접혔고, kimi 는 API 호출 없이
+    # minimax 의 태그를 수거했다). 되풀이되지 않게 여기서 세운다.
+    prev_path = RUNS_DIR / f"{label}.json"
+    if prev_path.exists():
+        prev = json.loads(prev_path.read_text())
+        mismatch = [
+            (k, prev_v, now_v)
+            for k, prev_v, now_v in (
+                ("model", prev.get("model"), model),
+                ("prompt", (prev.get("prompt") or {}).get("sha256"), sha256(PROMPT_PATH)),
+                ("input", (prev.get("input") or {}).get("taggingSha256"),
+                 tagging_input_hash(reviews)),
+            )
+            if prev_v is not None and prev_v != now_v
+        ]
+        if mismatch:
+            raise SystemExit(
+                f"label '{label}' 은 이미 다른 조건으로 돌린 실행이다 — 재개하면 결과가 섞인다\n"
+                + "".join(f"    {k}: 기존 {p!r} ≠ 지금 {n!r}\n" for k, p, n in mismatch)
+                + "  다른 --label 을 쓰거나, 기존 실행을 data/intermediate/tag_runs/ 에서 치운다."
+            )
     # 재개: 이미 받은 청크는 다시 부르지 않는다. 무료 엔드포인트에서 1,250청크를
     # 한 번에 끝내지 못하는 게 정상이라 이게 기능이다.
     done = set()
@@ -188,6 +213,7 @@ def run(model: str, pilot: bool, label: str | None, base_url: str, env: str,
                 "input": {
                     "path": str(input_path.relative_to(ROOT)),
                     "sha256": sha256(input_path),
+                    "taggingSha256": tagging_input_hash(reviews),
                 },
             },
             ensure_ascii=False,
