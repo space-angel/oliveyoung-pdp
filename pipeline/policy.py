@@ -165,20 +165,81 @@ def recency_cutoff_month(
 RECENCY_CUTOFF_MONTH = recency_cutoff_month()
 
 
-def assert_snapshot_current(latest_review_date: str) -> None:
+def assert_snapshot_current(
+    latest_review_date: str, latest_month: str = SNAPSHOT_LATEST_MONTH
+) -> None:
     """스냅샷이 정책 기준월보다 새로우면 에러.
 
     새 수집분을 넣고 리센시 컷을 그대로 두면 윈도우가 소리 없이 과거로 밀린다.
     조용히 밀리게 두지 않고 여기서 멈춰 `SNAPSHOT_LATEST_MONTH` 를 다시 정하게 한다.
     """
     latest = month_of(latest_review_date)
-    if latest > SNAPSHOT_LATEST_MONTH:
+    if latest > latest_month:
         raise PolicyError(
-            f"스냅샷 최신 월 {latest} 가 정책 기준 {SNAPSHOT_LATEST_MONTH} 보다 새롭다.\n"
+            f"스냅샷 최신 월 {latest} 가 정책 기준 {latest_month} 보다 새롭다.\n"
             "  → 새 수집분이 들어왔다. pipeline/policy.py 의 SNAPSHOT_LATEST_MONTH 와\n"
             "     리센시 컷을 다시 정하고 eval/measure_renewal_recency.py 로 비용을 재측정하라.\n"
             "     (그냥 두면 24개월 윈도우가 조용히 과거로 밀린다)"
         )
+
+
+@dataclass(frozen=True)
+class SnapshotPolicy:
+    """리센시 윈도우를 실행 단위로 들고 다닌다 (PER-194).
+
+    정본 스냅샷은 `SNAPSHOT_LATEST_MONTH` 로 고정이다 — 그 값으로 만든 리포트가
+    커밋돼 있어서, 상수를 올리면 25,000건의 컷이 바뀌어 전부 재현 실패한다.
+
+    그런데 제품 링크 하나를 방금 크롤해 돌리는 실행은 사정이 다르다. 지킬 기존
+    리포트가 없고, 오늘 수집분은 정의상 기준월보다 새롭다. 그래서 **런 전용으로만**
+    `derive()` 를 허용한다.
+
+    `derived=True` 는 "사람이 정한 게 아니라 데이터에서 가져왔다"는 기록이다.
+    run meta 에 그대로 실려 나간다 — 어느 창으로 잘랐는지 감추지 않는다.
+    """
+
+    latest_month: str = SNAPSHOT_LATEST_MONTH
+    window: int = RECENCY_WINDOW_MONTHS
+    derived: bool = False
+
+    def __post_init__(self) -> None:
+        if not MONTH_PATTERN.match(self.latest_month):
+            raise PolicyError(f"월 형식 위반: {self.latest_month!r} (기대: 2026-08)")
+        if self.window < 1:
+            raise PolicyError(f"리센시 윈도우는 1개월 이상이어야 한다: {self.window}")
+
+    @classmethod
+    def derive(cls, review_dates, window: int = RECENCY_WINDOW_MONTHS) -> "SnapshotPolicy":
+        """수집분에서 최신 월을 가져온다. **런에서만 쓴다.**
+
+        정본에 쓰면 `assert_snapshot_current` 가 영원히 통과하게 되어, 새 수집분이
+        들어와도 아무도 모른다. 그 검사가 존재하는 이유가 사라진다.
+        """
+        months = [month_of(d) for d in review_dates]
+        if not months:
+            raise PolicyError("리뷰가 없어 최신 월을 정할 수 없다")
+        return cls(latest_month=max(months), window=window, derived=True)
+
+    @property
+    def cutoff_month(self) -> str:
+        return recency_cutoff_month(self.latest_month, self.window)
+
+    def assert_current(self, latest_review_date: str) -> None:
+        assert_snapshot_current(latest_review_date, self.latest_month)
+
+    def gate(self, review_date: str) -> GateDecision:
+        return recency_gate(review_date, self.cutoff_month)
+
+    def as_dict(self) -> dict:
+        return {
+            "latestMonth": self.latest_month,
+            "windowMonths": self.window,
+            "cutoffMonth": self.cutoff_month,
+            "derived": self.derived,
+        }
+
+
+DEFAULT_SNAPSHOT = SnapshotPolicy()
 
 
 def recency_gate(review_date: str, cutoff: str = RECENCY_CUTOFF_MONTH) -> GateDecision:
