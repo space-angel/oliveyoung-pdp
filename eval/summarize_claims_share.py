@@ -137,6 +137,13 @@ def main() -> None:
         "model": meta.get("modelId"),
         "promptVersion": (meta.get("promptVersion") or {}).get("version")
                          if isinstance(meta.get("promptVersion"), dict) else meta.get("promptVersion"),
+        # 재현 메타를 산출물에서 그대로 옮긴다 (PER-193). 요약만 밖으로 나가는 일이
+        # 많은데, 요약이 무엇으로 만들어졌는지 스스로 못 밝히면 되짚을 수 없다.
+        # 여기서 값을 새로 만들지 않는다 — claims_v5_meta.json 이 정본이다.
+        "modelId": meta.get("modelId"),
+        "seed": meta.get("seed"),
+        "policy": meta.get("policy"),
+        "inputs": meta.get("inputs"),
         "funnel": [
             {"step": "입력 리뷰", "n": L["reviewsIn"]},
             {"step": "게이트1 동일성 통과", "n": L["afterGate1"]},

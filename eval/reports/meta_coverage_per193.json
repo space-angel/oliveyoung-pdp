@@ -115,43 +115,43 @@
   },
   "summary": {
     "all": {
-      "reports": 35,
+      "reports": 36,
       "byField": {
         "promptVersion": {
-          "present": 17,
+          "present": 18,
           "missing": 18
         },
         "modelId": {
-          "present": 9,
+          "present": 10,
           "missing": 26
         },
         "policy": {
-          "present": 9,
+          "present": 10,
           "missing": 26
         },
         "seed": {
-          "present": 15,
+          "present": 16,
           "missing": 20
         },
         "inputs": {
           "present": 29,
-          "missing": 6
+          "missing": 7
         },
         "failureTaxonomyVersion": {
           "present": 2,
-          "missing": 33
+          "missing": 34
         },
         "embeddingModel": {
           "present": 0,
-          "missing": 35
+          "missing": 36
         },
         "embeddingVersion": {
           "present": 1,
-          "missing": 34
+          "missing": 35
         },
         "vocabVersion": {
           "present": 1,
-          "missing": 34
+          "missing": 35
         }
       },
       "fullySatisfying": 0,
@@ -160,7 +160,7 @@
         "1": 4,
         "2": 5,
         "3": 16,
-        "4": 4,
+        "4": 5,
         "5": 1
       }
     },
@@ -257,6 +257,30 @@
       "foundAt": {
         "inputs": "$.source.bundles.sha256",
         "failureTaxonomyVersion": "$.source.failureTaxonomyVersion"
+      }
+    },
+    {
+      "report": "eval/reports/claims_share_summary.json",
+      "isIssueReport": false,
+      "present": [
+        "promptVersion",
+        "modelId",
+        "policy",
+        "seed"
+      ],
+      "missing": [
+        "inputs",
+        "failureTaxonomyVersion",
+        "embeddingModel",
+        "embeddingVersion",
+        "vocabVersion"
+      ],
+      "satisfied": 4,
+      "foundAt": {
+        "promptVersion": "$.promptVersion",
+        "modelId": "$.model",
+        "policy": "$.policy",
+        "seed": "$.seed"
       }
     },
     {

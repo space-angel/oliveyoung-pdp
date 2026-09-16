@@ -3,6 +3,39 @@
   "generatedAt": "claims",
   "model": "claude-sonnet-5",
   "promptVersion": "claim-v2",
+  "modelId": "claude-sonnet-5",
+  "seed": 20260916,
+  "policy": {
+    "issue": "PER-186",
+    "nMin": 8,
+    "rMin": 0.1,
+    "sMin": 8,
+    "minorityMin": 2,
+    "denominator": "spokeAuthors",
+    "note": "U ≥ N_min AND U/D ≥ R_min AND S ≥ S_min 을 모두 만족해야 통과. 분모 D 는 주제를 언급한 고유 작성자다 (PER-178 — 침묵은 근거가 아니다)",
+    "maxQuotes": 8,
+    "maxRetries": 2
+  },
+  "inputs": [
+    {
+      "name": "reviews",
+      "path": "data/intermediate/v5_reviews.jsonl",
+      "digestKind": "sha256",
+      "digest": "47a1fc98e93b10b45e1cca178fcdeb603327cacc6111191c55f6cd53f20f1974"
+    },
+    {
+      "name": "tags",
+      "path": "data/intermediate/v5_tags.jsonl",
+      "digestKind": "sha256",
+      "digest": "82bfba90283f6ea355ea2bf2b0dbcd846a724407d35cb536956351b0ea3c0ca3"
+    },
+    {
+      "name": "catalog",
+      "path": "data/input/product_catalog.json",
+      "digestKind": "sha256",
+      "digest": "897cbc2c9765ca08b8d9514f307a678cff82596e0493c3d9ea0ee9a156d94fb6"
+    }
+  ],
   "funnel": [
     {
       "step": "입력 리뷰",
