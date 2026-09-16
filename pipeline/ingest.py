@@ -37,7 +37,12 @@ sys.path.insert(0, str(Path(__file__).parent))
 
 from catalog import CatalogError, load_catalog  # noqa: E402
 from codebook import load_codebook  # noqa: E402
-from policy import PolicyError, assert_snapshot_current  # noqa: E402
+from policy import (  # noqa: E402
+    DEFAULT_SNAPSHOT,
+    PolicyError,
+    SnapshotPolicy,
+    assert_snapshot_current,
+)
 from trust import ScoringContext, TrustWeights, trust_prior  # noqa: E402
 from contracts import (  # noqa: E402
     CONDITION_AXES,
@@ -74,13 +79,21 @@ def load_aspect_counts(tags_path: Path) -> dict[int, int]:
 
 
 def ingest(
-    input_path: Path = INPUT_PATH, tags_path: Path | None = None
+    input_path: Path = INPUT_PATH,
+    tags_path: Path | None = None,
+    catalog_path: Path | None = None,
+    snapshot: SnapshotPolicy = DEFAULT_SNAPSHOT,
 ) -> tuple[list[dict], dict, dict]:
-    catalog = load_catalog()
+    """`catalog_path` · `snapshot` 은 런 격리용이다 (PER-194).
+
+    기본값은 정본이고, 기본값으로 부르면 지금까지와 완전히 같게 동작한다 —
+    `test_workspace.py` 가 그걸 고정한다.
+    """
+    catalog = load_catalog(catalog_path) if catalog_path else load_catalog()
     rows = json.loads(input_path.read_text())
     # 새 수집분이 들어왔는데 리센시 컷 기준을 안 고치면 24개월 윈도우가 조용히
     # 과거로 밀린다 (PER-172). 그 전에 멈춘다.
-    assert_snapshot_current(max(r["reviewDate"] for r in rows))
+    snapshot.assert_current(max(r["reviewDate"] for r in rows))
 
     records: list[dict] = []
     seen_ids: set[int] = set()
@@ -305,12 +318,22 @@ def assert_matches_ingest(
         )
 
 
-def write(records: list[dict], meta: dict, prof: dict) -> None:
-    OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
-    PROFILE_PATH.parent.mkdir(parents=True, exist_ok=True)
-    OUTPUT_PATH.write_text("".join(json.dumps(r, ensure_ascii=False) + "\n" for r in records))
-    META_PATH.write_text(json.dumps(meta, ensure_ascii=False, indent=2) + "\n")
-    PROFILE_PATH.write_text(json.dumps(prof, ensure_ascii=False, indent=2) + "\n")
+def write(
+    records: list[dict],
+    meta: dict,
+    prof: dict,
+    output_path: Path = OUTPUT_PATH,
+    meta_path: Path = META_PATH,
+    profile_path: Path | None = PROFILE_PATH,
+) -> None:
+    """`profile_path=None` 이면 프로파일을 쓰지 않는다 — 런은 eval/reports 에 쓰지 않는다."""
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    output_path.write_text("".join(json.dumps(r, ensure_ascii=False) + "\n" for r in records))
+    meta_path.parent.mkdir(parents=True, exist_ok=True)
+    meta_path.write_text(json.dumps(meta, ensure_ascii=False, indent=2) + "\n")
+    if profile_path is not None:
+        profile_path.parent.mkdir(parents=True, exist_ok=True)
+        profile_path.write_text(json.dumps(prof, ensure_ascii=False, indent=2) + "\n")
 
 
 def main() -> None:

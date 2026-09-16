@@ -17,6 +17,10 @@ data/intermediate/*
 data/cache/*
 !data/cache/.gitkeep
 
+# 링크 하나로 돌린 런 (PER-194). 정본이 아니고 재실행하면 다시 생긴다.
+data/runs/*
+!data/runs/.gitkeep
+
 # macOS
 .DS_Store
 

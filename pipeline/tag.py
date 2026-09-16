@@ -101,8 +101,13 @@ def client():
     return anthropic.Anthropic()
 
 
-def load_reviews(pilot: bool) -> list[dict]:
-    path = PILOT_SAMPLE_PATH if pilot else REVIEWS_PATH
+def _source_path(pilot: bool, reviews_path: Path | None = None) -> Path:
+    return reviews_path or (PILOT_SAMPLE_PATH if pilot else REVIEWS_PATH)
+
+
+def load_reviews(pilot: bool, reviews_path: Path | None = None) -> list[dict]:
+    """`reviews_path` 는 런 격리용이다 (PER-194). 주지 않으면 정본이다."""
+    path = reviews_path or (PILOT_SAMPLE_PATH if pilot else REVIEWS_PATH)
     if not path.exists():
         raise SystemExit(
             f"입력이 없다: {path.relative_to(ROOT)}\n"
@@ -161,13 +166,13 @@ def build_requests(reviews: list[dict], model: str) -> list[dict]:
 # --------------------------------------------------------------------------- submit
 
 
-def submit(model: str, pilot: bool, label: str | None) -> None:
+def submit(model: str, pilot: bool, label: str | None, reviews_path: Path | None = None) -> None:
     if model not in MODEL_PROFILES:
         raise SystemExit(
             f"모르는 모델: {model}\n  아는 모델: {', '.join(MODEL_PROFILES)}\n"
             "  새 모델을 쓰려면 MODEL_PROFILES 에 thinking/effort 규칙을 먼저 적는다."
         )
-    reviews = load_reviews(pilot)
+    reviews = load_reviews(pilot, reviews_path)
     label = label or f"{'pilot' if pilot else 'full'}_{model.replace('claude-', '').replace('-', '')}"
     requests = build_requests(reviews, model)
 
@@ -188,8 +193,8 @@ def submit(model: str, pilot: bool, label: str | None) -> None:
         "params": MODEL_PROFILES[model],
         "prompt": {"path": str(PROMPT_PATH.relative_to(ROOT)), "sha256": sha256(PROMPT_PATH)},
         "input": {
-            "path": str((PILOT_SAMPLE_PATH if pilot else REVIEWS_PATH).relative_to(ROOT)),
-            "sha256": sha256(PILOT_SAMPLE_PATH if pilot else REVIEWS_PATH),
+            "path": str(_source_path(pilot, reviews_path).relative_to(ROOT)),
+            "sha256": sha256(_source_path(pilot, reviews_path)),
             # 파생층(trustPrior 재점수 등)이 바뀌어도 태그가 낡지 않게 하는 축
             "taggingSha256": tagging_input_hash(reviews),
         },
@@ -386,7 +391,11 @@ CANONICAL_TAGS_PATH = ROOT / "data/intermediate/v5_tags.jsonl"
 CANONICAL_META_PATH = ROOT / "data/intermediate/v5_tags_meta.json"
 
 
-def ensure_current() -> None:
+def ensure_current(
+    reviews_path: Path | None = None,
+    tags_out: Path | None = None,
+    meta_out: Path | None = None,
+) -> None:
     """러너(`run_v5.py --steps tag`)용 진입점.
 
     **이 단계는 태깅을 대신 돌리지 않는다.** 외부 API 호출이고 실비가 들어서,
@@ -398,12 +407,16 @@ def ensure_current() -> None:
     복사한다. 뒤 단계(게이트3 방향성)는 이 경로만 본다 — 어느 실행을 썼는지는
     `v5_tags_meta.json` 에 남는다.
     """
-    if not REVIEWS_PATH.exists():
+    src = reviews_path or REVIEWS_PATH
+    tags_out = tags_out or CANONICAL_TAGS_PATH
+    meta_out = meta_out or CANONICAL_META_PATH
+
+    if not src.exists():
         raise SystemExit(
-            f"입수 산출물이 없다: {REVIEWS_PATH.relative_to(ROOT)}\n"
+            f"입수 산출물이 없다: {src.relative_to(ROOT)}\n"
             "  먼저 입수를 돌린다 — .venv/bin/python3 pipeline/run_v5.py --steps ingest"
         )
-    input_hash = tagging_input_hash(read_jsonl(REVIEWS_PATH))
+    input_hash = tagging_input_hash(read_jsonl(src))
 
     manifests = []
     if RUNS_DIR.exists():
@@ -420,7 +433,7 @@ def ensure_current() -> None:
         hint = f"\n  입력이 바뀐 실행: {', '.join(stale)} — 스냅샷이 달라졌으면 재태깅이다" if stale else ""
         raise SystemExit(
             "[tag] 지금 입력으로 만든 전수 태그가 없다 (PER-175)\n"
-            f"  입력 {REVIEWS_PATH.relative_to(ROOT)} sha256={input_hash[:12]}…{hint}\n"
+            f"  입력 {src.relative_to(ROOT)} sha256={input_hash[:12]}…{hint}\n"
             "  태깅을 먼저 돌린다 —\n"
             "    .venv/bin/python3 pipeline/tag.py submit --model claude-haiku-4-5\n"
             "    .venv/bin/python3 pipeline/tag.py collect --label full_haiku45\n"
@@ -449,8 +462,9 @@ def ensure_current() -> None:
     if not tags_path.exists():
         raise SystemExit(f"[tag] 태그 파일이 없다: {out['path']} — collect 를 다시 돌린다")
 
-    CANONICAL_TAGS_PATH.write_text(tags_path.read_text())
-    CANONICAL_META_PATH.write_text(
+    tags_out.parent.mkdir(parents=True, exist_ok=True)
+    tags_out.write_text(tags_path.read_text())
+    meta_out.write_text(
         json.dumps(
             {
                 "issue": "PER-175",
@@ -473,7 +487,7 @@ def ensure_current() -> None:
         f"[tag] 정본 = '{man['label']}' ({man['model']}) · 태그 {out['tags']:,}개 · "
         f"리뷰 {out['reviewsTagged']:,}건"
     )
-    print(f"       → {CANONICAL_TAGS_PATH.relative_to(ROOT)}")
+    print(f"       → {tags_out.relative_to(ROOT)}")
 
 
 def runs() -> None:
@@ -497,6 +511,8 @@ def main() -> None:
     s.add_argument("--model", required=True, choices=sorted(MODEL_PROFILES))
     s.add_argument("--pilot", action="store_true", help="정답셋 표본 200건만 (모델 비교용)")
     s.add_argument("--label", help="실행 이름. 생략하면 모델명으로 만든다")
+    s.add_argument("--reviews", type=Path,
+                   help="태깅할 입수 산출물. 생략하면 정본 (런 격리용 · PER-194)")
 
     p = sub.add_parser("poll", help="진행 상황")
     p.add_argument("--label", required=True)
@@ -510,7 +526,7 @@ def main() -> None:
 
     args = ap.parse_args()
     if args.cmd == "submit":
-        submit(args.model, args.pilot, args.label)
+        submit(args.model, args.pilot, args.label, getattr(args, "reviews", None))
     elif args.cmd == "poll":
         poll(args.label, args.watch, args.interval)
     elif args.cmd == "collect":

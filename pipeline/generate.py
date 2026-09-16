@@ -56,6 +56,7 @@ from condition_render import render as render_condition  # noqa: E402
 from context_layout import layout_context, render_layout  # noqa: E402
 from contracts import MISSING_SEGMENT  # noqa: E402
 from ledger import load_inputs, run_gates  # noqa: E402
+from workspace import CANONICAL, Workspace  # noqa: E402
 from polarity import aspect_support  # noqa: E402
 from quote_gate import gate_claim_payload, summarize as quote_summary  # noqa: E402
 import run_meta  # noqa: E402
@@ -347,18 +348,28 @@ def main() -> None:
     ap.add_argument("--concurrency", type=int, default=12)
     ap.add_argument("--seed", type=int, default=20260916, help="대상 정렬 시드 기록용")
     ap.add_argument("--check", action="store_true", help="LLM 없이 산출물 계약만 다시 검증")
+    ap.add_argument("--run", default="",
+                    help="런 ID. 주면 data/runs/<id>/ 로 격리한다 (정본을 건드리지 않는다)")
     args = ap.parse_args()
 
-    records, tags_by_review_pairs, catalog = load_inputs()
+    # 인자를 안 주면 정본이고 지금까지와 완전히 같다 (PER-194).
+    ws = Workspace.for_run(args.run) if args.run else CANONICAL
+    ws.assert_isolated()
+    ws.ensure_dirs()
+    out_path, meta_path = ws.claims, ws.claims_meta
+    raw_path = RAW_PATH if ws.is_canonical else ws.base / "claim_runs"
+
+    records, tags_by_review_pairs, catalog = load_inputs(
+        ws.reviews, ws.tags, None if ws.is_canonical else ws.catalog)
     reviews = {r["reviewId"]: r["raw"]["content"] for r in records}
 
     if args.check:
-        if not OUT_PATH.exists():
-            raise SystemExit(f"FAIL: 산출물이 없다 ({OUT_PATH.relative_to(ROOT)})")
-        rows = [json.loads(l) for l in OUT_PATH.read_text().splitlines() if l.strip()]
+        if not out_path.exists():
+            raise SystemExit(f"FAIL: 산출물이 없다 ({out_path.relative_to(ROOT)})")
+        rows = [json.loads(l) for l in out_path.read_text().splitlines() if l.strip()]
         for row in rows:
             validate_claim(row, reviews=reviews)
-        print(f"OK: claim {len(rows)}건이 계약을 통과한다 ({OUT_PATH.relative_to(ROOT)})")
+        print(f"OK: claim {len(rows)}건이 계약을 통과한다 ({out_path.relative_to(ROOT)})")
         return
 
     codebook = load_codebook()
@@ -413,24 +424,24 @@ def main() -> None:
     tok_in = sum(o.usage["input"] for o in outcomes)
     tok_out = sum(o.usage["output"] for o in outcomes)
 
-    OUT_PATH.parent.mkdir(parents=True, exist_ok=True)
+    out_path.parent.mkdir(parents=True, exist_ok=True)
     # 빈 결과로 기존 산출물을 덮지 않는다. 호출이 통째로 막히면(사용 한도·네트워크)
     # produced 가 0 이 되는데, 그때 그냥 쓰면 **지난 실행 결과가 사라진다.**
     # 2026-09-16 에 실제로 그렇게 997건을 잃었다. 산출물은 근거이므로 덮어쓰기 전에 막는다.
-    if not claims and OUT_PATH.exists() and OUT_PATH.stat().st_size > 0:
+    if not claims and out_path.exists() and out_path.stat().st_size > 0:
         raise SystemExit(
-            f"FAIL: 생성된 claim 이 0 건인데 기존 산출물이 있다 ({OUT_PATH.relative_to(ROOT)}).\n"
+            f"FAIL: 생성된 claim 이 0 건인데 기존 산출물이 있다 ({out_path.relative_to(ROOT)}).\n"
             f"  폐기 사유: {json.dumps(dict(collections.Counter((o.discards or [''])[0].split(':')[0] for o in skipped)), ensure_ascii=False)}\n"
             "  → 덮어쓰지 않았다. 호출이 막힌 원인을 먼저 보고, 정말 비우려면 파일을 직접 지워라")
     # 부분 실패도 덮어쓰기 전에 알린다 — 한도에 걸려 절반만 나온 실행이 전수인 척하면 안 된다
-    if OUT_PATH.exists() and OUT_PATH.stat().st_size > 0:
-        before = sum(1 for l in OUT_PATH.read_text().splitlines() if l.strip())
+    if out_path.exists() and out_path.stat().st_size > 0:
+        before = sum(1 for l in out_path.read_text().splitlines() if l.strip())
         if before > len(claims):
             print(f"  ! 기존 {before:,}건 → 이번 {len(claims):,}건 으로 줄어든다 "
                   f"(--products 로 일부만 돌렸다면 정상이다)")
-    OUT_PATH.write_text("".join(json.dumps(c_, ensure_ascii=False) + "\n" for c_ in claims))
-    RAW_PATH.mkdir(parents=True, exist_ok=True)
-    (RAW_PATH / "skipped.jsonl").write_text("".join(
+    out_path.write_text("".join(json.dumps(c_, ensure_ascii=False) + "\n" for c_ in claims))
+    raw_path.mkdir(parents=True, exist_ok=True)
+    (raw_path / "skipped.jsonl").write_text("".join(
         json.dumps({"claimId": o.claim_id, "skipped": o.skipped,
                     "attempts": o.attempts, "discards": o.discards},
                    ensure_ascii=False) + "\n" for o in skipped))
@@ -456,13 +467,13 @@ def main() -> None:
             (o.skipped or "").split(":")[0] for o in skipped).most_common()),
         "byAxis": dict(collections.Counter(t.axis for t in targets)),
     }
-    META_PATH.write_text(json.dumps(meta, ensure_ascii=False, indent=2) + "\n")
+    meta_path.write_text(json.dumps(meta, ensure_ascii=False, indent=2) + "\n")
 
     print(f"\n[생성] {len(claims):,}/{len(targets):,} "
           f"({meta['run']['producedPct']}%) · 건너뜀 {len(skipped):,}")
     print(f"[토큰] 입력 {tok_in:,} · 출력 {tok_out:,} · {elapsed:.0f}초")
     print(f"[인용] {meta['run']['quotes']}")
-    print(f"→ {OUT_PATH.relative_to(ROOT)} · {META_PATH.relative_to(ROOT)}")
+    print(f"→ {out_path.relative_to(ROOT)} · {meta_path.relative_to(ROOT)}")
 
 
 if __name__ == "__main__":

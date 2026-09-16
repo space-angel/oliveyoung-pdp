@@ -752,24 +752,33 @@ def _read_jsonl(path: Path) -> list[dict]:
     return [json.loads(line) for line in path.read_text().splitlines() if line.strip()]
 
 
-def load_inputs() -> tuple[list[dict], dict[int, list[tuple[str, str]]], object]:
-    """입수 산출물과 전수 태그를 읽는다. 없으면 조용히 건너뛰지 않고 멈춘다."""
-    if not REVIEWS_PATH.exists():
+def load_inputs(
+    reviews_path: Path = REVIEWS_PATH,
+    tags_path: Path = TAGS_PATH,
+    catalog_path: Path | None = None,
+) -> tuple[list[dict], dict[int, list[tuple[str, str]]], object]:
+    """입수 산출물과 전수 태그를 읽는다. 없으면 조용히 건너뛰지 않고 멈춘다.
+
+    경로 인자는 런 격리용이다 (PER-194). 인자 없이 부르면 정본이고, 지금까지와
+    완전히 같게 동작한다 — `test_workspace.py` 가 그걸 고정한다.
+    """
+    if not reviews_path.exists():
         raise SystemExit(
-            f"입수 산출물이 없다: {REVIEWS_PATH.relative_to(ROOT)}\n"
+            f"입수 산출물이 없다: {reviews_path}\n"
             "  먼저 입수를 돌린다 — python3 pipeline/run_v5.py --steps ingest"
         )
-    if not TAGS_PATH.exists():
+    if not tags_path.exists():
         raise SystemExit(
-            f"전수 태그가 없다: {TAGS_PATH.relative_to(ROOT)}\n"
+            f"전수 태그가 없다: {tags_path}\n"
             "  먼저 정본을 못박는다 — python3 pipeline/run_v5.py --steps tag\n"
             "  태그 없이 건 게이트4 는 후보가 0건이라 원장이 게이트1·2 만 담는다."
         )
-    records = _read_jsonl(REVIEWS_PATH)
+    records = _read_jsonl(reviews_path)
     tags_by_review: dict[int, list[tuple[str, str]]] = collections.defaultdict(list)
-    for tag in _read_jsonl(TAGS_PATH):
+    for tag in _read_jsonl(tags_path):
         tags_by_review[tag["reviewId"]].append((tag["aspect"], tag["polarity"]))
-    return records, dict(tags_by_review), load_catalog()
+    catalog = load_catalog(catalog_path) if catalog_path else load_catalog()
+    return records, dict(tags_by_review), catalog
 
 
 def _summary(run: GateRun, records: list[dict]) -> dict:
