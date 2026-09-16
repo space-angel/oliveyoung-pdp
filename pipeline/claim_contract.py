@@ -46,7 +46,7 @@ from golden_contract import (  # noqa: E402
 from reject_registry import assert_rejectable  # noqa: E402
 from tag_contract import fold_invisible  # noqa: E402
 
-CLAIM_SCHEMA_VERSION = "claim-v1"
+CLAIM_SCHEMA_VERSION = "claim-v2"
 
 # 조건축. `usagePeriod` 는 **비목표로 확정**됐다 (docs/V5_SPRINT_PLAN.md · PER-173·PER-187):
 # 데이터에 필드가 없고 `isMonthUseReview`/`isMonthOverReview` 는 불리언 리뷰 종류지
@@ -66,12 +66,18 @@ CLAIM_TYPES = ("unconditional", "conditional")
 # 단정 / 완곡. 소수점 점수를 두지 않는 이유는 §ConfidencePolicy 에 적었다.
 CONFIDENCE_BANDS = ("assertive", "hedged")
 
+# 결정 정보의 축 (PER-191 v2). 제품 카테고리가 달라도 구매 결정에 필요한 정보의
+# **구조**는 같다는 실측에서 나왔다 — 적합성·리스크·비교·실사용 맥락.
+# aspect(14종)는 "무엇에 대한 이야기인가" 이고 이 축은 "왜 묻는가" 다. 둘은 다르다.
+DECISION_AXES = ("적합성", "리스크", "비교", "실사용맥락")
+
 # 모델이 쓰는 필드. 이 밖의 것을 초안에 담으면 에러다.
-DRAFT_FIELDS = ("aspect", "question", "answer", "evidence")
+DRAFT_FIELDS = ("aspect", "decisionAxis", "question", "verdict", "answer", "evidence")
 DRAFT_EVIDENCE_FIELDS = ("reviewId", "quote", "stance")
 
 CLAIM_FIELDS = (
-    "schemaVersion", "claimId", "productId", "aspect", "question", "answer",
+    "schemaVersion", "claimId", "productId", "aspect", "decisionAxis",
+    "question", "verdict", "answer",
     "condition", "claimType", "direction", "evidence", "support",
     "rejected", "failureReasons", "failureReason", "confidence", "limitations", "meta",
 )
@@ -171,6 +177,10 @@ class Claim:
     limitations: tuple[str, ...] = ()
     meta: Mapping[str, object] = field(default_factory=dict)
     confidence_policy: ConfidencePolicy = DEFAULT_CONFIDENCE
+    # v2. 골든셋 라벨(PER-178)에는 없는 값이라 None 을 허용한다 — 라벨은 결정 축이
+    # 정해지기 전에 만들어졌다. **생성물에는 반드시 있어야 한다** (generate.py 가 강제)
+    decision_axis: str | None = None
+    verdict: str | None = None
 
     def __post_init__(self) -> None:
         if not self.evidence:
@@ -183,6 +193,13 @@ class Claim:
                            (self.claim_id, "claimId")):
             if not isinstance(text, str) or not text.strip():
                 raise ClaimContractError(f"[{self.claim_id}] {name} 이 비었다")
+        if self.decision_axis is not None and self.decision_axis not in DECISION_AXES:
+            raise ClaimContractError(
+                f"[{self.claim_id}] decisionAxis 는 {DECISION_AXES} 중 하나여야 한다: "
+                f"{self.decision_axis!r}"
+            )
+        if self.verdict is not None and not str(self.verdict).strip():
+            raise ClaimContractError(f"[{self.claim_id}] verdict 가 비었다")
         if self.direction not in DIRECTIONS:
             raise ClaimContractError(
                 f"[{self.claim_id}] direction 은 {DIRECTIONS} 중 하나여야 한다: {self.direction!r}"
@@ -260,7 +277,9 @@ class Claim:
             "claimId": self.claim_id,
             "productId": self.product_id,
             "aspect": self.aspect,
+            "decisionAxis": self.decision_axis,
             "question": self.question,
+            "verdict": self.verdict,
             "answer": self.answer,
             "condition": {axis: self.condition.get(axis) for axis in CONDITION_AXES},
             "claimType": self.claim_type,
@@ -461,7 +480,9 @@ def validate_claim(
         claim_id=payload.get("claimId"),
         product_id=payload.get("productId"),
         aspect=payload.get("aspect"),
+        decision_axis=payload.get("decisionAxis"),
         question=payload.get("question"),
+        verdict=payload.get("verdict"),
         answer=payload.get("answer"),
         condition=payload.get("condition") or {},
         direction=payload.get("direction"),
