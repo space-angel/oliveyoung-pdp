@@ -83,7 +83,8 @@ class ModelDoesNotWriteNumbers(unittest.TestCase):
     def test_초안에_support_가_있으면_에러다(self):
         with self.assertRaises(ClaimContractError) as cm:
             assert_model_draft({
-                "aspect": "보습감", "question": "q", "answer": "a",
+                "aspect": "보습감", "decisionAxis": "적합성", "question": "q",
+                "verdict": "v", "answer": "a",
                 "evidence": [{"reviewId": 1, "quote": "촉촉", "stance": "positive"}],
                 "support": support(),
             })
@@ -92,19 +93,34 @@ class ModelDoesNotWriteNumbers(unittest.TestCase):
     def test_초안에_direction_이_있으면_에러다(self):
         with self.assertRaises(ClaimContractError):
             assert_model_draft({
-                "aspect": "보습감", "question": "q", "answer": "a", "direction": "positive",
+                "aspect": "보습감", "decisionAxis": "적합성", "question": "q",
+                "verdict": "v", "answer": "a", "direction": "positive",
                 "evidence": [{"reviewId": 1, "quote": "촉촉", "stance": "positive"}],
             })
 
     def test_초안의_evidence_가_비면_에러다(self):
         with self.assertRaises(ClaimContractError):
-            assert_model_draft({"aspect": "보습감", "question": "q", "answer": "a", "evidence": []})
+            assert_model_draft({"aspect": "보습감", "decisionAxis": "적합성", "question": "q",
+                                "verdict": "v", "answer": "a", "evidence": []})
 
     def test_제_몫만_담으면_통과한다(self):
         assert_model_draft({
-            "aspect": "보습감", "question": "q", "answer": "a",
+            "aspect": "보습감", "decisionAxis": "적합성", "question": "q",
+            "verdict": "v", "answer": "a",
             "evidence": [{"reviewId": 1, "quote": "촉촉", "stance": "positive"}],
         })
+
+    def test_결정축이_어휘_밖이면_에러다(self):
+        """aspect(무엇에 대한 이야기인가)와 결정축(왜 묻는가)은 다른 어휘다."""
+        with self.assertRaises(ClaimContractError) as cm:
+            validate_claim(payload(decisionAxis="그냥궁금"))
+        self.assertIn("decisionAxis", str(cm.exception))
+
+    def test_결정축과_판단문은_골든셋에서는_없어도_된다(self):
+        """라벨(PER-178)은 결정축이 정해지기 전에 만들어졌다 — None 을 허용한다."""
+        c = validate_claim(payload())
+        self.assertIsNone(c.decision_axis)
+        self.assertIsNone(c.verdict)
 
 
 class SupportIsCounted(unittest.TestCase):

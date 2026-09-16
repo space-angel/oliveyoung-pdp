@@ -73,7 +73,17 @@ STEPS: tuple[Step, ...] = (
         # 순서가 규격이다 — 게이트1 을 건너뛰면 컷될 리뷰가 게이트2 의 대표로 남는다.
         "ledger:main",
     ),
-    Step("claims", "PER-189~195", "#5 주장 생성", "claim 생성 + 인용 원문 부분문자열 강제 + 스키마 검증"),
+    Step(
+        "claims",
+        "PER-189~195",
+        "#5 주장 생성",
+        "claim 생성 + 인용 원문 부분문자열 강제 + 스키마 검증",
+        # 태깅과 같은 이유로 러너가 생성을 대신 돌리지 않는다 — 외부 API 호출이고
+        # 실비가 든다. `--check` 는 LLM 없이 **기존 산출물의 계약만** 다시 본다.
+        # 생성하려면 인자를 골라야 하므로(제품·모델·동시성) 직접 부른다:
+        #   .venv/bin/python pipeline/generate.py --products p005,p009
+        "generate:check_only",
+    ),
     Step("judge", "PER-196~201", "#6 자동 평가", "루브릭 judge (생성과 다른 모델) + 전수 평가"),
 )
 BY_NAME = {s.name: s for s in STEPS}

@@ -1,6 +1,6 @@
 {
   "issue": "PER-189",
-  "schemaVersion": "claim-v1",
+  "schemaVersion": "claim-v2",
   "source": {
     "labels": {
       "path": "eval/gold/v5_concern_golden_labels.jsonl",

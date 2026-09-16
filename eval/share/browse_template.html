@@ -1,0 +1,282 @@
+<title>구매 고민 997쌍</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=IBM+Plex+Sans+KR:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  :root{
+    --paper:#F7F8F7; --panel:#FFFFFF; --ink:#12171A; --ink-soft:#44514F;
+    --muted:#6E7C7A; --line:#DFE5E3; --line-soft:#ECF0EF;
+    --accent:#1F5F5B; --accent-soft:#E6EEEC; --accent-ink:#0E3B38;
+    --pos:#2E7D5B; --neg:#B4472E; --warn:#8A6A1F;
+    --serif:"Gowun Batang",Batang,"Apple SD Gothic Neo",serif;
+    --sans:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+    --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  }
+  @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+    --paper:#0E1413; --panel:#151D1C; --ink:#EAF0EE; --ink-soft:#BAC7C4;
+    --muted:#8A9996; --line:#27332F; --line-soft:#1C2523;
+    --accent:#79C4B8; --accent-soft:#172A28; --accent-ink:#BFE4DD;
+    --pos:#67BE94; --neg:#E28368; --warn:#D3AE5E;}}
+  :root[data-theme="dark"]{
+    --paper:#0E1413; --panel:#151D1C; --ink:#EAF0EE; --ink-soft:#BAC7C4;
+    --muted:#8A9996; --line:#27332F; --line-soft:#1C2523;
+    --accent:#79C4B8; --accent-soft:#172A28; --accent-ink:#BFE4DD;
+    --pos:#67BE94; --neg:#E28368; --warn:#D3AE5E;}
+
+  *{box-sizing:border-box}
+  body{background:var(--paper);color:var(--ink);font-family:var(--sans);
+       font-size:15px;line-height:1.66;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1180px;margin:0 auto;padding-inline:20px}
+  .num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+  h1{font-family:var(--serif);font-size:clamp(25px,4vw,38px);font-weight:700;
+     margin:0;letter-spacing:-.015em;text-wrap:balance}
+  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.14em;
+           text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+  p{margin:0}
+
+  header{padding-block:clamp(30px,5vw,52px) 22px;border-bottom:1px solid var(--line)}
+  .lede{margin-top:14px;color:var(--ink-soft);max-width:62ch}
+  .totals{display:flex;flex-wrap:wrap;gap:6px 20px;margin-top:18px;
+          font-family:var(--mono);font-size:12.5px;color:var(--muted)}
+  .totals b{color:var(--ink);font-weight:500}
+  .note{margin-top:16px;padding:11px 14px;background:var(--line-soft);
+        border-left:2px solid var(--line);font-size:13px;color:var(--muted);max-width:74ch}
+
+  /* 도구 막대 */
+  .tools{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;
+         background:var(--paper);border-bottom:1px solid var(--line);
+         padding-block:12px;margin-bottom:4px}
+  .toolrow{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+  input[type=search],select{font-family:var(--sans);font-size:13.5px;color:var(--ink);
+    background:var(--panel);border:1px solid var(--line);border-radius:3px;
+    padding:7px 10px;min-width:0}
+  input[type=search]{flex:1 1 220px}
+  select{flex:0 1 auto}
+  input:focus-visible,select:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+  .count{font-family:var(--mono);font-size:12.5px;color:var(--muted);margin-left:auto}
+  .reset{font-family:var(--sans);font-size:12.5px;color:var(--accent);background:none;
+         border:0;cursor:pointer;padding:6px 4px;text-decoration:underline}
+
+  /* claim 카드 */
+  .list{display:flex;flex-direction:column;gap:14px;padding-block:18px 40px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:4px;
+        overflow:hidden}
+  .chead{display:flex;flex-wrap:wrap;gap:5px 9px;align-items:center;
+         padding:9px 15px;background:var(--line-soft);border-bottom:1px solid var(--line-soft)}
+  .chip{font-family:var(--mono);font-size:10.5px;letter-spacing:.04em;padding:2px 7px;
+        border:1px solid var(--line);border-radius:2px;color:var(--muted);white-space:nowrap}
+  .chip.prod{color:var(--ink);border-color:var(--line)}
+  .chip.cond{color:var(--accent-ink);background:var(--accent-soft);border-color:var(--accent)}
+  .chip.d-mixed{color:var(--warn);border-color:currentColor}
+  .chip.d-positive{color:var(--pos);border-color:currentColor}
+  .chip.d-negative{color:var(--neg);border-color:currentColor}
+  .cbody{padding:15px 15px 13px}
+  .q{font-family:var(--serif);font-size:17.5px;font-weight:700;line-height:1.45;
+     text-wrap:balance}
+  .a{margin-top:8px;color:var(--ink-soft);font-size:14.5px}
+  .counts{display:flex;flex-wrap:wrap;gap:3px 15px;margin-top:12px;
+          font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:12.5px;
+          color:var(--muted)}
+  .counts b{color:var(--ink);font-weight:500}
+  details{margin-top:11px;border-top:1px dashed var(--line);padding-top:10px}
+  summary{cursor:pointer;font-family:var(--mono);font-size:12px;color:var(--accent);
+          list-style:none}
+  summary::-webkit-details-marker{display:none}
+  summary::before{content:"▸ ";color:var(--muted)}
+  details[open] summary::before{content:"▾ "}
+  .quotes{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+  .quote{display:grid;grid-template-columns:auto minmax(0,1fr);gap:9px;align-items:start;font-size:13.5px}
+  .st{font-family:var(--mono);font-size:9.5px;letter-spacing:.05em;padding:2px 5px;
+      border-radius:2px;white-space:nowrap;margin-top:3px}
+  .st.positive{color:var(--pos);background:color-mix(in srgb,var(--pos) 13%,transparent)}
+  .st.negative{color:var(--neg);background:color-mix(in srgb,var(--neg) 13%,transparent)}
+  .st.neutral{color:var(--muted);background:var(--line-soft)}
+  .src{border:1px solid var(--line);border-radius:3px;background:var(--paper);
+       padding:9px 11px;min-width:0}
+  .srcmeta{display:flex;flex-wrap:wrap;gap:3px 11px;font-family:var(--mono);font-size:10.5px;
+           color:var(--muted);margin-bottom:5px}
+  .srctext{color:var(--ink-soft);font-size:13.5px;line-height:1.72;white-space:pre-wrap;
+           word-break:break-word;max-height:12.5em;overflow-y:auto}
+  .srctext mark{background:color-mix(in srgb,var(--accent) 22%,transparent);
+                color:var(--ink);padding:1px 0;border-bottom:1.5px solid var(--accent);
+                font-weight:500}
+  .legend{font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:9px}
+  .legend mark{background:color-mix(in srgb,var(--accent) 22%,transparent);
+               border-bottom:1.5px solid var(--accent);padding:0 3px}
+  .flags{margin-top:9px;font-size:12.5px;color:var(--muted)}
+  .empty{padding:50px 0;text-align:center;color:var(--muted)}
+  .more{display:block;width:100%;padding:13px;margin-top:6px;font-family:var(--sans);
+        font-size:14px;color:var(--accent);background:var(--panel);
+        border:1px solid var(--line);border-radius:4px;cursor:pointer}
+  footer{border-top:1px solid var(--line);padding-block:26px 46px;
+         font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+  footer p+p{margin-top:6px}
+  @media (max-width:520px){.count{margin-left:0;width:100%}}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<div class="wrap">
+  <header>
+    <p class="eyebrow">올리브영 PDP 리뷰 파이프라인 · v5 산출물</p>
+    <h1>구매 고민 997쌍</h1>
+    <p class="lede" id="lede"></p>
+    <div class="totals" id="totals"></div>
+    <p class="note">올리브영에 공개된 리뷰를 분석한 <b>독립 실험</b>이다. 공식 산출물이 아니고 제휴 관계도 없다. 인용은 전부 리뷰 원문을 그대로 잘라낸 것이며, 원문이 아닌 인용은 생성 단계에서 걸러져 화면에 나오지 않는다.</p>
+  </header>
+
+  <div class="tools">
+    <div class="toolrow">
+      <input type="search" id="q" placeholder="질문·답·인용에서 찾기" autocomplete="off">
+      <select id="fProduct"><option value="">제품 전체</option></select>
+      <select id="fAspect"><option value="">주제 전체</option></select>
+      <select id="fCond"><option value="">조건 전체</option></select>
+      <select id="fDir"><option value="">방향 전체</option></select>
+      <button class="reset" id="reset" type="button">초기화</button>
+      <span class="count" id="count"></span>
+    </div>
+  </div>
+
+  <div class="list" id="list"></div>
+  <button class="more" id="more" type="button" hidden>더 보기</button>
+
+  <footer>
+    <p id="prov"></p>
+    <p>인용 옆의 번호는 올리브영 리뷰 ID다. 수치는 리뷰 수가 아니라 <b>고유 작성자 수</b>이고, “말 없음”은 그 주제를 언급하지 않은 사람이라 어느 쪽 근거도 아니다.</p>
+  </footer>
+</div>
+
+<script>
+const D = window.__BROWSE_DATA__;
+const n = v => v.toLocaleString('ko-KR');
+const PAGE = 40;
+let shown = PAGE;
+
+document.getElementById('lede').innerHTML =
+  `리뷰 25,000건에서 게이트 넷을 통과한 (제품 × 조건 × 주제) 단위로 만든 질문과 답이다. ` +
+  `답에 쓰인 인용 ${n(D.totals.quotes)}개는 전부 리뷰 원문 그대로다 — 근거를 펼치면 <b>리뷰 원문 전체에서 인용된 부분이 표시</b>되므로 앞뒤 맥락까지 함께 확인할 수 있다. 수치는 모델이 아니라 코드가 센 것이다.`;
+
+const tot = document.getElementById('totals');
+[['질문–답 쌍', n(D.totals.claims)], ['인용', n(D.totals.quotes)],
+ ['조건부', n(D.totals.conditional)], ['무조건부', n(D.totals.unconditional)],
+ ['제품', n(D.facets.products.length)], ['주제', n(D.facets.aspects.length)]]
+ .forEach(([k, v]) => {
+   const s = document.createElement('span');
+   s.append(document.createTextNode(k + ' '));
+   const b = document.createElement('b'); b.className = 'num'; b.textContent = v;
+   s.append(b); tot.append(s);
+ });
+
+const fill = (id, arr) => {
+  const sel = document.getElementById(id);
+  arr.forEach(v => { const o = document.createElement('option'); o.value = v; o.textContent = v; sel.append(o); });
+};
+fill('fProduct', D.facets.products);
+fill('fAspect', D.facets.aspects);
+fill('fCond', D.facets.conditions);
+fill('fDir', D.facets.directions);
+
+const els = {
+  q: document.getElementById('q'), p: document.getElementById('fProduct'),
+  a: document.getElementById('fAspect'), c: document.getElementById('fCond'),
+  d: document.getElementById('fDir'), list: document.getElementById('list'),
+  count: document.getElementById('count'), more: document.getElementById('more'),
+};
+
+function matches(c) {
+  if (els.p.value && c.product !== els.p.value) return false;
+  if (els.a.value && c.aspect !== els.a.value) return false;
+  if (els.c.value && c.condition !== els.c.value) return false;
+  if (els.d.value && c.directionLabel !== els.d.value) return false;
+  const t = els.q.value.trim();
+  if (!t) return true;
+  const hay = (c.question + ' ' + c.answer + ' ' +
+               c.evidence.map(e => e.quote).join(' ')).toLowerCase();
+  return t.toLowerCase().split(/\s+/).every(w => hay.includes(w));
+}
+
+function card(c) {
+  const el = (t, cl, tx) => { const e = document.createElement(t); if (cl) e.className = cl;
+    if (tx !== undefined) e.textContent = tx; return e; };
+  const root = el('article', 'card');
+  const head = el('div', 'chead');
+  head.append(el('span', 'chip prod', c.product), el('span', 'chip', c.aspect));
+  if (c.claimType === 'conditional') head.append(el('span', 'chip cond', c.condition));
+  head.append(el('span', 'chip d-' + c.direction, c.directionLabel));
+  root.append(head);
+
+  const body = el('div', 'cbody');
+  body.append(el('h2', 'q', c.question), el('p', 'a', c.answer));
+
+  const counts = el('div', 'counts');
+  const put = (k, v, cls) => { const s = el('span', cls);
+    s.append(document.createTextNode(k + ' '));
+    s.append(el('b', null, n(v))); counts.append(s); };
+  put('긍정', c.positive); put('부정', c.negative);
+  if (c.neutral) put('중립', c.neutral);
+  put('말한 사람', c.spoke); put('말 없음', c.silent); put('전체', c.cell);
+  body.append(counts);
+
+  const det = el('details');
+  det.append(el('summary', null, `근거 리뷰 ${c.evidence.length}건 — 원문에서 인용 부분 보기`));
+  const qs = el('div', 'quotes');
+  c.evidence.forEach(e => {
+    const row = el('div', 'quote');
+    row.append(el('span', 'st ' + e.stance, e.stance));
+    const src = el('div', 'src');
+    const r = D.reviews[e.reviewId];
+    const meta = el('div', 'srcmeta');
+    meta.append(el('span', null, '리뷰 ' + e.reviewId));
+    if (r) meta.append(el('span', null, '★ ' + r.rating), el('span', null, r.date));
+    src.append(meta);
+    const t = el('div', 'srctext');
+    if (r && typeof e.at === 'number') {
+      // 원문을 그대로 싣고 인용 구간만 표시한다 — 인용만 떼어 보여주면
+      // 그게 정말 그 리뷰의 문장인지 읽는 사람이 확인할 수 없다
+      t.append(document.createTextNode(r.text.slice(0, e.at)));
+      const m = document.createElement('mark');
+      m.textContent = r.text.slice(e.at, e.at + e.len);
+      t.append(m, document.createTextNode(r.text.slice(e.at + e.len)));
+    } else {
+      t.textContent = e.quote;
+    }
+    src.append(t);
+    row.append(src); qs.append(row);
+  });
+  det.append(qs);
+  det.append(el('p', 'legend', '표시된 부분이 답의 근거로 쓰인 인용이다. 나머지는 같은 리뷰의 앞뒤 문장이다.'));
+  body.append(det);
+
+  const flags = [];
+  if (c.hedgeReasons.length) flags.push('완곡하게 서술: ' + c.hedgeReasons.join(' · '));
+  if (c.limitations.length) flags.push('한계: ' + c.limitations.join(' · '));
+  if (flags.length) body.append(el('p', 'flags', flags.join('   |   ')));
+  root.append(body);
+  return root;
+}
+
+function render(reset) {
+  if (reset) shown = PAGE;
+  const rows = D.claims.filter(matches);
+  els.list.replaceChildren();
+  rows.slice(0, shown).forEach(c => els.list.append(card(c)));
+  if (!rows.length) {
+    const p = document.createElement('p'); p.className = 'empty';
+    p.textContent = '조건에 맞는 질문이 없다.'; els.list.append(p);
+  }
+  els.count.textContent = `${n(rows.length)}건` +
+    (rows.length > shown ? ` 중 ${n(shown)}건 표시` : '');
+  els.more.hidden = rows.length <= shown;
+  els.more.textContent = `더 보기 (${n(Math.min(PAGE, rows.length - shown))}건)`;
+}
+
+[els.q, els.p, els.a, els.c, els.d].forEach(e =>
+  e.addEventListener('input', () => render(true)));
+els.more.addEventListener('click', () => { shown += PAGE; render(false); });
+document.getElementById('reset').addEventListener('click', () => {
+  els.q.value = ''; [els.p, els.a, els.c, els.d].forEach(s => s.value = ''); render(true);
+});
+
+document.getElementById('prov').textContent =
+  `생성 ${D.model} / 프롬프트 ${D.promptVersion} · 대상 ${n(D.run.targets)}건 중 ${n(D.run.produced)}건 생성 ` +
+  `(나머지는 API 사용 한도로 호출이 막혀 중단 — 품질 판정이 아니다)`;
+
+render(true);
+</script>

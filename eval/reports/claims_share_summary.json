@@ -1,0 +1,439 @@
+{
+  "issue": "PER-191",
+  "generatedAt": "claims",
+  "model": "claude-sonnet-5",
+  "promptVersion": "claim-v2",
+  "modelId": "claude-sonnet-5",
+  "seed": 20260916,
+  "policy": {
+    "issue": "PER-186",
+    "nMin": 8,
+    "rMin": 0.1,
+    "sMin": 8,
+    "minorityMin": 2,
+    "denominator": "spokeAuthors",
+    "note": "U ≥ N_min AND U/D ≥ R_min AND S ≥ S_min 을 모두 만족해야 통과. 분모 D 는 주제를 언급한 고유 작성자다 (PER-178 — 침묵은 근거가 아니다)",
+    "maxQuotes": 8,
+    "maxRetries": 2
+  },
+  "inputs": [
+    {
+      "name": "reviews",
+      "path": "data/intermediate/v5_reviews.jsonl",
+      "digestKind": "sha256",
+      "digest": "47a1fc98e93b10b45e1cca178fcdeb603327cacc6111191c55f6cd53f20f1974"
+    },
+    {
+      "name": "tags",
+      "path": "data/intermediate/v5_tags.jsonl",
+      "digestKind": "sha256",
+      "digest": "82bfba90283f6ea355ea2bf2b0dbcd846a724407d35cb536956351b0ea3c0ca3"
+    },
+    {
+      "name": "catalog",
+      "path": "data/input/product_catalog.json",
+      "digestKind": "sha256",
+      "digest": "897cbc2c9765ca08b8d9514f307a678cff82596e0493c3d9ea0ee9a156d94fb6"
+    }
+  ],
+  "funnel": [
+    {
+      "step": "입력 리뷰",
+      "n": 25000
+    },
+    {
+      "step": "게이트1 동일성 통과",
+      "n": 22194
+    },
+    {
+      "step": "게이트2 중복 통과",
+      "n": 17672
+    },
+    {
+      "step": "주장 후보 (셀 × aspect)",
+      "n": 7689
+    },
+    {
+      "step": "게이트4 충분성 통과 = 생성 대상",
+      "n": 2420
+    },
+    {
+      "step": "생성된 claim",
+      "n": 236
+    },
+    {
+      "step": "노출 가능 (failureReason = null)",
+      "n": 236
+    }
+  ],
+  "generation": {
+    "targets": 303,
+    "produced": 236,
+    "producedPct": 77.89,
+    "skipped": 67,
+    "skipReasons": {
+      "모델 판단": 65,
+      "3회 모두 실패 — 생성하지 않는다 (PRD §5-3)": 2
+    },
+    "tokens": {
+      "input": 1376565,
+      "output": 132943
+    },
+    "elapsedSec": 214.1,
+    "byAxis": {
+      "product": 45,
+      "skinTrouble": 158,
+      "skinType": 100
+    }
+  },
+  "quotes": {
+    "total": 933,
+    "verbatimPct": 100.0,
+    "note": "인용이 원문 부분문자열이 아니면 생성 게이트가 그 claim 을 내지 않는다 (PER-190). 이 수가 100% 인 것은 사후 측정이 아니라 구조의 결과다",
+    "v4": {
+      "pct": 88.8,
+      "counted": "127/143",
+      "note": "v4 자신의 500건 코퍼스에서 v4 방식으로 재측정해 재현한 값"
+    }
+  },
+  "shape": {
+    "byClaimType": {
+      "unconditional": 41,
+      "conditional": 195
+    },
+    "byDirection": {
+      "positive": 25,
+      "mixed": 210,
+      "negative": 1
+    },
+    "byConfidence": {
+      "hedged": 236
+    },
+    "withLimitations": 236,
+    "hedgeReasons": {
+      "gate_limitation": 236,
+      "direction_mixed": 210,
+      "silence_dominates": 207
+    },
+    "evidencePerClaim": {
+      "min": 2,
+      "median": 4,
+      "max": 7
+    }
+  },
+  "versusV4": {
+    "v4": {
+      "outputs": 30,
+      "unit": "질문",
+      "hasAnswer": false,
+      "hasCondition": false,
+      "quoteAccuracyPct": 88.8,
+      "fields": [
+        "category",
+        "concernId",
+        "confidence",
+        "negativeCount",
+        "negativeSnippets",
+        "positiveCount",
+        "positiveSnippets",
+        "question",
+        "supportingReviewIds"
+      ]
+    },
+    "v5": {
+      "outputs": 236,
+      "unit": "질문–답 쌍",
+      "hasAnswer": true,
+      "hasCondition": true,
+      "quoteAccuracyPct": 100.0,
+      "fields": [
+        "answer",
+        "aspect",
+        "claimId",
+        "claimType",
+        "condition",
+        "confidence",
+        "decisionAxis",
+        "direction",
+        "evidence",
+        "failureReason",
+        "failureReasons",
+        "limitations",
+        "meta",
+        "productId",
+        "question",
+        "rejected",
+        "schemaVersion",
+        "support",
+        "verdict"
+      ]
+    },
+    "note": "v4 는 질문만 냈다 — 사용자가 답을 리뷰에서 직접 찾아야 했다. 수를 그대로 비교하면 안 된다: v4 는 제품 10개 · 리뷰 500건이고 v5 는 제품 53개 · 리뷰 25,000건이다"
+  },
+  "evidenceNumbers": {
+    "gate4": {
+      "candidates": 7689,
+      "passed": 2420,
+      "unconditionalPassPct": 71.43,
+      "skinTypePassPct": 23.08,
+      "skinTroublePassPct": 22.84
+    },
+    "gate3": {
+      "sizedCells": 395,
+      "mixedCells": 343,
+      "mixedBeyondNoise": 202,
+      "ratingConflicts": 2289,
+      "ratingConflictPct": 9.46
+    },
+    "recall": {
+      "goldenLabels": 26,
+      "traceable": 22,
+      "produced": 16,
+      "recall": 0.7273,
+      "missByReason": {
+        "sufficiency/insufficient_support": 6
+      }
+    }
+  },
+  "limits": [
+    "**골든셋이 얇다.** 라벨 26건이고 번들 5개 중 4개에 사람이 직접 만든 claim 이 0건이다 — 25건이 모델 후보에서 왔다. 재현율 0.7273 은 '후보 모델이 떠올린 주장 안에서의 재현율' 이다",
+    "**조건별로 방향이 갈린다는 것을 이 스냅샷은 입증하지 못한다.** 갈린 셀 13개를 찾았지만 Holm 보정 후 0개이고 순열 p=0.495 다. 게이트 이전에는 유의 쌍 117개로 p<0.001 이었는데 중복 게이트만 걸어도 34개로 내려앉는다 — 갈림의 상당 부분이 같은 작성자를 여러 번 센 것이었다 (PER-192)",
+    "**태거 품질에 딸려 있다.** 태그는 GLM 4.7 단일 실행이고 방향이 반대로 뒤집히는 비율이 정답셋에서 1.29%, 재현율은 57.4% 다. 언급됐는데 태그가 안 붙은 축은 여기서 '침묵' 으로 세어진다",
+    "**재현 meta 가 아직 산출물에 다 안 붙어 있다.** 커밋된 리포트 35건 중 9축을 전부 기록한 것이 0건이다 (PER-193). 이 claim 산출물이 그 계약을 쓰는 첫 사례다",
+    "**judge 가 없다.** 생성물의 품질은 아직 자동으로 채점되지 않았다 — 치명 2유형 0건 판정은 PER-196~198 이후다"
+  ],
+  "examples": [
+    {
+      "bucket": "조건이 붙은 주장",
+      "claimId": "p005|skinTrouble=C01|발색",
+      "productId": "p005",
+      "aspect": "발색",
+      "claimType": "conditional",
+      "direction": "mixed",
+      "question": "잡티 있는 입술인데 이거 바르면 색이 예쁘게 표현될까?",
+      "answer": "얇게 바르면 여릿하게, 겹쳐 바르면 진하게 연출된다는 말이 많고, 맑은 발색으로 자연스럽게 혈색을 살려준다는 언급이 꾸준하다. 다만 기존 제품과 색감이 달라졌다는 불만도 있고, 여름뮤트 톤에서는 단독 발색만으로는 안 어울린다는 의견도 나온다.",
+      "conditionSentence": "잡티 고민 → 얇게 바르면 여릿하게, 겹쳐 바르면 진하게 연출된다는 말이 많고, 맑은 발색으로 자연스럽게 혈색을 살려준다는 언급이 꾸준하다. 다만 기존 제품과 색감이 달라졌다는 불만도 있고, 여름뮤트 톤에서는 단독 발색만으로는 안 어울린다는 의견도 나온다.",
+      "support": {
+        "positiveAuthors": 68,
+        "negativeAuthors": 8,
+        "neutralAuthors": 4,
+        "spokeAuthors": 80,
+        "silentAuthors": 38,
+        "cellAuthors": 118
+      },
+      "confidence": "hedged",
+      "confidenceReasons": [
+        "direction_mixed",
+        "gate_limitation"
+      ],
+      "limitations": [
+        "tagger_direction_error"
+      ],
+      "evidence": [
+        {
+          "reviewId": 62924953,
+          "stance": "positive",
+          "quote": "진하게 연하게 표현가능해요"
+        },
+        {
+          "reviewId": 61334572,
+          "stance": "positive",
+          "quote": "입술에 바르면 자연스럽게 혈색을 살려주는 컬러라"
+        },
+        {
+          "reviewId": 61504514,
+          "stance": "neutral",
+          "quote": "여름뮤트라 단독발색으로 어울리진 않지만"
+        },
+        {
+          "reviewId": 62007979,
+          "stance": "negative",
+          "quote": "기존이랑 색이 너무 달라졌어요"
+        }
+      ]
+    },
+    {
+      "bucket": "방향이 갈린 주장",
+      "claimId": "p009|product=None|커버력",
+      "productId": "p009",
+      "aspect": "커버력",
+      "claimType": "unconditional",
+      "direction": "mixed",
+      "question": "기미나 흉터도 이거 하나로 가려질까?",
+      "answer": "기미 같은 진한 잡티는 덧발라 콕콕 찍으면 촘촘히 가려진다는 평이 많다. 다만 기대만큼은 아니었다는 말도 있고, 흉터는 완전히 커버되지는 않는다는 언급이 나온다. 잡티 종류나 깊이에 따라 체감이 갈리는 것으로 보인다.",
+      "conditionSentence": "조건 없음 (이 제품 리뷰 전체) → 기미 같은 진한 잡티는 덧발라 콕콕 찍으면 촘촘히 가려진다는 평이 많다. 다만 기대만큼은 아니었다는 말도 있고, 흉터는 완전히 커버되지는 않는다는 언급이 나온다. 잡티 종류나 깊이에 따라 체감이 갈리는 것으로 보인다.",
+      "support": {
+        "positiveAuthors": 234,
+        "negativeAuthors": 10,
+        "neutralAuthors": 10,
+        "spokeAuthors": 254,
+        "silentAuthors": 206,
+        "cellAuthors": 460
+      },
+      "confidence": "hedged",
+      "confidenceReasons": [
+        "direction_mixed",
+        "gate_limitation"
+      ],
+      "limitations": [
+        "minority_within_tagger_noise",
+        "tagger_direction_error"
+      ],
+      "evidence": [
+        {
+          "reviewId": 61352499,
+          "stance": "positive",
+          "quote": "기미 진한 데는 진한 거 콕콕 찍고"
+        },
+        {
+          "reviewId": 58697312,
+          "stance": "positive",
+          "quote": "촘촘한 커버력을 제공합니다"
+        },
+        {
+          "reviewId": 63954941,
+          "stance": "negative",
+          "quote": "기대했던 것만큼 커버력이 좋지는 않아서"
+        },
+        {
+          "reviewId": 63331979,
+          "stance": "neutral",
+          "quote": "흉터 같은 건 완전히 가려지진 않지만"
+        }
+      ]
+    },
+    {
+      "bucket": "한 방향으로 모인 주장",
+      "claimId": "p044|skinType=미기재|보습감",
+      "productId": "p044",
+      "aspect": "보습감",
+      "claimType": "conditional",
+      "direction": "positive",
+      "question": "이거 하나로 촉촉함이 유지될까?",
+      "answer": "발랐을 때 겉이 아니라 속부터 수분이 차오르는 느낌이라는 말이 반복적으로 나온다. 스며드는 속도나 정돈되는 느낌을 언급하는 리뷰도 있어 보습감 자체에 대한 불만은 눈에 띄지 않는다. 다만 '적당하다'는 정도로만 말하는 경우도 있어, 극적인 보습보다는 무난한 촉촉함에 가깝다.",
+      "conditionSentence": "피부타입을 안 밝힌 리뷰 → 발랐을 때 겉이 아니라 속부터 수분이 차오르는 느낌이라는 말이 반복적으로 나온다. 스며드는 속도나 정돈되는 느낌을 언급하는 리뷰도 있어 보습감 자체에 대한 불만은 눈에 띄지 않는다. 다만 '적당하다'는 정도로만 말하는 경우도 있어, 극적인 보습보다는 무난한 촉촉함에 가깝다.",
+      "support": {
+        "positiveAuthors": 64,
+        "negativeAuthors": 0,
+        "neutralAuthors": 1,
+        "spokeAuthors": 65,
+        "silentAuthors": 98,
+        "cellAuthors": 163
+      },
+      "confidence": "hedged",
+      "confidenceReasons": [
+        "silence_dominates",
+        "gate_limitation"
+      ],
+      "limitations": [
+        "tagger_direction_error"
+      ],
+      "evidence": [
+        {
+          "reviewId": 47402753,
+          "stance": "positive",
+          "quote": "피부의 속보습을 확실하게 채워줘서"
+        },
+        {
+          "reviewId": 39811554,
+          "stance": "positive",
+          "quote": "속까지 촉촉해지는 느낌"
+        },
+        {
+          "reviewId": 63788837,
+          "stance": "neutral",
+          "quote": "보습도 적당해서"
+        }
+      ]
+    },
+    {
+      "bucket": "게이트가 한계를 남긴 주장",
+      "claimId": "p033|product=None|트러블/자극",
+      "productId": "p033",
+      "aspect": "트러블/자극",
+      "claimType": "unconditional",
+      "direction": "mixed",
+      "question": "트러블 진정 효과가 있을까, 자극은 없을까?",
+      "answer": "예민한 날에도 자극 없이 편안하게 쓸 수 있고, 좁쌀 트러블이나 튀어나온 덩어리가 가라앉는 걸 눈으로 확인했다는 말이 많다. 다만 트러블과 그 흔적이 마법처럼 완전히 사라지는 건 아니라는 말도 있어, 극적인 즉효를 기대하기보다는 꾸준한 진정 관리 용도로 보는 편이 맞다.",
+      "conditionSentence": "조건 없음 (이 제품 리뷰 전체) → 예민한 날에도 자극 없이 편안하게 쓸 수 있고, 좁쌀 트러블이나 튀어나온 덩어리가 가라앉는 걸 눈으로 확인했다는 말이 많다. 다만 트러블과 그 흔적이 마법처럼 완전히 사라지는 건 아니라는 말도 있어, 극적인 즉효를 기대하기보다는 꾸준한 진정 관리 용도로 보는 편이 맞다.",
+      "support": {
+        "positiveAuthors": 167,
+        "negativeAuthors": 15,
+        "neutralAuthors": 6,
+        "spokeAuthors": 188,
+        "silentAuthors": 170,
+        "cellAuthors": 358
+      },
+      "confidence": "hedged",
+      "confidenceReasons": [
+        "direction_mixed",
+        "gate_limitation"
+      ],
+      "limitations": [
+        "tagger_direction_error"
+      ],
+      "evidence": [
+        {
+          "reviewId": 63372951,
+          "stance": "positive",
+          "quote": "자극적인 느낌 없이 편안하게 사용할 수 있었어요"
+        },
+        {
+          "reviewId": 55672048,
+          "stance": "positive",
+          "quote": "튀어나오고 딱딱한 덩어리들이 싹 사라진게 육안으로도 보이고"
+        },
+        {
+          "reviewId": 38557340,
+          "stance": "negative",
+          "quote": "피부 트러블, 트러블 흔적을 막 마법처럼 사라지진 않았어요"
+        }
+      ]
+    },
+    {
+      "bucket": "근거가 가장 많은 주장",
+      "claimId": "p011|product=None|지속성",
+      "productId": "p011",
+      "aspect": "지속성",
+      "claimType": "unconditional",
+      "direction": "mixed",
+      "question": "이거 하루 종일 버텨줄까?",
+      "answer": "얇게 발려도 보송한 마무리가 비교적 오래 유지되고, 2일간 안 무너졌다는 리뷰까지 있을 만큼 지속력을 긍정하는 말이 많다. 다만 쓰다 보니 상태가 많이 무너졌다는 리뷰도 있어, 시간이 지나면 관리가 필요할 수 있다는 점은 감안하는 게 좋다.",
+      "conditionSentence": "조건 없음 (이 제품 리뷰 전체) → 얇게 발려도 보송한 마무리가 비교적 오래 유지되고, 2일간 안 무너졌다는 리뷰까지 있을 만큼 지속력을 긍정하는 말이 많다. 다만 쓰다 보니 상태가 많이 무너졌다는 리뷰도 있어, 시간이 지나면 관리가 필요할 수 있다는 점은 감안하는 게 좋다.",
+      "support": {
+        "positiveAuthors": 124,
+        "negativeAuthors": 17,
+        "neutralAuthors": 3,
+        "spokeAuthors": 144,
+        "silentAuthors": 282,
+        "cellAuthors": 426
+      },
+      "confidence": "hedged",
+      "confidenceReasons": [
+        "direction_mixed",
+        "silence_dominates",
+        "gate_limitation"
+      ],
+      "limitations": [
+        "tagger_direction_error"
+      ],
+      "evidence": [
+        {
+          "reviewId": 63084647,
+          "stance": "positive",
+          "quote": "화장 진짜 2일간 안 무너졌어요"
+        },
+        {
+          "reviewId": 62504698,
+          "stance": "positive",
+          "quote": "보송한 마무리감이 비교적 오래 유지되는 편"
+        },
+        {
+          "reviewId": 62903804,
+          "stance": "negative",
+          "quote": "쓰다보니 좀 개판5분전 나긴했는데"
+        }
+      ]
+    }
+  ]
+}
