@@ -21,32 +21,91 @@ AI 가 리뷰를 요약하는 파이프라인이 아니에요. **AI 가 말해�
 
 ## 산출물
 
-파이프라인이 내보내는 단위는 claim 하나예요. 질문, 답, 답이 성립하는 조건, 원문 인용을 한 덩어리로 묶어요.
+파이프라인이 내보내는 단위는 claim 하나예요. 질문, 답, 답이 성립하는 조건, 원문 인용, 그리고 **이 claim 을 얼마나 믿을 수 있는지**까지 한 덩어리로 묶어요.
+
+아래는 실제 산출물 한 건이에요(`data/runs/<runId>/claims.jsonl`). 필드를 줄이지 않고 그대로 실었어요.
 
 ```json
 {
+  "schemaVersion": "claim-v2",
+  "claimId": "p044|skinType=A03|보습감",
+  "productId": "p044",
+  "aspect": "보습감",
+  "decisionAxis": "적합성",
   "question": "복합성인데 이거 하나로 속건조까지 잡힐까?",
-  "verdict":  "속보습감은 좋다는 평이 많지만, 덜 느껴진다는 말도 있다",
-  "condition": {"skinType": ["A03"]},
+  "verdict": "속보습감은 좋다는 평이 많지만, 덜 느껴진다는 말도 있다",
+  "answer": "속건조가 잡히고 피부가 탱글해진다는 평이 많고, 순하면서 촉촉하다는 언급도 함께 나온다. 다만 수분감이 덜 느껴졌다는 리뷰도 있어 피부 상태나 그날 컨디션에 따라 체감이 달라질 수 있다.",
+  "condition": {"skinType": ["A03"], "skinTrouble": null, "option": null, "usagePeriod": null},
+  "claimType": "conditional",
   "direction": "mixed",
-  "support": {"positiveAuthors": 47, "negativeAuthors": 3,
-              "spokeAuthors": 50, "silentAuthors": 45, "cellAuthors": 95},
-  "evidence": [{"reviewId": 38875488, "quote": "원문 그대로", "stance": "negative"}]
+  "evidence": [
+    {"reviewId": 38875488, "quote": "수분감이 덜 느껴졌습니다", "stance": "negative"},
+    {"reviewId": 47047630, "quote": "속보습을 너무 잘 잡아줘서", "stance": "positive"},
+    {"reviewId": 39236408, "quote": "진짜 수분으로 랩핑 되어서 탱글탱글한 피부를 만들어 줘요", "stance": "positive"},
+    {"reviewId": 62066655, "quote": "엄청 촉촉한데 순한 느낌이라", "stance": "positive"}
+  ],
+  "support": {
+    "positiveAuthors": 47, "negativeAuthors": 3, "neutralAuthors": 0,
+    "spokeAuthors": 50, "silentAuthors": 45, "supportAuthors": 50, "cellAuthors": 95
+  },
+  "rejected": [],
+  "failureReasons": [],
+  "failureReason": null,
+  "confidence": {
+    "band": "hedged",
+    "reasons": ["direction_mixed", "gate_limitation"],
+    "inputs": {"direction": "mixed", "supportAuthors": 50, "spokeAuthors": 50,
+               "silentAuthors": 45,
+               "limitations": ["minority_within_tagger_noise", "tagger_direction_error"]},
+    "policy": {"silentRatioHedge": 0.5, "minAssertiveAuthors": 8,
+               "note": "잠정값. 교정은 PER-200 (FP 우선 임계값 튜닝)"}
+  },
+  "limitations": ["minority_within_tagger_noise", "tagger_direction_error"],
+  "meta": {"origin": "generated"}
 }
 ```
 
+### 답을 이루는 필드
+
 | 필드 | 무엇인가요 | 어떤 통제를 받나요 |
 |---|---|---|
-| `question` | 리뷰탭에 들어온 사람이 실제로 가진 고민 | 4축(적합성·리스크·맥락·비교) 중 하나에 속해요 |
-| `verdict` | 그 고민에 대한 답 | 비율이 아니라 무엇이 만족과 불만을 갈랐는지를 써요 |
-| `condition` | 이 답이 성립하는 조건 (`A03` = 복합성) | 코드북 26종 안의 코드만 허용해요. 밖의 값은 에러예요 |
-| `direction` | 방향 판정 | 사람이 고르지 않고 계산해요 (4절) |
+| `aspect` | 무엇에 대한 이야기인가 (보습감·지속성·트러블/자극 …) | 택소노미 14종으로 고정해요 |
+| `decisionAxis` | **왜 묻는가** — 적합성 · 리스크 · 비교 · 실사용맥락 | `aspect` 와 다른 축이에요. 같은 "보습감"도 조건에 걸리면 적합성, 트러블과 엮이면 리스크예요 (3-6절) |
+| `question` | 리뷰탭에 들어온 사람이 실제로 가진 고민 | 항목 이름을 의문문으로 바꾼 것은 거부해요 |
+| `verdict` | **한 줄 판단.** 이것만 읽고 다음 행동을 정할 수 있어야 해요 | "갈린다"로 끝내면 안 돼요. 상태 보고지 답이 아니거든요 (3-6절) |
+| `answer` | 무엇이 갈랐는지를 2~4문장으로 | 비율·인원수를 쓰지 않아요. 수는 코드가 붙여요 |
+| `condition` | 이 답이 성립하는 조건 (`A03` = 복합성) | 코드북 26종 안의 코드만 허용해요. `null`(무관)과 `"미기재"`(세그먼트)는 달라요 |
+| `claimType` | `conditional` / `unconditional` | 조건이 붙었는지를 드러내요. 현재 195 / 236 이 조건부예요 |
+| `direction` | `positive` · `negative` · `mixed` · `neutral` | 사람이 고르지 않고 근거에서 계산해요 (4-1절) |
+
+### 근거를 이루는 필드
+
+| 필드 | 무엇인가요 | 어떤 통제를 받나요 |
+|---|---|---|
+| `evidence[].quote` | 원문 그대로의 인용 | 원문 부분문자열이 아니면 claim 이 **생성되지 않아요** (3-1절) |
+| `evidence[].stance` | 그 문장 자체의 긍/부정 | 답 문장에 상대적이지 않아요. 인용 상한이 한 방향을 통째로 지우지도 않고요 (4-3절) |
 | `positiveAuthors` / `negativeAuthors` | 방향을 명시한 고유 작성자 수 | 리뷰 수가 아니라 사람 수예요 (3-3절) |
-| `spokeAuthors` | 이 주제를 말한 작성자 수 (47 + 3) | 비율의 분모는 이 값이에요 |
+| `neutralAuthors` | 언급은 했지만 방향이 없는 작성자 수 | `D` 에는 들어가고 비율의 분자에는 안 들어가요 |
+| `spokeAuthors` | 이 주제를 말한 작성자 수 = `D` | **비율의 분모는 이 값이에요** |
 | `silentAuthors` | 셀 안에 있지만 이 주제를 말하지 않은 작성자 수 | 분모에 넣지 않아요 (4-4절) |
-| `cellAuthors` | 조건 셀 전체 작성자 수 (50 + 45) | 셀 크기를 드러내려고 함께 실어요 |
-| `evidence[].quote` | 원문 그대로의 인용 | 원문 부분문자열이 아니면 claim 이 생성되지 않아요 (3-1절) |
-| `evidence[].stance` | 인용이 받치는 방향 | 인용 상한이 한 방향을 통째로 지우지 않아요 (4-3절) |
+| `supportAuthors` | 게이트4 가 세는 근거 수 = `U` | 3-5절의 산식에 들어가요 |
+| `cellAuthors` | 조건 셀 전체 작성자 수 = `S` | 셀 크기를 드러내려고 함께 실어요 |
+
+### 이 claim 을 얼마나 믿을 수 있는지
+
+| 필드 | 무엇인가요 | 어떤 통제를 받나요 |
+|---|---|---|
+| `confidence.band` | `assertive` / `hedged` 두 단계 | **소수점 점수를 두지 않아요.** 0.73 같은 수는 근거 없이 정밀해 보이거든요 |
+| `confidence.reasons` | 왜 완곡한가 (`direction_mixed`, `silence_dominates` …) | 밴드만 내면 왜 그렇게 됐는지 되짚을 수 없어요 |
+| `confidence.inputs` | 그 판정에 쓴 입력값 | 판정을 재현할 수 있게 함께 실어요 |
+| `confidence.policy` | 쓴 임계값과 **"잠정값"이라는 사실** | 교정 전이라는 걸 감추지 않아요 |
+| `limitations` | 통과했지만 남은 한계 | `tagger_direction_error`(태그 방향이 틀릴 수 있음) · `minority_within_tagger_noise`(갈렸지만 소수가 잡음 범위, 4-2절) · `single_dissent`(반대 1명, 4-1절) |
+| `rejected` | 이 claim 을 만들며 버린 근거 | 삭제가 아니라 사유가 붙은 행이에요 (3-4절) |
+| `failureReason` / `failureReasons` | 실패 유형 (PER-177 8종) | 값이 있으면 화면에 내보내지 않아요. `null` 은 "평가 완료 후 실패 없음"이지 9번째 유형이 아니에요 |
+| `schemaVersion` · `claimId` · `meta` | 스키마 판 · 식별자 · 출처 | 어느 판·어느 셀에서 나왔는지가 값 안에 남아요 |
+
+> 눈여겨볼 곳은 `limitations` 예요. 이 claim 은 **게이트를 통과했는데도** 한계가 둘 붙어 있어요.
+> 통과가 "문제 없음"을 뜻하지 않는다는 게 이 파이프라인의 기본 태도예요.
 
 <details>
 <summary>이 문서에서 쓰는 용어</summary>
