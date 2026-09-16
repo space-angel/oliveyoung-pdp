@@ -70,6 +70,16 @@ def generation(from_month=None, to_month=None, evidence="리뉴얼 공지 확인
     }
 
 
+# 정본 25K 스냅샷은 archive 브랜치에 있다 (main 은 실행 경로만 둔다).
+# 지우지 않고 건너뛴다 — 스냅샷을 받아오면 이 검사들이 다시 돌아야 한다:
+#   git checkout archive -- data/input/reviews_50products.json
+SNAPSHOT = ROOT / "data/input/reviews_50products.json"
+NEEDS_SNAPSHOT = unittest.skipUnless(
+    SNAPSHOT.exists(),
+    "정본 스냅샷이 없다 (archive 브랜치) — git checkout archive -- data/input/reviews_50products.json")
+
+
+@NEEDS_SNAPSHOT
 class RealCatalog(unittest.TestCase):
     """커밋된 카탈로그가 실제 입력을 전부 덮는지."""
 

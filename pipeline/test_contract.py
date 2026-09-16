@@ -191,6 +191,16 @@ class ConditionCodesAreCodebookCodes(unittest.TestCase):
         self.assertFalse(r["condition"]["option"]["stated"])
 
 
+# 정본 25K 스냅샷은 archive 브랜치에 있다 (main 은 실행 경로만 둔다).
+# 지우지 않고 건너뛴다 — 스냅샷을 받아오면 이 검사들이 다시 돌아야 한다:
+#   git checkout archive -- data/input/reviews_50products.json
+SNAPSHOT = ROOT / "data/input/reviews_50products.json"
+NEEDS_SNAPSHOT = unittest.skipUnless(
+    SNAPSHOT.exists(),
+    "정본 스냅샷이 없다 (archive 브랜치) — git checkout archive -- data/input/reviews_50products.json")
+
+
+@NEEDS_SNAPSHOT
 class SnapshotSchema(unittest.TestCase):
     """§3-4 스키마. 필드가 늘거나 준 것은 스냅샷 전체의 사건이라 경계에서 잡는다."""
 
@@ -261,6 +271,7 @@ def _load_codebook_from(axes: dict) -> Codebook:
         return load_codebook(path)
 
 
+@NEEDS_SNAPSHOT
 class RealSnapshotSatisfiesTheContract(unittest.TestCase):
     """25K 전건이 계약을 만족한다 — 계약이 현실보다 엄격해서 못 쓰는 게 아님을 고정한다."""
 

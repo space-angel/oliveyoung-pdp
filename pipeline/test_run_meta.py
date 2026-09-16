@@ -206,6 +206,33 @@ class TestDigests(unittest.TestCase):
             validate(good_meta(promptVersion="pipeline/prompts/tag/v1.md"))
 
 
+# 정본 25K 스냅샷은 archive 브랜치에 있다 (main 은 실행 경로만 둔다).
+# 지우지 않고 건너뛴다 — 스냅샷을 받아오면 이 검사들이 다시 돌아야 한다:
+#   git checkout archive -- data/input/reviews_50products.json
+SNAPSHOT = ROOT / "data/input/reviews_50products.json"
+NEEDS_SNAPSHOT = unittest.skipUnless(
+    SNAPSHOT.exists(),
+    "정본 스냅샷이 없다 (archive 브랜치) — git checkout archive -- data/input/reviews_50products.json")
+
+
+def _tracked(path) -> bool:
+    """git 이 추적하는 경로인가. `gitCommit` 다이제스트는 추적되는 파일에만 쓸 수 있다."""
+    import subprocess
+    try:
+        r = subprocess.run(["git", "ls-files", "--error-unmatch", str(path)],
+                           cwd=ROOT, capture_output=True)
+        return r.returncode == 0
+    except OSError:
+        return False
+
+
+# 파일이 **있는** 것과 **커밋돼 있는** 것은 다르다. main 은 실행 경로만 두므로
+# 스냅샷이 디스크에 있어도 추적되지 않을 수 있고, 그러면 커밋 해시를 쓸 수 없다.
+NEEDS_TRACKED_SNAPSHOT = unittest.skipUnless(
+    _tracked(SNAPSHOT), "정본 스냅샷이 이 브랜치에서 추적되지 않는다 (archive 브랜치에 있다)")
+
+
+@NEEDS_SNAPSHOT
 class TestBuilders(unittest.TestCase):
     """조각 만들기 — 저장소의 실제 파일에서 찍는다."""
 
@@ -215,6 +242,7 @@ class TestBuilders(unittest.TestCase):
         self.assertEqual(item["digest"], sha256_file(REVIEWS))
         self.assertEqual(item["path"], "data/input/reviews_50products.json")
 
+    @NEEDS_TRACKED_SNAPSHOT
     def test_file_input_git_commit(self):
         item = file_input("reviews", REVIEWS, digest_kind="gitCommit")
         self.assertEqual(item["digestKind"], "gitCommit")
@@ -266,6 +294,7 @@ class TestBuilders(unittest.TestCase):
         self.assertTrue(failure_taxonomy_version().startswith("failure-taxonomy-"))
 
 
+@NEEDS_SNAPSHOT
 class TestStamp(unittest.TestCase):
     """stamp 는 반쪽짜리를 내보내지 않는다 — 만들자마자 validate 를 돈다."""
 
