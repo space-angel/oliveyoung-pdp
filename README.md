@@ -193,6 +193,28 @@ crawler/.venv/bin/pip install -r crawler/requirements.txt
 crawler/.venv/bin/python crawler/oliveyoung_crawler.py --products crawler/products_50.json --target 500
 ```
 
+### 제품 링크 하나로 돌려보기 (PER-194)
+
+```bash
+URL="https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000211119"
+
+.venv/bin/python pipeline/run_url.py --url "$URL" --check   # 계획과 비용만 본다
+.venv/bin/python pipeline/run_url.py --url "$URL" --yes     # 실제로 돌린다
+```
+
+crawl → catalog → ingest → tag → gates → claims → report 를 한 번에 돈다.
+전부 `data/runs/<runId>/` 안이고 **정본은 읽지도 쓰지도 않는다** — `Workspace.assert_isolated()`
+가 크롤 전에 검사한다. `data/runs/` 는 gitignore 다.
+
+| 알아둘 것 | |
+|---|---|
+| 비용 | `crawl` 은 올리브영에 실제 요청, `tag`·`claims` 는 LLM 실비. `--yes` 없이는 안 돈다 |
+| 카탈로그 | **수집분에서** 만든다. 변형 SKU(제품당 평균 4종)를 빠뜨리면 입수가 미등록 `goodsNo` 에러로 멈춘다 |
+| 리센시 | 오늘 수집분은 정본 기준월보다 새롭다. 런에서만 데이터에서 파생하고 `derived: true` 를 남긴다 |
+| **재현율** | **재지 않는다.** 이 제품에는 사람이 만든 정답지가 없다 — `run.json` 의 `evaluation` 에 사유와 함께 적힌다 |
+
+무료 단계만 따로 돌릴 수도 있다 — `--steps catalog,ingest,gates,report`.
+
 ### 구조
 
 ```
@@ -220,6 +242,8 @@ pipeline/    v5 — 작업 대상
   trust.py                 신뢰도 사전 점수 (PER-174). 필터가 아니라 가중치
   trust_weights.json       신호별 가중치 — 코드가 아니라 여기서 고친다
   run_v5.py                단계 레지스트리
+  workspace.py             경로 배치 (PER-194). canonical() 은 기존 상수와 같고, for_run() 은 data/runs/ 로 격리
+  run_url.py               제품 링크 하나로 크롤 → claim 까지. 비용 드는 단계는 --yes 를 요구한다
   test_*.py                계약 테스트 (catalog·policy·ingest·tag·trust·option_norm·gates·polarity·sufficiency)
 legacy/v4/   v4 동결 — 비교 기준선. 고치지 않는다
 crawler/     올리브영 cursor API 크롤러 (상품당 최대 500건)
