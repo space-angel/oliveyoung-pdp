@@ -316,6 +316,29 @@ def generate_one(c, model: str, system: str, target: Target, layout, reviews: di
 # 실행
 # =============================================================================
 
+def check_only() -> None:
+    """러너(`run_v5.py --steps claims`)용 진입점.
+
+    **이 단계는 생성을 대신 돌리지 않는다.** 태깅(`tag:ensure_current`)과 같은
+    이유다 — 외부 API 호출이고 실비가 든다. 여기서 하는 일은 하나다:
+    *지금 있는 산출물이 계약을 통과하는가.* 없으면 **멈추고** 무엇을 돌려야
+    하는지 알려준다.
+
+    생성하려면 인자를 골라야 해서(제품·모델·동시성) 러너가 대신 정할 수 없다.
+    """
+    if not OUT_PATH.exists():
+        raise SystemExit(
+            f"FAIL: 산출물이 없다 ({OUT_PATH.relative_to(ROOT)})\n"
+            "  → .venv/bin/python pipeline/generate.py --products p005,p009,p011,p033,p044\n"
+            "     (LLM 호출 · 실비가 든다. ANTHROPIC_API_KEY 필요)")
+    records, _tags, _catalog = load_inputs()
+    reviews = {r["reviewId"]: r["raw"]["content"] for r in records}
+    rows = [json.loads(l) for l in OUT_PATH.read_text().splitlines() if l.strip()]
+    for row in rows:
+        validate_claim(row, reviews=reviews)
+    print(f"OK: claim {len(rows)}건이 계약을 통과한다 ({OUT_PATH.relative_to(ROOT)})")
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(description="question–answer 쌍 생성 (PER-191)")
     ap.add_argument("--model", default=DEFAULT_MODEL, choices=sorted(MODEL_PROFILES))
