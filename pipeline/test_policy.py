@@ -17,6 +17,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent))
 
 from policy import (  # noqa: E402
+    DEFAULT_SNAPSHOT,
     LIMIT_RENEWAL_UNOBSERVED,
     RECENCY_CUTOFF_MONTH,
     RECENCY_WINDOW_MONTHS,
@@ -27,6 +28,7 @@ from policy import (  # noqa: E402
     RENEWAL_UNOBSERVED,
     SNAPSHOT_LATEST_MONTH,
     PolicyError,
+    SnapshotPolicy,
     assert_snapshot_current,
     month_of,
     recency_cutoff_month,
@@ -177,6 +179,51 @@ class CommittedCatalogUnderPolicy(unittest.TestCase):
         self.assertTrue(renewal_gate(current, "2025.03.01").passed)
         self.assertFalse(renewal_gate(current, "2024.06.01").passed)
 
+
+
+class SnapshotPolicyIsRunScoped(unittest.TestCase):
+    """리센시 윈도우를 실행 단위로 들고 다닌다 (PER-194).
+
+    기본값이 기존 상수와 같아야 한다 — 다르면 25,000건의 컷이 조용히 바뀐다.
+    """
+
+    def test_default_matches_module_constants(self):
+        self.assertEqual(DEFAULT_SNAPSHOT.latest_month, SNAPSHOT_LATEST_MONTH)
+        self.assertEqual(DEFAULT_SNAPSHOT.window, RECENCY_WINDOW_MONTHS)
+        self.assertEqual(DEFAULT_SNAPSHOT.cutoff_month, RECENCY_CUTOFF_MONTH)
+        self.assertFalse(DEFAULT_SNAPSHOT.derived)
+
+    def test_default_still_rejects_newer_snapshot(self):
+        """정본은 새 수집분을 그대로 막는다 — 이 검사가 존재하는 이유다."""
+        with self.assertRaises(PolicyError):
+            DEFAULT_SNAPSHOT.assert_current("2026.09.16")
+
+    def test_derive_takes_the_latest_month_and_marks_itself(self):
+        p = SnapshotPolicy.derive(["2025.01.02", "2026.09.16", "2024.03.30"])
+        self.assertEqual(p.latest_month, "2026-09")
+        self.assertTrue(p.derived, "데이터에서 가져왔다는 사실이 기록에 남아야 한다")
+        p.assert_current("2026.09.16")          # 런은 자기 수집분을 통과시킨다
+
+    def test_derive_needs_reviews(self):
+        with self.assertRaises(PolicyError):
+            SnapshotPolicy.derive([])
+
+    def test_window_moves_with_latest_month(self):
+        p = SnapshotPolicy(latest_month="2026-09")
+        self.assertEqual(p.cutoff_month, "2024-10")     # 24개월 창은 최신 월을 포함한다
+
+    def test_rejects_bad_month_and_window(self):
+        with self.assertRaises(PolicyError):
+            SnapshotPolicy(latest_month="2026-13")
+        with self.assertRaises(PolicyError):
+            SnapshotPolicy(window=0)
+
+    def test_as_dict_says_whether_it_was_derived(self):
+        """런 메타로 나가는 값이다. 어느 창으로 잘랐는지 감추지 않는다."""
+        d = SnapshotPolicy.derive(["2026.09.16"]).as_dict()
+        self.assertEqual(
+            set(d), {"latestMonth", "windowMonths", "cutoffMonth", "derived"})
+        self.assertTrue(d["derived"])
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
